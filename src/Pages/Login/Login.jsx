@@ -1,11 +1,11 @@
 import React from 'react';
-import InputField from '../Components/Inputs/InputField';
-import PasswordInput from '../Components/Inputs/PasswordInput';
-import CheckboxInput from '../Components/Inputs/CheckboxInput';
-import ConnexionButton from '../Components/Buttons/ConnexionButton';
-import SocialButton from '../Components/Buttons/SocialButton';
-import FormOptions from '../Components/Form/FormOptions';
-import styles from '../Styles/Login.module.css'
+import InputField from '../../Components/Inputs/InputField';
+import PasswordInput from '../../Components/Inputs/PasswordInput';
+import CheckboxInput from '../../Components/Inputs/CheckboxInput';
+import ConnexionButton from '../../Components/Buttons/ConnexionButton';
+import SocialButton from '../../Components/Buttons/SocialButton';
+import FormOptions from '../../Components/Form/FormOptions';
+import styles from './Login.module.css'
 
 const Login = () => {
     const handleLogin = (e) => {
@@ -68,14 +68,12 @@ const Login = () => {
                         provider="google"
                         icon="G"
                         onClick={handleGoogleLogin}
-                        className={`${styles.socialButton} ${styles.socialButtonGoogle}`}
                     >
                         Continuer avec Google
                     </SocialButton>
                     <SocialButton
                         provider="apple"
                         onClick={handleAppleLogin}
-                        className={`${styles.socialButton} ${styles.socialButtonApple}`}
                     >
                         Continuer avec Apple
                     </SocialButton>

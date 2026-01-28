@@ -1,0 +1,349 @@
+/* Home.module.css */
+
+/* Container styles */
+.container {
+    min-height: 100vh;
+    background: linear-gradient(to bottom, #f7fafc, #e2e8f0);
+    padding: 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  }
+  
+  /* Header styles */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2d3748;
+  }
+  
+  .avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: #ebf8ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .avatarText {
+    color: #3182ce;
+    font-weight: 600;
+  }
+  
+  /* Greeting styles */
+  .greeting {
+    margin-bottom: 1.5rem;
+  }
+  
+  .greetingLabel {
+    color: #718096;
+  }
+  
+  .greetingName {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2d3748;
+  }
+  
+  /* Balance Card */
+  .balanceCard {
+    background: linear-gradient(to right, #4299e1, #3182ce);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    color: white;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .balanceLabel {
+    font-size: 0.875rem;
+    opacity: 0.9;
+    margin-bottom: 0.25rem;
+  }
+  
+  .balanceAmount {
+    font-size: 1.875rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+  
+  /* Virtual Card */
+  .virtualCard {
+    background: linear-gradient(to right, #2d3748, #1a202c);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  
+  .cardType {
+    font-size: 0.75rem;
+    color: #a0aec0;
+  }
+  
+  .cardNumber {
+    display: flex;
+    align-items: center;
+    margin-top: 0.25rem;
+  }
+  
+  .hiddenNumbers {
+    color: #e2e8f0;
+    font-size: 1.125rem;
+    letter-spacing: 0.1em;
+  }
+  
+  .visibleNumbers {
+    margin-left: 0.5rem;
+    color: #e2e8f0;
+    font-weight: 500;
+  }
+  
+  .cardIcon {
+    color: #f6e05e;
+  }
+  
+  /* Action Buttons */
+  .actionButtons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .actionButton {
+    background-color: white;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .actionButton:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .iconContainer {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+  }
+  
+  .scanIcon {
+    background-color: #ebf8ff;
+  }
+  
+  .scanIcon svg {
+    color: #3182ce;
+  }
+  
+  .rechargeIcon {
+    background-color: #f0fff4;
+  }
+  
+  .rechargeIcon svg {
+    color: #38a169;
+  }
+  
+  .buttonText {
+    font-weight: 500;
+    color: #2d3748;
+  }
+  
+  /* History Section */
+  .historySection {
+    background-color: white;
+    border-radius: 1rem;
+    padding: 1.25rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+  
+  .historyHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .historyTitle {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #2d3748;
+  }
+  
+  .viewAll {
+    color: #3182ce;
+    font-size: 0.875rem;
+    font-weight: 500;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  /* Transactions */
+  .transactionList {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .transactionItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f7fafc;
+  }
+  
+  .transactionItem:last-child {
+    border-bottom: none;
+  }
+  
+  .transactionInfo {
+    display: flex;
+    align-items: center;
+  }
+  
+  .transactionIcon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+  }
+  
+  .amazonIcon {
+    background-color: #fed7d7;
+  }
+  
+  .amazonIcon svg {
+    color: #e53e3e;
+  }
+  
+  .rechargeIconSmall {
+    background-color: #c6f6d5;
+  }
+  
+  .rechargeIconSmall svg {
+    color: #38a169;
+  }
+  
+  .bakeryIcon {
+    background-color: #bee3f8;
+  }
+  
+  .bakeryIcon svg {
+    color: #3182ce;
+  }
+  
+  .transactionDetails h3 {
+    font-weight: 500;
+    color: #2d3748;
+    margin-bottom: 0.25rem;
+  }
+  
+  .transactionDetails p {
+    font-size: 0.75rem;
+    color: #718096;
+  }
+  
+  .transactionAmount {
+    text-align: right;
+  }
+  
+  .transactionAmount p:first-child {
+    font-weight: bold;
+  }
+  
+  .negativeAmount {
+    color: #e53e3e;
+  }
+  
+  .positiveAmount {
+    color: #38a169;
+  }
+  
+  .transactionMethod {
+    font-size: 0.75rem;
+    color: #718096;
+  }
+  
+  /* Bottom Navigation */
+  .bottomNav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: white;
+    border-top: 1px solid #e2e8f0;
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .navButton {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .navButton svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+  
+  .navButton span {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+  }
+  
+  .activeNav {
+    color: #3182ce;
+    font-weight: 500;
+  }
+  
+  .inactiveNav {
+    color: #a0aec0;
+  }
+  
+  /* Responsive */
+  @media (min-width: 640px) {
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+    
+    .bottomNav {
+      max-width: 400px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }

@@ -1,6 +1,6 @@
 // Components/Buttons/SocialButton.jsx
 import React from 'react';
-import styles from '../../Styles/Login.module.css';
+import styles from '../../Pages/Login/Login.module.css'
 
 const SocialButton = ({ provider, children, icon, onClick }) => {
     const buttonClass = provider === 'google' 

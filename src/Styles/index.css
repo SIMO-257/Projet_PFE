@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+<<<<<<< HEAD
 
 /* ممكن تزيدي هنا أي custom CSS */
 
@@ -10,3 +11,5 @@
 body {
   font-family: 'Arial', sans-serif;
 }
+=======
+>>>>>>> origin/main

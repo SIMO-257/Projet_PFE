@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // tailwind.config.js
 module.exports = {
     content: [
@@ -9,3 +10,15 @@ module.exports = {
     plugins: [],
   };
   
+=======
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,jsx,ts,tsx,css}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+};
+>>>>>>> origin/main
