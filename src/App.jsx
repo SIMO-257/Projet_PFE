@@ -1,18 +1,13 @@
-<<<<<<< HEAD
-import Login from "./Pages/Login";
-import WalletApp from "./Pages/Home/Home";
-=======
 import Login from "./Pages/Login/Login";
->>>>>>> origin/main
+import WalletApp from "./Pages/Home/Home";
 
 function App() {
-  
-
   return (
     <>
+      <Login />
       <WalletApp />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
