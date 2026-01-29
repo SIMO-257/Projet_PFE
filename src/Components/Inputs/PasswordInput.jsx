@@ -2,7 +2,7 @@
 import React from 'react';
 import styles from '../../Styles/Auth.module.css'
 
-const PasswordInput = (props) => {
+export default function PasswordInput(props) {
     return (
         <div className={styles.formGroup}>
             <label htmlFor={props.id} className={styles.formLabel}>{props.label}</label>
@@ -16,6 +16,4 @@ const PasswordInput = (props) => {
             />
         </div>
     );
-};
-
-export default PasswordInput;
+}

@@ -10,7 +10,7 @@ import ForgotPassword from '../ForgotPassword/ForgotPassword';
 import SignUp from '../SignUp/SignUp';
 import styles from '../../Styles/Auth.module.css'
 
-const Login = () => {
+export default function Login() {
 
 
     // const { data, setData, post, processing, errors } = useForm({
@@ -115,6 +115,4 @@ const Login = () => {
         </div>
     </>        
     );
-};
-
-export default Login;
+}

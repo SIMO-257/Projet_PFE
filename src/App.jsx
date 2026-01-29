@@ -1,9 +1,11 @@
 import Login from "./Pages/Login/Login";
-
 import SignUp from "./Pages/SignUp/SignUp";
+// import WalletApp from "./Pages/Home/Home";
+import ValidationScreen from "./Pages/ValidationScreen/ValidatinScreen";
+import QRValidationModal from "./Pages/QRValidationModule/QRValidationModal";
+import NFCValidationModal from "./Pages/ValidationNFC/ValidationNFC";
+import ValidationResultModal from "./Pages/ValidationResultModal/ValidationResultModal";
 
-import WalletApp from "./Pages/Home/Home";
-import ValidationScreen from "./Pages/validation/ValidatinScreen";
 import { BrowserRouter } from "react-router-dom";
 
 
@@ -11,7 +13,8 @@ function App() {
   return (
     <>
       <BrowserRouter>
-        <Login />
+
+        <ValidationResultModal/>
 
       </BrowserRouter>
     </>

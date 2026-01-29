@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const NFCValidationModal = () => {
+export default function ValidationNFC() {
   const [showModal, setShowModal] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [validationComplete, setValidationComplete] = useState(false);
@@ -234,6 +234,4 @@ const NFCValidationModal = () => {
       )}
     </>
   );
-};
-
-export default NFCValidationModal;
+}

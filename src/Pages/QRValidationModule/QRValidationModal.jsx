@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
-const QRValidationModal = () => {
+export default function QRValidationModal() {
   const [showModal, setShowModal] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(30); // 30 seconds total
   const [isExpired, setIsExpired] = useState(false);
@@ -273,6 +273,4 @@ const QRValidationModal = () => {
       )}
     </>
   );
-};
-
-export default QRValidationModal;
+}

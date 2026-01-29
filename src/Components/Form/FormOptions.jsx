@@ -2,7 +2,7 @@
 import React from 'react';
 import styles from '../../Styles/Auth.module.css'
 
-const FormOptions = ({ leftContent, rightContent }) => {
+export default function FormOptions({ leftContent, rightContent }) {
     return (
         <div className={styles.formOptions}>
             <div className={styles.formOptionsLeft}>
@@ -13,6 +13,4 @@ const FormOptions = ({ leftContent, rightContent }) => {
             </div>
         </div>
     );
-};
-
-export default FormOptions;
+}

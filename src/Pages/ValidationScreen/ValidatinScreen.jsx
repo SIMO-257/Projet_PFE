@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const ValidationScreen = () => {
+export default function ValidationScreen() {
   const [showNFCModal, setShowNFCModal] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
   const [qrTimeRemaining, setQRTimeRemaining] = useState(30);
@@ -463,6 +463,4 @@ const ValidationScreen = () => {
       </div>
     </>
   );
-};
-
-export default ValidationScreen;
+}

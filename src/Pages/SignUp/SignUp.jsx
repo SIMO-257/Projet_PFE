@@ -2,7 +2,6 @@ import { Link,Route,Routes } from 'react-router-dom';
 // import { useForm } from '@inertiajs/react';
 
 import InputField from '../../Components/Inputs/InputField';
-import PasswordInput from '../../Components/Inputs/PasswordInput';
 import CheckboxInput from '../../Components/Inputs/CheckboxInput';
 import ConnexionButton from '../../Components/Buttons/ConnexionButton';
 import SocialButton from '../../Components/Buttons/SocialButton';
@@ -10,7 +9,7 @@ import FormOptions from '../../Components/Form/FormOptions';
 import Login from '../Login/Login';
 import styles from '../../Styles/Auth.module.css';
 
-const SignUp = () => {
+export default function SignUp() {
 
 
     const { data, setData, post, processing, errors } = useForm({
@@ -138,6 +137,4 @@ Rejoinier l'expérience premium du mobile intelligent
         </div>
     </>
     );
-};
-
-export default SignUp;
+}

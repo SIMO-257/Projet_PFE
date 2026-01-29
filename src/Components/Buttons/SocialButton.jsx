@@ -2,7 +2,7 @@
 import React from 'react';
 import styles from '../../Styles/Auth.module.css'
 
-const SocialButton = ({ provider, children, icon, onClick }) => {
+export default function SocialButton({ provider, children, icon, onClick }) {
     const buttonClass = provider === 'google' 
         ? `${styles.socialButton} ${styles.socialButtonGoogle}`
         : `${styles.socialButton} ${styles.socialButtonApple}`;
@@ -16,6 +16,4 @@ const SocialButton = ({ provider, children, icon, onClick }) => {
             {children}
         </button>
     );
-};
-
-export default SocialButton;
+}

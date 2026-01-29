@@ -2,7 +2,7 @@
 import React from 'react';
 import styles from '../../Styles/Auth.module.css'
 
-const ConnexionButton = ({ children, type = 'button', variant = 'primary', onClick, disabled = false }) => {
+export default function ConnexionButton({ children, type = 'button', variant = 'primary', onClick, disabled = false }) {
     const buttonClass = variant === 'primary' 
         ? `${styles.authButton} ${styles.authButtonPrimary}`
         : styles.authButton;
@@ -17,6 +17,4 @@ const ConnexionButton = ({ children, type = 'button', variant = 'primary', onCli
             {children}
         </button>
     );
-};
-
-export default ConnexionButton;
+}

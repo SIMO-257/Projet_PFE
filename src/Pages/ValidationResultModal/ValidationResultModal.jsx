@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const ValidationResultModal = () => {
+export default function ValidationResultModal() {
   const [showModal, setShowModal] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
 
@@ -292,6 +292,4 @@ const ValidationResultModal = () => {
       )}
     </>
   );
-};
-
-export default ValidationResultModal;
+}

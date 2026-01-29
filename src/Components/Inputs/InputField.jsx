@@ -2,7 +2,7 @@
 import React from 'react';
 import styles from '../../Styles/Auth.module.css'
 
-const InputField = (props) => {
+export default function InputField(props) {
     return (
         <div className={styles.formGroup}>
             <label htmlFor={props.id} className={styles.formLabel}>{props.label}</label>
@@ -17,6 +17,4 @@ const InputField = (props) => {
             />
         </div>
     );
-};
-
-export default InputField;
+}
