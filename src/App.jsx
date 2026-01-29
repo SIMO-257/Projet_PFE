@@ -1,14 +1,18 @@
 import Login from "./Pages/Login/Login";
+
 import SignUp from "./Pages/SignUp/SignUp";
 
-function App() {
-  
+import WalletApp from "./Pages/Home/Home";
 
+
+function App() {
   return (
     <>
-    <SignUp/>
+
+    <WalletApp />
+
     </>
-  )
+  );
 }
 
-export default App
+export default App;
