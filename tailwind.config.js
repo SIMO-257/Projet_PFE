@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 // tailwind.config.js
 module.exports = {
     content: [
@@ -9,8 +9,7 @@ module.exports = {
     },
     plugins: [],
   };
-  
-=======
+
 export default {
   content: [
     "./index.html",
@@ -21,4 +20,4 @@ export default {
   },
   plugins: [],
 };
->>>>>>> origin/main
+
