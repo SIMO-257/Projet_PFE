@@ -1,17 +1,18 @@
 // Components/Inputs/PasswordInput.jsx
 import React from 'react';
-import styles from '../../Pages/Login/Login.module.css'
+import styles from '../../Styles/Auth.module.css'
 
-const PasswordInput = ({ label, placeholder, id, required = false }) => {
+const PasswordInput = (props) => {
     return (
         <div className={styles.formGroup}>
-            <label htmlFor={id} className={styles.formLabel}>{label}</label>
+            <label htmlFor={props.id} className={styles.formLabel}>{props.label}</label>
             <input
                 type="password"
-                id={id}
-                placeholder={placeholder}
+                id={props.id}
+                placeholder={props.placeholder}
                 className={styles.formInput}
-                required={required}
+                
+                required={props.required}
             />
         </div>
     );

@@ -1,17 +1,19 @@
 // Components/Inputs/InputField.jsx
 import React from 'react';
-import styles from '../../Pages/Login/Login.module.css'
+import styles from '../../Styles/Auth.module.css'
 
-const InputField = ({ label, type = 'text', placeholder, id, required = false }) => {
+const InputField = (props) => {
     return (
         <div className={styles.formGroup}>
-            <label htmlFor={id} className={styles.formLabel}>{label}</label>
+            <label htmlFor={props.id} className={styles.formLabel}>{props.label}</label>
             <input
-                type={type}
-                id={id}
-                placeholder={placeholder}
+                type={props.type}
+                id={props.id}
+                placeholder={props.placeholder}
                 className={styles.formInput}
-                required={required}
+                value={props.var}
+                onChange={props.setVar}
+                required={props.required}
             />
         </div>
     );

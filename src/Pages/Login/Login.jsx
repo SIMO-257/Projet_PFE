@@ -1,13 +1,29 @@
-import React from 'react';
+import { Link,Route,Routes } from 'react-router-dom';
+// import { useForm } from '@inertiajs/react';
+
 import InputField from '../../Components/Inputs/InputField';
-import PasswordInput from '../../Components/Inputs/PasswordInput';
 import CheckboxInput from '../../Components/Inputs/CheckboxInput';
 import ConnexionButton from '../../Components/Buttons/ConnexionButton';
 import SocialButton from '../../Components/Buttons/SocialButton';
 import FormOptions from '../../Components/Form/FormOptions';
-import styles from './Login.module.css'
+import ForgotPassword from '../ForgotPassword/ForgotPassword';
+import SignUp from '../SignUp/SignUp';
+import styles from '../../Styles/Auth.module.css'
 
 const Login = () => {
+
+
+    // const { data, setData, post, processing, errors } = useForm({
+    //     login_email: '',
+    //     login_password: '',
+    //     remember_me: false,
+    // });
+ 
+
+    const Log_in = () =>{
+        // post('/login')
+    }
+
     const handleLogin = (e) => {
         e.preventDefault();
         console.log('Login submitted');
@@ -22,7 +38,12 @@ const Login = () => {
     };
 
     return (
-        <div className={styles.authContainer}>
+    <>
+            <Routes>
+                <Route path='/forgot_password' element={<ForgotPassword/>}/>
+                <Route path='/create_acount' element={<SignUp/>}/>
+            </Routes>
+            <div className={styles.authContainer}>
             <div className={styles.authCard}>
                 <header className={styles.authHeader}>
                     <h1 className={styles.authLogo}>CasaWay</h1>
@@ -33,25 +54,30 @@ const Login = () => {
                     </p>
                 </header>
 
-                <form className={styles.authForm} onSubmit={handleLogin}>
+                <form className={styles.authForm} onSubmit={Log_in}>
                     <InputField
                         label="Email"
                         type="email"
                         placeholder="votre@email.com"
                         id="login-email"
+                        var={data.login_email}
+                        setVar={()=>setData('login_email',e.target.value)}
                         required
                     />
 
-                    <PasswordInput
+                    <InputField
                         label="Mot de passe"
+                        type="password"
                         placeholder="********"
                         id="login-password"
+                        var={data.login_password}
+                        setVar={()=>setData('login_password',e.target.value)}
                         required
                     />
-
+                  
                     <FormOptions
-                        leftContent={<CheckboxInput label="Se souvenir" id="remember" />}
-                        rightContent={<a href="#" className={styles.forgotPassword}>Mot de passe oublié?</a>}
+                        leftContent={<CheckboxInput label="Se souvenir" id="remember" setCheck={()=>setData('remember_me',!remember_me)} check={data.remember_me} />}
+                        rightContent={<Link to="/forgot_password" className={styles.forgotPassword} >Mot de passe oublié?</Link>}
                     />
 
                     <ConnexionButton type="submit" variant="primary">
@@ -82,11 +108,12 @@ const Login = () => {
                 <div className={styles.authFooter}>
                     <p>
                         Pas encore membre?{' '}
-                        <a href="/signup" className={styles.authLink}>Créer un compte</a>
+                        <Link to="/create_acount" className={styles.authLink}>Créer un compte</Link>
                     </p>
                 </div>
             </div>
         </div>
+    </>        
     );
 };
 
