@@ -6,6 +6,7 @@ import ValidationScreen from "./Pages/ValidationScreen/ValidatinScreen";
 import QRValidationModal from "./Pages/QRValidationModule/QRValidationModal";
 import NFCValidationModal from "./Pages/ValidationNFC/ValidationNFC";
 import ValidationResultModal from "./Pages/ValidationResultModal/ValidationResultModal";
+import MyTickets from "./Pages/MyTickets/MyTickets";
 
 import { BrowserRouter } from "react-router-dom";
 
@@ -15,7 +16,7 @@ function App() {
     <>
       <BrowserRouter>
 
-        <ForgotPassword/>
+        <MyTickets/>
 
       </BrowserRouter>
     </>
