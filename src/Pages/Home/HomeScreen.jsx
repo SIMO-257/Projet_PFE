@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import Header from '../components/Layout/Header';
-import BalanceCard from '../components/Cards/BalanceCard';
-import ActionButtonCard from '../components/Cards/ActionButtonCard';
-import NotificationButton from '../components/UI/NotificationButton';
-import BottomNavigation from '../components/Layout/BottomNavigation';
-import styles from '../styles/HomeScreen.module.css';
+import Header from '../../Components/Layout/Header';
+import BalanceCard from '../../Components/Cards/BalanceCard';
+import ActionButtonCard from '../../Components/Cards/ActionButtonCard';
+import NotificationButton from '../../Components/UI/NotificationButton';
+import BottomNavigation from '../../Components/Layout/BottomNavigation';
+import styles from '../../Styles/HomeScreen.module.css';
 
 const HomeScreen = () => {
   const [activeTab, setActiveTab] = useState('home');
