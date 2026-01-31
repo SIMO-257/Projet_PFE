@@ -8,7 +8,7 @@ import QRValidationModal from "./Pages/QRValidationModule/QRValidationModal";
 import NFCValidationModal from "./Pages/ValidationNFC/ValidationNFC";
 import ValidationResultModal from "./Pages/ValidationResultModal/ValidationResultModal";
 
-import { BrowserRouter } from "react-router-dom";
+//import { BrowserRouter } from "react-router-dom";
 
 
 function App() {
