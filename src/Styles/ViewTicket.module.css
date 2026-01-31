@@ -1,0 +1,118 @@
+.pageContainer {
+  min-height: 100vh;
+  background-color: #0a0e27;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.container {
+  max-width: 400px;
+  width: 100%;
+  background-color: #0a0e27;
+  color: #fff;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 16px 0;
+  gap: 20px;
+}
+
+.headerIcon {
+  cursor: pointer;
+}
+
+.headerTitle {
+  font-size: 1.125rem;
+  font-weight: 500;
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+.statusCard {
+  background-color: #d4af37;
+  border-radius: 16px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.statusTitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 2px;
+}
+
+.statusSubtitle {
+  font-size: 0.8rem;
+  color: #fff;
+  opacity: 0.9;
+}
+
+.detailsCard {
+  background-color: #1a1f3a;
+  border-radius: 24px;
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.detailItem {
+  margin-bottom: 24px;
+}
+
+.detailItem:last-child {
+  margin-bottom: 0;
+}
+
+.detailHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.iconContainer {
+  background-color: #d4af37;
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.detailLabel {
+  font-size: 0.75rem;
+  color: #8b92b0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detailValue {
+  font-size: 1.125rem;
+  font-weight: 500;
+  padding-left: 44px;
+}
+
+.footer {
+  text-align: center;
+}
+
+.footerLink {
+  color: #d4af37;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.footerLink:hover {
+  text-decoration: underline;
+}

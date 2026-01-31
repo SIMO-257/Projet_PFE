@@ -1,10 +1,11 @@
 import styles from '../../Styles/Ticket.module.css';
 import Ticket from "../../Components/Cards/Ticket";
+import PurchaseCard from '../../Components/Cards/PurchaseCard';
 import NavBar from "../../Components/NavBar/NavBar";
+import { useNavigate } from 'react-router-dom';
 export default function MyTickets(){
 
-
-
+  const navigate = useNavigate();
   const tickets = [
     {
       id: 1,
@@ -13,11 +14,15 @@ export default function MyTickets(){
       description: "Valid for one journey",
       price: "8 DH",
       validInfo: "Valid until",
+      validPeriod:"7 jours",
       validTime: "18:30 Today",
       buttonText: "View Ticket",
       buttonVariant: "primary",
       isActive: true
-    },
+    }
+  ];
+  
+  const purchases = [
     {
       id: 2,
       title: "Daily Ticket",
@@ -75,11 +80,12 @@ export default function MyTickets(){
 
       <main className={styles.mainContent}>
         {tickets.map((ticket) => (
-            <Ticket ticket={ticket}/>
+            <Ticket ticket={ticket} navigate={navigate}/>
+        ))}
+        {purchases.map((p) => (
+            <PurchaseCard purchase={p} navigate={navigate}/>
         ))}
       </main>
-
-      {/* Navigation Footer */}
 
       <NavBar/>
      
