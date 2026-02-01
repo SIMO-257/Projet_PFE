@@ -1,0 +1,511 @@
+.container {
+    min-height: 100vh;
+    background-color: #2a1a1a;
+    padding: 1rem;
+}
+
+@media (min-width: 768px) {
+    .container {
+        padding: 1.5rem;
+    }
+}
+
+/* Progress Steps */
+.progressContainer {
+    max-width: 42rem;
+    margin: 0 auto 2rem;
+}
+
+.progressSteps {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.stepGroup {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.stepGroup:last-child {
+    flex: 0;
+}
+
+.stepWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.stepCircle {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1.125rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: scale(1);
+}
+
+.stepCircleActive {
+    background-color: #8b6f47;
+    color: white;
+    animation: scaleIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stepClickable {
+    cursor: pointer;
+}
+
+.stepClickable:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 20px -5px rgba(139, 111, 71, 0.4);
+}
+
+.stepCircleInactive {
+    background-color: #4a2a2a;
+    color: #9ca3af;
+}
+
+.stepLabel {
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.4s ease-in-out;
+}
+
+.stepLabelActive {
+    color: #8b6f47;
+    animation: fadeIn 0.5s ease-in-out 0.2s both;
+}
+
+.stepLabelInactive {
+    color: #6b7280;
+    opacity: 0.6;
+}
+
+.progressLineWrapper {
+    flex: 1;
+    padding: 0 1rem;
+    margin-bottom: 2rem;
+}
+
+.progressLine {
+    height: 0.125rem;
+    background-color: #4a2a2a;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease-in-out;
+}
+
+.progressLineActive {
+    background-color: #8b6f47;
+    animation: fillLine 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both;
+}
+
+.progressLineActive::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.3) 50%, 
+        transparent 100%);
+    animation: shimmer 1s ease-in-out;
+}
+
+/* Progress Animations */
+@keyframes scaleIn {
+    0% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-0.5rem);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fillLine {
+    0% {
+        transform: scaleX(0);
+        transform-origin: left;
+    }
+    100% {
+        transform: scaleX(1);
+        transform-origin: left;
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* Responsive Progress Steps */
+@media (max-width: 640px) {
+    .stepCircle {
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 1rem;
+    }
+    
+    .stepLabel {
+        font-size: 0.75rem;
+    }
+    
+    .progressLineWrapper {
+        padding: 0 0.5rem;
+    }
+}
+
+.mainContent {
+    max-width: 42rem;
+    margin: 0 auto;
+}
+
+.card {
+    background-color: #3d1f1f;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    border: 1px solid #5a3a3a;
+}
+
+.header {
+    background: linear-gradient(to bottom, #4a2626, #3d1f1f);
+    padding: 1.5rem;
+    border-bottom: 1px solid #5a3a3a;
+}
+
+.headerContent {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.headerTitle {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: white;
+}
+
+.closeButton {
+    color: #9ca3af;
+    transition: color 0.2s;
+}
+
+.closeButton:hover {
+    color: white;
+}
+
+.closeIcon {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.content {
+    padding: 1.5rem;
+}
+
+.ticketSummary {
+    background-color: #2d1616;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #4a2a2a;
+}
+
+.ticketHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.ticketInfo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.ticketDot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background-color: #8b6f47;
+}
+
+.ticketType {
+    color: white;
+    font-weight: 500;
+}
+
+.ticketPrice {
+    color: white;
+    font-weight: 700;
+}
+
+.ticketDescription {
+    color: #9ca3af;
+    font-size: 0.875rem;
+    padding-left: 1.25rem;
+}
+
+.sectionTitle {
+    color: white;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.quantityCard {
+    background-color: #2d1616;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #4a2a2a;
+}
+
+.quantityHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.quantityLabel {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.radioOuter {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 9999px;
+    border: 2px solid #8b6f47;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.radioInner {
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: 9999px;
+    background-color: #8b6f47;
+}
+
+.quantityText {
+    color: white;
+    font-weight: 500;
+}
+
+.chevronIcon {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: #9ca3af;
+}
+
+.quantityControls {
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.quantityButtons {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.quantityButton {
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #3d1f1f;
+    border-radius: 0.25rem;
+    border: 1px solid #5a3a3a;
+    color: white;
+    transition: background-color 0.2s;
+    font-size: 1.125rem;
+}
+
+.quantityButton:hover {
+    background-color: #4a2626;
+}
+
+.quantityDisplay {
+    width: 3rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #3d1f1f;
+    border: 1px solid #5a3a3a;
+    border-radius: 0.25rem;
+}
+
+.quantityNumber {
+    color: white;
+    font-weight: 600;
+}
+
+.priceSection {
+    text-align: right;
+}
+
+.totalPrice {
+    color: #8b6f47;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.priceDetails {
+    color: #9ca3af;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+.termsContainer {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    cursor: pointer;
+}
+
+.termsContainer:hover .termsText {
+    color: white;
+}
+
+.checkboxWrapper {
+    margin-top: 0.125rem;
+}
+
+.checkbox {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 0.25rem;
+    border-color: #5a3a3a;
+    background-color: #2d1616;
+    color: #8b6f47;
+}
+
+.checkbox:focus {
+    --tw-ring-color: #8b6f47;
+    --tw-ring-offset-width: 0;
+}
+
+.termsText {
+    color: #d1d5db;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    transition: color 0.2s;
+}
+
+.termsLink {
+    color: #8b6f47;
+    text-decoration: underline;
+}
+
+.termsLink:hover {
+    color: #a08558;
+}
+
+.continueButton {
+    width: 100%;
+    background: linear-gradient(to right, #6b4423, #8b6f47);
+    color: white;
+    font-weight: 600;
+    padding: 1rem 1.5rem;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: all 0.2s;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem;
+    border: none;
+    cursor: pointer;
+}
+
+.continueButton:hover {
+    background: linear-gradient(to right, #7a5129, #9d7d52);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.paymentMethodsFooter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid #4a2a2a;
+}
+
+.paymentIcon {
+    background-color: white;
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.paymentIconText {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.paymentIconRed {
+    color: #dc2626;
+}
+
+.paymentMoreText {
+    color: #6b7280;
+    font-size: 0.75rem;
+}
+
+.securityNotice {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.securityContent {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: #9ca3af;
+    font-size: 0.75rem;
+}
+
+.securityIcon {
+    width: 1rem;
+    height: 1rem;
+}

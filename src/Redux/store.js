@@ -1,8 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
-import TickReducer from './Slices/ticketsslice';
+import TicketsReducer from "./Slices/TicketsSlice";
+import PurchasesReducer from "./Slices/PurchaseseSlice";
 const store = configureStore({
     reducer:{
-        Tickets:TickReducer
+        Tickets:TicketsReducer,
+        Purchases:PurchasesReducer
     }
 })
 export default store

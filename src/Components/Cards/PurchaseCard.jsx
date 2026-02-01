@@ -4,7 +4,7 @@ import CardButton from '../Buttons/CardButton';
 export default function PurchaseCard(props){
 
 const purchase_ticket = ()=>{
-  props.navigate(`/viewticket/${props.purchase.id}`)
+  props.navigate(`/ticketselection/${props.purchase.id}`)
 }
   return (
    

@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 export default function MyTickets(){
 
   const navigate = useNavigate();
+  
   const tickets = [
     {
       id: 1,
