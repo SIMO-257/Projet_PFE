@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import Header from '../../components/Layout/Header';
-import BalanceCard from '../../components/Cards/BalanceCard';
-import ActionButtonCard from '../../components/Cards/ActionButtonCard';
-import BottomNavigation from '../../components/Layout/BottomNavigation';
-import TransactionItem from '../../components/Cards/TransactionItem';
-import SectionHeader from '../../components/Layout/SectionHeader';
-import styles from '../../styles/WalletScreen.module.css';
+import Header from '../../Components/Layout/Header';
+import BalanceCard from '../../Components/Cards/BalanceCard';
+import ActionButtonCard from '../../Components/Cards/ActionButtonCard';
+import BottomNavigation from '../../Components/Layout/BottomNavigation';
+import TransactionItem from '../../Components/Cards/TransactionItem';
+import SectionHeader from '../../Components/Layout/SectionHeader';
+import styles from '../../Styles/WalletScreen.module.css';
 
 const WalletScreen = () => {
   const [activeTab, setActiveTab] = useState('wallet');

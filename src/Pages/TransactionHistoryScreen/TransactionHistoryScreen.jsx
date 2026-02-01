@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import Header from '../../components/Layout/Header';
-import FilterTabs from '../../components/UI/FilterTabs';
-import SummaryCard from '../../components/Cards/SummaryCard';
-import TransactionGroup from '../../components/Layout/TransactionGroup';
-import ActionButtonCard from '../../components/Cards/ActionButtonCard';
-import styles from '../../styles/TransactionHistoryScreen.module.css';
+import Header from '../../Components/Layout/Header';
+import FilterTabs from '../../Components/UI/FilterTabs';
+import SummaryCard from '../../Components/Cards/SummaryCard';
+import TransactionGroup from '../../Components/Layout/TransactionGroup';
+import ActionButtonCard from '../../Components/Cards/ActionButtonCard';
+import styles from '../../Styles/TransactionHistoryScreen.module.css';
 
 const TransactionHistoryScreen = () => {
   const [activeFilter, setActiveFilter] = useState('Tous');

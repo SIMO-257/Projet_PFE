@@ -1,6 +1,6 @@
 import React from 'react';
 import NavButton from '../Buttons/NavButton';
-import styles from '../../styles/HomeScreen.module.css';
+import styles from '../../Styles/HomeScreen.module.css';
 
 const BottomNavigation = ({ activeTab = 'validation', onNavigate }) => {
     const navItems = [

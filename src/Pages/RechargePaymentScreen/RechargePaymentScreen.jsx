@@ -6,7 +6,7 @@ import ActionButtonCard from '../../Components/Cards/ActionButtonCard';
 import SavedCardItem from '../../Components/Cards/SavedCardItem';
 import PaymentSummary from '../../Components/Cards/PaymentSummary';
 import CheckboxInput from '../../Components/Inputs/CheckboxInput';
-import styles from '../../styles/RechargePaymentScreen.module.css';
+import styles from '../../Styles/RechargePaymentScreen.module.css';
 
 const RechargePaymentScreen = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('card');
