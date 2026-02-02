@@ -5,7 +5,7 @@ import SignUp from "./Pages/SignUp/SignUp";
 import ForgotPassword from "./Pages/ForgotPassword/ForgotPassword";
 import HomeScreen from "./Pages/Home/HomeScreen";
 import ViewTicket from "./Pages/ViewTicket/ViewTicket";
-import TicketSelection from "./Pages/TicketSelection/TicketSelection";
+// import TicketSelection from "./Pages/TicketSelection/TicketSelection";
 import MyTickets from "./Pages/MyTickets/MyTickets";
 import Paiment from "./Pages/Paiment/Paiment";
 
@@ -15,11 +15,11 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<MyTickets />} />
+          <Route path="/" element={<Paiment />} />
           <Route path="/viewticket/:id" element={<ViewTicket />} />
-          <Route path="/ticketselection/:id/:cardid?" element={<TicketSelection />}>
+          {/* <Route path="/ticketselection/:id/:cardid?" element={<TicketSelection />}>
             <Route path="paiment" element={<Paiment />} />
-          </Route>
+          </Route> */}
         </Routes>
       </BrowserRouter>
     </>
