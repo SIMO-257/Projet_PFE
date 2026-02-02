@@ -1,79 +1,54 @@
-import styles from '../../Styles/TicketSelection.module.css'; // Assuming similar styles
+import React from 'react';
+import { useState } from 'react';
 import PaymentMethod from '../../Components/Payment/PaymentMethod';
-import PaymentSummary from '../../Components/Payment/PaymentSummary';
-import PaymentButton from '../../Components/Buttons/PaymentButton';
 import TicketInfo from '../../Components/Payment/TicketInfo';
-
-import { useForm } from '@inertiajs/react';
-import { useState, useEffect } from 'react';
+import PaymentButton from '../../Components/Buttons/PaymentButton';
+import PaymentSummary from '../../Components/Payment/PaymentSummary';
+import styles from '../../Styles/Paiment.module.css';
 
 export default function Paiment() {
-
-    // const fetch_paiment = useForm({
-    //     id: props.p
-    // });
-
-    // useEffect(() => {
-
-    //     fetch_purchase.get('/paiment', {
-
-    //         onSuccess: (page) => {
-
-    //             setPurchase(page.props.paiment);
-
-    //         },
-    //     });
-    // }, []);
-    
-
-    // App.jsx (Main Component)
-
-
-
-
-  const [selectedMethod, setSelectedMethod] = useState('carte_virtuelle');
+  const [selectedMethod, setSelectedMethod] = useState('card');
   const [acceptTerms, setAcceptTerms] = useState(false);
   
   const paymentMethods = [
     {
-      id: 'carte_virtuelle',
+      id: 'card',
       title: 'Carte virtuelle',
+      icon: '💳',
       details: [
         { label: 'Sonde d\'approbation', value: '42,50 €' },
         { label: 'Numéro', value: '*** 7905' }
       ],
-      note: 'Sens débité immédiatement',
-      icon: '💳'
+      note: 'Sens débité immédiatement'
     },
     {
-      id: 'carte_bancaire',
+      id: 'bank',
       title: 'Carte bancaire',
+      icon: '💳',
       details: [
         { label: 'Visa', value: '***** 4532' },
         { label: 'Expire', value: '12/27' }
       ],
-      note: 'Paiement évalué par Stripe',
-      icon: '💳',
-      hasAddButton: true
+      note: 'Paiement évalué par Stripe'
     },
     {
-      id: 'portefeuille',
+      id: 'portfolio',
       title: 'Portefeuille',
+      icon: '💰',
       details: [
         { label: 'Solde', value: '42,50 €' },
         { label: 'Disponible', value: 'Solde suffisant' }
       ],
-      note: 'Solde suffisant',
-      icon: '💰'
+      note: 'Solde suffisant'
     },
     {
-      id: 'apple_pay',
+      id: 'apple',
       title: 'Apple Pay',
+      icon: '🍎',
       details: [
         { label: 'Numéro', value: '***** 8901' }
       ],
-      note: 'Paiement en un tap sécurisé',
-      icon: '🍎'
+      note: 'Paiement en un tap sécurisé'
     }
   ];
 
@@ -91,7 +66,7 @@ export default function Paiment() {
     alert(`Paiement de ${ticketInfo.total} confirmé avec ${selectedMethod}`);
   };
 
-return (
+  return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">Paiement</h1>
@@ -122,7 +97,7 @@ return (
             </div>
           </div>
           
-          {/* Payment Summary - NEW SECTION */}
+          {/* Payment Summary */}
           <PaymentSummary ticketInfo={ticketInfo} />
           
           {/* Ticket Details */}
@@ -177,7 +152,4 @@ return (
       </div>
     </div>
   );
-
-    
-
 }

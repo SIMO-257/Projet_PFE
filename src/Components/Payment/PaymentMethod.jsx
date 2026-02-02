@@ -1,46 +1,105 @@
 // components/PaymentMethod.jsx
-import React from 'react';
+
+import styles from '../../Styles/Paiment.module.css';
 
 const PaymentMethod = ({ method, isSelected, onSelect }) => {
+  const cardStyle = isSelected ? {
+    '--bg-from': method.bgColor.split(', ')[0],
+    '--bg-to': method.bgColor.split(', ')[1],
+    '--border-color': method.borderColor
+  } : {};
+
   return (
     <div 
-      className={`border rounded-xl p-4 cursor-pointer transition-all duration-200 ${
-        isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'
-      }`}
+      className={isSelected ? styles.methodCardSelected : styles.methodCardUnselected}
       onClick={onSelect}
+      style={cardStyle}
     >
-      <div className="flex items-start justify-between">
-        <div>
-          <div className="flex items-center">
-            <span className="mr-2 text-xl">{method.icon}</span>
-            <h4 className="font-medium text-gray-800">{method.title}</h4>
-          </div>
-          
-          <div className="mt-3 space-y-1">
-            {method.details.map((detail, index) => (
-              <div key={index} className="flex justify-between">
-                <span className="text-gray-600 text-sm">{detail.label}</span>
-                <span className={`font-medium ${detail.label === 'Solde' ? 'text-green-600' : 'text-gray-800'}`}>
-                  {detail.value}
-                </span>
-              </div>
-            ))}
-          </div>
-          
-          <p className="text-sm text-gray-500 mt-3">{method.note}</p>
+      <div className={styles.methodHeader}>
+        <div className={styles.methodTitleWrapper}>
+          {method.id === 'apple' ? (
+            <>
+              <svg className={styles.appleIcon} viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+              </svg>
+              <span className={styles.methodTitle}>{method.title}</span>
+            </>
+          ) : (
+            <>
+              <span className={styles.methodIcon}>{method.icon}</span>
+              <span className={styles.methodTitle}>{method.title}</span>
+            </>
+          )}
+          {method.id === 'bank' && (
+            <svg className={styles.methodInfoIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          )}
         </div>
         
-        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-          isSelected ? 'border-blue-500' : 'border-gray-300'
-        }`}>
-          {isSelected && <div className="w-3 h-3 bg-blue-500 rounded-full"></div>}
+        <div className={isSelected ? styles.radioButtonSelected : styles.radioButtonUnselected}>
+          {isSelected && <div className={styles.radioButtonInner}></div>}
         </div>
       </div>
       
-      {method.hasAddButton && (
-        <button className="mt-4 text-blue-600 text-sm font-medium flex items-center">
-          <span className="mr-1">+</span> Ajouter une nouvelle carte
-        </button>
+      {/* Card Virtual - Expanded View */}
+      {method.id === 'card' && isSelected && (
+        <div>
+          <div className={styles.cardChipsWrapper}>
+            <div className={styles.cardChip}></div>
+            <div className={styles.cardChip}></div>
+          </div>
+          <p className={styles.cardSubtext}>Sous-options</p>
+          <p className={styles.cardBalance}>{method.balance}</p>
+          <p className={styles.cardType}>{method.cardType}</p>
+          <div className={styles.cardNote}>
+            <svg className={styles.cardNoteIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{method.note}</span>
+          </div>
+        </div>
+      )}
+      
+      {/* Bank Card */}
+      {method.id === 'bank' && (
+        <>
+          <div className={styles.bankCardNumber}>
+            <p className={styles.bankCardNumberText}>{method.cardNumber}</p>
+          </div>
+          {!isSelected && (
+            <p className={styles.bankNote}>{method.note}</p>
+          )}
+        </>
+      )}
+      
+      {/* Portfolio */}
+      {method.id === 'portfolio' && (
+        <div className={styles.portfolioWrapper}>
+          <p className={styles.portfolioBalance}>{method.balance}</p>
+          <p className={styles.portfolioLabel}>Solde disponible</p>
+          {isSelected && (
+            <div className={styles.portfolioStatus}>
+              <svg className={styles.portfolioCheckIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              <span className={styles.portfolioStatusText}>{method.note}</span>
+            </div>
+          )}
+        </div>
+      )}
+      
+      {/* Apple Pay */}
+      {method.id === 'apple' && (
+        <div className={styles.applePayWrapper}>
+          <div className={styles.applePayInfo}>
+            <span className={styles.applePayCardNumber}>{method.cardNumber}</span>
+            {method.express && (
+              <span className={styles.applePayBadge}>Express</span>
+            )}
+          </div>
+          <p className={styles.applePayNote}>{method.note}</p>
+        </div>
       )}
     </div>
   );
