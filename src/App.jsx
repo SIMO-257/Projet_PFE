@@ -8,6 +8,8 @@ import ViewTicket from "./Pages/ViewTicket/ViewTicket";
 // import TicketSelection from "./Pages/TicketSelection/TicketSelection";
 import MyTickets from "./Pages/MyTickets/MyTickets";
 import Paiment from "./Pages/Paiment/Paiment";
+import ConfirmationPaiment from "./Pages/ConfirmationPaiment/ConfirmationPaiment";
+import PaimentHistory from "./Pages/PaimentHistory/PaimentHistory";
 
 
 function App() {
@@ -15,7 +17,7 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Paiment />} />
+          <Route path="/" element={<PaimentHistory />} />
           <Route path="/viewticket/:id" element={<ViewTicket />} />
           {/* <Route path="/ticketselection/:id/:cardid?" element={<TicketSelection />}>
             <Route path="paiment" element={<Paiment />} />

@@ -1,0 +1,464 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.appContainer {
+    min-height: 100vh;
+    background: linear-gradient(180deg, #3d1515 0%, #2d0f0f 100%);
+    padding: 0;
+    font-family: 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.container {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 5rem 1rem;
+    color: #fff;
+}
+
+/* Header */
+.header {
+    margin-bottom: 1.5rem;
+}
+
+.headerTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.mainTitle {
+    font-size: 1.8rem;
+    color: #fff;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+.headerActions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.iconButton {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.iconButton svg {
+    width: 20px;
+    height: 20px;
+    stroke: rgba(255, 255, 255, 0.8);
+    stroke-width: 2;
+}
+
+.iconButton:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(212, 175, 119, 0.3);
+}
+
+/* Filter Tabs */
+.filterTabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.filterTabs::-webkit-scrollbar {
+    display: none;
+}
+
+.tab {
+    padding: 0.5rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: transparent;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    font-family: 'Sora', sans-serif;
+}
+
+.tab:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+}
+
+.tabActive {
+    background: rgba(212, 175, 119, 0.2);
+    color: #d4af77;
+    border-color: rgba(212, 175, 119, 0.4);
+}
+
+/* Date Filters */
+.dateFilters {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.dateFilters::-webkit-scrollbar {
+    display: none;
+}
+
+.dateFilter {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: rgba(212, 175, 119, 0.1);
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.6);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    font-family: 'Sora', sans-serif;
+}
+
+.dateFilter:hover {
+    background: rgba(212, 175, 119, 0.15);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.dateFilterActive {
+    background: linear-gradient(135deg, #d4af77 0%, #c19a5f 100%);
+    color: #2d0f0f;
+    font-weight: 600;
+}
+
+/* Statistics Section */
+.statisticsSection {
+    background: rgba(20, 10, 10, 0.5);
+    border: 1px solid rgba(212, 175, 119, 0.2);
+    border-radius: 16px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    backdrop-filter: blur(10px);
+    animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.sectionTitle {
+    font-size: 1.1rem;
+    color: #fff;
+    font-weight: 600;
+}
+
+.expandButton {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+}
+
+.expandButton svg {
+    width: 20px;
+    height: 20px;
+    stroke: rgba(255, 255, 255, 0.6);
+    stroke-width: 2;
+    transition: transform 0.3s ease;
+}
+
+.expandButton:hover svg {
+    stroke: #d4af77;
+}
+
+.statsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.statCard {
+    background: rgba(30, 15, 15, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    gap: 0.75rem;
+}
+
+.statIcon {
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    background: rgba(212, 175, 119, 0.15);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.statIcon svg {
+    width: 20px;
+    height: 20px;
+    stroke: #d4af77;
+    stroke-width: 2;
+}
+
+.statContent {
+    flex: 1;
+}
+
+.statLabel {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 0.25rem;
+    font-weight: 400;
+}
+
+.statValue {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.25rem;
+    line-height: 1.2;
+}
+
+.statSubLabel {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.statTrend {
+    font-size: 0.75rem;
+    color: #4ade80;
+    font-weight: 500;
+}
+
+.statTrend.negative {
+    color: #f87171;
+}
+
+/* Day Section */
+.daySection {
+    margin-bottom: 1.5rem;
+    animation: fadeInUp 0.5s ease-out;
+    animation-fill-mode: backwards;
+}
+
+.daySection:nth-child(3) {
+    animation-delay: 0.1s;
+}
+
+.daySection:nth-child(4) {
+    animation-delay: 0.2s;
+}
+
+.daySection:nth-child(5) {
+    animation-delay: 0.3s;
+}
+
+.dayHeader {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0.75rem;
+    font-weight: 500;
+}
+
+.ticketList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* Ticket Card */
+.ticketCard {
+    background: rgba(20, 10, 10, 0.6);
+    border: 1px solid rgba(212, 175, 119, 0.2);
+    border-radius: 12px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.ticketCard:hover {
+    background: rgba(20, 10, 10, 0.8);
+    border-color: rgba(212, 175, 119, 0.3);
+    transform: translateX(4px);
+}
+
+.ticketHeader {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.ticketIcon {
+    flex-shrink: 0;
+    width: 2.25rem;
+    height: 2.25rem;
+    background: rgba(212, 175, 119, 0.15);
+    border: 1px solid rgba(212, 175, 119, 0.2);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ticketIcon svg {
+    width: 18px;
+    height: 18px;
+    stroke: #d4af77;
+    stroke-width: 2;
+}
+
+.ticketInfo {
+    flex: 1;
+    min-width: 0;
+}
+
+.ticketType {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.25rem;
+}
+
+.ticketDate {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.ticketDate svg {
+    width: 12px;
+    height: 12px;
+    stroke: currentColor;
+    stroke-width: 2;
+}
+
+.ticketPrice {
+    flex-shrink: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #d4af77;
+}
+
+.ticketDetails {
+    padding: 0.75rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 0.75rem;
+}
+
+.detailText {
+    display: block;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 0.25rem;
+}
+
+.detailText:last-child {
+    margin-bottom: 0;
+}
+
+.ticketFooter {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.ticketStatus {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.statusDot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.statusValid {
+    background: rgba(74, 222, 128, 0.15);
+    color: #4ade80;
+    border: 1px solid rgba(74, 222, 128, 0.2);
+}
+
+.statusValid .statusDot {
+    background: #4ade80;
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
+}
+
+.statusUsed {
+    background: rgba(96, 165, 250, 0.15);
+    color: #60a5fa;
+    border: 1px solid rgba(96, 165, 250, 0.2);
+}
+
+.statusUsed .statusDot {
+    background: #60a5fa;
+}
+
+.statusExpired {
+    background: rgba(248, 113, 113, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.2);
+}
+
+.statusExpired .statusDot {
+    background: #f87171;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .container {
+        padding: 1rem 0.75rem 5rem 0.75rem;
+    }
+    
+    .mainTitle {
+        font-size: 1.5rem;
+    }
+    
+    .statsGrid {
+        grid-template-columns: 1fr;
+    }
+    
+    .statValue {
+        font-size: 1.6rem;
+    }
+}
