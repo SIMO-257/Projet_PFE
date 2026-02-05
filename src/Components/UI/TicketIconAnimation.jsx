@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../../styles/ValidationScreen.module.css';
+import styles from '../../Styles/ValidationScreen.module.css';
 
 const TicketIconAnimation = ({ 
     size = 128,

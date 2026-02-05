@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../../styles/HomeScreen.module.css';
+import styles from '../../Styles/HomeScreen.module.css';
 
 const NotificationButton = ({ onClick, hasNotifications = false }) => {
     const handleClick = (e) => {

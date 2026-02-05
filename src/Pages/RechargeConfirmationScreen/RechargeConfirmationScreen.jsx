@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // If using React Router
 import ValidationCard from '../../Components/Cards/ValidationCard';
 import StatusIndicator from '../../Components/UI/StatusIndicator';

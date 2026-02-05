@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../../styles/NFCValidation.module.css';
+import styles from '../../Styles/NFCValidation.module.css';
 
 const ProcessingIndicator = ({ 
     message = "Traitement en cours...",

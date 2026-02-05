@@ -8,7 +8,7 @@ import Header from "../../Components/Layout/Header";
 import ProgressDots from "../../Components/UI/ProgressDots";
 
 // Cards Components
-import  AmountDisplay from "../../Components/Cards/AmountDisplay";
+import AmountDisplay from "../../Components/Cards/AmountDisplay";
 import PaymentOptionCard from "../../Components/Cards/PaymentOptionCard";
 import SavedCardItem from "../../Components/Cards/SavedCardItem";
 import ActionButtonCard from "../../Components/Cards/ActionButtonCard";
@@ -18,7 +18,8 @@ import ValidationCard from "../../Components/Cards/ValidationCard";
 // Inputs Components
 import CheckboxInput from "../../Components/Inputs/CheckboxInput";
 
-import styles from '../../Styles/RechargePaymentScreen.module.css';
+import styles from "../../Styles/RechargePaymentScreen.module.css";
+
 const RechargePaymentScreen = () => {
   const navigate = useNavigate();
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("card");

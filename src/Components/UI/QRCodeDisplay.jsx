@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../../styles/QRValidation.module.css';
+import styles from '../../Styles/QRValidation.module.css';
 
 const QRCodeDisplay = ({ 
     isValid = true,

@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../../styles/ValidationResult.module.css';
+import styles from '../../Styles/ValidationResult.module.css';
 
 const StatusIndicator = ({ 
     isValid = true,
