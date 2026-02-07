@@ -10,6 +10,8 @@ import MyTickets from "./Pages/MyTickets/MyTickets";
 import Paiment from "./Pages/Paiment/Paiment";
 import ConfirmationPaiment from "./Pages/ConfirmationPaiment/ConfirmationPaiment";
 import PaimentHistory from "./Pages/PaimentHistory/PaimentHistory";
+import OfflineMode from "./Pages/OfflineMode/OfflineMode";
+import Notifications from "./Pages/Notifications/Notifications";
 
 
 function App() {
@@ -17,7 +19,7 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<PaimentHistory />} />
+          <Route path="/" element={<Notifications/>} />
           <Route path="/viewticket/:id" element={<ViewTicket />} />
           {/* <Route path="/ticketselection/:id/:cardid?" element={<TicketSelection />}>
             <Route path="paiment" element={<Paiment />} />
