@@ -1,136 +1,80 @@
-/* NFC Icon Container */
-.nfcIconContainer {
-    border-radius: 50%;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* NFC Icon Container */
+  .nfcIconContainer {
+    @apply rounded-full flex items-center justify-center relative z-10;
     background: linear-gradient(135deg, rgba(212, 175, 55, 0.3), rgba(139, 64, 73, 0.3));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    z-index: 10;
-}
+  }
 
-/* Pulse Glow Animation */
-.pulseGlow {
-    animation: pulseGlow 2s ease-in-out infinite;
-}
+  /* Pulse Glow Animation */
+  .pulseGlow {
+    @apply animate-pulse-glow;
+  }
 
-.pulseGlowSlow {
-    animation: pulseGlow 3s ease-in-out infinite;
-}
+  .pulseGlowSlow {
+    @apply animate-pulse-glow-slow;
+  }
 
-.pulseGlowFast {
-    animation: pulseGlow 1.5s ease-in-out infinite;
-}
+  .pulseGlowFast {
+    @apply animate-pulse-glow-fast;
+  }
 
-@keyframes pulseGlow {
-    0%, 100% {
-        box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
-        transform: scale(1);
-    }
-    50% {
-        box-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
-        transform: scale(1.05);
-    }
-}
-
-/* NFC Wave Animation */
-.nfcWave {
-    position: absolute;
-    top: 50%;
-    left: 50%;
+  /* NFC Wave Animation */
+  .nfcWave {
+    @apply absolute top-1/2 left-1/2 rounded-full w-full h-full z-[5] pointer-events-none;
     border: 2px solid rgba(255, 215, 0, 0.5);
-    border-radius: 50%;
-    width: 100%;
-    height: 100%;
     transform: translate(-50%, -50%);
-    z-index: 5;
-    pointer-events: none;
-}
+  }
 
-.nfcWave:nth-child(2) {
-    animation: nfcWave 2s ease-out infinite;
-}
+  .nfcWave:nth-child(2) {
+    @apply animate-nfc-wave;
+  }
 
-.nfcWave:nth-child(3) {
-    animation: nfcWave 2s ease-out infinite;
+  .nfcWave:nth-child(3) {
+    @apply animate-nfc-wave;
     animation-delay: 0.5s;
-}
+  }
 
-.nfcWave:nth-child(4) {
-    animation: nfcWave 2s ease-out infinite;
+  .nfcWave:nth-child(4) {
+    @apply animate-nfc-wave;
     animation-delay: 1s;
-}
+  }
 
-@keyframes nfcWave {
-    0% {
-        transform: translate(-50%, -50%) scale(0.8);
-        opacity: 0.5;
-    }
-    100% {
-        transform: translate(-50%, -50%) scale(1.8);
-        opacity: 0;
-    }
-}
+  /* Progress Pulse Animation */
+  .progressPulse {
+    @apply animate-progress-pulse;
+  }
 
-/* Progress Pulse Animation */
-.progressPulse {
-    animation: progressPulse 1.5s ease-in-out infinite;
-}
-
-@keyframes progressPulse {
-    0%, 100% {
-        opacity: 0.7;
-    }
-    50% {
-        opacity: 1;
-    }
-}
-
-/* Modal Card */
-.nfcModalCard {
-    position: relative;
-    border-radius: 24px;
+  /* Modal Card */
+  .nfcModalCard {
+    @apply relative rounded-3xl overflow-hidden border backdrop-blur-lg;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-    overflow: hidden;
     background: linear-gradient(135deg, rgba(64, 1, 6, 0.95), rgba(38, 1, 1, 0.95));
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(212, 175, 55, 0.2);
-}
+    border-color: rgba(212, 175, 55, 0.2);
+  }
 
-.nfcModalCard::before {
+  .nfcModalCard::before {
     content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
+    @apply absolute top-0 left-0 right-0 h-1 z-20;
     background: linear-gradient(to right, #FFD700, #D4AF37);
     border-radius: 24px 24px 0 0;
-    z-index: 20;
-}
+  }
 
-/* Fade In Animation */
-.fadeIn {
-    animation: fadeIn 0.3s ease-out;
-}
+  /* Fade In Animation */
+  .fadeIn {
+    @apply animate-fade-in;
+  }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+  /* Hide scrollbar */
+  .noScrollbar::-webkit-scrollbar {
+    @apply hidden;
+  }
 
-/* Hide scrollbar */
-.noScrollbar::-webkit-scrollbar {
-    display: none;
-}
-
-.noScrollbar {
+  .noScrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
 }

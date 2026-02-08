@@ -1,98 +1,70 @@
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&display=swap');
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-.appContainer {
-    min-height: 100vh;
+@layer components {
+  .appContainer {
+    @apply min-h-screen flex items-start justify-center p-4;
     background: linear-gradient(180deg, #4a1a1a 0%, #2d0f0f 100%);
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 1rem;
     font-family: 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
+  }
 
-.container {
-    max-width: 440px;
-    width: 100%;
-    padding: 2rem 1.5rem;
-    position: relative;
+  .container {
+    @apply w-full max-w-md px-6 py-8 relative;
     animation: fadeIn 0.5s ease-out;
-}
+  }
 
-@keyframes fadeIn {
+  @keyframes fadeIn {
     from {
-        opacity: 0;
-        transform: translateY(20px);
+      opacity: 0;
+      transform: translateY(20px);
     }
     to {
-        opacity: 1;
-        transform: translateY(0);
+      opacity: 1;
+      transform: translateY(0);
     }
-}
+  }
 
-/* Close Button */
-.closeBtn {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: transparent;
-    border: none;
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 2rem;
-    cursor: pointer;
-    width: 2.5rem;
-    height: 2.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    border-radius: 50%;
-    z-index: 10;
-}
+  /* Close Button */
+  .closeBtn {
+    @apply absolute top-4 right-4 bg-transparent border-none text-white/60 text-3xl cursor-pointer w-10 h-10 flex items-center justify-center rounded-full z-10 transition-all duration-200;
+  }
 
-.closeBtn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.9);
-    transform: rotate(90deg);
-}
+  .closeBtn:hover {
+    @apply bg-white/10 text-white/90 rotate-90;
+  }
 
-/* Success Icon */
-.successIcon {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 1.5rem;
+  /* Success Icon */
+  .successIcon {
+    @apply flex justify-center mb-6;
     animation: scaleIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
+  }
 
-@keyframes scaleIn {
+  @keyframes scaleIn {
     from {
-        transform: scale(0);
-        opacity: 0;
+      transform: scale(0);
+      opacity: 0;
     }
     to {
-        transform: scale(1);
-        opacity: 1;
+      transform: scale(1);
+      opacity: 1;
     }
-}
+  }
 
-.checkmark {
-    width: 80px;
-    height: 80px;
-}
+  .checkmark {
+    @apply w-20 h-20;
+  }
 
-.circleBg {
-    fill: none;
+  .circleBg {
+    @apply fill-none;
     stroke: rgba(255, 255, 255, 0.2);
     stroke-width: 2;
-}
+  }
 
-.check {
-    fill: none;
+  .check {
+    @apply fill-none;
     stroke: #d4af77;
     stroke-width: 3;
     stroke-linecap: round;
@@ -100,302 +72,231 @@
     stroke-dasharray: 100;
     stroke-dashoffset: 100;
     animation: drawCheck 0.8s ease-out 0.3s forwards;
-}
+  }
 
-@keyframes drawCheck {
+  @keyframes drawCheck {
     to {
-        stroke-dashoffset: 0;
+      stroke-dashoffset: 0;
     }
-}
+  }
 
-/* Header */
-.header {
-    text-align: center;
-    margin-bottom: 2rem;
-}
+  /* Header */
+  .header {
+    @apply text-center mb-8;
+  }
 
-.subTitle {
-    font-size: 1.5rem;
-    color: #fff;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    letter-spacing: -0.02em;
-}
+  .subTitle {
+    @apply text-2xl text-white font-semibold mb-2 tracking-tight;
+  }
 
-.description {
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 0.95rem;
-    font-weight: 300;
-    line-height: 1.5;
-}
+  .description {
+    @apply text-white/70 text-[0.95rem] font-light leading-relaxed;
+  }
 
-/* Ticket Card */
-.ticketCard {
+  /* Ticket Card */
+  .ticketCard {
+    @apply border rounded-2xl p-6 mb-6 backdrop-blur-lg;
     background: rgba(20, 10, 10, 0.6);
-    border: 1px solid rgba(212, 175, 119, 0.2);
-    border-radius: 16px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    backdrop-filter: blur(10px);
+    border-color: rgba(212, 175, 119, 0.2);
     animation: slideUp 0.5s ease-out 0.2s backwards;
-}
+  }
 
-@keyframes slideUp {
+  @keyframes slideUp {
     from {
-        opacity: 0;
-        transform: translateY(30px);
+      opacity: 0;
+      transform: translateY(30px);
     }
     to {
-        opacity: 1;
-        transform: translateY(0);
+      opacity: 1;
+      transform: translateY(0);
     }
-}
+  }
 
-.ticketHeader {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
+  .ticketHeader {
+    @apply flex items-center gap-3 mb-6 pb-4;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
+  }
 
-.ticketIcon {
-    width: 20px;
-    height: 20px;
+  .ticketIcon {
+    @apply w-5 h-5;
     stroke: #d4af77;
-}
+  }
 
-.ticketType {
-    color: #fff;
-    font-weight: 500;
-    font-size: 1rem;
-}
+  .ticketType {
+    @apply text-white font-medium text-base;
+  }
 
-.ticketDetails {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    margin-bottom: 1.25rem;
-}
+  .ticketDetails {
+    @apply flex flex-col gap-3 mb-5;
+  }
 
-.detailRow {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.9rem;
-}
+  .detailRow {
+    @apply flex justify-between items-center text-sm;
+  }
 
-.label {
-    color: rgba(255, 255, 255, 0.6);
-    font-weight: 400;
-}
+  .label {
+    @apply text-white/60 font-normal;
+  }
 
-.value {
-    color: #fff;
-    font-weight: 500;
-}
+  .value {
+    @apply text-white font-medium;
+  }
 
-.statusBadge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
+  .statusBadge {
+    @apply inline-flex items-center gap-2 border rounded-[20px] py-2 px-4 text-sm font-medium;
     background: rgba(212, 175, 119, 0.15);
-    border: 1px solid rgba(212, 175, 119, 0.3);
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
+    border-color: rgba(212, 175, 119, 0.3);
     color: #d4af77;
-    font-size: 0.85rem;
-    font-weight: 500;
-}
+  }
 
-.statusIcon {
-    width: 16px;
-    height: 16px;
+  .statusIcon {
+    @apply w-4 h-4;
     stroke: #d4af77;
-}
+  }
 
-/* Buttons */
-.buttonContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
-}
+  /* Buttons */
+  .buttonContainer {
+    @apply flex flex-col gap-3 mb-6;
+  }
 
-.btnPrimary,
-.btnSecondary,
-.btnLink,
-.btnDownload {
-    border: none;
-    border-radius: 12px;
-    padding: 1rem 1.5rem;
-    font-size: 0.95rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
+  .btnPrimary,
+  .btnSecondary,
+  .btnLink,
+  .btnDownload {
+    @apply border-none rounded-xl py-4 px-6 text-[0.95rem] font-medium cursor-pointer transition-all duration-300 flex items-center justify-center gap-2;
     font-family: 'Sora', sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-}
+  }
 
-.btnPrimary {
-    background: linear-gradient(135deg, #d4af77 0%, #c19a5f 100%);
-    color: #2d0f0f;
-    box-shadow: 0 4px 15px rgba(212, 175, 119, 0.3);
-}
-
-.btnPrimary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(212, 175, 119, 0.4);
-}
-
-.btnPrimary:active {
-    transform: translateY(0);
-}
-
-.btnIcon {
-    width: 18px;
-    height: 18px;
+  .btnIcon {
+    @apply w-[18px] h-[18px];
     stroke: #2d0f0f;
     stroke-width: 2;
-}
+  }
 
-.btnSecondary {
+  .btnPrimary {
+    @apply text-[#2d0f0f];
+    background: linear-gradient(135deg, #d4af77 0%, #c19a5f 100%);
+    box-shadow: 0 4px 15px rgba(212, 175, 119, 0.3);
+  }
+
+  .btnPrimary:hover {
+    @apply -translate-y-0.5;
+    box-shadow: 0 6px 20px rgba(212, 175, 119, 0.4);
+  }
+
+  .btnPrimary:active {
+    @apply translate-y-0;
+  }
+
+  .btnSecondary {
+    @apply text-white border;
     background: rgba(20, 10, 10, 0.6);
-    border: 1px solid rgba(212, 175, 119, 0.2);
-    color: #fff;
-}
+    border-color: rgba(212, 175, 119, 0.2);
+  }
 
-.btnSecondary:hover {
-    background: rgba(20, 10, 10, 0.8);
+  .btnSecondary:hover {
+    @apply bg-[rgba(20,10,10,0.8)];
     border-color: rgba(212, 175, 119, 0.4);
-}
+  }
 
-.plusIcon {
-    font-size: 1.2rem;
-    font-weight: 400;
-}
+  .plusIcon {
+    @apply text-lg font-normal;
+  }
 
-.btnLink {
-    background: transparent;
-    border: none;
-    color: rgba(255, 255, 255, 0.7);
-    padding: 0.75rem;
-}
+  .btnLink {
+    @apply bg-transparent border-none text-white/70 py-3;
+  }
 
-.btnLink:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.05);
-}
+  .btnLink:hover {
+    @apply text-white bg-white/5;
+  }
 
-.homeIcon {
-    width: 18px;
-    height: 18px;
+  .homeIcon {
+    @apply w-[18px] h-[18px];
     stroke: currentColor;
     stroke-width: 2;
-}
+  }
 
-/* Transaction Accordion */
-.transactionAccordion {
+  /* Transaction Accordion */
+  .transactionAccordion {
+    @apply border rounded-xl overflow-hidden;
     background: rgba(20, 10, 10, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    overflow: hidden;
+    border-color: rgba(255, 255, 255, 0.1);
     animation: slideUp 0.5s ease-out 0.4s backwards;
-}
+  }
 
-.accordionHeader {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem 1.25rem;
-    color: rgba(255, 255, 255, 0.8);
-    font-weight: 500;
-    font-size: 0.95rem;
-    cursor: pointer;
-    user-select: none;
-    list-style: none;
-    transition: all 0.3s ease;
-}
+  .accordionHeader {
+    @apply flex items-center justify-between py-4 px-5 text-white/80 font-medium text-[0.95rem] cursor-pointer select-none list-none transition-all duration-300;
+  }
 
-.accordionHeader:hover {
-    background: rgba(255, 255, 255, 0.05);
-}
+  .accordionHeader:hover {
+    @apply bg-white/5;
+  }
 
-.accordionHeader::-webkit-details-marker {
-    display: none;
-}
+  .accordionHeader::-webkit-details-marker {
+    @apply hidden;
+  }
 
-.chevron {
-    width: 20px;
-    height: 20px;
+  .chevron {
+    @apply w-5 h-5 transition-transform duration-300;
     stroke: rgba(255, 255, 255, 0.6);
     stroke-width: 2;
-    transition: transform 0.3s ease;
-}
+  }
 
-.transactionAccordion[open] .chevron {
-    transform: rotate(180deg);
-}
+  .transactionAccordion[open] .chevron {
+    @apply rotate-180;
+  }
 
-.accordionContent {
-    padding: 0 1.25rem 1.25rem;
+  .accordionContent {
+    @apply px-5 pb-5;
     animation: accordionSlide 0.3s ease-out;
-}
+  }
 
-@keyframes accordionSlide {
+  @keyframes accordionSlide {
     from {
-        opacity: 0;
-        transform: translateY(-10px);
+      opacity: 0;
+      transform: translateY(-10px);
     }
     to {
-        opacity: 1;
-        transform: translateY(0);
+      opacity: 1;
+      transform: translateY(0);
     }
-}
+  }
 
-.transactionInfo {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-    padding-bottom: 1rem;
+  .transactionInfo {
+    @apply flex flex-col gap-3 mb-4 pb-4;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
+  }
 
-.btnDownload {
-    width: 100%;
+  .btnDownload {
+    @apply w-full border text-[#d4af77];
     background: rgba(20, 10, 10, 0.6);
-    border: 1px solid rgba(212, 175, 119, 0.3);
-    color: #d4af77;
-}
+    border-color: rgba(212, 175, 119, 0.3);
+  }
 
-.btnDownload:hover {
-    background: rgba(212, 175, 119, 0.1);
+  .btnDownload:hover {
+    @apply bg-[rgba(212,175,119,0.1)];
     border-color: rgba(212, 175, 119, 0.5);
-}
+  }
 
-.downloadIcon {
-    width: 18px;
-    height: 18px;
+  .downloadIcon {
+    @apply w-[18px] h-[18px];
     stroke: #d4af77;
     stroke-width: 2;
-}
+  }
 
-/* Responsive */
-@media (max-width: 480px) {
+  /* Responsive */
+  @media (max-width: 480px) {
     .container {
-        padding: 1.5rem 1rem;
+      @apply px-4 py-6;
     }
-    
+
     .ticketCard {
-        padding: 1.25rem;
+      @apply p-5;
     }
-    
+
     .subTitle {
-        font-size: 1.3rem;
+      @apply text-[1.3rem];
     }
+  }
 }

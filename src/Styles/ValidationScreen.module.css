@@ -1,104 +1,88 @@
-/* Ticket Icon Animation */
-.ticketIcon {
-    border-radius: 50%;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* Ticket Icon Animation */
+  .ticketIcon {
+    @apply rounded-full flex items-center justify-center relative z-10;
     background: linear-gradient(135deg, rgba(212, 175, 55, 0.3), rgba(139, 64, 73, 0.3));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    z-index: 10;
-}
+  }
 
-.ticketPulse {
-    animation: ticketPulse 2s ease-in-out infinite;
-}
+  .ticketPulse {
+    @apply animate-ticket-pulse;
+  }
 
-.ticketPulseSlow {
-    animation: ticketPulse 3s ease-in-out infinite;
-}
+  .ticketPulseSlow {
+    @apply animate-ticket-pulse-slow;
+  }
 
-.ticketPulseFast {
-    animation: ticketPulse 1.5s ease-in-out infinite;
-}
+  .ticketPulseFast {
+    @apply animate-ticket-pulse-fast;
+  }
 
-@keyframes ticketPulse {
-    0%, 100% {
-        box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
-        transform: scale(1);
-    }
-    50% {
-        box-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
-        transform: scale(1.05);
-    }
-}
-
-/* Ticket Wave Animation */
-.ticketWave {
-    position: absolute;
-    top: 50%;
-    left: 50%;
+  /* Ticket Wave Animation */
+  .ticketWave {
+    @apply absolute top-1/2 left-1/2 rounded-full w-full h-full z-[5] pointer-events-none;
     border: 2px solid rgba(255, 215, 0, 0.5);
-    border-radius: 50%;
-    width: 100%;
-    height: 100%;
     transform: translate(-50%, -50%);
-    z-index: 5;
-    pointer-events: none;
     animation: ticketWave 2s ease-out infinite;
-}
+  }
 
-@keyframes ticketWave {
+  @keyframes ticketWave {
     0% {
-        transform: translate(-50%, -50%) scale(0.8);
-        opacity: 0.5;
+      transform: translate(-50%, -50%) scale(0.8);
+      opacity: 0.5;
     }
     100% {
-        transform: translate(-50%, -50%) scale(1.8);
-        opacity: 0;
+      transform: translate(-50%, -50%) scale(1.8);
+      opacity: 0;
     }
-}
+  }
 
-/* Notification Slide Down Animation */
-@keyframes slideDown {
+  /* Notification Slide Down Animation */
+  .animateSlideDown {
+    @apply animate-slide-in;
+    animation: slideDown 0.3s ease-out;
+  }
+
+  @keyframes slideDown {
     from {
-        transform: translateY(-100%);
-        opacity: 0;
+      transform: translateY(-100%);
+      opacity: 0;
     }
     to {
-        transform: translateY(0);
-        opacity: 1;
+      transform: translateY(0);
+      opacity: 1;
     }
-}
+  }
 
-.animateSlideDown {
-    animation: slideDown 0.3s ease-out;
-}
+  /* Custom Scrollbar */
+  .customScrollbar::-webkit-scrollbar {
+    @apply w-1;
+  }
 
-/* Custom Scrollbar */
-.customScrollbar::-webkit-scrollbar {
-    width: 4px;
-}
-
-.customScrollbar::-webkit-scrollbar-track {
+  .customScrollbar::-webkit-scrollbar-track {
+    @apply rounded-[10px];
     background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-}
+  }
 
-.customScrollbar::-webkit-scrollbar-thumb {
+  .customScrollbar::-webkit-scrollbar-thumb {
+    @apply rounded-[10px];
     background: rgba(255, 215, 0, 0.3);
-    border-radius: 10px;
-}
+  }
 
-.customScrollbar::-webkit-scrollbar-thumb:hover {
+  .customScrollbar::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 215, 0, 0.5);
-}
+  }
 
-/* Hide scrollbar */
-.noScrollbar::-webkit-scrollbar {
-    display: none;
-}
+  /* Hide scrollbar */
+  .noScrollbar::-webkit-scrollbar {
+    @apply hidden;
+  }
 
-.noScrollbar {
+  .noScrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
 }
