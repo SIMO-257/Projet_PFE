@@ -15,11 +15,12 @@ import RechargeConfirmationScreen from "./Pages/RechargeConfirmationScreen/Recha
 import TransactionHistoryScreen from "./Pages/TransactionHistoryScreen/TransactionHistoryScreen";
 import WalletScreen from "./Pages/WalletScreen/WalletScreen";
 import SettingsScreen from "./Pages/SettingsScreen/SettingsScreen";
-
+import EditProfileScreen from "./Pages/EditProfileScreen/EditProfileScreen";
+import HelpSupportScreen from "./Pages/HelpSupportScreen/HelpSupportScreen";
 function App() {
   return (
     <BrowserRouter>
-      <SettingsScreen/>
+      <HelpSupportScreen/>
     </BrowserRouter>
   );
 }

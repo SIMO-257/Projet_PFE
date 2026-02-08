@@ -1,0 +1,92 @@
+/* Edit Profile Container */
+.edit-profile-container {
+    background: linear-gradient(to bottom right, #2a0b0f, #1a0507);
+    min-height: 100vh;
+  }
+  
+  .edit-profile-card {
+    background: linear-gradient(to bottom right, rgba(64, 1, 6, 0.95), rgba(38, 1, 1, 0.95));
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 1.5rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .edit-profile-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(to right, #FFD700, #D4AF37);
+    border-radius: 1.5rem 1.5rem 0 0;
+  }
+  
+  /* Scrollbar */
+  .edit-profile-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .edit-profile-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+  }
+  
+  .edit-profile-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(212, 175, 55, 0.3);
+    border-radius: 10px;
+  }
+  
+  .edit-profile-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(212, 175, 55, 0.5);
+  }
+  
+  /* Save Button */
+  .save-button {
+    background: linear-gradient(135deg, #D9B991, #C9A961);
+    color: #400106;
+    font-weight: 600;
+    padding: 1rem;
+    border-radius: 1rem;
+    transition: all 0.3s;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  }
+  
+  .save-button:hover {
+    background: linear-gradient(135deg, #E5C5A1, #D9B971);
+    transform: scale(1.02);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+  }
+  
+  .save-button:active {
+    transform: scale(0.98);
+  }
+  
+  /* Profile Section */
+  .profile-section {
+    padding: 2rem 0;
+  }
+  
+  /* Form Container */
+  .form-container {
+    padding: 0 1.5rem 1.5rem;
+  }
+  
+  /* Spacing */
+  .vertical-space {
+    margin-top: 2rem;
+  }
+  
+  /* Responsive */
+  @media (max-width: 640px) {
+    .edit-profile-card {
+      margin: 0.5rem;
+    }
+    
+    .profile-section {
+      padding: 1.5rem 0;
+    }
+  }

@@ -1,0 +1,204 @@
+/* Help Support Container */
+.help-support-container {
+    background: linear-gradient(to bottom right, #2a0b0f, #1a0507);
+    min-height: 100vh;
+  }
+  
+  .help-support-card {
+    background: linear-gradient(to bottom right, rgba(64, 1, 6, 0.95), rgba(38, 1, 1, 0.95));
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 1.5rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .help-support-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(to right, #FFD700, #D4AF37);
+    border-radius: 1.5rem 1.5rem 0 0;
+  }
+  
+  /* Scrollbar */
+  .help-support-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .help-support-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+  }
+  
+  .help-support-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(212, 175, 55, 0.3);
+    border-radius: 10px;
+  }
+  
+  .help-support-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(212, 175, 55, 0.5);
+  }
+  
+  /* Search Bar */
+  .search-bar {
+    position: relative;
+  }
+  
+  .search-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 1rem;
+    padding: 0.75rem 1rem 0.75rem 3rem;
+    color: white;
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  
+  .search-input:focus {
+    border-color: rgba(212, 175, 55, 0.5);
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  
+  /* Section Header */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .section-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: rgba(212, 175, 55, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  
+  .section-icon svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: #D4AF37;
+  }
+  
+  .section-icon.danger {
+    background: rgba(239, 68, 68, 0.2);
+  }
+  
+  .section-icon.danger svg {
+    color: #EF4444;
+  }
+  
+  .section-title {
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  
+  .section-subtitle {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.75rem;
+  }
+  
+  /* Quick Contact Grid */
+  .quick-contact-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+  }
+  
+  /* Contact Methods */
+  .contact-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  /* Guides Grid */
+  .guides-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  /* Footer */
+  .help-footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    padding-bottom: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .help-footer-text {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.75rem;
+    margin: 0.25rem 0;
+  }
+  
+  .help-footer-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+  
+  .help-footer-link {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.75rem;
+    transition: color 0.3s;
+  }
+  
+  .help-footer-link:hover {
+    color: #D4AF37;
+  }
+  
+  .help-footer-separator {
+    color: rgba(255, 255, 255, 0.4);
+  }
+  
+  /* Animation */
+  @keyframes pulse-dot {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+  
+  .pulse-dot {
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  
+  /* Spacing Utilities */
+  .mb-6 {
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Responsive */
+  @media (max-width: 640px) {
+    .help-support-card {
+      margin: 0.5rem;
+    }
+    
+    .quick-contact-grid {
+      gap: 0.5rem;
+    }
+  }
