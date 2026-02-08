@@ -17,10 +17,11 @@ import WalletScreen from "./Pages/WalletScreen/WalletScreen";
 import SettingsScreen from "./Pages/SettingsScreen/SettingsScreen";
 import EditProfileScreen from "./Pages/EditProfileScreen/EditProfileScreen";
 import HelpSupportScreen from "./Pages/HelpSupportScreen/HelpSupportScreen";
+import ProfileScreen from "./Pages/ProfileScreen/ProfileScreen";
 function App() {
   return (
     <BrowserRouter>
-      <HelpSupportScreen/>
+      <ProfileScreen/>
     </BrowserRouter>
   );
 }
