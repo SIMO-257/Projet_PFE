@@ -14,11 +14,12 @@ import RechargePaymentScreen from "./Pages/RechargePaymentScreen/RechargePayment
 import RechargeConfirmationScreen from "./Pages/RechargeConfirmationScreen/RechargeConfirmationScreen";
 import TransactionHistoryScreen from "./Pages/TransactionHistoryScreen/TransactionHistoryScreen";
 import WalletScreen from "./Pages/WalletScreen/WalletScreen";
+import SettingsScreen from "./Pages/SettingsScreen/SettingsScreen";
 
 function App() {
   return (
     <BrowserRouter>
-      <WalletScreen />
+      <SettingsScreen/>
     </BrowserRouter>
   );
 }
