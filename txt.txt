@@ -1,0 +1,15 @@
+CREATE TABLE ticket_types (
+    id SERIAL PRIMARY KEY,
+    code VARCHAR(50) UNIQUE NOT NULL,  -- ex: SINGLE_TICKET, DAY_PASS, MONTH_PASS
+    name_fr VARCHAR(100) NOT NULL,
+    name_ar VARCHAR(100),
+    description TEXT,
+    price DECIMAL(10,2) NOT NULL,
+    duration_minutes INTEGER,  -- Durée validité en minutes
+    is_reusable BOOLEAN DEFAULT FALSE,
+    max_uses INTEGER DEFAULT 1,  -- Nombre max de validations
+    validity_zones TEXT[],  -- Zones géographiques
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+);
+
