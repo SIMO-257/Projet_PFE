@@ -1,0 +1,206 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* App Container */
+  .appContainer {
+    @apply min-h-screen bg-[#0a0a0a] text-white mx-auto px-4 pt-5 pb-20;
+    max-width: 480px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  /* Header Section */
+  .header {
+    @apply flex justify-between items-center mb-2;
+  }
+
+  .backButton,
+  .menuButton {
+    @apply bg-none border-none text-white text-2xl cursor-pointer p-2 w-10 h-10 flex items-center justify-center;
+  }
+
+  .mainTitle {
+    @apply text-2xl font-semibold text-white m-0;
+  }
+
+  .subtitle {
+    @apply text-sm text-white/50 m-0 mb-6 font-normal;
+  }
+
+  /* Main Content - Tickets */
+  .mainContent {
+    @apply flex flex-col gap-4 mb-5;
+  }
+
+  /* Ticket Card */
+  .ticketCard {
+    @apply bg-[#1a1a1a] rounded-2xl p-6 border border-[#3a3a3a] transition-all duration-300;
+    border-width: 1.5px;
+  }
+
+  .ticketCard:hover {
+    @apply -translate-y-0.5;
+  }
+
+  .activeTicket {
+    @apply border border-ticket-border;
+    background: linear-gradient(135deg, #2d1b2e 0%, #1f1520 100%);
+    border-width: 1.5px;
+  }
+
+  .ticketTop {
+    @apply mb-5;
+  }
+
+  .ticketHeaderRow {
+    @apply flex justify-between items-start mb-3;
+  }
+
+  .ticketTitleSection {
+    @apply flex items-start gap-3;
+  }
+
+  .ticketIcon {
+    @apply text-3xl grayscale brightness-[0.7] contrast-125;
+    color: #b8965f;
+  }
+
+  .activeTicket .ticketIcon {
+    @apply grayscale-0;
+    color: #d4af37;
+  }
+
+  .ticketTitle {
+    @apply text-[22px] font-normal text-white m-0 mb-1.5;
+    font-family: serif;
+    letter-spacing: 0.5px;
+  }
+
+  .ticketDescription {
+    @apply text-sm text-white/40 m-0 font-light;
+  }
+
+  /* Status Badge */
+  .statusBadge {
+    @apply py-2 px-6 rounded-3xl text-sm font-medium;
+    letter-spacing: 0.3px;
+  }
+
+  .activeBadge {
+    @apply border;
+    background: rgba(180, 160, 90, 0.15);
+    color: #b4a05a;
+    border-color: rgba(180, 160, 90, 0.3);
+    border-width: 1.5px;
+  }
+
+  .inactiveBadge {
+    @apply bg-transparent border;
+    color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.2);
+    border-width: 1.5px;
+  }
+
+  /* Ticket Details */
+  .ticketDetails {
+    @apply flex justify-between items-end mb-6 py-5;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .detailRow {
+    @apply flex flex-col items-start gap-2;
+  }
+
+  .detailRow:last-child {
+    @apply items-end;
+  }
+
+  .detailLabel {
+    @apply text-[15px] text-white/40 font-light;
+    letter-spacing: 0.3px;
+  }
+
+  .detailValue {
+    @apply text-lg text-white/90 font-light;
+    letter-spacing: 0.3px;
+  }
+
+  .priceValue {
+    @apply text-5xl text-gold font-light;
+    font-family: serif;
+    letter-spacing: 1px;
+  }
+
+  .ticketCard:not(.activeTicket) .priceValue {
+    @apply text-white;
+  }
+
+  /* Buttons */
+  .ticketButton {
+    @apply w-full py-4 border-none rounded-2xl text-base font-normal cursor-pointer transition-all duration-300 flex items-center justify-center gap-2.5;
+    letter-spacing: 0.3px;
+  }
+
+  .buttonIcon {
+    @apply text-lg;
+  }
+
+  .viewButton {
+    @apply text-white;
+    background: linear-gradient(135deg, #7d3f5d 0%, #5d2f4a 100%);
+  }
+
+  .viewButton:hover {
+    background: linear-gradient(135deg, #8d4f6d 0%, #6d3f5a 100%);
+    transform: translateY(-1px);
+  }
+
+  .purchaseButton {
+    @apply bg-[#2a2a2a] text-white/70 border;
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .purchaseButton:hover {
+    @apply bg-[#333] text-white/90;
+  }
+
+  .purchaseButton .buttonIcon {
+    @apply brightness-[0.7];
+  }
+
+  /* Navigation Footer */
+  .navigation {
+    @apply fixed bottom-0 left-0 right-0 flex justify-around py-3 px-4 mx-auto;
+    max-width: 480px;
+    background: rgba(15, 15, 15, 0.98);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .navItem {
+    @apply bg-none border-none text-white/40 text-xs font-normal cursor-pointer py-2 px-3 rounded-lg transition-all duration-200 flex flex-col items-center gap-1 flex-1;
+  }
+
+  .navIcon {
+    @apply text-xl grayscale brightness-[0.6];
+  }
+
+  .navLabel {
+    @apply text-xs;
+    letter-spacing: 0.2px;
+  }
+
+  .navItem:hover {
+    @apply text-white/70;
+  }
+
+  .activeNav {
+    @apply text-gold;
+  }
+
+  .activeNav .navIcon {
+    @apply grayscale-0 text-gold;
+  }
+}

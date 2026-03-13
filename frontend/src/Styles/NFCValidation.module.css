@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* NFC Icon Container */
+  .nfcIconContainer {
+    @apply rounded-full flex items-center justify-center relative z-10;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.3), rgba(139, 64, 73, 0.3));
+  }
+
+  /* Pulse Glow Animation */
+  .pulseGlow {
+    @apply animate-pulse-glow;
+  }
+
+  .pulseGlowSlow {
+    @apply animate-pulse-glow-slow;
+  }
+
+  .pulseGlowFast {
+    @apply animate-pulse-glow-fast;
+  }
+
+  /* NFC Wave Animation */
+  .nfcWave {
+    @apply absolute top-1/2 left-1/2 rounded-full w-full h-full z-[5] pointer-events-none;
+    border: 2px solid rgba(255, 215, 0, 0.5);
+    transform: translate(-50%, -50%);
+  }
+
+  .nfcWave:nth-child(2) {
+    @apply animate-nfc-wave;
+  }
+
+  .nfcWave:nth-child(3) {
+    @apply animate-nfc-wave;
+    animation-delay: 0.5s;
+  }
+
+  .nfcWave:nth-child(4) {
+    @apply animate-nfc-wave;
+    animation-delay: 1s;
+  }
+
+  /* Progress Pulse Animation */
+  .progressPulse {
+    @apply animate-progress-pulse;
+  }
+
+  /* Modal Card */
+  .nfcModalCard {
+    @apply relative rounded-3xl overflow-hidden border backdrop-blur-lg;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    background: linear-gradient(135deg, rgba(64, 1, 6, 0.95), rgba(38, 1, 1, 0.95));
+    border-color: rgba(212, 175, 55, 0.2);
+  }
+
+  .nfcModalCard::before {
+    content: '';
+    @apply absolute top-0 left-0 right-0 h-1 z-20;
+    background: linear-gradient(to right, #FFD700, #D4AF37);
+    border-radius: 24px 24px 0 0;
+  }
+
+  /* Fade In Animation */
+  .fadeIn {
+    @apply animate-fade-in;
+  }
+
+  /* Hide scrollbar */
+  .noScrollbar::-webkit-scrollbar {
+    @apply hidden;
+  }
+
+  .noScrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

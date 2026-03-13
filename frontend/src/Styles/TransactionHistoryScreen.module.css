@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* History Card Top Border */
+  .historyCard::before {
+    content: '';
+    @apply absolute top-0 left-0 right-0 h-1 z-20;
+    background: linear-gradient(to right, #FFD700, #D4AF37);
+    border-radius: 12px 12px 0 0;
+  }
+
+  /* Custom Scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    @apply w-1;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply rounded-[10px];
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply rounded-[10px];
+    background: rgba(212, 175, 55, 0.3);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(212, 175, 55, 0.5);
+  }
+}
