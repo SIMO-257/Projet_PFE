@@ -1,27 +1,78 @@
-import { Link,Route,Routes } from 'react-router-dom';
-// import { useForm } from '@inertiajs/react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import axios from 'axios';
 
 import InputField from '../../Components/Inputs/InputField';
 import CheckboxInput from '../../Components/Inputs/CheckboxInput';
 import ConnexionButton from '../../Components/Buttons/ConnexionButton';
 import SocialButton from '../../Components/Buttons/SocialButton';
 import FormOptions from '../../Components/Form/FormOptions';
-import Login from '../Login/Login';
 import styles from '../../Styles/Auth.module.css';
 
 export default function SignUp() {
 
+    const apiBase = import.meta.env.VITE_API_URL ?? '';
+    const navigate = useNavigate();
 
-    const { data, setData, post, processing, errors } = useForm({
-        signup_name: '',
-        signup_email: '',
-        signup_password: '',
-        signup_number : '',
-        accecpte_cond: false,
+    const [form, setForm] = useState({
+        full_name: '',
+        email: '',
+        phone: '',
+        password: '',
+        password_confirmation: '',
+        accept_terms: false,
     });
-    const handleLogin = (e) => {
+
+    const [errors, setErrors] = useState({});
+    const [processing, setProcessing] = useState(false);
+
+    const setField = (field) => (e) => {
+        setForm((prev) => ({ ...prev, [field]: e.target.value }));
+    };
+
+    const toggleTerms = () => {
+        setForm((prev) => ({ ...prev, accept_terms: !prev.accept_terms }));
+    };
+
+    const Sign_up = async (e) => {
         e.preventDefault();
-        console.log('Login submitted');
+        setErrors({});
+
+        if (!form.accept_terms) {
+            setErrors({ accept_terms: 'Vous devez accepter les conditions.' });
+            return;
+        }
+
+        const nameParts = form.full_name.trim().split(/\s+/);
+        const firstName = nameParts.shift() || null;
+        const lastName = nameParts.length ? nameParts.join(' ') : null;
+
+        const payload = {
+            email: form.email,
+            phone: form.phone || null,
+            password: form.password,
+            password_confirmation: form.password_confirmation,
+            first_name: firstName,
+            last_name: lastName,
+        };
+
+        try {
+            setProcessing(true);
+            const res = await axios.post(`${apiBase}/api/signup`, payload, { withCredentials: false });
+            const redirectTo = res?.data?.redirect;
+            if (redirectTo) {
+                navigate(redirectTo);
+            }
+        } catch (err) {
+            const responseErrors = err?.response?.data?.errors;
+            if (responseErrors) {
+                setErrors(responseErrors);
+            } else {
+                setErrors({ form: "Inscription échouée. Réessayez." });
+            }
+        } finally {
+            setProcessing(false);
+        }
     };
 
     const handleGoogleLogin = () => {
@@ -32,18 +83,7 @@ export default function SignUp() {
         console.log('Apple login');
     };
 
-    const Sign_up = () =>{
-        // post('/signup')
-    }
-
-
-
     return (
-        <>
-            <Routes>
-                <Route path='/login' element={<Login/>}/>
-            </Routes>
-        
         <div className={styles.authContainer}>
             <div className={styles.authCard}>
                 <header className={styles.authHeader}>
@@ -62,48 +102,66 @@ Rejoinier l'expérience premium du mobile intelligent
                         type="text"
                         placeholder="Entrez votre nom complet"
                         id="signup-name"
-                        var={data.signup_name}
-                        setVar={()=>setData('signup_name',e.target.value)}
+                        var={form.full_name}
+                        setVar={setField('full_name')}
                         required
                     />
+                    {errors.full_name && <p className={styles.authDescription}>{errors.full_name}</p>}
 
                     <InputField
                         label="Email"
                         type="email"
                         placeholder="votre@email.com"
                         id="signup-email"
-                        var={data.signup_email}
-                        setVar={()=>setData('signup_email',e.target.value)}                        
+                        var={form.email}
+                        setVar={setField('email')}                        
                         required
                     />
+                    {errors.email && <p className={styles.authDescription}>{errors.email}</p>}
 
                     <InputField
                         label="Téléphone"
                         type="number"
                         placeholder="+121 6 12 34 56 78"
                         id="signup-number"
-                        var={data.signup_number}
-                        setVar={()=>setData('signup_number',e.target.value)}
+                        var={form.phone}
+                        setVar={setField('phone')}
                         required
                     />
+                    {errors.phone && <p className={styles.authDescription}>{errors.phone}</p>}
 
                     <InputField
                         label="Mot de passe"
                         type="password"
                         placeholder="********"
                         id="signup-password"
-                        var={data.signup_password}
-                        setVar={()=>setData('signup_password',e.target.value)}
+                        var={form.password}
+                        setVar={setField('password')}
                         required
                     />
+                    {errors.password && <p className={styles.authDescription}>{errors.password}</p>}
+
+                    <InputField
+                        label="Confirmer le mot de passe"
+                        type="password"
+                        placeholder="********"
+                        id="signup-password-confirmation"
+                        var={form.password_confirmation}
+                        setVar={setField('password_confirmation')}
+                        required
+                    />
+                    {errors.password_confirmation && <p className={styles.authDescription}>{errors.password_confirmation}</p>}
 
                     <FormOptions
-                        leftContent={<CheckboxInput  label={<>Jaccept les <a className={styles.authLink} href='#'>Conditions d'utilisation</a> et <a className={styles.authLink} href='#'>Politique de Confidentialité</a></>} id="remember" setCheck={()=>setData('accepte_cond',!accecpte_cond)} check={data.accecpte_cond} />}
+                        leftContent={<CheckboxInput  label={<>Jaccept les <a className={styles.authLink} href='#'>Conditions d'utilisation</a> et <a className={styles.authLink} href='#'>Politique de Confidentialité</a></>} id="remember" setCheck={toggleTerms} check={form.accept_terms} />}
                         rightContent=""
                     />
 
-                    <ConnexionButton type="submit" variant="primary">
-                        Inscription
+                    {errors.accept_terms && <p className={styles.authDescription}>{errors.accept_terms}</p>}
+                    {errors.form && <p className={styles.authDescription}>{errors.form}</p>}
+
+                    <ConnexionButton type="submit" variant="primary" disabled={processing}>
+                        {processing ? 'Inscription...' : 'Inscription'}
                     </ConnexionButton>
                 </form>
 
@@ -135,6 +193,5 @@ Rejoinier l'expérience premium du mobile intelligent
                 </div>
             </div>
         </div>
-    </>
     );
 }

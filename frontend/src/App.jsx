@@ -3,10 +3,13 @@ import WalletScreen from "./Pages/WalletScreen/WalletScreen";
 import Login from "./Pages/Login/Login";
 import SignUp from "./Pages/SignUp/SignUp";
 import ForgotPassword from "./Pages/ForgotPassword/ForgotPassword";
+
 import HomeScreen from "./Pages/Home/HomeScreen";
+import WalletScreen from "./Pages/WalletScreen/WalletScreen";
+import MyTickets from "./Pages/MyTickets/MyTickets";
 import ViewTicket from "./Pages/ViewTicket/ViewTicket";
 // import TicketSelection from "./Pages/TicketSelection/TicketSelection";
-import MyTickets from "./Pages/MyTickets/MyTickets";
+
 import Paiment from "./Pages/Paiment/Paiment";
 import ConfirmationPaiment from "./Pages/ConfirmationPaiment/ConfirmationPaiment";
 import PaimentHistory from "./Pages/PaimentHistory/PaimentHistory";
@@ -19,7 +22,10 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Notifications/>} />
+          <Route path="/" element={<SignUp/>} />
+          <Route path="/login" element={<Login/>} />
+          <Route path="/forgot_password" element={<ForgotPassword/>} />
+          <Route path="/home" element={<HomeScreen/>} />
           <Route path="/viewticket/:id" element={<ViewTicket />} />
           {/* <Route path="/ticketselection/:id/:cardid?" element={<TicketSelection />}>
             <Route path="paiment" element={<Paiment />} />

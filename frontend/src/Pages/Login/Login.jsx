@@ -1,32 +1,62 @@
-import { Link,Route,Routes } from 'react-router-dom';
-// import { useForm } from '@inertiajs/react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import axios from 'axios';
 
 import InputField from '../../Components/Inputs/InputField';
 import CheckboxInput from '../../Components/Inputs/CheckboxInput';
 import ConnexionButton from '../../Components/Buttons/ConnexionButton';
 import SocialButton from '../../Components/Buttons/SocialButton';
 import FormOptions from '../../Components/Form/FormOptions';
-import ForgotPassword from '../ForgotPassword/ForgotPassword';
-import SignUp from '../SignUp/SignUp';
 import styles from '../../Styles/Auth.module.css'
 
 export default function Login() {
 
+    const apiBase = import.meta.env.VITE_API_URL ?? '';
+    const navigate = useNavigate();
 
-    // const { data, setData, post, processing, errors } = useForm({
-    //     login_email: '',
-    //     login_password: '',
-    //     remember_me: false,
-    // });
- 
+    const [form, setForm] = useState({
+        email: '',
+        password: '',
+        remember_me: false,
+    });
 
-    const Log_in = () =>{
-        // post('/login')
-    }
+    const [errors, setErrors] = useState({});
+    const [processing, setProcessing] = useState(false);
 
-    const handleLogin = (e) => {
+    const setField = (field) => (e) => {
+        setForm((prev) => ({ ...prev, [field]: e.target.value }));
+    };
+
+    const toggleRemember = () => {
+        setForm((prev) => ({ ...prev, remember_me: !prev.remember_me }));
+    };
+
+    const Log_in = async (e) => {
         e.preventDefault();
-        console.log('Login submitted');
+        setErrors({});
+
+        const payload = {
+            email: form.email,
+            password: form.password,
+        };
+
+        try {
+            setProcessing(true);
+            const res = await axios.post(`${apiBase}/api/login`, payload, { withCredentials: false });
+            const redirectTo = res?.data?.redirect;
+            if (redirectTo) {
+                navigate(redirectTo);
+            }
+        } catch (err) {
+            const responseErrors = err?.response?.data?.errors;
+            if (responseErrors) {
+                setErrors(responseErrors);
+            } else {
+                setErrors({ form: "Connexion échouée. Réessayez." });
+            }
+        } finally {
+            setProcessing(false);
+        }
     };
 
     const handleGoogleLogin = () => {
@@ -38,12 +68,7 @@ export default function Login() {
     };
 
     return (
-    <>
-            <Routes>
-                <Route path='/forgot_password' element={<ForgotPassword/>}/>
-                <Route path='/create_acount' element={<SignUp/>}/>
-            </Routes>
-            <div className={styles.authContainer}>
+    <><div className={styles.authContainer}>
             <div className={styles.authCard}>
                 <header className={styles.authHeader}>
                     <h1 className={styles.authLogo}>CasaWay</h1>
@@ -60,28 +85,32 @@ export default function Login() {
                         type="email"
                         placeholder="votre@email.com"
                         id="login-email"
-                        var={data.login_email}
-                        setVar={()=>setData('login_email',e.target.value)}
+                        var={form.email}
+                        setVar={setField('email')}
                         required
                     />
+                    {errors.email && <p className={styles.authDescription}>{errors.email}</p>}
 
                     <InputField
                         label="Mot de passe"
                         type="password"
                         placeholder="********"
                         id="login-password"
-                        var={data.login_password}
-                        setVar={()=>setData('login_password',e.target.value)}
+                        var={form.password}
+                        setVar={setField('password')}
                         required
                     />
+                    {errors.password && <p className={styles.authDescription}>{errors.password}</p>}
                   
                     <FormOptions
-                        leftContent={<CheckboxInput label="Se souvenir" id="remember" setCheck={()=>setData('remember_me',!remember_me)} check={data.remember_me} />}
+                        leftContent={<CheckboxInput label="Se souvenir" id="remember" setCheck={toggleRemember} check={form.remember_me} />}
                         rightContent={<Link to="/forgot_password" className={styles.forgotPassword} >Mot de passe oublié?</Link>}
                     />
 
-                    <ConnexionButton type="submit" variant="primary">
-                        Connexion
+                    {errors.form && <p className={styles.authDescription}>{errors.form}</p>}
+
+                    <ConnexionButton type="submit" variant="primary" disabled={processing}>
+                        {processing ? 'Connexion...' : 'Connexion'}
                     </ConnexionButton>
                 </form>
 
@@ -108,7 +137,7 @@ export default function Login() {
                 <div className={styles.authFooter}>
                     <p>
                         Pas encore membre?{' '}
-                        <Link to="/create_acount" className={styles.authLink}>Créer un compte</Link>
+                        <Link to="/" className={styles.authLink}>Créer un compte</Link>
                     </p>
                 </div>
             </div>
