@@ -12,9 +12,9 @@ return new class extends Migration
      */
     public function up():void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('clients', function (Blueprint $table) {
             $table->id();
-            $table->uuid('uuid')->default(DB::raw('gen_random_uuid()'))->unique();
+            $table->uuid('uuid')->unique();
             $table->string('email', 255)->unique();
             $table->string('phone', 20)->unique()->nullable();
             $table->string('password_hash', 255);
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('clients');
     }
 };
