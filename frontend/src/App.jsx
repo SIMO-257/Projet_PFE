@@ -1,13 +1,12 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import WalletScreen from "./Pages/WalletScreen/WalletScreen";
 import Login from "./Pages/Login/Login";
 import SignUp from "./Pages/SignUp/SignUp";
 import ForgotPassword from "./Pages/ForgotPassword/ForgotPassword";
 
 import HomeScreen from "./Pages/Home/HomeScreen";
-// import WalletScreen from "./Pages/WalletScreen/WalletScreen";
 import MyTickets from "./Pages/MyTickets/MyTickets";
-// import ViewTicket from "./Pages/ViewTicket/ViewTicket";
+// import WalletScreen from "./Pages/WalletScreen/WalletScreen";
+ import ViewTicket from "./Pages/ViewTicket/ViewTicket";
 // import TicketSelection from "./Pages/TicketSelection/TicketSelection";
 
 // import Paiment from "./Pages/Paiment/Paiment";
@@ -24,9 +23,9 @@ function App() {
         <Routes>
           <Route path="/" element={<SignUp/>} />
           <Route path="/login" element={<Login/>} />
-          <Route path="/forgot_password" element={<ForgotPassword/>} />
+          <Route path="/forgot_password/*" element={<ForgotPassword/>} />
           <Route path="/home" element={<HomeScreen/>} />
-          <Route path="/viewticket/:id" element={<ViewTicket />} />
+          <Route path="/viewticket/:id" element={<ViewTicket/>} />
           {/* <Route path="/ticketselection/:id/:cardid?" element={<TicketSelection />}>
             <Route path="paiment" element={<Paiment />} />
           </Route> */}

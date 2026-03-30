@@ -6,7 +6,11 @@ use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Inertia\Inertia;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use App\Mail\ForgotPasswordMail;
+
 
 class ClientController extends Controller
 {
@@ -57,13 +61,34 @@ class ClientController extends Controller
     // Handle the signup form submission
     public function signup(Request $request)
     {
-        $data = $request->validate([
+        $validator = Validator::make($request->all(), [
             'email' => 'required|email|max:255|unique:clients,email',
-            'phone' => 'nullable|string|max:20|unique:clients,phone',
+            'phone' => ['required', 'string', 'regex:/^(06|07)\d{8}$/', 'unique:clients,phone'],
             'password' => 'required|string|min:8|confirmed',
+            'full_name' => 'nullable|string|max:255',
             'first_name' => 'nullable|string|max:100',
             'last_name' => 'nullable|string|max:100',
         ]);
+
+        $validator->after(function ($validator) use ($request) {
+            $fullName = trim((string) $request->input('full_name', ''));
+            if ($fullName !== '') {
+                $parts = preg_split('/[\s,]+/', $fullName, -1, PREG_SPLIT_NO_EMPTY);
+                if (count($parts) < 2) {
+                    $validator->errors()->add('full_name', 'Le nom complet doit contenir le nom de famille puis le prenom.');
+                }
+            }
+        });
+
+        $data = $validator->validate();
+
+        if (!empty($data['full_name'])) {
+            $parts = preg_split('/[\s,]+/', trim($data['full_name']), -1, PREG_SPLIT_NO_EMPTY);
+            $familyName = array_shift($parts) ?: null;
+            $personalName = count($parts) ? implode(' ', $parts) : null;
+            $data['last_name'] = $familyName;
+            $data['first_name'] = $personalName;
+        }
 
         Client::create([
             'email' => $data['email'],
@@ -91,5 +116,31 @@ class ClientController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect('/login');
+    }
+
+    // Forgot password: send a temporary password if account exists and is active
+    public function forgotPassword(Request $request)
+    {
+        $data = $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $client = Client::where('email', $data['email'])->first();
+
+        if ($client && $client->is_active) {
+            $tempPassword = Str::random(10);
+            $client->password_hash = Hash::make($tempPassword);
+            $client->save();
+
+            Mail::to($client->email)->send(new ForgotPasswordMail($tempPassword));
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => 'If the account exists, a password has been sent to the email.',
+            ]);
+        }
+
+        return back()->with('status', 'If the account exists, a password has been sent to the email.');
     }
 }

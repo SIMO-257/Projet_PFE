@@ -61,6 +61,11 @@
   font-family: 'Inter', sans-serif;
 }
 
+.formInputError {
+  border-color: #dc2626;
+  background-color: #fff5f5;
+}
+
 .formInput::placeholder {
   @apply text-gray-500 font-normal;
 }
@@ -69,6 +74,18 @@
   @apply outline-none bg-white;
   border-color: #7d1f4d;
   box-shadow: 0 0 0 3px rgba(125, 31, 77, 0.1);
+}
+
+.formInputError:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+}
+
+.fieldError {
+  color: #dc2626;
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  margin: 5px 0 0 0;
 }
 
 .formOptions {

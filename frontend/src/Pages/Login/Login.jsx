@@ -50,9 +50,14 @@ export default function Login() {
         } catch (err) {
             const responseErrors = err?.response?.data?.errors;
             if (responseErrors) {
-                setErrors(responseErrors);
+                if (responseErrors.email || responseErrors.password) {
+                    const generic = 'Password or Email are not valid';
+                    setErrors({ email: generic, password: generic });
+                } else {
+                    setErrors(responseErrors);
+                }
             } else {
-                setErrors({ form: "Connexion échouée. Réessayez." });
+                setErrors({ form: 'Password or Email are not valid' });
             }
         } finally {
             setProcessing(false);
@@ -87,9 +92,10 @@ export default function Login() {
                         id="login-email"
                         var={form.email}
                         setVar={setField('email')}
+                        error={Boolean(errors.email)}
+                        errorMessage={errors.email}
                         required
                     />
-                    {errors.email && <p className={styles.authDescription}>{errors.email}</p>}
 
                     <InputField
                         label="Mot de passe"
@@ -98,16 +104,17 @@ export default function Login() {
                         id="login-password"
                         var={form.password}
                         setVar={setField('password')}
+                        error={Boolean(errors.password)}
+                        errorMessage={errors.password}
                         required
                     />
-                    {errors.password && <p className={styles.authDescription}>{errors.password}</p>}
                   
                     <FormOptions
                         leftContent={<CheckboxInput label="Se souvenir" id="remember" setCheck={toggleRemember} check={form.remember_me} />}
                         rightContent={<Link to="/forgot_password" className={styles.forgotPassword} >Mot de passe oublié?</Link>}
                     />
 
-                    {errors.form && <p className={styles.authDescription}>{errors.form}</p>}
+                    {errors.form && <p className={styles.fieldError}>{errors.form}</p>}
 
                     <ConnexionButton type="submit" variant="primary" disabled={processing}>
                         {processing ? 'Connexion...' : 'Connexion'}
