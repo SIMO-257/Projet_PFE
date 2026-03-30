@@ -53,7 +53,7 @@ class Client extends Model
      *
      * @var bool
      */
-    public $timestamps = false;
+    public $timestamps = true;
 
     protected static function booted(): void
     {

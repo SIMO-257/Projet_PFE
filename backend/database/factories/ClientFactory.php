@@ -22,7 +22,7 @@ class ClientFactory extends Factory
         return [
             'uuid' => (string) Str::uuid(),
             'email' => $this->faker->unique()->safeEmail(),
-            'phone' => $this->faker->optional()->e164PhoneNumber(),
+            'phone' => $this->faker->e164PhoneNumber(),
             'password_hash' => Hash::make('password'),
             'first_name' => $this->faker->firstName(),
             'last_name' => $this->faker->lastName(),

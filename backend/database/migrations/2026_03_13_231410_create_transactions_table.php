@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -14,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->uuid('uuid')->default(DB::raw('gen_random_uuid()'))->unique();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->enum('type', ['purchase', 'topup', 'refund', 'validation']);
+            $table->uuid('uuid')->unique();
+            $table->foreignId('user_id')->constrained('clients')->onDelete('cascade');
+            $table->enum('type', ['purchase','validation']);
             $table->decimal('amount', 10, 2);
             $table->decimal('balance_before', 10, 2);
             $table->decimal('balance_after', 10, 2);

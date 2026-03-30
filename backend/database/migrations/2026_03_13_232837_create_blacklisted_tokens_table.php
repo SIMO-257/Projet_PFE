@@ -21,6 +21,9 @@ return new class extends Migration
             
             $table->index('ticket_uuid');
             $table->index('expires_at');
+            $table->foreign('ticket_uuid')
+                ->references('uuid')
+                ->on('tickets');
         });
     }
 

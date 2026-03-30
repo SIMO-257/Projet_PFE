@@ -5,16 +5,16 @@ import SignUp from "./Pages/SignUp/SignUp";
 import ForgotPassword from "./Pages/ForgotPassword/ForgotPassword";
 
 import HomeScreen from "./Pages/Home/HomeScreen";
-import WalletScreen from "./Pages/WalletScreen/WalletScreen";
+// import WalletScreen from "./Pages/WalletScreen/WalletScreen";
 import MyTickets from "./Pages/MyTickets/MyTickets";
-import ViewTicket from "./Pages/ViewTicket/ViewTicket";
+// import ViewTicket from "./Pages/ViewTicket/ViewTicket";
 // import TicketSelection from "./Pages/TicketSelection/TicketSelection";
 
-import Paiment from "./Pages/Paiment/Paiment";
-import ConfirmationPaiment from "./Pages/ConfirmationPaiment/ConfirmationPaiment";
-import PaimentHistory from "./Pages/PaimentHistory/PaimentHistory";
-import OfflineMode from "./Pages/OfflineMode/OfflineMode";
-import Notifications from "./Pages/Notifications/Notifications";
+// import Paiment from "./Pages/Paiment/Paiment";
+// import ConfirmationPaiment from "./Pages/ConfirmationPaiment/ConfirmationPaiment";
+// import PaimentHistory from "./Pages/PaimentHistory/PaimentHistory";
+// import OfflineMode from "./Pages/OfflineMode/OfflineMode";
+// import Notifications from "./Pages/Notifications/Notifications";
 
 
 function App() {

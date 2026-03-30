@@ -21,7 +21,7 @@ return new class extends Migration
             $table->integer('duration_minutes')->nullable();
             $table->boolean('is_reusable')->default(false);
             $table->integer('max_uses')->default(1);
-            $table->timestamp('created_at')->useCurrent();
+            $table->timestamps();
             $table->boolean('is_active')->default(true);
         });
     }

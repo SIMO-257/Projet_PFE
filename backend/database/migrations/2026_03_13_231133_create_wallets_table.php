@@ -13,9 +13,8 @@ return new class extends Migration
     {
         Schema::create('wallets', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('clients')->onDelete('cascade');
             $table->decimal('balance', 10, 2)->default(0.00);
-            $table->string('currency', 10)->default('MAD');
             $table->string('card_number', 20)->nullable(); // Virtual card number
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
