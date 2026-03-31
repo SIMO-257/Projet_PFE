@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../../Components/Layout/Header';
 import BottomNavigation from '../../Components/Layout/BottomNavigation';
 import ValidationCard from '../../Components/Cards/ValidationCard';
@@ -42,9 +43,15 @@ export default function ValidationScreen() {
     console.log('Going back...');
   };
 
+  const navigateHook = useNavigate();
+
   const navigate = (section) => {
     setActiveTab(section);
     console.log('Navigating to:', section);
+    if (section === 'home') navigateHook('/home');
+    if (section === 'wallet') navigateHook('/wallet');
+    if (section === 'tickets') navigateHook('/mytickets');
+    if (section === 'profile') navigateHook('/profile');
   };
 
   const validateNFC = () => {

@@ -5,9 +5,16 @@
 }
 
 .authCard {
-  @apply bg-white rounded-3xl shadow-md w-full border border-gray-100;
-  padding: 48px 40px;
+  @apply bg-white rounded-3xl w-full border border-gray-100;
+  padding: 40px;
   max-width: 420px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(212, 175, 55, 0.1);
+}
+
+/* Fixed for ForgotPassword nested cards */
+.authCard .authCard {
+  @apply p-0 border-none bg-none shadow-none m-0;
 }
 
 .authHeader {
@@ -16,7 +23,7 @@
 
 .authLogo {
   @apply text-4xl font-normal mb-4 tracking-normal;
-  color: #7d1f4d;
+  color: #8B4049;
   font-family: 'Playfair Display', Georgia, serif;
 }
 
@@ -24,19 +31,18 @@
   @apply border-none mx-auto mb-5 block;
   width: 60px;
   height: 3px;
-  background-color: #d4af37;
+  background: linear-gradient(to right, #FFD700, #D4AF37);
+  border-radius: 2px;
 }
 
 .authSubtitle {
   @apply text-gray-900 font-semibold mb-3;
   font-size: 22px;
-  font-family: 'Inter', sans-serif;
 }
 
 .authDescription {
-  @apply text-gray-600 text-sm leading-relaxed mx-auto font-normal;
+  @apply text-gray-500 text-sm leading-relaxed mx-auto font-normal;
   max-width: 320px;
-  font-family: 'Inter', sans-serif;
 }
 
 .authForm {
@@ -48,17 +54,15 @@
 }
 
 .formLabel {
-  @apply block text-gray-900 font-semibold mb-2;
-  font-size: 13px;
-  font-family: 'Inter', sans-serif;
+  @apply block text-gray-600 font-semibold mb-2 uppercase tracking-wider;
+  font-size: 11px;
 }
 
 .formInput {
-  @apply w-full px-4 border-gray-300 text-sm bg-gray-50 transition-all text-gray-800 font-normal;
+  @apply w-full px-4 border-gray-200 text-sm bg-gray-50 transition-all text-gray-800 font-normal;
   padding: 14px 16px;
-  border: 1.5px solid #e0e0e0;
-  border-radius: 10px;
-  font-family: 'Inter', sans-serif;
+  border: 1.5px solid #f0f0f0;
+  border-radius: 12px;
 }
 
 .formInputError {
@@ -67,13 +71,13 @@
 }
 
 .formInput::placeholder {
-  @apply text-gray-500 font-normal;
+  @apply text-gray-400 font-normal;
 }
 
 .formInput:focus {
   @apply outline-none bg-white;
-  border-color: #7d1f4d;
-  box-shadow: 0 0 0 3px rgba(125, 31, 77, 0.1);
+  border-color: rgba(139, 64, 73, 0.5);
+  box-shadow: 0 0 0 3px rgba(139, 64, 73, 0.05);
 }
 
 .formInputError:focus {
@@ -98,56 +102,53 @@
 }
 
 .checkboxLabel {
-  @apply flex items-center text-gray-600 cursor-pointer font-normal;
+  @apply flex items-center text-gray-500 cursor-pointer font-normal transition-colors;
   font-size: 13px;
-  font-family: 'Inter', sans-serif;
+}
+
+.checkboxLabel:hover {
+  @apply text-gray-800;
 }
 
 .checkboxLabel input {
-  @apply w-4 h-4 rounded cursor-pointer;
+  @apply w-4 h-4 rounded cursor-pointer transition-all;
   margin-right: 10px;
-  border: 1.5px solid #d0d0d0;
-  accent-color: #7d1f4d;
-}
-
-.checkboxLabel input:checked {
-  background-color: #7d1f4d;
-  border-color: #7d1f4d;
+  border: 1.5px solid #e0e0e0;
+  accent-color: #8B4049;
 }
 
 .forgotPassword {
   @apply no-underline font-medium transition-colors;
-  color: #7d1f4d;
+  color: #8B4049;
   font-size: 13px;
-  font-family: 'Inter', sans-serif;
 }
 
 .forgotPassword:hover {
-  @apply no-underline;
-  color: #651939;
+  @apply no-underline text-[#5C2A2E];
 }
 
 .authButton {
   @apply w-full px-4 py-4 border-none cursor-pointer transition-all;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 15px;
   font-weight: 600;
-  font-family: 'Inter', sans-serif;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.5px;
 }
 
 .authButtonPrimary {
-  @apply text-white;
-  background-color: #7d1f4d;
+  @apply text-white shadow-md;
+  background: linear-gradient(135deg, #8B4049 0%, #5C2A2E 100%);
 }
 
 .authButtonPrimary:hover:not(:disabled) {
-  @apply -translate-y-px;
-  background-color: #651939;
-  box-shadow: 0 4px 12px rgba(125, 31, 77, 0.2);
+  @apply scale-[1.01];
+  filter: brightness(1.1);
+  box-shadow: 0 8px 15px rgba(139, 64, 73, 0.2);
 }
 
 .authButtonPrimary:active:not(:disabled) {
+  @apply scale-[0.99];
+}
   background-color: #4d1329;
 }
 

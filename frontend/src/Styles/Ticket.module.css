@@ -35,18 +35,17 @@
 
   /* Ticket Card */
   .ticketCard {
-    @apply bg-[#1a1a1a] rounded-2xl p-6 border border-[#3a3a3a] transition-all duration-300;
-    border-width: 1.5px;
+    @apply bg-black/40 rounded-2xl p-6 border border-white/10 transition-all duration-300;
   }
 
   .ticketCard:hover {
-    @apply -translate-y-0.5;
+    @apply -translate-y-1 border-yellow-500/20;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
   }
 
   .activeTicket {
-    @apply border border-ticket-border;
-    background: linear-gradient(135deg, #2d1b2e 0%, #1f1520 100%);
-    border-width: 1.5px;
+    @apply border-yellow-500/20;
+    background: linear-gradient(135deg, rgba(139, 64, 73, 0.1) 0%, rgba(92, 42, 46, 0.1) 100%);
   }
 
   .ticketTop {
@@ -62,55 +61,46 @@
   }
 
   .ticketIcon {
-    @apply text-3xl grayscale brightness-[0.7] contrast-125;
-    color: #b8965f;
+    @apply text-3xl opacity-50;
+    color: #D4AF37;
   }
 
   .activeTicket .ticketIcon {
-    @apply grayscale-0;
-    color: #d4af37;
+    @apply opacity-100;
+    color: #FFD700;
   }
 
   .ticketTitle {
-    @apply text-[22px] font-normal text-white m-0 mb-1.5;
-    font-family: serif;
+    @apply text-lg font-semibold text-white m-0 mb-1;
     letter-spacing: 0.5px;
   }
 
   .ticketDescription {
-    @apply text-sm text-white/40 m-0 font-light;
+    @apply text-xs text-white/40 m-0 font-light;
   }
 
   /* Status Badge */
   .statusBadge {
-    @apply py-2 px-6 rounded-3xl text-sm font-medium;
-    letter-spacing: 0.3px;
+    @apply py-1 px-3 rounded-full text-[10px] font-medium uppercase tracking-wider;
   }
 
   .activeBadge {
-    @apply border;
-    background: rgba(180, 160, 90, 0.15);
-    color: #b4a05a;
-    border-color: rgba(180, 160, 90, 0.3);
-    border-width: 1.5px;
+    @apply bg-yellow-500/20 text-yellow-500 border border-yellow-500/30;
   }
 
   .inactiveBadge {
-    @apply bg-transparent border;
-    color: rgba(255, 255, 255, 0.3);
-    border-color: rgba(255, 255, 255, 0.2);
-    border-width: 1.5px;
+    @apply bg-white/5 text-white/30 border border-white/10;
   }
 
   /* Ticket Details */
   .ticketDetails {
-    @apply flex justify-between items-end mb-6 py-5;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    @apply flex justify-between items-end mb-6 py-4;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   }
 
   .detailRow {
-    @apply flex flex-col items-start gap-2;
+    @apply flex flex-col items-start gap-1;
   }
 
   .detailRow:last-child {
@@ -118,57 +108,48 @@
   }
 
   .detailLabel {
-    @apply text-[15px] text-white/40 font-light;
-    letter-spacing: 0.3px;
+    @apply text-[10px] text-white/40 font-medium uppercase tracking-wider;
   }
 
   .detailValue {
-    @apply text-lg text-white/90 font-light;
-    letter-spacing: 0.3px;
+    @apply text-sm text-white/90 font-medium;
   }
 
   .priceValue {
-    @apply text-5xl text-gold font-light;
-    font-family: serif;
-    letter-spacing: 1px;
+    @apply text-2xl text-yellow-500 font-bold;
   }
 
   .ticketCard:not(.activeTicket) .priceValue {
-    @apply text-white;
+    @apply text-white/70;
   }
 
   /* Buttons */
   .ticketButton {
-    @apply w-full py-4 border-none rounded-2xl text-base font-normal cursor-pointer transition-all duration-300 flex items-center justify-center gap-2.5;
-    letter-spacing: 0.3px;
+    @apply w-full py-3 border-none rounded-xl text-sm font-semibold cursor-pointer transition-all duration-300 flex items-center justify-center gap-2;
   }
 
   .buttonIcon {
-    @apply text-lg;
+    @apply text-base;
   }
 
   .viewButton {
-    @apply text-white;
-    background: linear-gradient(135deg, #7d3f5d 0%, #5d2f4a 100%);
+    @apply text-white shadow-lg;
+    background: linear-gradient(135deg, #8B4049 0%, #5C2A2E 100%);
   }
 
   .viewButton:hover {
-    background: linear-gradient(135deg, #8d4f6d 0%, #6d3f5a 100%);
-    transform: translateY(-1px);
+    @apply scale-[1.02];
+    filter: brightness(1.1);
   }
 
   .purchaseButton {
-    @apply bg-[#2a2a2a] text-white/70 border;
-    border-color: rgba(255, 255, 255, 0.1);
+    @apply bg-white/5 text-white/70 border border-white/10;
   }
 
   .purchaseButton:hover {
-    @apply bg-[#333] text-white/90;
+    @apply bg-white/10 text-white/90;
   }
 
-  .purchaseButton .buttonIcon {
-    @apply brightness-[0.7];
-  }
 
   /* Navigation Footer */
   .navigation {

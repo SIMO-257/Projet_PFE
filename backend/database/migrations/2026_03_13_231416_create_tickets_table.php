@@ -14,7 +14,11 @@ return new class extends Migration
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
+<<<<<<< Updated upstream
             $table->foreignId('user_id')->constrained('clients')->onDelete('cascade');
+=======
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+>>>>>>> Stashed changes
             $table->foreignId('ticket_type_id')->constrained('ticket_types')->onDelete('cascade');
             $table->foreignId('purchase_id')->nullable()->constrained('transactions')->onDelete('set null');
             $table->enum('status', ['active', 'used', 'expired'])->default('active');

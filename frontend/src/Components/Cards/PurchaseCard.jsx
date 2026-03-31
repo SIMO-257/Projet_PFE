@@ -1,18 +1,15 @@
 import styles from '../../Styles/Ticket.module.css';
 import CardButton from '../Buttons/CardButton';
-import { useForm } from '@inertiajs/react';
 
 export default function PurchaseCard(props) {
 
-  const { Data } = useForm({
-    id: props.purchase_id
-  });
-
   const purchase_ticket = () => {
-    post('/ticketselection');
+    console.log('Purchase ticket:', props.purchase.id);
+    // In a real app, this would navigate to a payment page or call an API
+    // props.navigate('/payment', { state: { item: props.purchase } });
   }
-  return (
 
+  return (
     <div key={props.purchase.id} className={styles.ticketCard} >
       <div className={styles.ticketTop}>
         <div className={styles.ticketHeaderRow}>
@@ -31,20 +28,19 @@ export default function PurchaseCard(props) {
 
       <div className={styles.ticketDetails}>
         <div className={styles.detailRow}>
-          <span className={styles.detailLabel}>Price</span>
+          <span className={styles.detailLabel}>Prix</span>
           <span className={styles.priceValue}>{props.purchase.price}</span>
         </div>
 
         <div className={styles.detailRow}>
-          <span className={styles.detailLabel}>Duration</span>
+          <span className={styles.detailLabel}>Durée</span>
           <span className={styles.detailValue}>{props.purchase.duration}</span>
         </div>
 
       </div>
 
-      <CardButton active={props.purchase.isActive} btnText={props.purchase.buttonText} method={purchase_ticket} />
+      <CardButton active={true} btnText={props.purchase.buttonText} method={purchase_ticket} />
 
     </div>
-
   );
 };
