@@ -1,157 +1,48 @@
-/* Toggle Switch Styles */
-.toggle-switch {
-    position: relative;
-    width: 48px;
-    height: 28px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 14px;
-    transition: background 0.3s;
-    cursor: pointer;
-    flex-shrink: 0;
-  }
-  
-  .toggle-switch.active {
-    background: linear-gradient(135deg, #D9B991, #C9A961);
-  }
-  
-  .toggle-knob {
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 22px;
-    height: 22px;
-    background: white;
-    border-radius: 11px;
-    transition: transform 0.3s;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  }
-  
-  .toggle-switch.active .toggle-knob {
-    transform: translateX(20px);
-  }
-  
-  /* Settings Screen Container */
-  .settings-container {
-    background: linear-gradient(to bottom right, #2a0b0f, #1a0507);
-    min-height: 100vh;
-  }
-  
-  .settings-card {
-    background: linear-gradient(to bottom right, rgba(64, 1, 6, 0.95), rgba(38, 1, 1, 0.95));
-    border: 1px solid rgba(212, 175, 55, 0.2);
-    backdrop-filter: blur(10px);
-    border-radius: 1.5rem;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .settings-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(to right, #FFD700, #D4AF37);
-    border-radius: 1.5rem 1.5rem 0 0;
-  }
-  
-  /* Scrollbar */
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 4px;
-  }
-  
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-  }
-  
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(212, 175, 55, 0.3);
-    border-radius: 10px;
-  }
-  
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(212, 175, 55, 0.5);
-  }
-  
-  /* Section Titles */
-  .section-title {
-    color: #D4AF37;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-weight: 600;
-    margin-bottom: 0.75rem;
-  }
-  
-  /* Spacing Utilities */
-  .mb-6 {
-    margin-bottom: 1.5rem;
-  }
-  
-  .space-y-3 > * + * {
-    margin-top: 0.75rem;
-  }
-  
-  /* Footer */
-  .settings-footer {
-    text-align: center;
-    padding-top: 1.5rem;
-    padding-bottom: 1rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  .settings-footer-text {
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 0.75rem;
-    margin: 0.25rem 0;
-  }
-  
-  .settings-footer-links {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    margin-top: 0.5rem;
-  }
-  
-  .settings-footer-link {
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 0.75rem;
-    transition: color 0.3s;
-  }
-  
-  .settings-footer-link:hover {
-    color: #D4AF37;
-  }
-  
-  .settings-footer-separator {
-    color: rgba(255, 255, 255, 0.4);
-  }
-  
-  /* Profile Avatar */
-  .profile-avatar {
-    width: 3.5rem;
-    height: 3.5rem;
-    border-radius: 50%;
-    background: linear-gradient(to bottom right, #FFD700, #D4AF37);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-  }
-  
-  .profile-initials {
-    color: white;
-    font-weight: bold;
-    font-size: 0.875rem;
-  }
-  
-  /* Responsive */
-  @media (max-width: 640px) {
-    .settings-card {
-      margin: 0.5rem;
-    }
-  }
+.settingsCard {
+  position: relative;
+  border-radius: 1.5rem; /* 24px */
+  overflow: hidden;
+  background: linear-gradient(to bottom right, rgba(64, 1, 6, 0.95), rgba(38, 1, 1, 0.95));
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(234, 179, 8, 0.2);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.settingsCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(to right, #FFD700, #D4AF37);
+  border-top-left-radius: 1.5rem;
+  border-top-right-radius: 1.5rem;
+}
+
+.scrollContainer {
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+/* Custom Scrollbar */
+.scrollContainer::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollContainer::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.scrollContainer::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.3);
+  border-radius: 10px;
+}
+
+.scrollContainer::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 175, 55, 0.5);
+}

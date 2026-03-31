@@ -1,134 +1,58 @@
-/* Profile Screen Container */
-.profile-container {
-    background: linear-gradient(to bottom right, #2a0b0f, #1a0507);
-    min-height: 100vh;
-  }
-  
-  .profile-card {
-    background: linear-gradient(to bottom right, rgba(64, 1, 6, 0.9), rgba(38, 1, 1, 0.9));
-    border: 1px solid rgba(212, 175, 55, 0.2);
-    backdrop-filter: blur(10px);
-    border-radius: 1.5rem;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .profile-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(to right, #FFD700, #D4AF37);
-    border-radius: 1.5rem 1.5rem 0 0;
-  }
-  
-  /* Scrollbar */
-  .profile-scrollbar::-webkit-scrollbar {
-    width: 4px;
-  }
-  
-  .profile-scrollbar::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-  }
-  
-  .profile-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(212, 175, 55, 0.3);
-    border-radius: 10px;
-  }
-  
-  .profile-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(212, 175, 55, 0.5);
-  }
-  
-  /* Profile Info Card */
-  .profile-info-card {
-    background: linear-gradient(to bottom right, #5C2A36, #3D1A24);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 1.5rem;
-    padding: 1.5rem;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-  }
-  
-  /* Name & Status */
-  .profile-name {
-    color: white;
-    font-size: 1.5rem;
-    font-weight: bold;
-    text-align: center;
-  }
-  
-  .profile-status {
-    color: #D4AF37;
-    font-size: 0.875rem;
-    font-weight: 500;
-    text-align: center;
-  }
-  
-  /* Edit Profile Button */
-  .edit-profile-button {
-    background: linear-gradient(135deg, #8B4049, #5C2A2E);
-    color: white;
-    font-weight: 600;
-    padding: 0.75rem;
-    border-radius: 1rem;
-    transition: all 0.3s;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-  }
-  
-  .edit-profile-button:hover {
-    background: linear-gradient(135deg, #9B5059, #6C3A3E);
-  }
-  
-  /* Contact Info */
-  .contact-info-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-  
-  /* Menu Options */
-  .menu-options-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-  
-  /* Bottom Navigation Padding */
-  .bottom-nav-padding {
-    padding-top: 5rem; /* Add padding for bottom navigation */
-  }
-  
-  /* Header */
-  .profile-header {
-    padding: 2rem 1.5rem 1rem;
-  }
-  
-  .profile-header-title {
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 1rem;
-    font-weight: 300;
-  }
-  
-  /* Spacing Utilities */
-  .mb-6 {
-    margin-bottom: 1.5rem;
-  }
-  
-  .space-y-3 > * + * {
-    margin-top: 0.75rem;
-  }
-  
-  /* Responsive */
-  @media (max-width: 640px) {
-    .profile-card {
-      margin: 0.5rem;
-    }
-    
-    .profile-info-card {
-      padding: 1rem;
-    }
-  }
+.profileCard {
+  position: relative;
+  border-radius: 1.5rem; /* 24px */
+  overflow: hidden;
+  background: linear-gradient(to bottom right, rgba(64, 1, 6, 0.9), rgba(38, 1, 1, 0.9));
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(234, 179, 8, 0.2);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.profileCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(to right, #FFD700, #D4AF37);
+  border-top-left-radius: 1.5rem;
+  border-top-right-radius: 1.5rem;
+}
+
+.scrollContainer {
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-bottom: 6rem;
+}
+
+/* Custom Scrollbar */
+.scrollContainer::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollContainer::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.scrollContainer::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.3);
+  border-radius: 10px;
+}
+
+.scrollContainer::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 175, 55, 0.5);
+}
+
+/* Utility to hide scrollbar if needed, similar to HomeScreen */
+.hideScrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hideScrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

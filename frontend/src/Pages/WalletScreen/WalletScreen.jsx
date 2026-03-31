@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../../Components/Layout/Header';
 import BalanceCard from '../../Components/Cards/BalanceCard';
 import ActionButtonCard from '../../Components/Cards/ActionButtonCard';
@@ -10,14 +11,21 @@ import styles from '../../Styles/WalletScreen.module.css';
 
 const WalletScreen = () => {
   const [activeTab, setActiveTab] = useState('wallet');
+  const navigateHook = useNavigate();
 
   const navigate = (section) => {
     setActiveTab(section);
     console.log('Navigating to:', section);
+    if (section === 'profile') navigateHook('/profile');
+    if (section === 'home') navigateHook('/home');
   };
 
   const handleRecharge = () => {
     console.log('Recharge wallet');
+  };
+
+  const handleChangeCard = () => {
+    navigateHook('/change-card');
   };
 
   const handleMenuAction = () => {
@@ -79,6 +87,19 @@ const WalletScreen = () => {
                 gradientTo="#5C2A36"
                 showCircles={false}
               />
+
+              {/* Change Card Button */}
+              <div className="flex justify-end -mt-4 mb-4 pr-2">
+                <button 
+                  onClick={handleChangeCard}
+                  className="text-yellow-500 text-xs font-medium hover:text-yellow-400 flex items-center space-x-1"
+                >
+                  <span>Changer de carte</span>
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/>
+                  </svg>
+                </button>
+              </div>
 
               {/* Recharge Button */}
               <ActionButtonCard

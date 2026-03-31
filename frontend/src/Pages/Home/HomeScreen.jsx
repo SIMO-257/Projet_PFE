@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../../Components/Layout/Header';
 import BalanceCard from '../../Components/Cards/BalanceCard';
 import ActionButtonCard from '../../Components/Cards/ActionButtonCard';
@@ -8,10 +9,14 @@ import styles from '../../Styles/HomeScreen.module.css';
 
 const HomeScreen = () => {
   const [activeTab, setActiveTab] = useState('home');
+  const navigateHook = useNavigate();
 
   const navigate = (section) => {
     setActiveTab(section);
     console.log('Navigating to:', section);
+    if (section === 'wallet') navigateHook('/wallet');
+    if (section === 'profile') navigateHook('/profile');
+    if (section === 'tickets') navigateHook('/mytickets');
   };
 
   const handleAction = (action) => {
