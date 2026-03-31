@@ -17,6 +17,7 @@ import PaimentHistory from "./Pages/PaimentHistory/PaimentHistory";
 import OfflineMode from "./Pages/OfflineMode/OfflineMode";
 import Notifications from "./Pages/Notifications/Notifications";
 import ChangeCardScreen from "./Pages/ChangeCardScreen/ChangeCardScreen";
+import ValidationScreen from "./Pages/ValidationScreen/ValidationScreen";
 
 function App() {
   return (
@@ -25,24 +26,29 @@ function App() {
         <Routes>
           <Route path="/" element={<HomeScreen />} />
           <Route path="/home" element={<HomeScreen />} />
+
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/forgot_password" element={<ForgotPassword />} />
+
           <Route path="/profile" element={<ProfileScreen />} />
           <Route path="/edit-profile" element={<EditProfileScreen />} />
           <Route path="/settings" element={<SettingsScreen />} />
           <Route path="/help-support" element={<HelpSupportScreen />} />
+          <Route path="/change-card" element={<ChangeCardScreen />} />
           <Route path="/security" element={<SecurityScreen />} />
+
           <Route path="/wallet" element={<WalletScreen />} />
           <Route path="/viewticket/:id" element={<ViewTicket />} />
+          
           <Route path="/mytickets" element={<MyTickets />} />
+          <Route path="/validation" element={<ValidationScreen />} />
           <Route path="/payment" element={<Paiment />} />
           <Route path="/payment-confirmation" element={<ConfirmationPaiment />} />
           <Route path="/payment-history" element={<PaimentHistory />} />
           <Route path="/offline" element={<OfflineMode />} />
           <Route path="/notifications" element={<Notifications />} />
-          <Route path="/change-card" element={<ChangeCardScreen />} />
         </Routes>
       </BrowserRouter>
     </>

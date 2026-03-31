@@ -1,203 +1,189 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-.authContainer {
-  @apply min-h-screen flex items-center justify-center bg-white p-5;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
+@layer components {
+  .authContainer {
+    @apply min-h-screen flex items-center justify-center bg-white p-5;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
 
-.authCard {
-  @apply bg-white rounded-3xl shadow-md w-full border border-gray-100;
-  padding: 48px 40px;
-  max-width: 420px;
-}
+  .authCard {
+    @apply bg-white rounded-3xl w-full border border-gray-100;
+    padding: 40px;
+    max-width: 420px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(212, 175, 55, 0.1);
+  }
 
-.authHeader {
-  @apply text-center mb-8;
-}
+  /* Fixed for ForgotPassword nested cards */
+  .authCard .authCard {
+    @apply p-0 border-none bg-none shadow-none m-0;
+  }
 
-.authLogo {
-  @apply text-4xl font-normal mb-4 tracking-normal;
-  color: #7d1f4d;
-  font-family: 'Playfair Display', Georgia, serif;
-}
+  .authHeader {
+    @apply text-center mb-8;
+  }
 
-.goldenLine {
-  @apply border-none mx-auto mb-5 block;
-  width: 60px;
-  height: 3px;
-  background-color: #d4af37;
-}
+  .authLogo {
+    @apply text-4xl font-normal mb-4 tracking-normal;
+    color: #8B4049;
+    font-family: 'Playfair Display', Georgia, serif;
+  }
 
-.authSubtitle {
-  @apply text-gray-900 font-semibold mb-3;
-  font-size: 22px;
-  font-family: 'Inter', sans-serif;
-}
+  .goldenLine {
+    @apply border-none mx-auto mb-5 block;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(to right, #FFD700, #D4AF37);
+    border-radius: 2px;
+  }
 
-.authDescription {
-  @apply text-gray-600 text-sm leading-relaxed mx-auto font-normal;
-  max-width: 320px;
-  font-family: 'Inter', sans-serif;
-}
+  .authSubtitle {
+    @apply text-gray-900 font-semibold mb-3;
+    font-size: 22px;
+  }
 
-.authForm {
-  @apply mb-7;
-}
+  .authDescription {
+    @apply text-gray-500 text-sm leading-relaxed mx-auto font-normal;
+    max-width: 320px;
+  }
 
-.formGroup {
-  @apply mb-6;
-}
+  .authForm {
+    @apply mb-7;
+  }
 
-.formLabel {
-  @apply block text-gray-900 font-semibold mb-2;
-  font-size: 13px;
-  font-family: 'Inter', sans-serif;
-}
+  .formGroup {
+    @apply mb-6;
+  }
 
-.formInput {
-  @apply w-full px-4 border-gray-300 text-sm bg-gray-50 transition-all text-gray-800 font-normal;
-  padding: 14px 16px;
-  border: 1.5px solid #e0e0e0;
-  border-radius: 10px;
-  font-family: 'Inter', sans-serif;
-}
+  .formLabel {
+    @apply block text-gray-600 font-semibold mb-2 uppercase tracking-wider;
+    font-size: 11px;
+  }
 
-.formInput::placeholder {
-  @apply text-gray-500 font-normal;
-}
+  .formInput {
+    @apply w-full px-4 border-gray-200 text-sm bg-gray-50 transition-all text-gray-800 font-normal;
+    padding: 14px 16px;
+    border: 1.5px solid #f0f0f0;
+    border-radius: 12px;
+  }
 
-.formInput:focus {
-  @apply outline-none bg-white;
-  border-color: #7d1f4d;
-  box-shadow: 0 0 0 3px rgba(125, 31, 77, 0.1);
-}
+  .formInput::placeholder {
+    @apply text-gray-400 font-normal;
+  }
 
-.formOptions {
-  @apply flex justify-between items-center mb-7;
-}
+  .formInput:focus {
+    @apply outline-none bg-white;
+    border-color: rgba(139, 64, 73, 0.5);
+    box-shadow: 0 0 0 3px rgba(139, 64, 73, 0.05);
+  }
 
-.formOptionsLeft,
-.formOptionsRight {
-  @apply flex items-center;
-}
+  .formOptions {
+    @apply flex justify-between items-center mb-7;
+  }
 
-.checkboxLabel {
-  @apply flex items-center text-gray-600 cursor-pointer font-normal;
-  font-size: 13px;
-  font-family: 'Inter', sans-serif;
-}
+  .formOptionsLeft,
+  .formOptionsRight {
+    @apply flex items-center;
+  }
 
-.checkboxLabel input {
-  @apply w-4 h-4 rounded cursor-pointer;
-  margin-right: 10px;
-  border: 1.5px solid #d0d0d0;
-  accent-color: #7d1f4d;
-}
+  .checkboxLabel {
+    @apply flex items-center text-gray-500 cursor-pointer font-normal transition-colors;
+    font-size: 13px;
+  }
 
-.checkboxLabel input:checked {
-  background-color: #7d1f4d;
-  border-color: #7d1f4d;
-}
+  .checkboxLabel:hover {
+    @apply text-gray-800;
+  }
 
-.forgotPassword {
-  @apply no-underline font-medium transition-colors;
-  color: #7d1f4d;
-  font-size: 13px;
-  font-family: 'Inter', sans-serif;
-}
+  .checkboxLabel input {
+    @apply w-4 h-4 rounded cursor-pointer transition-all;
+    margin-right: 10px;
+    border: 1.5px solid #e0e0e0;
+    accent-color: #8B4049;
+  }
 
-.forgotPassword:hover {
-  @apply no-underline;
-  color: #651939;
-}
+  .forgotPassword {
+    @apply no-underline font-medium transition-colors;
+    color: #8B4049;
+    font-size: 13px;
+  }
 
-.authButton {
-  @apply w-full px-4 py-4 border-none cursor-pointer transition-all;
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: 600;
-  font-family: 'Inter', sans-serif;
-  letter-spacing: 0.2px;
-}
+  .forgotPassword:hover {
+    @apply no-underline text-[#5C2A2E];
+  }
 
-.authButtonPrimary {
-  @apply text-white;
-  background-color: #7d1f4d;
-}
+  .authButton {
+    @apply w-full px-4 py-4 border-none cursor-pointer transition-all;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
 
-.authButtonPrimary:hover:not(:disabled) {
-  @apply -translate-y-px;
-  background-color: #651939;
-  box-shadow: 0 4px 12px rgba(125, 31, 77, 0.2);
-}
+  .authButtonPrimary {
+    @apply text-white shadow-md;
+    background: linear-gradient(135deg, #8B4049 0%, #5C2A2E 100%);
+  }
 
-.authButtonPrimary:active:not(:disabled) {
-  background-color: #4d1329;
-}
+  .authButtonPrimary:hover:not(:disabled) {
+    @apply scale-[1.01];
+    filter: brightness(1.1);
+    box-shadow: 0 8px 15px rgba(139, 64, 73, 0.2);
+  }
 
-.authButton:disabled {
-  @apply opacity-50 cursor-not-allowed;
-}
+  .authButtonPrimary:active:not(:disabled) {
+    @apply scale-[0.99];
+  }
 
-.divider {
-  @apply flex items-center my-7 text-gray-500 font-normal;
-  font-size: 13px;
-  font-family: 'Inter', sans-serif;
-}
+  .divider {
+    @apply flex items-center my-7 text-gray-400 font-normal;
+    font-size: 13px;
+  }
 
-.divider::before,
-.divider::after {
-  @apply flex-1 border-b border-gray-200;
-  content: '';
-}
+  .divider::before,
+  .divider::after {
+    @apply flex-1 border-b border-gray-100;
+    content: '';
+  }
 
-.divider span {
-  @apply px-4 lowercase tracking-normal;
-  font-size: 13px;
-}
+  .divider span {
+    @apply px-4 lowercase tracking-normal;
+  }
 
-.socialButtons {
-  @apply flex flex-col gap-3 mb-7;
-}
+  .socialButtons {
+    @apply flex flex-col gap-3 mb-7;
+  }
 
-.socialButton {
-  @apply w-full bg-white text-sm font-medium cursor-pointer flex items-center justify-center transition-all text-gray-800;
-  padding: 14px;
-  border: 1.5px solid #e8e8e8;
-  border-radius: 10px;
-  font-family: 'Inter', sans-serif;
-}
+  .socialButton {
+    @apply w-full bg-white text-sm font-medium cursor-pointer flex items-center justify-center transition-all text-gray-700;
+    padding: 14px;
+    border: 1.5px solid #f0f0f0;
+    border-radius: 12px;
+  }
 
-.socialButton:hover {
-  @apply bg-gray-50 -translate-y-px;
-  border-color: #d0d0d0;
-}
+  .socialButton:hover {
+    @apply bg-gray-50 scale-[1.01];
+    border-color: #e0e0e0;
+  }
 
-.socialButtonGoogle {
-  @apply text-gray-800;
-}
+  .socialIcon {
+    @apply font-semibold text-base text-gray-900;
+    margin-right: 12px;
+  }
 
-.socialButtonApple {
-  @apply text-gray-800;
-}
+  .authFooter {
+    @apply text-center text-gray-500 pt-5 border-t border-gray-100 mt-2 font-normal;
+    font-size: 13px;
+  }
 
-.socialIcon {
-  @apply font-semibold text-base text-gray-900;
-  margin-right: 12px;
-}
+  .authLink {
+    @apply no-underline font-semibold transition-colors;
+    color: #8B4049;
+  }
 
-.authFooter {
-  @apply text-center text-gray-600 pt-5 border-t border-gray-100 mt-2 font-normal;
-  font-size: 13px;
-  font-family: 'Inter', sans-serif;
-}
-
-.authLink {
-  @apply no-underline font-semibold transition-colors;
-  color: #7d1f4d;
-  font-family: 'Inter', sans-serif;
-}
-
-.authLink:hover {
-  @apply underline;
-  color: #651939;
+  .authLink:hover {
+    @apply underline;
+  }
 }

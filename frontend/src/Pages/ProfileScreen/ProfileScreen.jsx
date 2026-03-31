@@ -14,6 +14,7 @@ const ProfileScreen = () => {
     if (section === 'home') navigateHook('/home');
     if (section === 'wallet') navigateHook('/wallet');
     if (section === 'tickets') navigateHook('/mytickets');
+    if (section === 'validation') navigateHook('/validation');
   };
 
   const handleEditProfile = () => {

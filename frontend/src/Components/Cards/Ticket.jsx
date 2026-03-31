@@ -28,7 +28,7 @@ const view_ticket = ()=>{
 
       <div className={styles.ticketDetails}>
         <div className={styles.detailRow}>
-          <span className={styles.detailLabel}>Price</span>
+          <span className={styles.detailLabel}>Prix</span>
           <span className={styles.priceValue}>{props.ticket.price}</span>
         </div>
 

@@ -18,6 +18,8 @@ const WalletScreen = () => {
     console.log('Navigating to:', section);
     if (section === 'profile') navigateHook('/profile');
     if (section === 'home') navigateHook('/home');
+    if (section === 'tickets') navigateHook('/mytickets');
+    if (section === 'validation') navigateHook('/validation');
   };
 
   const handleRecharge = () => {
