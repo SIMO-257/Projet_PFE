@@ -148,7 +148,7 @@ export default function Login() {
                 <div className={styles.authFooter}>
                     <p>
                         Pas encore membre?{' '}
-                        <Link to="/" className={styles.authLink}>Créer un compte</Link>
+                        <Link to="/signup" className={styles.authLink}>Créer un compte</Link>
                     </p>
                 </div>
             </div>
