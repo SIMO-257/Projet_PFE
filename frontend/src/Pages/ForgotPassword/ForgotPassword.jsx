@@ -11,7 +11,7 @@ import styles from '../../Styles/Auth.module.css';
 export default function ForgotPassword() {
 
 
-    const apiBase = import.meta.env.VITE_API_URL ?? '';
+    const apiBase = import.meta.env.VITE_API_URL;
     const [form, setForm] = useState({ email: '' });
     const [errors, setErrors] = useState({});
     const [processing, setProcessing] = useState(false);

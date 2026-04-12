@@ -1,3 +1,9 @@
 in the forgot password page i am sending an email:
     -- the controller verify if the email exists in the database .
     -- if it does and is_active is true it send the password with the account to that email.
+
+--in the profile page there is 4 things you should fetch.
+-- the name , the email , the phone number , and the reted at date of the account .
+-- place every data in the right place .
+-- use minimale code with simple logic
+

@@ -1,12 +1,28 @@
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import Header from '../../Components/Layout/Header';
 import BottomNavigation from '../../Components/Layout/BottomNavigation';
 import styles from '../../Styles/ProfileScreen.module.css';
 
 const ProfileScreen = () => {
+  const apiBase = import.meta.env.VITE_API_URL ?? '';
   const [activeTab, setActiveTab] = useState('profile');
+  const [profile, setProfile] = useState(null);
   const navigateHook = useNavigate();
+
+  useEffect(() => {
+    const uuid = sessionStorage.getItem('client_uuid');
+    if (!uuid) {
+      navigateHook('/login');
+      return;
+    }
+
+    axios
+      .get(`${apiBase}/api/profile`, { params: { uuid }, withCredentials: false })
+      .then((res) => setProfile(res?.data ?? null))
+      .catch(() => setProfile(null));
+  }, [apiBase, navigateHook]);
 
   const navigate = (section) => {
     setActiveTab(section);
@@ -18,7 +34,7 @@ const ProfileScreen = () => {
   };
 
   const handleEditProfile = () => {
-    console.log('Navigating to edit profile...');
+    navigateHook('/edit-profile', { state: { profile } });
   };
 
   const handleSettings = () => {
@@ -31,6 +47,8 @@ const ProfileScreen = () => {
 
   const handleLogout = () => {
     console.log('Logging out...');
+    sessionStorage.removeItem('client_uuid');
+    navigateHook('/login');
   };
 
   return (
@@ -51,9 +69,13 @@ const ProfileScreen = () => {
               <div className="flex justify-center mb-6">
                 <div className="relative">
                   <div className="w-28 h-28 rounded-full border-4 border-yellow-500 bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center overflow-hidden">
-                    <svg className="w-14 h-14 text-white/40" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd"/>
-                    </svg>
+                    {profile?.avatar_url ? (
+                      <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                    ) : (
+                      <svg className="w-14 h-14 text-white/40" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd"/>
+                      </svg>
+                    )}
                   </div>
                   {/* Premium Badge */}
                   <div className="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-gradient-to-br from-yellow-500 to-yellow-600 border-4 border-[#3D1A24] flex items-center justify-center">
@@ -66,7 +88,7 @@ const ProfileScreen = () => {
 
               {/* Name & Status */}
               <div className="text-center mb-6">
-                <h2 className="text-white text-2xl font-bold mb-1">Sophie Marchand</h2>
+                <h2 className="text-white text-2xl font-bold mb-1">{profile?.name ?? '—'}</h2>
                 <p className="text-yellow-500 text-sm font-medium">Membre Premium</p>
               </div>
 
@@ -82,7 +104,7 @@ const ProfileScreen = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-white/60 text-xs mb-0.5">Email</p>
-                    <p className="text-white text-sm font-medium truncate">sophie.marchand@email.fr</p>
+                    <p className="text-white text-sm font-medium truncate">{profile?.email ?? '—'}</p>
                   </div>
                 </div>
 
@@ -95,7 +117,7 @@ const ProfileScreen = () => {
                   </div>
                   <div className="flex-1">
                     <p className="text-white/60 text-xs mb-0.5">Téléphone</p>
-                    <p className="text-white text-sm font-medium">+33 6 12 34 56 78</p>
+                    <p className="text-white text-sm font-medium">{profile?.phone ?? '—'}</p>
                   </div>
                 </div>
 
@@ -108,7 +130,7 @@ const ProfileScreen = () => {
                   </div>
                   <div className="flex-1">
                     <p className="text-white/60 text-xs mb-0.5">Membre depuis</p>
-                    <p className="text-white text-sm font-medium">Janvier 2024</p>
+                    <p className="text-white text-sm font-medium">{profile?.created_at ?? '—'}</p>
                   </div>
                 </div>
               </div>

@@ -43,6 +43,10 @@ export default function Login() {
         try {
             setProcessing(true);
             const res = await axios.post(`${apiBase}/api/login`, payload, { withCredentials: false });
+            const clientUuid = res?.data?.client_uuid;
+            if (clientUuid) {
+                sessionStorage.setItem('client_uuid', clientUuid);
+            }
             const redirectTo = res?.data?.redirect;
             if (redirectTo) {
                 navigate(redirectTo);
