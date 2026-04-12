@@ -9,4 +9,5 @@ Route::post('/forgot-password', [ClientController::class, 'forgotPassword'])->na
 Route::get('/profile', [ClientController::class, 'fetch_profile'])->name('api.client.profile');
 Route::post('/profile/avatar', [ClientController::class, 'upload_avatar'])->name('api.client.profile.avatar');
 Route::put('/profile', [ClientController::class, 'update_profile'])->middleware('profilMiddleware')->name('api.client.profile.update');
+Route::post('/logout', [ClientController::class, 'logout'])->name('api.client.logout');
 Route::get('/home', [ClientController::class, 'home'])->name('api.client.home');

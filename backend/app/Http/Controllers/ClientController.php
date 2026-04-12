@@ -14,6 +14,22 @@ use Illuminate\Support\Facades\Validator;
 
 class ClientController extends Controller
 {
+    public function showLogin(Request $request)
+    {
+        $referer = (string) ($request->headers->get('referer') ?? '');
+        if ($referer !== '') {
+            $parts = parse_url($referer);
+            $scheme = $parts['scheme'] ?? null;
+            $host = $parts['host'] ?? null;
+            if ($scheme && $host) {
+                $port = isset($parts['port']) ? ':'.$parts['port'] : '';
+                return redirect()->away($scheme.'://'.$host.$port.'/login');
+            }
+        }
+
+        return redirect('/');
+    }
+
     public function home()
     {
         return redirect('/home');
@@ -188,9 +204,38 @@ class ClientController extends Controller
 
     public function logout(Request $request)
     {
+        $uuid = $request->header('X-Client-UUID')
+            ?? $request->input('uuid')
+            ?? $request->query('uuid');
+
+        $isApiRequest = $request->is('api/*') || $request->expectsJson();
+
         Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+
+        if ($request->hasSession()) {
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
+
+        if ($isApiRequest) {
+            return response()->json([
+                'message' => 'Logout successful.',
+                'redirect' => '/login',
+                'client_uuid' => $uuid,
+            ]);
+        }
+
+        $referer = (string) ($request->headers->get('referer') ?? '');
+        if ($referer !== '') {
+            $parts = parse_url($referer);
+            $scheme = $parts['scheme'] ?? null;
+            $host = $parts['host'] ?? null;
+            if ($scheme && $host) {
+                $port = isset($parts['port']) ? ':'.$parts['port'] : '';
+                return redirect()->away($scheme.'://'.$host.$port.'/login');
+            }
+        }
+
         return redirect('/login');
     }
 
