@@ -21,6 +21,19 @@ export default function ValidationScreen() {
   const [qrTimeRemaining, setQRTimeRemaining] = useState(30);
   const [notification, setNotification] = useState(null);
 
+  const closeQRModal = () => {
+    setShowQRModal(false);
+    setQRTimeRemaining(30);
+  };
+
+  const showQRExpired = () => {
+    setNotification({
+      type: 'error',
+      title: 'QR Code expiré',
+      message: 'Générez un nouveau code pour continuer'
+    });
+  };
+
   // QR Timer Effect
   useEffect(() => {
     let timer;
@@ -71,24 +84,11 @@ export default function ValidationScreen() {
     setQRTimeRemaining(30);
   };
 
-  const closeQRModal = () => {
-    setShowQRModal(false);
-    setQRTimeRemaining(30);
-  };
-
   const showValidationSuccess = () => {
     setNotification({
       type: 'success',
       title: 'Validation réussie!',
       message: 'Votre titre a été validé avec succès'
-    });
-  };
-
-  const showQRExpired = () => {
-    setNotification({
-      type: 'error',
-      title: 'QR Code expiré',
-      message: 'Générez un nouveau code pour continuer'
     });
   };
 

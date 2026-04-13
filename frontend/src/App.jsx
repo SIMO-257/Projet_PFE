@@ -1,9 +1,10 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import WalletScreen from "./Pages/WalletScreen/WalletScreen";
 import Login from "./Pages/Login/Login";
 import SignUp from "./Pages/SignUp/SignUp";
 import ForgotPassword from "./Pages/ForgotPassword/ForgotPassword";
 import HomeScreen from "./Pages/Home/HomeScreen";
+
+
 import ViewTicket from "./Pages/ViewTicket/ViewTicket";
 import ProfileScreen from "./Pages/ProfileScreen/ProfileScreen";
 import EditProfileScreen from "./Pages/EditProfile/EditProfile";
@@ -18,6 +19,7 @@ import OfflineMode from "./Pages/OfflineMode/OfflineMode";
 import Notifications from "./Pages/Notifications/Notifications";
 import ChangeCardScreen from "./Pages/ChangeCardScreen/ChangeCardScreen";
 import ValidationScreen from "./Pages/ValidationScreen/ValidationScreen";
+import WalletScreen from "./Pages/WalletScreen/WalletScreen";
 
 function App() {
   return (

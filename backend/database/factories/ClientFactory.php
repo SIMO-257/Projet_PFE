@@ -26,7 +26,7 @@ class ClientFactory extends Factory
             'password_hash' => Hash::make('password'),
             'first_name' => $this->faker->firstName(),
             'last_name' => $this->faker->lastName(),
-            'is_active' => $this->faker->boolean(90),
+            'is_active' => true,
             'created_at' => now(),
         ];
     }

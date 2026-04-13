@@ -52,6 +52,7 @@ export default function SignUp() {
             phone: form.phone || null,
             password: form.password,
             password_confirmation: form.password_confirmation,
+            full_name: form.full_name,
             first_name: firstName,
             last_name: lastName,
         };
@@ -104,9 +105,10 @@ Rejoinier l'expérience premium du mobile intelligent
                         id="signup-name"
                         var={form.full_name}
                         setVar={setField('full_name')}
+                        error={Boolean(errors.full_name)}
+                        errorMessage={errors.full_name}
                         required
                     />
-                    {errors.full_name && <p className={styles.authDescription}>{errors.full_name}</p>}
 
                     <InputField
                         label="Email"
@@ -114,21 +116,23 @@ Rejoinier l'expérience premium du mobile intelligent
                         placeholder="votre@email.com"
                         id="signup-email"
                         var={form.email}
-                        setVar={setField('email')}                        
+                        setVar={setField('email')}
+                        error={Boolean(errors.email)}                        
+                        errorMessage={errors.email}                        
                         required
                     />
-                    {errors.email && <p className={styles.authDescription}>{errors.email}</p>}
 
                     <InputField
                         label="Téléphone"
                         type="number"
-                        placeholder="+121 6 12 34 56 78"
+                        placeholder="06 12 34 56 78"
                         id="signup-number"
                         var={form.phone}
                         setVar={setField('phone')}
+                        error={Boolean(errors.phone)}
+                        errorMessage={errors.phone}
                         required
                     />
-                    {errors.phone && <p className={styles.authDescription}>{errors.phone}</p>}
 
                     <InputField
                         label="Mot de passe"
@@ -137,9 +141,10 @@ Rejoinier l'expérience premium du mobile intelligent
                         id="signup-password"
                         var={form.password}
                         setVar={setField('password')}
+                        error={Boolean(errors.password)}
+                        errorMessage={errors.password}
                         required
                     />
-                    {errors.password && <p className={styles.authDescription}>{errors.password}</p>}
 
                     <InputField
                         label="Confirmer le mot de passe"
@@ -148,17 +153,18 @@ Rejoinier l'expérience premium du mobile intelligent
                         id="signup-password-confirmation"
                         var={form.password_confirmation}
                         setVar={setField('password_confirmation')}
+                        error={Boolean(errors.password_confirmation)}
+                        errorMessage={errors.password_confirmation}
                         required
                     />
-                    {errors.password_confirmation && <p className={styles.authDescription}>{errors.password_confirmation}</p>}
 
                     <FormOptions
                         leftContent={<CheckboxInput  label={<>Jaccept les <a className={styles.authLink} href='#'>Conditions d'utilisation</a> et <a className={styles.authLink} href='#'>Politique de Confidentialité</a></>} id="remember" setCheck={toggleTerms} check={form.accept_terms} />}
                         rightContent=""
                     />
 
-                    {errors.accept_terms && <p className={styles.authDescription}>{errors.accept_terms}</p>}
-                    {errors.form && <p className={styles.authDescription}>{errors.form}</p>}
+                    {errors.accept_terms && <p className={styles.fieldError}>{errors.accept_terms}</p>}
+                    {errors.form && <p className={styles.fieldError}>{errors.form}</p>}
 
                     <ConnexionButton type="submit" variant="primary" disabled={processing}>
                         {processing ? 'Inscription...' : 'Inscription'}

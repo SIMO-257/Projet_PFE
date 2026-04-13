@@ -69,18 +69,31 @@
     border-radius: 12px;
   }
 
+  .formInputError {
+    @apply border-red-500 bg-red-50;
+  }
+
   .formInput::placeholder {
     @apply text-gray-400 font-normal;
   }
 
   .formInput:focus {
-    @apply outline-none bg-white;
-    border-color: rgba(139, 64, 73, 0.5);
+    @apply outline-none bg-white border-burgundy-light;
     box-shadow: 0 0 0 3px rgba(139, 64, 73, 0.05);
   }
 
+  .formInputError:focus {
+    @apply border-red-500;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+  }
+
+  .fieldError {
+    @apply text-red-600 text-xs mt-1;
+    font-family: 'Inter', sans-serif;
+  }
+
   .formOptions {
-    @apply flex justify-between items-center mb-7;
+    @apply flex justify-around items-center mb-7;
   }
 
   .formOptionsLeft,
@@ -176,6 +189,7 @@
   .authFooter {
     @apply text-center text-gray-500 pt-5 border-t border-gray-100 mt-2 font-normal;
     font-size: 13px;
+    font-family: 'Inter', sans-serif;
   }
 
   .authLink {

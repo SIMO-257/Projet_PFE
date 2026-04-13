@@ -1,13 +1,13 @@
-import { useSelector } from 'react-redux';
-import { useState } from 'react';
-import { useParams, useNavigate, Outlet } from 'react-router-dom';
-import { useForm } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
+import { Outlet } from 'react-router-dom';
+import { useForm } from '@inertiajs/react';
 
 import ProgressSteps from '../../Components/NavBar/ProgressSteps';
 import styles from '../../Styles/TicketSelection.module.css'
 
 export default function TicketSelection(props) {
+    const [quantity, setQuantity] = useState(1);
+    const [purchase, setPurchase] = useState({});
 
     const fetch_purchase = useForm({
         id: props.purchase_id
@@ -17,10 +17,6 @@ export default function TicketSelection(props) {
         quantity:quantity,
         purchase:purchase
     });
-
-
-    const [quantity, setQuantity] = useState(1);
-    const [purchase, setPurchase] = useState({});
 
  
     useEffect(() => {
@@ -33,6 +29,7 @@ export default function TicketSelection(props) {
 
             },
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const incrementQuantity = () => {
@@ -48,7 +45,7 @@ export default function TicketSelection(props) {
         selected_ticket.post('/paiment')
     }
 
-    const totalPrice = purchase.price * quantity;
+    const totalPrice = (purchase.price || 0) * quantity;
 
     return (
         <>
