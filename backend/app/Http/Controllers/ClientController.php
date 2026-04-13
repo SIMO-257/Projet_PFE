@@ -14,25 +14,11 @@ use Illuminate\Support\Facades\Validator;
 
 class ClientController extends Controller
 {
-    public function showLogin(Request $request)
-    {
-        $referer = (string) ($request->headers->get('referer') ?? '');
-        if ($referer !== '') {
-            $parts = parse_url($referer);
-            $scheme = $parts['scheme'] ?? null;
-            $host = $parts['host'] ?? null;
-            if ($scheme && $host) {
-                $port = isset($parts['port']) ? ':'.$parts['port'] : '';
-                return redirect()->away($scheme.'://'.$host.$port.'/login');
-            }
-        }
-
-        return redirect('/');
-    }
-
     public function home()
     {
-        return redirect('/home');
+        return response()->json([
+            'message' => 'Home endpoint is available.',
+        ]);
     }
 
     public function fetch_profile(Request $request)
@@ -149,32 +135,18 @@ class ClientController extends Controller
         $valid = $client && Hash::check($credentials['password'], $client->password_hash);
 
         if ($valid) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'message' => 'Login successful.',
-                    'client_uuid' => $client->uuid,
-                    'redirect' => '/home',
-                ]);
-            }
-
-            $request->session()->regenerate();
-            $request->session()->put('client_uuid', $client->uuid);
-        }
-
-        if ($request->expectsJson()) {
             return response()->json([
-                'message' => 'Invalid credentials.',
-                'errors' => [
-                    'email' => ['The provided credentials do not match our records.'],
-                ],
-            ], 422);
+                'message' => 'Login successful.',
+                'client_uuid' => $client->uuid,
+            ]);
         }
 
-        return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ]);
-
-
+        return response()->json([
+            'message' => 'Invalid credentials.',
+            'errors' => [
+                'email' => ['The provided credentials do not match our records.'],
+            ],
+        ], 422);
     }
 
  
@@ -191,14 +163,9 @@ class ClientController extends Controller
             'is_active' => true,
         ]);
 
-        if ($request->expectsJson()) {
-            return response()->json([
-                'message' => 'Account created successfully.',
-                'redirect' => '/login',
-            ], 201);
-        }
-
-        return redirect('/login')->with('status', 'Account created successfully.');
+        return response()->json([
+            'message' => 'Account created successfully.',
+        ], 201);
     }
 
 
@@ -208,8 +175,6 @@ class ClientController extends Controller
             ?? $request->input('uuid')
             ?? $request->query('uuid');
 
-        $isApiRequest = $request->is('api/*') || $request->expectsJson();
-
         Auth::logout();
 
         if ($request->hasSession()) {
@@ -217,26 +182,10 @@ class ClientController extends Controller
             $request->session()->regenerateToken();
         }
 
-        if ($isApiRequest) {
-            return response()->json([
-                'message' => 'Logout successful.',
-                'redirect' => '/login',
-                'client_uuid' => $uuid,
-            ]);
-        }
-
-        $referer = (string) ($request->headers->get('referer') ?? '');
-        if ($referer !== '') {
-            $parts = parse_url($referer);
-            $scheme = $parts['scheme'] ?? null;
-            $host = $parts['host'] ?? null;
-            if ($scheme && $host) {
-                $port = isset($parts['port']) ? ':'.$parts['port'] : '';
-                return redirect()->away($scheme.'://'.$host.$port.'/login');
-            }
-        }
-
-        return redirect('/login');
+        return response()->json([
+            'message' => 'Logout successful.',
+            'client_uuid' => $uuid,
+        ]);
     }
 
     public function forgotPassword(Request $request)
@@ -255,13 +204,9 @@ class ClientController extends Controller
             Mail::to($client->email)->send(new ForgotPasswordMail($tempPassword));
         }
 
-        if ($request->expectsJson()) {
-            return response()->json([
-                'message' => 'If the account exists, a password has been sent to the email.',
-            ]);
-        }
-
-        return back()->with('status', 'If the account exists, a password has been sent to the email.');
+        return response()->json([
+            'message' => 'If the account exists, a password has been sent to the email.',
+        ]);
     }
 
     
