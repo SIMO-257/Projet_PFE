@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import axios from 'axios';
+import { signupClient } from '../../services/clientService';
 
 import InputField from '../../Components/Inputs/InputField';
 import CheckboxInput from '../../Components/Inputs/CheckboxInput';
@@ -11,7 +11,6 @@ import styles from '../../Styles/Auth.module.css';
 
 export default function SignUp() {
 
-    const apiBase = import.meta.env.VITE_API_URL ?? '';
     const navigate = useNavigate();
 
     const [form, setForm] = useState({
@@ -59,7 +58,7 @@ export default function SignUp() {
 
         try {
             setProcessing(true);
-            const res = await axios.post(`${apiBase}/api/signup`, payload, { withCredentials: false });
+            const res = await signupClient(payload);
             const redirectTo = res?.data?.redirect;
             if (redirectTo) {
                 navigate(redirectTo);

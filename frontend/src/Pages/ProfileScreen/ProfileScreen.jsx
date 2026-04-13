@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import Header from '../../Components/Layout/Header';
 import BottomNavigation from '../../Components/Layout/BottomNavigation';
 import ProfilInfo from '../../Components/Cards/ProfilInfo';
 import ProfileOpt from '../../Components/Cards/ProfileOpt';
 import styles from '../../Styles/ProfileScreen.module.css';
+import {
+  fetchClientProfile,
+  logoutClient,
+} from '../../services/clientService';
 
 const ProfileScreen = () => {
-  const apiBase = import.meta.env.VITE_API_URL ?? '';
   const [activeTab, setActiveTab] = useState('profile');
   const [profile, setProfile] = useState(null);
   const navigateHook = useNavigate();
@@ -20,11 +22,10 @@ const ProfileScreen = () => {
       return;
     }
 
-    axios
-      .get(`${apiBase}/api/profile`, { params: { uuid }, withCredentials: false })
+    fetchClientProfile({ uuid })
       .then((res) => setProfile(res?.data ?? null))
       .catch(() => setProfile(null));
-  }, [apiBase, navigateHook]);
+  }, [navigateHook]);
 
   const navigate = (section) => {
     setActiveTab(section);
@@ -49,14 +50,12 @@ const ProfileScreen = () => {
 
   const handleLogout = () => {
     const uuid = sessionStorage.getItem('client_uuid');
-    sessionStorage.removeItem('client_uuid');
-
-    const url = new URL(`${apiBase}/logout`, window.location.href);
-    if (uuid) {
-      url.searchParams.set('uuid', uuid);
-    }
-
-    window.location.assign(url.toString());
+    logoutClient({ uuid })
+      .catch(() => {})
+      .finally(() => {
+        sessionStorage.removeItem('client_uuid');
+        navigateHook('/login');
+      });
   };
 
   return (

@@ -7,3 +7,7 @@ in the forgot password page i am sending an email:
 -- place every data in the right place .
 -- use minimale code with simple logic
 
+here is what i want:
+-- i created a serviceClient.jsx file in the frontend this file will containe the client methods wich are all the 6 or 7 i think in the api.php.
+-- there will be custom functionnes for each method and it will be exported from the service file and imported in the file where the method will be used (eq:login,signup..).
+-- the pages wil only send the params or reach the response got it.

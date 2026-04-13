@@ -1,13 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import Header from '../../Components/Layout/Header';
 import styles from '../../Styles/EditProfile.module.css';
+import {
+  fetchClientProfile,
+  updateClientProfile,
+  uploadClientAvatar,
+} from '../../services/clientService';
 
 const EditProfileScreen = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const apiBase = import.meta.env.VITE_API_URL ?? '';
 
   const initialProfile = location.state?.profile ?? null;
   const [fullName, setFullName] = useState(initialProfile?.name ?? '');
@@ -28,8 +31,7 @@ const EditProfileScreen = () => {
       return;
     }
 
-    axios
-      .get(`${apiBase}/api/profile`, { params: { uuid }, withCredentials: false })
+    fetchClientProfile({ uuid })
       .then((res) => {
         const data = res?.data ?? null;
         if (!data) return;
@@ -38,7 +40,7 @@ const EditProfileScreen = () => {
         setPhone(data?.phone ?? '');
       })
       .catch(() => {});
-  }, [apiBase, initialProfile, navigate]);
+  }, [initialProfile, navigate]);
 
   const goBack = () => {
     navigate(-1);
@@ -74,21 +76,15 @@ const EditProfileScreen = () => {
 
     const uploadAvatar = () => {
       if (!avatarFile) return Promise.resolve();
-      const form = new FormData();
-      form.append('avatar', avatarFile);
-      return axios.post(`${apiBase}/api/profile/avatar`, form, {
-        headers: { 'X-Client-UUID': uuid, 'Content-Type': 'multipart/form-data' },
-        withCredentials: false,
-      });
+      return uploadClientAvatar({ uuid, avatarFile });
     };
 
     uploadAvatar()
       .then(() =>
-        axios.put(
-          `${apiBase}/api/profile`,
-          { full_name: fullName, phone },
-          { headers: { 'X-Client-UUID': uuid }, withCredentials: false }
-        )
+        updateClientProfile({
+          uuid,
+          payload: { full_name: fullName, phone },
+        })
       )
       .then(() => navigate('/profile'))
       .catch((err) => {
