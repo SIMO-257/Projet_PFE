@@ -6,16 +6,138 @@ use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use App\Mail\ForgotPasswordMail;
+use Illuminate\Support\Facades\Validator;
 
 
 class ClientController extends Controller
 {
+    public function showLogin(Request $request)
+    {
+        $referer = (string) ($request->headers->get('referer') ?? '');
+        if ($referer !== '') {
+            $parts = parse_url($referer);
+            $scheme = $parts['scheme'] ?? null;
+            $host = $parts['host'] ?? null;
+            if ($scheme && $host) {
+                $port = isset($parts['port']) ? ':'.$parts['port'] : '';
+                return redirect()->away($scheme.'://'.$host.$port.'/login');
+            }
+        }
 
-    // Handle the login form submission
+        return redirect('/');
+    }
+
+    public function home()
+    {
+        return redirect('/home');
+    }
+
+    public function fetch_profile(Request $request)
+    {
+        $uuid = $request->header('X-Client-UUID')
+            ?? $request->query('uuid')
+            ?? $request->session()->get('client_uuid');
+
+        if (!$uuid) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+
+        $client = Client::where('uuid', $uuid)->first();
+
+        if (!$client) {
+            return response()->json(['message' => 'Client not found.'], 404);
+        }
+
+        $name = trim(($client->first_name ?? '').' '.($client->last_name ?? ''));
+        if ($name === '') {
+            $name = $client->email;
+        }
+
+        return response()->json([
+            'name' => $name,
+            'email' => $client->email,
+            'phone' => $client->phone,
+            'created_at' => $client->created_at->toDateString(),
+            'avatar' => $client->avatar,
+            'avatar_url' => $client->avatar_url,
+        ]);
+    }
+
+    public function update_profile(Request $request)
+    {
+        $client = $request->attributes->get('client');
+        if (!$client) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+
+        $validated = (array) $request->attributes->get('validated_profile', []);
+        $client->phone = $validated['phone'] ?? $client->phone;
+
+        $fullName = trim((string) ($validated['full_name'] ?? ''));
+        if ($fullName !== '') {
+            $parts = preg_split('/[\s,]+/', $fullName, -1, PREG_SPLIT_NO_EMPTY);
+            $familyName = array_shift($parts) ?: null;
+            $personalName = count($parts) ? implode(' ', $parts) : null;
+            $client->last_name = $familyName;
+            $client->first_name = $personalName;
+        }
+
+        $client->save();
+
+        $name = trim(($client->first_name ?? '').' '.($client->last_name ?? ''));
+        if ($name === '') {
+            $name = $client->email;
+        }
+
+        return response()->json([
+            'name' => $name,
+            'email' => $client->email,
+            'phone' => $client->phone,
+            'created_at' => $client->created_at->toDateString(),
+            'avatar' => $client->avatar,
+            'avatar_url' => $client->avatar_url,
+        ]);
+    }
+
+    public function upload_avatar(Request $request)
+    {
+        $uuid = $request->header('X-Client-UUID')
+            ?? $request->query('uuid')
+            ?? $request->session()->get('client_uuid');
+
+        if (!$uuid) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+
+        $client = Client::where('uuid', $uuid)->first();
+        if (!$client) {
+            return response()->json(['message' => 'Client not found.'], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'avatar' => 'required|file|max:5120|mimes:jpg,jpeg,png,webp',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed.',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $file = $request->file('avatar');
+        $client->storeAvatar($file);
+
+        return response()->json([
+            'avatar' => $client->avatar,
+            'avatar_url' => $client->avatar_url,
+        ]);
+    }
+
+
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -30,11 +152,13 @@ class ClientController extends Controller
             if ($request->expectsJson()) {
                 return response()->json([
                     'message' => 'Login successful.',
+                    'client_uuid' => $client->uuid,
                     'redirect' => '/home',
                 ]);
             }
 
             $request->session()->regenerate();
+            $request->session()->put('client_uuid', $client->uuid);
         }
 
         if ($request->expectsJson()) {
@@ -53,42 +177,10 @@ class ClientController extends Controller
 
     }
 
-    public function home()
-    {
-        return redirect('/home');
-    }
-
-    // Handle the signup form submission
+ 
     public function signup(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email|max:255|unique:clients,email',
-            'phone' => ['required', 'string', 'regex:/^(06|07)\d{8}$/', 'unique:clients,phone'],
-            'password' => 'required|string|min:8|confirmed',
-            'full_name' => 'nullable|string|max:255',
-            'first_name' => 'nullable|string|max:100',
-            'last_name' => 'nullable|string|max:100',
-        ]);
-
-        $validator->after(function ($validator) use ($request) {
-            $fullName = trim((string) $request->input('full_name', ''));
-            if ($fullName !== '') {
-                $parts = preg_split('/[\s,]+/', $fullName, -1, PREG_SPLIT_NO_EMPTY);
-                if (count($parts) < 2) {
-                    $validator->errors()->add('full_name', 'Le nom complet doit contenir le nom de famille puis le prenom.');
-                }
-            }
-        });
-
-        $data = $validator->validate();
-
-        if (!empty($data['full_name'])) {
-            $parts = preg_split('/[\s,]+/', trim($data['full_name']), -1, PREG_SPLIT_NO_EMPTY);
-            $familyName = array_shift($parts) ?: null;
-            $personalName = count($parts) ? implode(' ', $parts) : null;
-            $data['last_name'] = $familyName;
-            $data['first_name'] = $personalName;
-        }
+        $data = (array) $request->attributes->get('validated_signup', []);
 
         Client::create([
             'email' => $data['email'],
@@ -109,16 +201,44 @@ class ClientController extends Controller
         return redirect('/login')->with('status', 'Account created successfully.');
     }
 
-    // Logout
+
     public function logout(Request $request)
     {
+        $uuid = $request->header('X-Client-UUID')
+            ?? $request->input('uuid')
+            ?? $request->query('uuid');
+
+        $isApiRequest = $request->is('api/*') || $request->expectsJson();
+
         Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+
+        if ($request->hasSession()) {
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
+
+        if ($isApiRequest) {
+            return response()->json([
+                'message' => 'Logout successful.',
+                'redirect' => '/login',
+                'client_uuid' => $uuid,
+            ]);
+        }
+
+        $referer = (string) ($request->headers->get('referer') ?? '');
+        if ($referer !== '') {
+            $parts = parse_url($referer);
+            $scheme = $parts['scheme'] ?? null;
+            $host = $parts['host'] ?? null;
+            if ($scheme && $host) {
+                $port = isset($parts['port']) ? ':'.$parts['port'] : '';
+                return redirect()->away($scheme.'://'.$host.$port.'/login');
+            }
+        }
+
         return redirect('/login');
     }
 
-    // Forgot password: send a temporary password if account exists and is active
     public function forgotPassword(Request $request)
     {
         $data = $request->validate([
@@ -143,4 +263,6 @@ class ClientController extends Controller
 
         return back()->with('status', 'If the account exists, a password has been sent to the email.');
     }
+
+    
 }

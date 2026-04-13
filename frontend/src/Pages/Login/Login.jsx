@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import axios from 'axios';
+import { loginClient } from '../../services/clientService';
 
 import InputField from '../../Components/Inputs/InputField';
 import CheckboxInput from '../../Components/Inputs/CheckboxInput';
@@ -11,7 +11,6 @@ import styles from '../../Styles/Auth.module.css'
 
 export default function Login() {
 
-    const apiBase = import.meta.env.VITE_API_URL ?? '';
     const navigate = useNavigate();
 
     const [form, setForm] = useState({
@@ -42,7 +41,11 @@ export default function Login() {
 
         try {
             setProcessing(true);
-            const res = await axios.post(`${apiBase}/api/login`, payload, { withCredentials: false });
+            const res = await loginClient(payload);
+            const clientUuid = res?.data?.client_uuid;
+            if (clientUuid) {
+                sessionStorage.setItem('client_uuid', clientUuid);
+            }
             const redirectTo = res?.data?.redirect;
             if (redirectTo) {
                 navigate(redirectTo);
@@ -144,7 +147,7 @@ export default function Login() {
                 <div className={styles.authFooter}>
                     <p>
                         Pas encore membre?{' '}
-                        <Link to="/" className={styles.authLink}>Créer un compte</Link>
+                        <Link to="/signup" className={styles.authLink}>Créer un compte</Link>
                     </p>
                 </div>
             </div>

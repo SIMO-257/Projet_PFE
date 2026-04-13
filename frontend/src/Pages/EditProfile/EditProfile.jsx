@@ -1,21 +1,62 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '../../Components/Layout/Header';
 import styles from '../../Styles/EditProfile.module.css';
+import {
+  fetchClientProfile,
+  updateClientProfile,
+  uploadClientAvatar,
+} from '../../services/clientService';
 
 const EditProfileScreen = () => {
   const navigate = useNavigate();
-  const [fullName, setFullName] = useState('Sarah Martinez');
-  const [email, setEmail] = useState('sarah.martinez@email.com');
-  const [phone, setPhone] = useState('+212 661 23 45 67');
+  const location = useLocation();
+
+  const initialProfile = location.state?.profile ?? null;
+  const [fullName, setFullName] = useState(initialProfile?.name ?? '');
+  const [email, setEmail] = useState(initialProfile?.email ?? '');
+  const [phone, setPhone] = useState(initialProfile?.phone ?? '');
   const [profileImage, setProfileImage] = useState(null);
+  const [avatarFile, setAvatarFile] = useState(null);
+  const fileInputRef = useRef(null);
+  const [errors, setErrors] = useState({});
+  const [processing, setProcessing] = useState(false);
+
+  useEffect(() => {
+    if (initialProfile) return;
+
+    const uuid = sessionStorage.getItem('client_uuid');
+    if (!uuid) {
+      navigate('/login');
+      return;
+    }
+
+    fetchClientProfile({ uuid })
+      .then((res) => {
+        const data = res?.data ?? null;
+        if (!data) return;
+        setFullName(data?.name ?? '');
+        setEmail(data?.email ?? '');
+        setPhone(data?.phone ?? '');
+      })
+      .catch(() => {});
+  }, [initialProfile, navigate]);
 
   const goBack = () => {
     navigate(-1);
   };
 
   const handleImageUpload = () => {
-    console.log('Opening image picker...');
+    fileInputRef.current?.click();
+  };
+
+  const onImageSelected = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarFile(file);
+    const reader = new FileReader();
+    reader.onload = () => setProfileImage(String(reader.result ?? ''));
+    reader.readAsDataURL(file);
   };
 
   const handleChangePassword = () => {
@@ -23,7 +64,44 @@ const EditProfileScreen = () => {
   };
 
   const handleSaveChanges = () => {
-    console.log('Saving changes...', { fullName, email, phone });
+    setErrors({});
+
+    const uuid = sessionStorage.getItem('client_uuid');
+    if (!uuid) {
+      navigate('/login');
+      return;
+    }
+
+    setProcessing(true);
+
+    const uploadAvatar = () => {
+      if (!avatarFile) return Promise.resolve();
+      return uploadClientAvatar({ uuid, avatarFile });
+    };
+
+    uploadAvatar()
+      .then(() =>
+        updateClientProfile({
+          uuid,
+          payload: { full_name: fullName, phone },
+        })
+      )
+      .then(() => navigate('/profile'))
+      .catch((err) => {
+        if (err?.response?.status === 401) {
+          sessionStorage.removeItem('client_uuid');
+          navigate('/login');
+          return;
+        }
+
+        const responseErrors = err?.response?.data?.errors;
+        if (responseErrors) {
+          setErrors(responseErrors);
+        } else {
+          setErrors({ form: ['Erreur lors de la mise à jour du profil.'] });
+        }
+      })
+      .finally(() => setProcessing(false));
   };
 
   const handleClearField = (field) => {
@@ -49,6 +127,13 @@ const EditProfileScreen = () => {
             {/* Profile Photo Section */}
             <div className="flex flex-col items-center py-6">
               <div className="relative">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={onImageSelected}
+                />
                 {/* Profile Image */}
                 <div className="w-28 h-28 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 border-4 border-yellow-500/50 flex items-center justify-center overflow-hidden">
                   {profileImage ? (
@@ -114,6 +199,7 @@ const EditProfileScreen = () => {
                     <div className="text-white/40 text-xs">{fullName.length}/50</div>
                   </div>
                 </div>
+                {errors.full_name?.[0] && <p className="text-red-400 text-xs mt-1">{errors.full_name[0]}</p>}
               </div>
 
               {/* Email Field */}
@@ -146,6 +232,7 @@ const EditProfileScreen = () => {
                     )}
                   </div>
                 </div>
+               
               </div>
 
               {/* Phone Field */}
@@ -174,10 +261,11 @@ const EditProfileScreen = () => {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       className="flex-1 bg-transparent text-white text-sm outline-none placeholder-white/40"
-                      placeholder="+212 XXX XX XX XX"
+                      placeholder="(07/06) XX XX XX XX"
                     />
                   </div>
                 </div>
+                 {errors.phone?.[0] && <p className="text-red-400 text-xs mt-1">{errors.phone[0]}</p>}
               </div>
 
               {/* Change Password Button */}
@@ -203,11 +291,13 @@ const EditProfileScreen = () => {
 
             {/* Save Button */}
             <div className="mt-8">
+              {errors.form?.[0] && <p className="text-red-400 text-sm mb-3">{errors.form[0]}</p>}
               <button
                 onClick={handleSaveChanges}
+                disabled={processing}
                 className="w-full bg-gradient-to-r from-[#D9B991] to-[#C9A961] text-[#400106] font-semibold py-4 rounded-2xl hover:from-[#E5C5A1] hover:to-[#D9B971] transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg"
               >
-                Enregistrer les modifications
+                {processing ? 'Enregistrement...' : 'Enregistrer les modifications'}
               </button>
             </div>
           </div>

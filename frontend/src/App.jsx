@@ -1,10 +1,14 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import WalletScreen from "./Pages/WalletScreen/WalletScreen";
 import Login from "./Pages/Login/Login";
 import SignUp from "./Pages/SignUp/SignUp";
 import ForgotPassword from "./Pages/ForgotPassword/ForgotPassword";
 import HomeScreen from "./Pages/Home/HomeScreen";
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> e8d880d9d20a6edd5c690a616ba45c0c8739c87c
 import ViewTicket from "./Pages/ViewTicket/ViewTicket";
 import ProfileScreen from "./Pages/ProfileScreen/ProfileScreen";
 import EditProfileScreen from "./Pages/EditProfile/EditProfile";
@@ -19,7 +23,10 @@ import OfflineMode from "./Pages/OfflineMode/OfflineMode";
 import Notifications from "./Pages/Notifications/Notifications";
 import ChangeCardScreen from "./Pages/ChangeCardScreen/ChangeCardScreen";
 import ValidationScreen from "./Pages/ValidationScreen/ValidationScreen";
+<<<<<<< HEAD
 import WalletScreen from "./Pages/WalletScreen/WalletScreen";
+=======
+>>>>>>> e8d880d9d20a6edd5c690a616ba45c0c8739c87c
 
 function App() {
   return (
@@ -31,7 +38,6 @@ function App() {
 
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/forgot_password" element={<ForgotPassword />} />
 
           <Route path="/profile" element={<ProfileScreen />} />

@@ -1,67 +1,71 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
-@layer components {
-  .authContainer {
-    @apply min-h-screen flex items-center justify-center bg-white p-5;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  }
+.authContainer {
+  @apply min-h-screen flex items-center justify-center bg-white p-5;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
 
-  .authCard {
-    @apply bg-white rounded-3xl w-full border border-gray-100;
-    padding: 40px;
-    max-width: 420px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
-    border: 1px solid rgba(212, 175, 55, 0.1);
-  }
+.authCard {
+  @apply bg-white rounded-3xl w-full border border-gray-100;
+  padding: 40px;
+  max-width: 420px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(212, 175, 55, 0.1);
+}
 
-  /* Fixed for ForgotPassword nested cards */
-  .authCard .authCard {
-    @apply p-0 border-none bg-none shadow-none m-0;
-  }
+/* Fixed for ForgotPassword nested cards */
+.authCard .authCard {
+  @apply p-0 border-none bg-none shadow-none m-0;
+}
 
-  .authHeader {
-    @apply text-center mb-8;
-  }
+.authHeader {
+  @apply text-center mb-8;
+}
 
-  .authLogo {
-    @apply text-4xl font-normal mb-4 tracking-normal;
-    color: #8B4049;
-    font-family: 'Playfair Display', Georgia, serif;
-  }
+.authLogo {
+  @apply text-4xl font-normal mb-4 tracking-normal;
+  color: #8B4049;
+  font-family: 'Playfair Display', Georgia, serif;
+}
 
-  .goldenLine {
-    @apply border-none mx-auto mb-5 block;
-    width: 60px;
-    height: 3px;
-    background: linear-gradient(to right, #FFD700, #D4AF37);
-    border-radius: 2px;
-  }
+.goldenLine {
+  @apply border-none mx-auto mb-5 block;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(to right, #FFD700, #D4AF37);
+  border-radius: 2px;
+}
 
-  .authSubtitle {
-    @apply text-gray-900 font-semibold mb-3;
-    font-size: 22px;
-  }
+.authSubtitle {
+  @apply text-gray-900 font-semibold mb-3;
+  font-size: 22px;
+}
 
-  .authDescription {
-    @apply text-gray-500 text-sm leading-relaxed mx-auto font-normal;
-    max-width: 320px;
-  }
+.authDescription {
+  @apply text-gray-500 text-sm leading-relaxed mx-auto font-normal;
+  max-width: 320px;
+}
 
-  .authForm {
-    @apply mb-7;
-  }
+.authForm {
+  @apply mb-7;
+}
 
-  .formGroup {
-    @apply mb-6;
-  }
+.formGroup {
+  @apply mb-6;
+}
 
-  .formLabel {
-    @apply block text-gray-600 font-semibold mb-2 uppercase tracking-wider;
-    font-size: 11px;
-  }
+.formLabel {
+  @apply block text-gray-600 font-semibold mb-2 uppercase tracking-wider;
+  font-size: 11px;
+}
 
+.formInput {
+  @apply w-full px-4 border-gray-200 text-sm bg-gray-50 transition-all text-gray-800 font-normal;
+  padding: 14px 16px;
+  border: 1.5px solid #f0f0f0;
+  border-radius: 12px;
+}
+
+<<<<<<< HEAD
   .formInput {
     @apply w-full px-4 border-gray-200 text-sm bg-gray-50 transition-all text-gray-800 font-normal;
     padding: 14px 16px;
@@ -72,11 +76,24 @@
   .formInputError {
     @apply border-red-500 bg-red-50;
   }
+=======
+.formInputError {
+  border-color: #dc2626;
+  background-color: #fff5f5;
+}
 
-  .formInput::placeholder {
-    @apply text-gray-400 font-normal;
-  }
+.formInput::placeholder {
+  @apply text-gray-400 font-normal;
+}
+>>>>>>> e8d880d9d20a6edd5c690a616ba45c0c8739c87c
 
+.formInput:focus {
+  @apply outline-none bg-white;
+  border-color: rgba(139, 64, 73, 0.5);
+  box-shadow: 0 0 0 3px rgba(139, 64, 73, 0.05);
+}
+
+<<<<<<< HEAD
   .formInput:focus {
     @apply outline-none bg-white border-burgundy-light;
     box-shadow: 0 0 0 3px rgba(139, 64, 73, 0.05);
@@ -200,4 +217,142 @@
   .authLink:hover {
     @apply underline;
   }
+=======
+.formInputError:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+}
+
+.fieldError {
+  color: #dc2626;
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  margin: 5px 0 0 0;
+}
+
+.formOptions {
+  @apply flex justify-between items-center mb-7;
+}
+
+.formOptionsLeft,
+.formOptionsRight {
+  @apply flex items-center;
+}
+
+.checkboxLabel {
+  @apply flex items-center text-gray-500 cursor-pointer font-normal transition-colors;
+  font-size: 13px;
+}
+
+.checkboxLabel:hover {
+  @apply text-gray-800;
+}
+
+.checkboxLabel input {
+  @apply w-4 h-4 rounded cursor-pointer transition-all;
+  margin-right: 10px;
+  border: 1.5px solid #e0e0e0;
+  accent-color: #8B4049;
+}
+
+.forgotPassword {
+  @apply no-underline font-medium transition-colors;
+  color: #8B4049;
+  font-size: 13px;
+}
+
+.forgotPassword:hover {
+  @apply no-underline text-[#5C2A2E];
+}
+
+.authButton {
+  @apply w-full px-4 py-4 border-none cursor-pointer transition-all;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.authButtonPrimary {
+  @apply text-white shadow-md;
+  background: linear-gradient(135deg, #8B4049 0%, #5C2A2E 100%);
+}
+
+.authButtonPrimary:hover:not(:disabled) {
+  @apply scale-[1.01];
+  filter: brightness(1.1);
+  box-shadow: 0 8px 15px rgba(139, 64, 73, 0.2);
+}
+
+.authButtonPrimary:active:not(:disabled) {
+  @apply scale-[0.99];
+}
+
+.authButton:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+.divider {
+  @apply flex items-center my-7 text-gray-500 font-normal;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+}
+
+.divider::before,
+.divider::after {
+  @apply flex-1 border-b border-gray-200;
+  content: '';
+}
+
+.divider span {
+  @apply px-4 lowercase tracking-normal;
+  font-size: 13px;
+}
+
+.socialButtons {
+  @apply flex flex-col gap-3 mb-7;
+}
+
+.socialButton {
+  @apply w-full bg-white text-sm font-medium cursor-pointer flex items-center justify-center transition-all text-gray-800;
+  padding: 14px;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 10px;
+  font-family: 'Inter', sans-serif;
+}
+
+.socialButton:hover {
+  @apply bg-gray-50 -translate-y-px;
+  border-color: #d0d0d0;
+}
+
+.socialButtonGoogle {
+  @apply text-gray-800;
+}
+
+.socialButtonApple {
+  @apply text-gray-800;
+}
+
+.socialIcon {
+  @apply font-semibold text-base text-gray-900;
+  margin-right: 12px;
+}
+
+.authFooter {
+  @apply text-center text-gray-600 pt-5 border-t border-gray-100 mt-2 font-normal;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+}
+
+.authLink {
+  @apply no-underline font-semibold transition-colors;
+  color: #7d1f4d;
+  font-family: 'Inter', sans-serif;
+}
+
+.authLink:hover {
+  @apply underline;
+  color: #651939;
+>>>>>>> e8d880d9d20a6edd5c690a616ba45c0c8739c87c
 }

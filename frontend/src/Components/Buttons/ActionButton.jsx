@@ -37,8 +37,7 @@ const ActionButtonCard = ({
                 </div>
             );
         }
-        
-        // Default variant (grid buttons - HomeScreen)
+
         return (
             <>
                 <div className="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center">

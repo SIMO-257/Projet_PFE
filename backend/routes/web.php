@@ -10,4 +10,5 @@ Route::get('/', function () {
 
 Route::get('/login', [ClientController::class, 'showLogin'])->name('login');
 Route::post('/login', [ClientController::class, 'login']);
+Route::get('/logout', [ClientController::class, 'logout'])->name('logout.get');
 Route::post('/logout', [ClientController::class, 'logout'])->name('logout');

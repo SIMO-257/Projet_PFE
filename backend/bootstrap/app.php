@@ -18,6 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
     $middleware->web(append: [
         HandleInertiaRequests::class,
     ]);
+    $middleware->alias([
+        'profilMiddleware' => \App\Http\Middleware\ProfilMiddleware::class,
+        'credentialsMiddlware' => \App\Http\Middleware\CredentialsMiddlware::class,
+    ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
