@@ -4,9 +4,7 @@ import CardButton from '../Buttons/CardButton';
 export default function PurchaseCard(props) {
 
   const purchase_ticket = () => {
-    console.log('Purchase ticket:', props.purchase.id);
-    // In a real app, this would navigate to a payment page or call an API
-    // props.navigate('/payment', { state: { item: props.purchase } });
+    props.navigate('/ticket-selection');
   }
 
   return (

@@ -1,170 +1,257 @@
 import { useState, useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
-import { useForm } from '@inertiajs/react';
-
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import ProgressSteps from '../../Components/NavBar/ProgressSteps';
-import styles from '../../Styles/TicketSelection.module.css'
+import styles from '../../Styles/TicketSelection.module.css';
 
-export default function TicketSelection(props) {
+export default function TicketSelection() {
+
+    const apiBase = import.meta.env.VITE_API_URL ?? '';
+    const navigate = useNavigate();
+
+    const [ticketTypes, setTicketTypes] = useState([]);
+    const [selectedType, setSelectedType] = useState(null);
     const [quantity, setQuantity] = useState(1);
-    const [purchase, setPurchase] = useState({});
+    const [processing, setProcessing] = useState(false);
+    const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(true);
+    const [acceptedTerms, setAcceptedTerms] = useState(false);
 
-    const fetch_purchase = useForm({
-        id: props.purchase_id
-    });
-
-    const selected_ticket = useForm({
-        quantity:quantity,
-        purchase:purchase
-    });
-
- 
     useEffect(() => {
+        const fetchTypes = async () => {
+            try {
+                const res = await axios.get(`${apiBase}/api/ticket-types`);
+                setTicketTypes(res.data);
 
-        fetch_purchase.get('/purchases', {
+                if (res.data.length > 0) {
+                    setSelectedType(res.data[0]);
+                }
 
-            onSuccess: (page) => {
+            } catch (err) {
+                console.error("Failed to fetch ticket types", err);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-                setPurchase(page.props.purchase);
+        fetchTypes();
 
-            },
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [apiBase]);
 
-    const incrementQuantity = () => {
-        setQuantity(prev => prev + 1);
-    };
+    const incrementQuantity = () => setQuantity(prev => prev < 10 ? prev + 1 : prev);
+    const decrementQuantity = () => setQuantity(prev => prev > 1 ? prev - 1 : prev);
 
-    const decrementQuantity = () => {
-        if (quantity > 1) {
-            setQuantity(prev => prev - 1);
+    const handlePurchase = async () => {
+
+        if (!selectedType) return;
+
+        if (!acceptedTerms) {
+            setErrors({ terms: "Vous devez accepter les conditions générales." });
+            return;
+        }
+
+        const clientUuid = sessionStorage.getItem('client_uuid') || '';
+
+        if (!clientUuid) {
+            setErrors({ form: "Session expirée. Veuillez vous reconnecter." });
+            setTimeout(() => navigate('/login'), 2000);
+            return;
+        }
+
+        setProcessing(true);
+        setErrors({});
+
+        try {
+
+            const payload = {
+                ticket_type_id: selectedType.id,
+                quantity: quantity,
+                client_uuid: clientUuid
+            };
+
+            const res = await axios.post(`${apiBase}/api/tickets/purchase`, payload);
+
+            navigate('/payment-confirmation', {
+                state: {
+                    message: res.data.message,
+                    tickets: res.data.tickets
+                }
+            });
+
+        } catch (err) {
+
+            const responseErrors = err?.response?.data?.errors;
+
+            if (responseErrors) {
+                setErrors(responseErrors);
+            } else {
+                setErrors({
+                    form: err?.response?.data?.message || "Échec de l'achat. Réessayez."
+                });
+            }
+
+        } finally {
+            setProcessing(false);
         }
     };
-    const Confirmer_Payer = () => {
-        selected_ticket.post('/paiment')
+
+    if (loading) {
+        return (
+            <div className={styles.container}>
+                <p style={{ color: 'white', textAlign: 'center' }}>Chargement...</p>
+            </div>
+        );
     }
 
-    const totalPrice = (purchase.price || 0) * quantity;
+    const totalPrice = selectedType ? (selectedType.price * quantity).toFixed(2) : 0;
 
     return (
-        <>
-            <Outlet />
-            <div className={styles.container}>
-                {/* Progress Steps */}
-                <ProgressSteps />
-                {/* Main Content */}
-                <div className={styles.mainContent}>
-                    <div className={styles.card}>
-                        {/* Header */}
-                        <div className={styles.header}>
-                            <div className={styles.headerContent}>
-                                <h1 className={styles.headerTitle}>Paiement</h1>
-                                <button className={styles.closeButton}>
-                                    <svg className={styles.closeIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
+        <div className={styles.container}>
+            <ProgressSteps currentStep={1} />
 
-                        <div className={styles.content}>
-                            {/* Ticket Summary */}
-                            <div className={styles.ticketSummary}>
-                                <div className={styles.ticketHeader}>
-                                    <div className={styles.ticketInfo}>
-                                        <div className={styles.ticketDot}></div>
-                                        <span className={styles.ticketType}>Billet Unitaire</span>
-                                    </div>
-                                    <span className={styles.ticketPrice}>{purchase.price} DH</span>
-                                </div>
-                                <p className={styles.ticketDescription}>{purchase.description}</p>
-                            </div>
+            <div className={styles.mainContent}>
 
-                            {/* Section Title */}
-                            <h3 className={styles.sectionTitle}>Choisissez votre mode de paiement</h3>
+                <div className={styles.card}>
 
-                            {/* Quantity Selector */}
-                            <div className={styles.quantityCard}>
-                                <div className={styles.quantityHeader}>
-                                    <div className={styles.quantityLabel}>
-                                        <div className={styles.radioOuter}>
-                                            <div className={styles.radioInner}></div>
-                                        </div>
-                                        <span className={styles.quantityText}>Quantité</span>
-                                    </div>
-                                    <svg className={styles.chevronIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </div>
+                    <div className={styles.header}>
+                        <div className={styles.headerContent}>
 
-                                <div className={styles.quantityControls}>
-                                    <div className={styles.quantityButtons}>
-                                        <button
-                                            onClick={decrementQuantity}
-                                            className={styles.quantityButton}
-                                        >
-                                            <span>−</span>
-                                        </button>
-                                        <div className={styles.quantityDisplay}>
-                                            <span className={styles.quantityNumber}>{quantity}</span>
-                                        </div>
-                                        <button
-                                            onClick={incrementQuantity}
-                                            className={styles.quantityButton}
-                                        >
-                                            <span>+</span>
-                                        </button>
-                                    </div>
-                                    <div className={styles.priceSection}>
-                                        <div className={styles.totalPrice}>{totalPrice} DH</div>
-                                        <div className={styles.priceDetails}>{quantity} billet{quantity > 1 ? 's' : ''} × {purchase.price} DH</div>
-                                    </div>
-                                </div>
-                            </div>
+                            <h1 className={styles.headerTitle}>
+                                Sélection du Billet
+                            </h1>
 
-                            {/* Terms Checkbox */}
-                            <label className={styles.termsContainer}>
-                                <div className={styles.checkboxWrapper}>
-                                    <input type="checkbox" className={styles.checkbox} />
-                                </div>
-                                <span className={styles.termsText}>
-                                    J'ai pris connaissance et j'accepte les <a href="#" className={styles.termsLink}>conditions générales de vente</a> et la <a href="#" className={styles.termsLink}>politique de confidentialité</a>.
-                                </span>
-                            </label>
-
-                            {/* Continue Button */}
-                            <button className={styles.continueButton} onClick={Confirmer_Payer}>
-                                Confirmer et payer {totalPrice} DH
+                            <button
+                                className={styles.closeButton}
+                                onClick={() => navigate('/home')}
+                            >
+                                ✕
                             </button>
 
-                            {/* Payment Methods Footer */}
-                            <div className={styles.paymentMethodsFooter}>
-                                <div className={styles.paymentIcon}>
-                                    <span className={styles.paymentIconText}>CB</span>
-                                </div>
-                                <div className={styles.paymentIcon}>
-                                    <span className={`${styles.paymentIconText} ${styles.paymentIconRed}`}>⬤⬤</span>
-                                </div>
-                                <div className={styles.paymentIcon}>
-                                    <span className={styles.paymentIconText}>€</span>
-                                </div>
-                                <span className={styles.paymentMoreText}>+Plus</span>
-                            </div>
                         </div>
                     </div>
 
-                    {/* Security Notice */}
-                    <div className={styles.securityNotice}>
-                        <div className={styles.securityContent}>
-                            <svg className={styles.securityIcon} fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                            </svg>
-                            <span>Paiement sécurisé SSL</span>
+                    <div className={styles.content}>
+
+                        <h3 className={styles.sectionTitle}>
+                            Choisissez votre type de billet
+                        </h3>
+
+                        <div className="grid gap-4">
+
+                            {ticketTypes.map((type) => (
+
+                                <div
+                                    key={type.id}
+                                    className={styles.ticketSummary}
+                                    onClick={() => setSelectedType(type)}
+                                    style={{
+                                        cursor: 'pointer',
+                                        border: selectedType?.id === type.id
+                                            ? '2px solid #8b6f47'
+                                            : '1px solid #4a2a2a'
+                                    }}
+                                >
+
+                                    <div className={styles.ticketHeader}>
+
+                                        <span className={styles.ticketType}>
+                                            {type.name_fr}
+                                        </span>
+
+                                        <span className={styles.ticketPrice}>
+                                            {type.price} DH
+                                        </span>
+
+                                    </div>
+
+                                    <p className={styles.ticketDescription}>
+                                        {type.description}
+                                    </p>
+
+                                </div>
+
+                            ))}
+
                         </div>
+
+                        <div className={styles.quantityCard}>
+
+                            <div className={styles.quantityControls}>
+
+                                <button
+                                    onClick={decrementQuantity}
+                                    className={styles.quantityButton}
+                                >
+                                    −
+                                </button>
+
+                                <div className={styles.quantityDisplay}>
+                                    {quantity}
+                                </div>
+
+                                <button
+                                    onClick={incrementQuantity}
+                                    className={styles.quantityButton}
+                                >
+                                    +
+                                </button>
+
+                            </div>
+
+                            <div className={styles.totalPrice}>
+                                {totalPrice} DH
+                            </div>
+
+                        </div>
+
+                        {errors.balance && (
+                            <p className="text-red-500 text-sm">
+                                {errors.balance[0]}
+                            </p>
+                        )}
+
+                        {errors.form && (
+                            <p className="text-red-500 text-sm">
+                                {errors.form}
+                            </p>
+                        )}
+
+                        {errors.terms && (
+                            <p className="text-red-500 text-sm">
+                                {errors.terms}
+                            </p>
+                        )}
+
+                        <label className={styles.termsContainer}>
+
+                            <input
+                                type="checkbox"
+                                checked={acceptedTerms}
+                                onChange={() => setAcceptedTerms(!acceptedTerms)}
+                            />
+
+                            <span className={styles.termsText}>
+                                J'accepte les conditions générales de vente
+                            </span>
+
+                        </label>
+
+                        <button
+                            className={styles.continueButton}
+                            onClick={handlePurchase}
+                            disabled={processing || !selectedType}
+                        >
+
+                            {processing
+                                ? 'Transaction en cours...'
+                                : `Confirmer et payer ${totalPrice} DH`
+                            }
+
+                        </button>
+
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     );
 }

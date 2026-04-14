@@ -18,6 +18,7 @@ import OfflineMode from "./Pages/OfflineMode/OfflineMode";
 import Notifications from "./Pages/Notifications/Notifications";
 import ChangeCardScreen from "./Pages/ChangeCardScreen/ChangeCardScreen";
 import ValidationScreen from "./Pages/ValidationScreen/ValidationScreen";
+import TicketSelection from "./Pages/TicketSelection/TicketSelection";
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
 
           <Route path="/wallet" element={<WalletScreen />} />
           <Route path="/viewticket/:id" element={<ViewTicket />} />
+          <Route path="/ticket-selection" element={<TicketSelection />} />
           
           <Route path="/mytickets" element={<MyTickets />} />
           <Route path="/validation" element={<ValidationScreen />} />
