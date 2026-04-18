@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('password_hash', 255);
             $table->string('first_name', 100)->nullable();
             $table->string('last_name', 100)->nullable();
-            $table->string('avatar', 255)->nullable();
+            $table->binary('profile_file')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

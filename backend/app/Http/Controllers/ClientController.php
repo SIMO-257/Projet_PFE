@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ClientRequest;
+use App\Http\Requests\ProfileRequest;
 use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -9,7 +11,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use App\Mail\ForgotPasswordMail;
-use Illuminate\Support\Facades\Validator;
 
 
 class ClientController extends Controller
@@ -47,29 +48,17 @@ class ClientController extends Controller
             'email' => $client->email,
             'phone' => $client->phone,
             'created_at' => $client->created_at->toDateString(),
-            'avatar' => $client->avatar,
-            'avatar_url' => $client->avatar_url,
+            'has_profile_file' => !is_null($client->profile_file),
         ]);
     }
 
-    public function update_profile(Request $request)
+    public function update_profile(ProfileRequest $request)
     {
-        $client = $request->attributes->get('client');
-        if (!$client) {
-            return response()->json(['message' => 'Unauthenticated.'], 401);
-        }
-
-        $validated = (array) $request->attributes->get('validated_profile', []);
-        $client->phone = $validated['phone'] ?? $client->phone;
-
-        $fullName = trim((string) ($validated['full_name'] ?? ''));
-        if ($fullName !== '') {
-            $parts = preg_split('/[\s,]+/', $fullName, -1, PREG_SPLIT_NO_EMPTY);
-            $familyName = array_shift($parts) ?: null;
-            $personalName = count($parts) ? implode(' ', $parts) : null;
-            $client->last_name = $familyName;
-            $client->first_name = $personalName;
-        }
+        $client = $request->clientModel();
+        $validated = $request->validated();
+        $client->phone = $validated['phone'];
+        $this->applyName($client, $validated);
+        $this->applyProfileFile($client, $request, 'profile_file');
 
         $client->save();
 
@@ -83,85 +72,34 @@ class ClientController extends Controller
             'email' => $client->email,
             'phone' => $client->phone,
             'created_at' => $client->created_at->toDateString(),
-            'avatar' => $client->avatar,
-            'avatar_url' => $client->avatar_url,
-        ]);
-    }
-
-    public function upload_avatar(Request $request)
-    {
-        $uuid = $request->header('X-Client-UUID')
-            ?? $request->query('uuid')
-            ?? $request->session()->get('client_uuid');
-
-        if (!$uuid) {
-            return response()->json(['message' => 'Unauthenticated.'], 401);
-        }
-
-        $client = Client::where('uuid', $uuid)->first();
-        if (!$client) {
-            return response()->json(['message' => 'Client not found.'], 404);
-        }
-
-        $validator = Validator::make($request->all(), [
-            'avatar' => 'required|file|max:5120|mimes:jpg,jpeg,png,webp',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation failed.',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
-
-        $file = $request->file('avatar');
-        $client->storeAvatar($file);
-
-        return response()->json([
-            'avatar' => $client->avatar,
-            'avatar_url' => $client->avatar_url,
+            'has_profile_file' => !is_null($client->profile_file),
         ]);
     }
 
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-
-        $client = Client::where('email', $credentials['email'])->first();
-        $valid = $client && Hash::check($credentials['password'], $client->password_hash);
-
-        if ($valid) {
-            return response()->json([
-                'message' => 'Login successful.',
-                'client_uuid' => $client->uuid,
-            ]);
-        }
-
+        $client = $request->attributes->get('client');
         return response()->json([
-            'message' => 'Invalid credentials.',
-            'errors' => [
-                'email' => ['The provided credentials do not match our records.'],
-            ],
-        ], 422);
+            'message' => 'Login successful.',
+            'client_uuid' => $client->uuid,
+        ]);
     }
 
  
-    public function signup(Request $request)
+    public function signup(ClientRequest $request)
     {
-        $data = (array) $request->attributes->get('validated_signup', []);
+        $data = $request->validated();
 
-        Client::create([
+        $client = Client::create([
             'email' => $data['email'],
             'phone' => $data['phone'] ?? null,
             'password_hash' => Hash::make($data['password']),
-            'first_name' => $data['first_name'] ?? null,
-            'last_name' => $data['last_name'] ?? null,
+            'profile_file' => $request->hasFile('profile_file') ? file_get_contents($request->file('profile_file')->getRealPath()) : null,
             'is_active' => true,
         ]);
+        $this->applyName($client, $data);
+        $client->save();
 
         return response()->json([
             'message' => 'Account created successfully.',
@@ -209,5 +147,28 @@ class ClientController extends Controller
         ]);
     }
 
-    
+    private function applyName(Client $client, array $data): void
+    {
+        if (!empty($data['full_name'])) {
+            $parts = preg_split('/[\s,]+/', trim((string) $data['full_name']), -1, PREG_SPLIT_NO_EMPTY);
+            $client->last_name = array_shift($parts) ?: null;
+            $client->first_name = count($parts) ? implode(' ', $parts) : null;
+            return;
+        }
+
+        if (array_key_exists('first_name', $data)) {
+            $client->first_name = $data['first_name'] ?: null;
+        }
+
+        if (array_key_exists('last_name', $data)) {
+            $client->last_name = $data['last_name'] ?: null;
+        }
+    }
+
+    private function applyProfileFile(Client $client, Request $request, string $key): void
+    {
+        if ($request->hasFile($key)) {
+            $client->profile_file = file_get_contents($request->file($key)->getRealPath());
+        }
+    }
 }
