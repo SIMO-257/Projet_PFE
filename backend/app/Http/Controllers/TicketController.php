@@ -38,21 +38,25 @@ class TicketController extends Controller
         
         $totalPrice = $ticketType->price * $validated['quantity'];
 
-        // Get or create wallet
-        $wallet = Wallet::firstOrCreate(
-            ['user_id' => $client->id],
-            ['balance' => 0.00, 'currency' => 'DH']
-        );
-
-        if ($wallet->balance < $totalPrice) {
-            return response()->json([
-                'message' => 'Solde insuffisant.',
-                'errors' => ['balance' => ['Votre solde est insuffisant pour cet achat.']]
-            ], 422);
-        }
-
         try {
-            return DB::transaction(function () use ($wallet, $totalPrice, $ticketType, $validated, $client) {
+            return DB::transaction(function () use ($totalPrice, $ticketType, $validated, $client) {
+                // Get or create wallet inside transaction with lock
+                $wallet = Wallet::where('user_id', $client->id)->lockForUpdate()->first();
+                
+                if (!$wallet) {
+                    $wallet = Wallet::create([
+                        'user_id' => $client->id,
+                        'balance' => 0.00 // Default if missing
+                    ]);
+                }
+
+                if ($wallet->balance < $totalPrice) {
+                    return response()->json([
+                        'message' => 'Solde insuffisant.',
+                        'errors' => ['balance' => ['Votre solde est insuffisant pour cet achat.']]
+                    ], 422);
+                }
+
                 $balanceBefore = $wallet->balance;
                 
                 // 1. Deduct from wallet
@@ -63,7 +67,7 @@ class TicketController extends Controller
                 $transaction = Transaction::create([
                     'uuid' => (string) Str::uuid(),
                     'user_id' => $client->id,
-                    'type' => 'debit',
+                    'type' => 'purchase',
                     'amount' => $totalPrice,
                     'balance_before' => $balanceBefore,
                     'balance_after' => $wallet->balance,

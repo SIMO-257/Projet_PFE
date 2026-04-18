@@ -45,6 +45,21 @@ export default function MyTickets() {
     fetchData();
   }, [apiBase, navigateHook]);
 
+  // Group tickets by type
+  const groupedTickets = tickets.reduce((acc, t) => {
+    const typeId = t.ticket_type_id;
+    if (!acc[typeId]) {
+      acc[typeId] = { 
+        ...t, 
+        count: 0,
+        instances: [] 
+      };
+    }
+    acc[typeId].count += 1;
+    acc[typeId].instances.push(t);
+    return acc;
+  }, {});
+
   const onNavigate = (section) => {
     setActiveTab(section);
     if (section === 'home') navigateHook('/home');
@@ -52,6 +67,9 @@ export default function MyTickets() {
     if (section === 'profile') navigateHook('/profile');
     if (section === 'validation') navigateHook('/validation');
   };
+
+  const simpleBilletType = ticketTypes.find(t => t.code === 'BILLET_SIMPLE' || t.name_fr === 'Billet');
+  const otherTicketTypes = ticketTypes.filter(t => t.id !== simpleBilletType?.id);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#2a0b0f] to-[#1a0507] flex items-center justify-center p-4">
@@ -69,23 +87,23 @@ export default function MyTickets() {
             ) : (
               <div className="space-y-4">
                 {/* Active/Purchased Tickets Section */}
-                {tickets.length > 0 && (
+                {Object.keys(groupedTickets).length > 0 && (
                   <>
-                    <h3 className="text-yellow-500 text-xs uppercase tracking-wider font-bold mb-2">Mes Titres Actifs</h3>
-                    {tickets.map((t) => (
+                    <h3 className="text-yellow-500 text-xs uppercase tracking-wider font-bold mb-2 mt-4">Mes Titres Actifs</h3>
+                    {Object.values(groupedTickets).map((g) => (
                       <Ticket 
-                        key={t.uuid} 
+                        key={g.uuid} 
                         ticket={{
-                          id: t.uuid,
-                          title: t.ticket_type?.name_fr || "Billet",
-                          status: t.status === 'active' ? "Actif" : "Expiré",
-                          description: t.ticket_type?.description || "Valable pour un trajet",
-                          price: `${t.price_paid} DH`,
+                          id: g.uuid,
+                          title: g.count > 1 ? `${g.ticket_type?.name_fr || "Billet"} (x${g.count})` : (g.ticket_type?.name_fr || "Billet"),
+                          status: g.status === 'active' ? "Actif" : "Expiré",
+                          description: g.ticket_type?.description || "Valable pour un trajet",
+                          price: `${g.price_paid} DH`,
                           validInfo: "Valide jusqu'au",
-                          validTime: new Date(t.valid_until).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }),
-                          buttonText: "Voir le billet",
+                          validTime: new Date(g.valid_until).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }),
+                          buttonText: g.count > 1 ? "Voir les billets" : "Voir le billet",
                           buttonVariant: "primary",
-                          isActive: t.status === 'active'
+                          isActive: g.status === 'active'
                         }} 
                         navigate={navigateHook} 
                       />
@@ -93,25 +111,51 @@ export default function MyTickets() {
                   </>
                 )}
 
-                {/* Purchase Options Section */}
-                <h3 className="text-yellow-500 text-xs uppercase tracking-wider font-bold mb-2 mt-6">Acheter un Billet</h3>
-                {ticketTypes.map((type) => (
-                  <PurchaseCard 
-                    key={type.id} 
-                    purchase={{
-                      id: type.id,
-                      title: type.name_fr,
-                      status: "Disponible",
-                      description: type.description,
-                      price: `${type.price} DH`,
-                      duration: `${type.duration_minutes} min`,
-                      buttonText: "Acheter le billet",
-                      buttonVariant: "secondary",
-                      isActive: false
-                    }} 
-                    navigate={navigateHook} 
-                  />
-                ))}
+                {/* Main Purchase Option (Billet) */}
+                {simpleBilletType && (
+                  <>
+                    <h3 className="text-yellow-500 text-xs uppercase tracking-wider font-bold mb-2 mt-8">Acheter un Billet</h3>
+                    <PurchaseCard 
+                      key={simpleBilletType.id} 
+                      purchase={{
+                        id: simpleBilletType.id,
+                        title: simpleBilletType.name_fr,
+                        status: "Disponible",
+                        description: simpleBilletType.description,
+                        price: `${simpleBilletType.price} DH`,
+                        duration: `${simpleBilletType.duration_minutes} min`,
+                        buttonText: "Acheter le billet",
+                        buttonVariant: "secondary",
+                        isActive: false
+                      }} 
+                      navigate={navigateHook} 
+                    />
+                  </>
+                )}
+
+                {/* Other Purchase Options */}
+                {otherTicketTypes.length > 0 && (
+                  <>
+                    <h3 className="text-yellow-500 text-xs uppercase tracking-wider font-bold mb-2 mt-8">Autres Options</h3>
+                    {otherTicketTypes.map((type) => (
+                      <PurchaseCard 
+                        key={type.id} 
+                        purchase={{
+                          id: type.id,
+                          title: type.name_fr,
+                          status: "Disponible",
+                          description: type.description,
+                          price: `${type.price} DH`,
+                          duration: `${type.duration_minutes} min`,
+                          buttonText: "Acheter",
+                          buttonVariant: "secondary",
+                          isActive: false
+                        }} 
+                        navigate={navigateHook} 
+                      />
+                    ))}
+                  </>
+                )}
               </div>
             )}
           </div>

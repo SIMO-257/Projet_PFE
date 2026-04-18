@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import ProgressSteps from '../../Components/NavBar/ProgressSteps';
 import styles from '../../Styles/TicketSelection.module.css';
@@ -8,6 +8,8 @@ export default function TicketSelection() {
 
     const apiBase = import.meta.env.VITE_API_URL ?? '';
     const navigate = useNavigate();
+    const location = useLocation();
+    const { selectedTypeId } = location.state || {};
 
     const [ticketTypes, setTicketTypes] = useState([]);
     const [selectedType, setSelectedType] = useState(null);
@@ -21,11 +23,19 @@ export default function TicketSelection() {
         const fetchTypes = async () => {
             try {
                 const res = await axios.get(`${apiBase}/api/ticket-types`);
-                setTicketTypes(res.data);
+                let types = res.data;
 
-                if (res.data.length > 0) {
-                    setSelectedType(res.data[0]);
+                if (selectedTypeId) {
+                    const found = types.find(t => t.id === selectedTypeId);
+                    if (found) {
+                        types = [found];
+                        setSelectedType(found);
+                    }
+                } else if (types.length > 0) {
+                    setSelectedType(types[0]);
                 }
+
+                setTicketTypes(types);
 
             } catch (err) {
                 console.error("Failed to fetch ticket types", err);
@@ -36,7 +46,7 @@ export default function TicketSelection() {
 
         fetchTypes();
 
-    }, [apiBase]);
+    }, [apiBase, selectedTypeId]);
 
     const incrementQuantity = () => setQuantity(prev => prev < 10 ? prev + 1 : prev);
     const decrementQuantity = () => setQuantity(prev => prev > 1 ? prev - 1 : prev);

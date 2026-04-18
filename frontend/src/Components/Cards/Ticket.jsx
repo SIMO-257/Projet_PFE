@@ -1,3 +1,4 @@
+
 import styles from '../../Styles/Ticket.module.css';
 import CardButton from '../Buttons/CardButton';
 
