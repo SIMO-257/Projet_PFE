@@ -46,10 +46,7 @@ export default function Login() {
             if (clientUuid) {
                 sessionStorage.setItem('client_uuid', clientUuid);
             }
-            const redirectTo = res?.data?.redirect;
-            if (redirectTo) {
-                navigate(redirectTo);
-            }
+            navigate('/home');
         } catch (err) {
             const responseErrors = err?.response?.data?.errors;
             if (responseErrors) {

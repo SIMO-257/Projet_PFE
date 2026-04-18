@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : lun. 30 mars 2026 à 13:36
+-- Généré le : lun. 13 avr. 2026 à 22:11
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -88,7 +88,12 @@ INSERT INTO `clients` (`id`, `uuid`, `email`, `phone`, `password_hash`, `first_n
 (2, '8ccc0228-aa1a-4fb3-b9e5-6a45d3327429', 'trantow.sunny@example.com', '+18782388907', '$2y$12$dYxMIcZUPBc5Lbe3KPKSU.wHQ..y8I5bb8jtX3Eh90KhWqFY/SaFq', 'Terence', 'Hoppe', 1, '2026-03-30 10:36:00', '2026-03-30 10:36:02'),
 (3, '36a49646-598c-41b8-923e-927c5912548e', 'stamm.lesly@example.net', '+19408234108', '$2y$12$G17OOolqA1hRChKM7bNs/.tcM9RkThOKLSh.WMgry8uZMcnWmvp9a', 'Ryley', 'Mertz', 0, '2026-03-30 10:36:00', '2026-03-30 10:36:02'),
 (4, '97ff667f-991d-4784-851d-a8e2198d41be', 'jboyer@example.com', '+18589056525', '$2y$12$9vepucMM6/nEmroOwAgsguVF0/cjYWQjPu0X1qN4wd6vBO6iOPxKS', 'Hugh', 'Okuneva', 1, '2026-03-30 10:36:01', '2026-03-30 10:36:02'),
-(5, '071b77a0-b5f4-4dd9-87b2-bf60e1775668', 'wilkinson.rosalind@example.com', '+13079962596', '$2y$12$FLpI3/FBS6K0hUdrxniIouvbGQmuLCMcoi8LrsUoj3VQd2tQ4R9xG', 'Vance', 'Borer', 1, '2026-03-30 10:36:01', '2026-03-30 10:36:02');
+(5, '071b77a0-b5f4-4dd9-87b2-bf60e1775668', 'wilkinson.rosalind@example.com', '+13079962596', '$2y$12$FLpI3/FBS6K0hUdrxniIouvbGQmuLCMcoi8LrsUoj3VQd2tQ4R9xG', 'Vance', 'Borer', 1, '2026-03-30 10:36:01', '2026-03-30 10:36:02'),
+(6, 'c36e2c5f-0959-4b9c-9780-f2228337c0cb', '7mohammed.mammah@gmail.com', '0712345623', '$2y$12$hkpqwpqMlVpkGTDxRz/6BOHpH2QZHyZSAMqduVNcgH2DL/ccDQTYe', 'Casa', 'Simo', 1, '2026-03-30 16:10:48', '2026-04-12 10:08:00'),
+(7, '51bd69f9-20f5-4a20-b385-3da746b414ea', 'admin@gmail.com', '0670360925', '$2y$12$QYqy8NnGtdhTcQ.43Wdg8Opnr3jgicPy3L2EtGz7PrkZLp2JFedri', 'Mammah', 'Mohammed', 1, '2026-03-30 16:43:41', '2026-03-30 16:43:41'),
+(8, '9758ee34-5a51-402e-81f6-9b5b1bcdb258', '0simo.casa@gmail.com', '0770360919', '$2y$12$55QS/EC85.O3f/7gZUsV1OTKXjSYJYUMrcrn6cIkkg/OHlbdyrvoS', 'casa', 'simo', 1, '2026-03-30 19:25:52', '2026-03-30 19:26:16'),
+(9, '2ad924d6-0245-474b-b19a-7d921322a58a', 'lbakhira@gmail.com', '0770360925', '$2y$12$VXpFAsbVKApypqBdlV1rBOSlKTssFBrALs813ih9t37Wfam2CY4ZO', 'HOWA', 'ANA', 1, '2026-04-12 12:17:01', '2026-04-12 12:17:01'),
+(10, 'ecb3a3fd-289a-4b87-b566-9adcba6979d6', 'leo@gmail.com', '0770360921', '$2y$12$k6r.L4fGfM55JWbldHxRyOZw7H/t1lKBJmuOzXHfRnKTkvyEmL6GS', 'messi', 'leo', 1, '2026-04-13 19:09:46', '2026-04-13 19:09:46');
 
 -- --------------------------------------------------------
 
@@ -168,7 +173,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (8, '2026_03_13_231416_create_tickets_table', 1),
 (9, '2026_03_13_232547_create_validation_logs_table', 1),
 (10, '2026_03_13_232819_create_user_devices_table', 1),
-(11, '2026_03_13_232837_create_blacklisted_tokens_table', 1);
+(11, '2026_03_13_232837_create_blacklisted_tokens_table', 1),
+(12, '2026_04_10_160521_create_personal_access_tokens_table', 2);
 
 -- --------------------------------------------------------
 
@@ -185,6 +191,25 @@ CREATE TABLE `password_reset_tokens` (
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `personal_access_tokens`
+--
+
+CREATE TABLE `personal_access_tokens` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `tokenable_type` varchar(255) NOT NULL,
+  `tokenable_id` bigint(20) UNSIGNED NOT NULL,
+  `name` text NOT NULL,
+  `token` varchar(64) NOT NULL,
+  `abilities` text DEFAULT NULL,
+  `last_used_at` timestamp NULL DEFAULT NULL,
+  `expires_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `sessions`
 --
 
@@ -196,6 +221,14 @@ CREATE TABLE `sessions` (
   `payload` longtext NOT NULL,
   `last_activity` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `sessions`
+--
+
+INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
+('glVnIhsnuaQDTJML1AeWndUrmr6hGQN6PSPATO3g', NULL, '127.0.0.1', 'curl/8.18.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiVkZIZ1JUc05lTmk0QTl0eFFxZzhMaDZBR1lzYmFqWHlwSlI1T3lXRyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NDM6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9sb2dvdXQ/dXVpZD10ZXN0LXV1aWQiO3M6NToicm91dGUiO3M6MTA6ImxvZ291dC5nZXQiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1776011569),
+('Xrpa6ZgU3ogY69t8W8RHIke24RsvG0zaUHcqngTu', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiemxCYXVLbER3VjRkcWxyZ20wRzl0Y01Yblk5bE9sWFZuRklXa0NPVyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NzA6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9sb2dvdXQ/dXVpZD1jMzZlMmM1Zi0wOTU5LTRiOWMtOTc4MC1mMjIyODMzN2MwY2IiO3M6NToicm91dGUiO3M6MTA6ImxvZ291dC5nZXQiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1776011649);
 
 -- --------------------------------------------------------
 
@@ -396,6 +429,15 @@ ALTER TABLE `password_reset_tokens`
   ADD PRIMARY KEY (`email`);
 
 --
+-- Index pour la table `personal_access_tokens`
+--
+ALTER TABLE `personal_access_tokens`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `personal_access_tokens_token_unique` (`token`),
+  ADD KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`),
+  ADD KEY `personal_access_tokens_expires_at_index` (`expires_at`);
+
+--
 -- Index pour la table `sessions`
 --
 ALTER TABLE `sessions`
@@ -472,7 +514,7 @@ ALTER TABLE `blacklisted_tokens`
 -- AUTO_INCREMENT pour la table `clients`
 --
 ALTER TABLE `clients`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT pour la table `failed_jobs`
@@ -490,7 +532,13 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT pour la table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT pour la table `personal_access_tokens`
+--
+ALTER TABLE `personal_access_tokens`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `tickets`

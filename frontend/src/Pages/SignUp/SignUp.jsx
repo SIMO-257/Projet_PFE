@@ -58,11 +58,8 @@ export default function SignUp() {
 
         try {
             setProcessing(true);
-            const res = await signupClient(payload);
-            const redirectTo = res?.data?.redirect;
-            if (redirectTo) {
-                navigate(redirectTo);
-            }
+            await signupClient(payload);
+            navigate('/login');
         } catch (err) {
             const responseErrors = err?.response?.data?.errors;
             if (responseErrors) {
