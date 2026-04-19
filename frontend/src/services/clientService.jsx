@@ -25,7 +25,6 @@ export const setAuthToken = (token, rememberMe = false) => {
 export const clearAuthData = () => {
   localStorage.removeItem('auth_token');
   sessionStorage.removeItem('auth_token');
-  sessionStorage.removeItem('client_uuid');
 };
 
 clientApi.interceptors.request.use((config) => {
@@ -51,6 +50,7 @@ export const fetchClientProfile = () => clientApi.get('/profile');
 export const updateClientProfile = ({ payload = {}, avatarFile = null }) => {
   if (avatarFile) {
     const form = new FormData();
+    form.append('_method', 'PUT');
     Object.entries(payload).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
         form.append(key, value);
@@ -58,7 +58,7 @@ export const updateClientProfile = ({ payload = {}, avatarFile = null }) => {
     });
     form.append('profile_file', avatarFile);
 
-    return clientApi.put('/profile', form);
+    return clientApi.post('/profile', form);
   }
 
   return clientApi.put('/profile', payload);

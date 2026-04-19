@@ -44,12 +44,8 @@ export default function Login() {
             setProcessing(true);
             const res = await loginClient(payload);
             const token = res?.data?.token;
-            const clientUuid = res?.data?.client_uuid;
             if (token) {
                 setAuthToken(token, form.remember_me);
-            }
-            if (clientUuid) {
-                sessionStorage.setItem('client_uuid', clientUuid);
             }
             navigate('/home');
         } catch (err) {
@@ -157,3 +153,4 @@ export default function Login() {
     </>        
     );
 }
+

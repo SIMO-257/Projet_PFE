@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Client;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -10,35 +9,21 @@ use Illuminate\Validation\Rule;
 
 class ProfileRequest extends FormRequest
 {
-    private ?Client $client = null;
-
     public function authorize(): bool
     {
         return true;
     }
 
-    protected function prepareForValidation(): void
-    {
-        $this->merge([
-            'uuid' => $this->input('uuid')
-                ?? $this->header('X-Client-UUID')
-                ?? $this->query('uuid')
-                ?? $this->session()->get('client_uuid'),
-        ]);
-    }
-
     public function rules(): array
     {
-        $uuid = (string) $this->input('uuid', '');
-        $this->client = Client::where('uuid', $uuid)->first();
+        $client = $this->user();
 
         return [
-            'uuid' => 'required|uuid|exists:clients,uuid',
             'phone' => [
                 'nullable',
                 'string',
                 'regex:/^(06|07)\d{8}$/',
-                Rule::unique('clients', 'phone')->ignore($this->client?->id),
+                Rule::unique('clients', 'phone')->ignore($client?->id),
             ],
             'full_name' => 'nullable|string|max:255',
             'first_name' => 'nullable|string|max:100',
@@ -50,8 +35,6 @@ class ProfileRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'uuid.required' => 'Client UUID is required.',
-            'uuid.exists' => 'Client not found.',
             'phone.regex' => 'Phone must start with 06 or 07 and have 10 digits.',
             'phone.unique' => 'This phone number is already used.',
             'full_name.max' => 'Full name is too long.',
@@ -76,17 +59,9 @@ class ProfileRequest extends FormRequest
 
     protected function failedValidation(Validator $validator): void
     {
-        $errors = $validator->errors();
-        $status = $errors->has('uuid') ? 401 : 422;
-
         throw new HttpResponseException(response()->json([
-            'message' => $status === 401 ? 'Unauthenticated.' : 'Validation failed.',
-            'errors' => $errors,
-        ], $status));
-    }
-
-    public function clientModel(): ?Client
-    {
-        return $this->client;
+            'message' => 'Validation failed.',
+            'errors' => $validator->errors(),
+        ], 422));
     }
 }

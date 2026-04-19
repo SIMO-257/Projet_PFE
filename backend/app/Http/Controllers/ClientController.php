@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ClientRequest;
+use App\Http\Requests\ProfileRequest;
 use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -38,23 +39,12 @@ class ClientController extends Controller
         ]);
     }
 
-    public function update_profile(Request $request)
+    public function update_profile(ProfileRequest $request)
     {
         /** @var Client $client */
         $client = $request->user();
 
-        $validated = $request->validate([
-            'phone' => [
-                'nullable',
-                'string',
-                'regex:/^(06|07)\d{8}$/',
-                'unique:clients,phone,'.$client->id,
-            ],
-            'full_name' => 'nullable|string|max:255',
-            'first_name' => 'nullable|string|max:100',
-            'last_name' => 'nullable|string|max:100',
-            'profile_file' => 'nullable|file|max:5120|mimes:jpg,jpeg,png,webp',
-        ]);
+        $validated = $request->validated();
 
         if (array_key_exists('phone', $validated)) {
             $client->phone = $validated['phone'] ?: null;
@@ -110,7 +100,6 @@ class ClientController extends Controller
             'message' => 'Login successful.',
             'token' => $token,
             'token_type' => 'Bearer',
-            'client_uuid' => $client->uuid,
             'remember_me' => $client->remember_me,
         ]);
     }
@@ -124,6 +113,7 @@ class ClientController extends Controller
             'email' => $data['email'],
             'phone' => $data['phone'] ?? null,
             'password_hash' => $data['password'],
+            'profile_file' => $this->defaultAvatarBinary(),
             'is_active' => true,
         ]);
         $this->applyName($client, $data);
@@ -236,5 +226,27 @@ class ClientController extends Controller
         $mime = (new \finfo(FILEINFO_MIME_TYPE))->buffer($binary) ?: 'image/jpeg';
 
         return 'data:'.$mime.';base64,'.base64_encode($binary);
+    }
+
+    private function defaultAvatarBinary(): ?string
+    {
+        static $cached = null;
+        static $loaded = false;
+
+        if ($loaded) {
+            return $cached;
+        }
+
+        $loaded = true;
+        $path = resource_path('images/default-avatar.svg');
+
+        if (!is_file($path)) {
+            return null;
+        }
+
+        $data = file_get_contents($path);
+        $cached = $data === false ? null : $data;
+
+        return $cached;
     }
 }
