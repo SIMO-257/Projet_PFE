@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BottomNavigation from '../../Components/Layout/BottomNavigation';
 import BalanceCard from '../../Components/Cards/BalanceCard';
 import styles from '../../Styles/HomeScreen.module.css';
+import { clearAuthData, fetchClientHome, getAuthToken } from '../../services/clientService';
 
 // Mock data
 const mockUser = {
@@ -58,6 +59,21 @@ const HomeScreen = () => {
   const [unreadCount] = useState(3);
   const [activeTab, setActiveTab] = useState('home');
   const navigateHook = useNavigate();
+
+  useEffect(() => {
+    const token = getAuthToken();
+    if (!token) {
+      navigateHook('/login');
+      return;
+    }
+
+    fetchClientHome().catch((err) => {
+      if (err?.response?.status === 401) {
+        clearAuthData();
+        navigateHook('/login');
+      }
+    });
+  }, [navigateHook]);
 
   // Navigation handlers
   const onNavigate = (section) => {

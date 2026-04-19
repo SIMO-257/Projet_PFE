@@ -35,7 +35,7 @@ class ProfileRequest extends FormRequest
         return [
             'uuid' => 'required|uuid|exists:clients,uuid',
             'phone' => [
-                'required',
+                'nullable',
                 'string',
                 'regex:/^(06|07)\d{8}$/',
                 Rule::unique('clients', 'phone')->ignore($this->client?->id),
@@ -52,7 +52,6 @@ class ProfileRequest extends FormRequest
         return [
             'uuid.required' => 'Client UUID is required.',
             'uuid.exists' => 'Client not found.',
-            'phone.required' => 'Phone number is required.',
             'phone.regex' => 'Phone must start with 06 or 07 and have 10 digits.',
             'phone.unique' => 'This phone number is already used.',
             'full_name.max' => 'Full name is too long.',

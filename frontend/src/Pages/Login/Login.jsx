@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { loginClient } from '../../services/clientService';
+import { loginClient, setAuthToken } from '../../services/clientService';
 
 import InputField from '../../Components/Inputs/InputField';
 import CheckboxInput from '../../Components/Inputs/CheckboxInput';
@@ -37,12 +37,17 @@ export default function Login() {
         const payload = {
             email: form.email,
             password: form.password,
+            remember_me: form.remember_me,
         };
 
         try {
             setProcessing(true);
             const res = await loginClient(payload);
+            const token = res?.data?.token;
             const clientUuid = res?.data?.client_uuid;
+            if (token) {
+                setAuthToken(token, form.remember_me);
+            }
             if (clientUuid) {
                 sessionStorage.setItem('client_uuid', clientUuid);
             }

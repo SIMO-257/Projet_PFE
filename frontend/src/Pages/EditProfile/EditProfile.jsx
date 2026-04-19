@@ -3,9 +3,11 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '../../Components/Layout/Header';
 import styles from '../../Styles/EditProfile.module.css';
 import {
+  clearAuthData,
   fetchClientProfile,
+  forgotPasswordClient,
+  getAuthToken,
   updateClientProfile,
-  uploadClientAvatar,
 } from '../../services/clientService';
 
 const EditProfileScreen = () => {
@@ -21,17 +23,19 @@ const EditProfileScreen = () => {
   const fileInputRef = useRef(null);
   const [errors, setErrors] = useState({});
   const [processing, setProcessing] = useState(false);
+  const [resetStatus, setResetStatus] = useState('');
+  const [sendingReset, setSendingReset] = useState(false);
 
   useEffect(() => {
     if (initialProfile) return;
 
-    const uuid = sessionStorage.getItem('client_uuid');
-    if (!uuid) {
+    const token = getAuthToken();
+    if (!token) {
       navigate('/login');
       return;
     }
 
-    fetchClientProfile({ uuid })
+    fetchClientProfile()
       .then((res) => {
         const data = res?.data ?? null;
         if (!data) return;
@@ -39,7 +43,12 @@ const EditProfileScreen = () => {
         setEmail(data?.email ?? '');
         setPhone(data?.phone ?? '');
       })
-      .catch(() => {});
+      .catch((err) => {
+        if (err?.response?.status === 401) {
+          clearAuthData();
+          navigate('/login');
+        }
+      });
   }, [initialProfile, navigate]);
 
   const goBack = () => {
@@ -59,37 +68,48 @@ const EditProfileScreen = () => {
     reader.readAsDataURL(file);
   };
 
-  const handleChangePassword = () => {
-    console.log('Navigating to change password...');
+  const handleChangePassword = async () => {
+    setResetStatus('');
+    if (!email) {
+      setErrors((prev) => ({ ...prev, form: ['Email is missing for password reset.'] }));
+      return;
+    }
+
+    try {
+      setSendingReset(true);
+      const res = await forgotPasswordClient({ email });
+      setResetStatus(res?.data?.message ?? 'Reset link sent successfully.');
+    } catch (err) {
+      const responseErrors = err?.response?.data?.errors;
+      if (responseErrors) {
+        setErrors((prev) => ({ ...prev, ...responseErrors }));
+      } else {
+        setErrors((prev) => ({ ...prev, form: ['Failed to send reset link.'] }));
+      }
+    } finally {
+      setSendingReset(false);
+    }
   };
 
   const handleSaveChanges = () => {
     setErrors({});
 
-    const uuid = sessionStorage.getItem('client_uuid');
-    if (!uuid) {
+    const token = getAuthToken();
+    if (!token) {
       navigate('/login');
       return;
     }
 
     setProcessing(true);
 
-    const uploadAvatar = () => {
-      if (!avatarFile) return Promise.resolve();
-      return uploadClientAvatar({ uuid, avatarFile });
-    };
-
-    uploadAvatar()
-      .then(() =>
-        updateClientProfile({
-          uuid,
-          payload: { full_name: fullName, phone },
-        })
-      )
+    updateClientProfile({
+      payload: { full_name: fullName, phone },
+      avatarFile,
+    })
       .then(() => navigate('/profile'))
       .catch((err) => {
         if (err?.response?.status === 401) {
-          sessionStorage.removeItem('client_uuid');
+          clearAuthData();
           navigate('/login');
           return;
         }
@@ -271,6 +291,7 @@ const EditProfileScreen = () => {
               {/* Change Password Button */}
               <button
                 onClick={handleChangePassword}
+                disabled={sendingReset}
                 className="w-full bg-black/40 rounded-xl p-4 border border-white/10 hover:border-white/20 transition-all mt-6"
               >
                 <div className="flex items-center justify-between">
@@ -280,13 +301,16 @@ const EditProfileScreen = () => {
                         <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"/>
                       </svg>
                     </div>
-                    <span className="text-white text-sm">Modifier le mot de passe</span>
+                    <span className="text-white text-sm">
+                      {sendingReset ? 'Envoi du lien...' : 'Modifier le mot de passe'}
+                    </span>
                   </div>
                   <svg className="w-5 h-5 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/>
                   </svg>
                 </div>
               </button>
+              {resetStatus && <p className="text-green-400 text-xs mt-2">{resetStatus}</p>}
             </div>
 
             {/* Save Button */}

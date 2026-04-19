@@ -20,3 +20,10 @@ time to man up now lets get this started:
 -- i want things to be well structered and sepereated errors shoul be in the request controller should not containe a verification logic etc 
 -- tell me about your plan and sugejest some tips if you know.
 -- write simple code as short as possible abvouis for a student .
+
+now i want you to add a new column in the client table "remember_me" if the user select it :
+-- the property will be true so when the user reopen he stay loged in.
+-- but if the user didn't choose it it take him directly to login.
+-- so the default page is the home page , if the token is still valid the app should open on the home page .
+-- if it is not it take you to login page .
+what is your plan ?  
