@@ -2,16 +2,20 @@
 
 namespace App\Models;
 
+use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use App\Notifications\ClientResetPasswordNotification;
 
-class Client extends Model
+class Client extends Authenticatable implements CanResetPasswordContract
 {
     /** @use HasFactory<\Database\Factories\ClientFactory> */
-    use HasFactory;
+    use HasApiTokens, HasFactory, Notifiable, CanResetPassword;
 
     /**
      * The attributes that are mass assignable.
@@ -25,8 +29,9 @@ class Client extends Model
         'password_hash',
         'first_name',
         'last_name',
-        'avatar',
+        'profile_file',
         'is_active',
+        'remember_me',
     ];
 
     /**
@@ -38,48 +43,6 @@ class Client extends Model
         'password_hash',
     ];
 
-    protected $appends = [
-        'avatar_url',
-    ];
-
-    public function avatarKey(string $extension): string
-    {
-        $ext = strtolower(trim($extension)) ?: 'jpg';
-        return "avatars/clients/{$this->uuid}/avatar.{$ext}";
-    }
-
-    public function storeAvatar(UploadedFile $file, ?string $disk = null): string
-    {
-        $diskName = $disk ?: config('filesystems.default');
-        $key = $this->avatarKey($file->extension() ?: 'jpg');
-
-        Storage::disk($diskName)->putFileAs(dirname($key), $file, basename($key));
-
-        $this->avatar = $key;
-        $this->save();
-
-        return $key;
-    }
-
-    public function getAvatarUrlAttribute(): ?string
-    {
-        $avatar = (string) ($this->avatar ?? '');
-        if ($avatar === '') {
-            return null;
-        }
-
-        if (preg_match('/^https?:\\/\\//i', $avatar)) {
-            return $avatar;
-        }
-
-        $base = rtrim((string) env('AVATAR_BASE_URL', ''), '/');
-        if ($base === '') {
-            return $avatar;
-        }
-
-        return $base.'/'.ltrim($avatar, '/');
-    }
-
     /**
      * The attributes that should be cast.
      *
@@ -89,6 +52,7 @@ class Client extends Model
     {
         return [
             'is_active' => 'boolean',
+            'remember_me' => 'boolean',
             'created_at' => 'datetime',
         ];
     }
@@ -107,5 +71,20 @@ class Client extends Model
                 $client->uuid = (string) Str::uuid();
             }
         });
+    }
+
+    public function setPasswordHashAttribute(?string $value): void
+    {
+        if ($value === null || $value === '') {
+            $this->attributes['password_hash'] = $value;
+            return;
+        }
+
+        $this->attributes['password_hash'] = Hash::make($value);
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ClientResetPasswordNotification($token));
     }
 }

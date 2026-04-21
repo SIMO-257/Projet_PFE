@@ -6,7 +6,9 @@ import ProfilInfo from '../../Components/Cards/ProfilInfo';
 import ProfileOpt from '../../Components/Cards/ProfileOpt';
 import styles from '../../Styles/ProfileScreen.module.css';
 import {
+  clearAuthData,
   fetchClientProfile,
+  getAuthToken,
   logoutClient,
 } from '../../services/clientService';
 
@@ -16,15 +18,22 @@ const ProfileScreen = () => {
   const navigateHook = useNavigate();
 
   useEffect(() => {
-    const uuid = sessionStorage.getItem('client_uuid');
-    if (!uuid) {
+    const token = getAuthToken();
+    if (!token) {
       navigateHook('/login');
       return;
     }
 
-    fetchClientProfile({ uuid })
+    fetchClientProfile()
       .then((res) => setProfile(res?.data ?? null))
-      .catch(() => setProfile(null));
+      .catch((err) => {
+        if (err?.response?.status === 401) {
+          clearAuthData();
+          navigateHook('/login');
+          return;
+        }
+        setProfile(null);
+      });
   }, [navigateHook]);
 
   const navigate = (section) => {
@@ -49,11 +58,10 @@ const ProfileScreen = () => {
   };
 
   const handleLogout = () => {
-    const uuid = sessionStorage.getItem('client_uuid');
-    logoutClient({ uuid })
+    logoutClient()
       .catch(() => {})
       .finally(() => {
-        sessionStorage.removeItem('client_uuid');
+        clearAuthData();
         navigateHook('/login');
       });
   };

@@ -1,8 +1,10 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { useEffect, useState } from "react";
 import WalletScreen from "./Pages/WalletScreen/WalletScreen";
 import Login from "./Pages/Login/Login";
 import SignUp from "./Pages/SignUp/SignUp";
 import ForgotPassword from "./Pages/ForgotPassword/ForgotPassword";
+import ResetPassword from "./Pages/ResetPassword/ResetPassword";
 import HomeScreen from "./Pages/Home/HomeScreen";
 import ViewTicket from "./Pages/ViewTicket/ViewTicket";
 import ProfileScreen from "./Pages/ProfileScreen/ProfileScreen";
@@ -18,19 +20,47 @@ import OfflineMode from "./Pages/OfflineMode/OfflineMode";
 import Notifications from "./Pages/Notifications/Notifications";
 import ChangeCardScreen from "./Pages/ChangeCardScreen/ChangeCardScreen";
 import ValidationScreen from "./Pages/ValidationScreen/ValidationScreen";
+<<<<<<< HEAD
 import TicketSelection from "./Pages/TicketSelection/TicketSelection";
+=======
+import { clearAuthData, fetchClientHome, getAuthToken } from "./services/clientService";
+
+function RootRedirect() {
+  const [target, setTarget] = useState(null);
+
+  useEffect(() => {
+    const token = getAuthToken();
+    if (!token) {
+      setTarget("/login");
+      return;
+    }
+
+    fetchClientHome()
+      .then(() => setTarget("/home"))
+      .catch(() => {
+        clearAuthData();
+        setTarget("/login");
+      });
+  }, []);
+
+  if (!target) return null;
+
+  return <Navigate to={target} replace />;
+}
+>>>>>>> origin/simo-branch
 
 function App() {
   return (
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<HomeScreen />} />
+          <Route path="/" element={<RootRedirect />} />
           <Route path="/home" element={<HomeScreen />} />
 
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/forgot_password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
           <Route path="/profile" element={<ProfileScreen />} />
           <Route path="/edit-profile" element={<EditProfileScreen />} />
