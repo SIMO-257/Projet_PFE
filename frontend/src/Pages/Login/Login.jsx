@@ -44,8 +44,12 @@ export default function Login() {
             setProcessing(true);
             const res = await loginClient(payload);
             const token = res?.data?.token;
+            const uuid = res?.data?.client_uuid;
             if (token) {
                 setAuthToken(token, form.remember_me);
+            }
+            if (uuid) {
+                sessionStorage.setItem('client_uuid', uuid);
             }
             navigate('/home');
         } catch (err) {

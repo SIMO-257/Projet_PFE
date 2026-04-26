@@ -20,9 +20,9 @@ import OfflineMode from "./Pages/OfflineMode/OfflineMode";
 import Notifications from "./Pages/Notifications/Notifications";
 import ChangeCardScreen from "./Pages/ChangeCardScreen/ChangeCardScreen";
 import ValidationScreen from "./Pages/ValidationScreen/ValidationScreen";
-<<<<<<< HEAD
+
 import TicketSelection from "./Pages/TicketSelection/TicketSelection";
-=======
+
 import { clearAuthData, fetchClientHome, getAuthToken } from "./services/clientService";
 
 function RootRedirect() {
@@ -47,7 +47,7 @@ function RootRedirect() {
 
   return <Navigate to={target} replace />;
 }
->>>>>>> origin/simo-branch
+
 
 function App() {
   return (

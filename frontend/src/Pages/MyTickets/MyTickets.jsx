@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import clientApi from '../../services/clientService';
 import Header from '../../Components/Layout/Header';
 import BottomNavigation from '../../Components/Layout/BottomNavigation';
 import Ticket from "../../Components/Cards/Ticket";
@@ -13,7 +13,6 @@ export default function MyTickets() {
   const [tickets, setTickets] = useState([]);
   const [ticketTypes, setTicketTypes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const apiBase = import.meta.env.VITE_API_URL ?? '';
 
   useEffect(() => {
     const fetchData = async () => {
@@ -25,13 +24,13 @@ export default function MyTickets() {
 
       try {
         setLoading(true);
-        // Fetch User's Tickets
-        const ticketsRes = await axios.get(`${apiBase}/api/tickets`, {
+        // Fetch User's Tickets using secure clientApi
+        const ticketsRes = await clientApi.get('/tickets', {
           headers: { 'X-Client-UUID': uuid }
         });
         
-        // Fetch Available Ticket Types for purchase
-        const typesRes = await axios.get(`${apiBase}/api/ticket-types`);
+        // Fetch Available Ticket Types
+        const typesRes = await clientApi.get('/ticket-types');
 
         setTickets(ticketsRes.data || []);
         setTicketTypes(typesRes.data || []);
@@ -43,7 +42,7 @@ export default function MyTickets() {
     };
 
     fetchData();
-  }, [apiBase, navigateHook]);
+  }, [navigateHook]);
 
   // Group tickets by type
   const groupedTickets = tickets.reduce((acc, t) => {

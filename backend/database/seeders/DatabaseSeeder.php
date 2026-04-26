@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
             [
                 'first_name' => 'Test',
                 'last_name' => 'Client',
-                'password_hash' => \Illuminate\Support\Facades\Hash::make('password'),
+                'password_hash' => 'password',
             ]
         );
 
@@ -28,6 +28,35 @@ class DatabaseSeeder extends Seeder
             ['user_id' => $client->id],
             ['balance' => 100.00]
         );
+
+        // Seed some tickets for the test user
+        $simpleTicketType = \App\Models\TicketType::where('code', 'BILLET_SIMPLE')->first();
+        if ($simpleTicketType) {
+            \App\Models\Ticket::create([
+                'uuid' => (string) \Illuminate\Support\Str::uuid(),
+                'user_id' => $client->id,
+                'ticket_type_id' => $simpleTicketType->id,
+                'status' => 'active',
+                'valid_from' => now(),
+                'valid_until' => now()->addDays(1),
+                'remaining_uses' => 1,
+                'price_paid' => $simpleTicketType->price,
+            ]);
+        }
+
+        $carnetType = \App\Models\TicketType::where('code', 'CARTE_NORMALE')->first();
+        if ($carnetType) {
+            \App\Models\Ticket::create([
+                'uuid' => (string) \Illuminate\Support\Str::uuid(),
+                'user_id' => $client->id,
+                'ticket_type_id' => $carnetType->id,
+                'status' => 'active',
+                'valid_from' => now(),
+                'valid_until' => now()->addDays(7),
+                'remaining_uses' => 2,
+                'price_paid' => $carnetType->price,
+            ]);
+        }
 
         // Rename old types to "Billet" before deactivating to ensure existing tickets show the new name
         \App\Models\TicketType::whereIn('code', ['VOYAGE_ALLEZ', 'VOYAGE_RETOUR', 'VOYAGE_REGULIER'])
