@@ -6,6 +6,13 @@ import BottomNavigation from '../../Components/Layout/BottomNavigation';
 import Ticket from "../../Components/Cards/Ticket";
 import PurchaseCard from '../../Components/Cards/PurchaseCard';
 import styles from '../../Styles/Ticket.module.css';
+import {
+  clearAuthData,
+  fetchClientProfile,
+  getAuthToken,
+  getClientUuid,
+  setClientUuid,
+} from '../../services/clientService';
 
 export default function MyTickets() {
   const navigateHook = useNavigate();
@@ -17,14 +24,30 @@ export default function MyTickets() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const uuid = sessionStorage.getItem('client_uuid');
-      if (!uuid) {
+      const token = getAuthToken();
+      if (!token) {
         navigateHook('/login');
         return;
       }
 
       try {
         setLoading(true);
+        let uuid = getClientUuid();
+
+        if (!uuid) {
+          const profileRes = await fetchClientProfile();
+          uuid = profileRes?.data?.client_uuid ?? '';
+          if (uuid) {
+            setClientUuid(uuid, Boolean(localStorage.getItem('auth_token')));
+          }
+        }
+
+        if (!uuid) {
+          clearAuthData();
+          navigateHook('/login');
+          return;
+        }
+
         // Fetch User's Tickets
         const ticketsRes = await axios.get(`${apiBase}/api/tickets`, {
           headers: { 'X-Client-UUID': uuid }
@@ -36,6 +59,11 @@ export default function MyTickets() {
         setTickets(ticketsRes.data || []);
         setTicketTypes(typesRes.data || []);
       } catch (err) {
+        if (err?.response?.status === 401) {
+          clearAuthData();
+          navigateHook('/login');
+          return;
+        }
         console.error("Error fetching tickets data:", err);
       } finally {
         setLoading(false);

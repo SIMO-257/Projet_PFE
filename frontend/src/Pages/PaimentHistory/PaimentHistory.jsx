@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import styles from '../../Styles/PaimentHistory.module.css';
 import BottomNavigation from '../../Components/Layout/BottomNavigation';
+import { getClientUuid } from '../../services/clientService';
 
 export default function PaimentHistory () {
     const navigateHook = useNavigate();
@@ -15,7 +16,7 @@ export default function PaimentHistory () {
 
     useEffect(() => {
         const fetchTickets = async () => {
-            const uuid = sessionStorage.getItem('client_uuid');
+            const uuid = getClientUuid();
             if (!uuid) return;
 
             try {

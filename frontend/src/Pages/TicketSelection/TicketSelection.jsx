@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import ProgressSteps from '../../Components/NavBar/ProgressSteps';
 import styles from '../../Styles/TicketSelection.module.css';
+import { getClientUuid } from '../../services/clientService';
 
 export default function TicketSelection() {
 
@@ -60,7 +61,7 @@ export default function TicketSelection() {
             return;
         }
 
-        const clientUuid = sessionStorage.getItem('client_uuid') || '';
+        const clientUuid = getClientUuid() || '';
 
         if (!clientUuid) {
             setErrors({ form: "Session expirée. Veuillez vous reconnecter." });

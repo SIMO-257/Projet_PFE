@@ -1,11 +1,10 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { loginClient, setAuthToken } from '../../services/clientService';
+import { loginClient, setAuthToken, setClientUuid } from '../../services/clientService';
 
 import InputField from '../../Components/Inputs/InputField';
 import CheckboxInput from '../../Components/Inputs/CheckboxInput';
 import ConnexionButton from '../../Components/Buttons/ConnexionButton';
-import SocialButton from '../../Components/Buttons/SocialButton';
 import FormOptions from '../../Components/Form/FormOptions';
 import styles from '../../Styles/Auth.module.css'
 
@@ -44,8 +43,12 @@ export default function Login() {
             setProcessing(true);
             const res = await loginClient(payload);
             const token = res?.data?.token;
+            const clientUuid = res?.data?.client_uuid;
             if (token) {
                 setAuthToken(token, form.remember_me);
+            }
+            if (clientUuid) {
+                setClientUuid(clientUuid, form.remember_me);
             }
             navigate('/home');
         } catch (err) {
@@ -63,14 +66,6 @@ export default function Login() {
         } finally {
             setProcessing(false);
         }
-    };
-
-    const handleGoogleLogin = () => {
-        console.log('Google login');
-    };
-
-    const handleAppleLogin = () => {
-        console.log('Apple login');
     };
 
     return (
@@ -121,26 +116,6 @@ export default function Login() {
                         {processing ? 'Connexion...' : 'Connexion'}
                     </ConnexionButton>
                 </form>
-
-                <div className={styles.divider}>
-                    <span>ou</span>
-                </div>
-
-                <div className={styles.socialButtons}>
-                    <SocialButton
-                        provider="google"
-                        icon="G"
-                        onClick={handleGoogleLogin}
-                    >
-                        Continuer avec Google
-                    </SocialButton>
-                    <SocialButton
-                        provider="apple"
-                        onClick={handleAppleLogin}
-                    >
-                        Continuer avec Apple
-                    </SocialButton>
-                </div>
 
                 <div className={styles.authFooter}>
                     <p>

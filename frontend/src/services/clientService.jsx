@@ -10,6 +10,9 @@ const clientApi = axios.create({
 export const getAuthToken = () =>
   localStorage.getItem('auth_token') ?? sessionStorage.getItem('auth_token');
 
+export const getClientUuid = () =>
+  localStorage.getItem('client_uuid') ?? sessionStorage.getItem('client_uuid');
+
 export const setAuthToken = (token, rememberMe = false) => {
   if (!token) return;
 
@@ -22,9 +25,23 @@ export const setAuthToken = (token, rememberMe = false) => {
   }
 };
 
+export const setClientUuid = (uuid, rememberMe = false) => {
+  if (!uuid) return;
+
+  if (rememberMe) {
+    localStorage.setItem('client_uuid', uuid);
+    sessionStorage.removeItem('client_uuid');
+  } else {
+    sessionStorage.setItem('client_uuid', uuid);
+    localStorage.removeItem('client_uuid');
+  }
+};
+
 export const clearAuthData = () => {
   localStorage.removeItem('auth_token');
   sessionStorage.removeItem('auth_token');
+  localStorage.removeItem('client_uuid');
+  sessionStorage.removeItem('client_uuid');
 };
 
 clientApi.interceptors.request.use((config) => {

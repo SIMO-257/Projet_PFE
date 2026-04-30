@@ -31,6 +31,7 @@ class ClientController extends Controller
 
         return response()->json([
             'name' => $name,
+            'client_uuid' => $client->uuid,
             'email' => $client->email,
             'phone' => $client->phone,
             'created_at' => $client->created_at->toDateString(),
@@ -101,6 +102,7 @@ class ClientController extends Controller
             'token' => $token,
             'token_type' => 'Bearer',
             'remember_me' => $client->remember_me,
+            'client_uuid' => $client->uuid,
         ]);
     }
 

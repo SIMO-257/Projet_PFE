@@ -5,7 +5,6 @@ import { signupClient } from '../../services/clientService';
 import InputField from '../../Components/Inputs/InputField';
 import CheckboxInput from '../../Components/Inputs/CheckboxInput';
 import ConnexionButton from '../../Components/Buttons/ConnexionButton';
-import SocialButton from '../../Components/Buttons/SocialButton';
 import FormOptions from '../../Components/Form/FormOptions';
 import styles from '../../Styles/Auth.module.css';
 
@@ -70,14 +69,6 @@ export default function SignUp() {
         } finally {
             setProcessing(false);
         }
-    };
-
-    const handleGoogleLogin = () => {
-        console.log('Google login');
-    };
-
-    const handleAppleLogin = () => {
-        console.log('Apple login');
     };
 
     return (
@@ -166,26 +157,6 @@ Rejoinier l'expérience premium du mobile intelligent
                         {processing ? 'Inscription...' : 'Inscription'}
                     </ConnexionButton>
                 </form>
-
-                <div className={styles.divider}>
-                    <span>ou</span>
-                </div>
-
-                <div className={styles.socialButtons}>
-                    <SocialButton
-                        provider="google"
-                        icon="G"
-                        onClick={handleGoogleLogin}
-                    >
-                        Continuer avec Google
-                    </SocialButton>
-                    <SocialButton
-                        provider="apple"
-                        onClick={handleAppleLogin}
-                    >
-                        Continuer avec Apple
-                    </SocialButton>
-                </div>
 
                 <div className={styles.authFooter}>
                     <p>
