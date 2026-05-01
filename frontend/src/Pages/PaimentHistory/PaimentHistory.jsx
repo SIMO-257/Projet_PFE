@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import clientApi from '../../services/clientService';
 import styles from '../../Styles/PaimentHistory.module.css';
 import BottomNavigation from '../../Components/Layout/BottomNavigation';
 import { getClientUuid } from '../../services/clientService';
@@ -12,7 +12,6 @@ export default function PaimentHistory () {
     const [activeDateFilter, setActiveDateFilter] = useState('all');
     const [tickets, setTickets] = useState([]);
     const [loading, setLoading] = useState(true);
-    const apiBase = import.meta.env.VITE_API_URL ?? '';
 
     useEffect(() => {
         const fetchTickets = async () => {
@@ -21,7 +20,7 @@ export default function PaimentHistory () {
 
             try {
                 setLoading(true);
-                const res = await axios.get(`${apiBase}/api/tickets`, {
+                const res = await clientApi.get('/tickets', {
                     headers: { 'X-Client-UUID': uuid }
                 });
                 setTickets(res.data || []);
@@ -32,7 +31,7 @@ export default function PaimentHistory () {
             }
         };
         fetchTickets();
-    }, [apiBase]);
+    }, []);
 
     const onNavigate = (section) => {
         setActiveTabNav(section);
@@ -59,7 +58,7 @@ export default function PaimentHistory () {
     const getValidity = (ticket) => {
         if (!ticket.ticket_type) return "1 trajet";
         const code = ticket.ticket_type.code;
-        if (code === 'BILLET_SIMPLE' || code === 'VOYAGE_REGULIER') return "1 trajet";
+        if (code === 'BILLET_SIMPLE') return "1 trajet";
         if (code === 'CARTE_NORMALE') return "2 trajets";
         if (code === 'BILLET_SEMAINE') return "Illimité (7j)";
         if (code === 'BILLET_MOIS') return "Illimité (30j)";

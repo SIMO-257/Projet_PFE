@@ -18,6 +18,7 @@ class Transaction extends Model
         'uuid',
         'user_id',
         'type',
+        'status',
         'amount',
         'balance_before',
         'balance_after',
@@ -25,6 +26,14 @@ class Transaction extends Model
         'reference',
         'metadata',
     ];
+
+    /**
+     * Get the client that owns the transaction.
+     */
+    public function client()
+    {
+        return $this->belongsTo(Client::class, 'user_id');
+    }
 
     /**
      * @var bool

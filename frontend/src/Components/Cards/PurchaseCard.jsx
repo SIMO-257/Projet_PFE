@@ -30,11 +30,6 @@ export default function PurchaseCard(props) {
           <span className={styles.priceValue}>{props.purchase.price}</span>
         </div>
 
-        <div className={styles.detailRow}>
-          <span className={styles.detailLabel}>Durée</span>
-          <span className={styles.detailValue}>{props.purchase.duration}</span>
-        </div>
-
       </div>
 
       <CardButton active={true} btnText={props.purchase.buttonText} method={purchase_ticket} />

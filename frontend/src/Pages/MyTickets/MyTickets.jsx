@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import clientApi from '../../services/clientService';
 import Header from '../../Components/Layout/Header';
 import BottomNavigation from '../../Components/Layout/BottomNavigation';
 import Ticket from "../../Components/Cards/Ticket";
@@ -20,7 +20,6 @@ export default function MyTickets() {
   const [tickets, setTickets] = useState([]);
   const [ticketTypes, setTicketTypes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const apiBase = import.meta.env.VITE_API_URL ?? '';
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,32 +31,17 @@ export default function MyTickets() {
 
       try {
         setLoading(true);
-        let uuid = getClientUuid();
-
-        if (!uuid) {
-          const profileRes = await fetchClientProfile();
-          uuid = profileRes?.data?.client_uuid ?? '';
-          if (uuid) {
-            setClientUuid(uuid, Boolean(localStorage.getItem('auth_token')));
-          }
-        }
-
-        if (!uuid) {
-          clearAuthData();
-          navigateHook('/login');
-          return;
-        }
-
-        // Fetch User's Tickets
-        const ticketsRes = await axios.get(`${apiBase}/api/tickets`, {
+        // Fetch User's Tickets using secure clientApi
+        const ticketsRes = await clientApi.get('/tickets', {
           headers: { 'X-Client-UUID': uuid }
         });
         
-        // Fetch Available Ticket Types for purchase
-        const typesRes = await axios.get(`${apiBase}/api/ticket-types`);
+        // Fetch Available Ticket Types
+        const typesRes = await clientApi.get('/ticket-types');
+        const filteredTypes = (typesRes.data || []).filter(t => t.code !== 'CARTE_RECHARGE');
 
         setTickets(ticketsRes.data || []);
-        setTicketTypes(typesRes.data || []);
+        setTicketTypes(filteredTypes);
       } catch (err) {
         if (err?.response?.status === 401) {
           clearAuthData();
@@ -71,7 +55,7 @@ export default function MyTickets() {
     };
 
     fetchData();
-  }, [apiBase, navigateHook]);
+  }, [navigateHook]);
 
   // Group tickets by type
   const groupedTickets = tickets.reduce((acc, t) => {
@@ -151,7 +135,6 @@ export default function MyTickets() {
                         status: "Disponible",
                         description: simpleBilletType.description,
                         price: `${simpleBilletType.price} DH`,
-                        duration: `${simpleBilletType.duration_minutes} min`,
                         buttonText: "Acheter le billet",
                         buttonVariant: "secondary",
                         isActive: false
@@ -174,7 +157,6 @@ export default function MyTickets() {
                           status: "Disponible",
                           description: type.description,
                           price: `${type.price} DH`,
-                          duration: `${type.duration_minutes} min`,
                           buttonText: "Acheter",
                           buttonVariant: "secondary",
                           isActive: false

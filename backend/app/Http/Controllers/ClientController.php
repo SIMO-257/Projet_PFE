@@ -79,7 +79,9 @@ class ClientController extends Controller
             'remember_me' => 'nullable|boolean',
         ]);
 
-        $client = Client::where('email', $data['email'])
+        $email = trim($data['email']);
+
+        $client = Client::where('email', $email)
             ->where('is_active', true)
             ->first();
 

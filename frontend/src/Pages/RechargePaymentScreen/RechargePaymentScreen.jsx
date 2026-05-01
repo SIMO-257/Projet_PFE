@@ -1,332 +1,160 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
 
 // Layout Components
 import Header from "../../Components/Layout/Header";
-
-// UI Components
 import ProgressDots from "../../Components/UI/ProgressDots";
 
-// Cards Components
-import AmountDisplay from "../../Components/Cards/AmountDisplay";
-import PaymentOptionCard from "../../Components/Cards/PaymentOptionCard";
-import SavedCardItem from "../../Components/Cards/SavedCardItem";
-import ActionButtonCard from "../../Components/Cards/ActionButtonCard";
-import PaymentSummary from "../../Components/Cards/PaymentSummary";
+// UI Components
 import ValidationCard from "../../Components/Cards/ValidationCard";
+import AmountDisplay from "../../Components/Cards/AmountDisplay";
+import CheckoutForm from "./CheckoutForm";
+import InputField from "../../Components/Inputs/InputField";
 
-// Inputs Components
-import CheckboxInput from "../../Components/Inputs/CheckboxInput";
-
-import styles from "../../Styles/RechargePaymentScreen.module.css";
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 const RechargePaymentScreen = () => {
   const navigate = useNavigate();
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("card");
-  const [selectedCard, setSelectedCard] = useState("visa-4532");
-  const [savePayment, setSavePayment] = useState(false);
-  const [amount] = useState("50,00 DH");
+  const [step, setStep] = useState(1); // 1: Amount Selection, 2: Card Details
+  const [amount, setAmount] = useState("");
+  const [error, setError] = useState("");
 
   const goBack = () => {
-    navigate(-1);
+    if (step === 2) {
+      setStep(1);
+    } else {
+      navigate(-1);
+    }
   };
 
   const closeModal = () => {
-    navigate("/home");
+    navigate("/wallet");
   };
 
-  const handleConfirmPayment = () => {
-    console.log("Confirming payment...");
-    navigate("/recharge/confirm");
+  const handleProceedToPayment = () => {
+    // Robust parsing: handle both dot and comma
+    const cleanAmount = amount.toString().replace(',', '.');
+    const val = parseFloat(cleanAmount);
+    
+    if (isNaN(val) || val < 5 || val > 500) {
+      setError("Le montant doit être compris entre 5 DH et 500 DH.");
+      return;
+    }
+    
+    // Set formatted amount back to state
+    setAmount(val.toFixed(2));
+    setError("");
+    setStep(2);
   };
 
-  const addNewCard = () => {
-    console.log("Adding new card...");
+  const onSuccess = () => {
+    navigate("/wallet", { state: { successMessage: "Rechargement réussi !" } });
   };
 
-  // Sample saved cards
-  const savedCards = [
-    {
-      id: "visa-4532",
-      type: "Visa",
-      number: "**** 4532",
-      status: "Par défaut",
-      isDefault: true,
-      expired: false,
-    },
-    {
-      id: "mastercard-8801",
-      type: "Mastercard",
-      number: "**** 8801",
-      expiry: "05/26",
-      isDefault: false,
-      expired: false,
-    },
-  ];
+  // Helper to handle input change matching InputField's expectation
+  const onAmountChange = (e) => {
+    setAmount(e.target.value);
+    if (error) setError("");
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#2a0b0f] to-[#1a0507] flex items-center justify-center p-4">
       <div className="w-full max-w-md mx-auto">
-        {/* Payment Modal Card */}
         <ValidationCard className="shadow-2xl">
           {/* Header */}
           <Header
-            title="Mode de paiement"
+            title={step === 1 ? "Rechargement" : "Paiement sécurisé"}
             onBack={goBack}
             showBackButton={true}
             onClose={closeModal}
-            showCloseButton={true}
+            showCloseButton={false}
             className="px-6 pt-6 pb-4"
           />
 
           {/* Progress Dots */}
-          <ProgressDots totalSteps={3} currentStep={1} />
+          <div className="px-6">
+            <ProgressDots totalSteps={2} currentStep={step} />
+          </div>
 
-          {/* Main Content - Scrollable */}
-          <div className="max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar px-6 pb-6">
-            {/* Amount Display */}
-            <AmountDisplay
-              label="Montant sélectionné"
-              amount={amount}
-              icon="wallet"
-              gradientFrom="#5C2A36"
-              gradientTo="#3D1A24"
-              className="mb-6"
-            />
+          {/* Main Content */}
+          <div className="max-h-[calc(100vh-150px)] overflow-y-auto custom-scrollbar px-6 pb-8">
+            {step === 1 ? (
+              <div className="space-y-8 mt-4">
+                <div className="space-y-2">
+                  <h3 className="text-white text-lg font-bold">Combien souhaitez-vous recharger ?</h3>
+                  <p className="text-white/40 text-xs">Le solde sera disponible immédiatement après validation.</p>
+                </div>
 
-            {/* Payment Method Selection */}
-            <div className="mb-6">
-              <h3 className="text-white text-sm mb-4">
-                Choisissez votre mode de paiement
-              </h3>
-
-              {/* Card Payment Option */}
-              <PaymentOptionCard
-                title="Carte bancaire"
-                isSelected={selectedPaymentMethod === "card"}
-                onClick={() => setSelectedPaymentMethod("card")}
-                icon={
-                  <svg
-                    className="w-5 h-5 text-white"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z" />
-                  </svg>
-                }
-                className="mb-3"
-              >
-                {selectedPaymentMethod === "card" && (
-                  <div className="space-y-3 pl-8">
-                    {/* Saved Cards */}
-                    {savedCards.map((card) => (
-                      <SavedCardItem
-                        key={card.id}
-                        type={card.type}
-                        number={card.number}
-                        status={card.status}
-                        expiry={card.expiry}
-                        isSelected={selectedCard === card.id}
-                        onClick={() => setSelectedCard(card.id)}
-                        isDefault={card.isDefault}
-                      />
-                    ))}
-
-                    {/* Add New Card Button */}
-                    <ActionButtonCard
-                      variant="default"
-                      icon={
-                        <svg
-                          className="w-5 h-5 text-yellow-500"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M12 4v16m8-8H4"
-                          />
-                        </svg>
-                      }
-                      label="Ajouter une nouvelle carte"
-                      onClick={addNewCard}
-                      className="w-full rounded-xl p-3 border-2 border-dashed border-yellow-500/30 hover:border-yellow-500/50"
-                      showArrow={false}
-                    />
-
-                    {/* Secure Payment Info */}
-                    <div className="flex items-center space-x-2 pt-2">
-                      <svg
-                        className="w-4 h-4 text-green-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      <span className="text-white/50 text-xs">
-                        Paiement sécurisé par Stripe
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </PaymentOptionCard>
-
-              {/* PayPal Option */}
-              <PaymentOptionCard
-                variant="paypal"
-                title="Paiement express"
-                subtitle="Carte **** 8801"
-                description="Paiement en un tap sécurisé"
-                isSelected={selectedPaymentMethod === "paypal"}
-                onClick={() => setSelectedPaymentMethod("paypal")}
-                showExpressBadge={true}
-                icon={
-                  <svg
-                    className="w-5 h-5 text-white"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z" />
-                  </svg>
-                }
-                className="mb-3"
-              >
-                {selectedPaymentMethod === "paypal" && (
-                  <div className="pl-8 mt-2">
-                    <div className="flex items-center space-x-1">
-                      <svg
-                        className="w-3 h-3 text-yellow-500"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      <span className="text-white/50 text-xs">
-                        Authentification avec Face ID biométrique
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </PaymentOptionCard>
-
-              {/* Email Option */}
-              <PaymentOptionCard
-                variant="email"
-                title="user@example.com"
-                subtitle="Recevez un lien PayPal pour finaliser"
-                isSelected={selectedPaymentMethod === "email"}
-                onClick={() => setSelectedPaymentMethod("email")}
-                rightIcon={
-                  <svg
-                    className="w-4 h-4 text-white/40"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                }
-              />
-            </div>
-
-            {/* Save Payment Checkbox */}
-            <div className="mb-6">
-              <CheckboxInput
-                label={
-                  <>
-                    <div className="flex items-center space-x-2 mb-1">
-                      <svg
-                        className="w-4 h-4 text-red-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      <span className="text-white text-sm">Paiement sécurisé</span>
-                    </div>
-                    <div className="flex items-center space-x-2 text-white/40 text-xs">
-                      <span>SSL Crypté</span>
-                      <span>•</span>
-                      <span>PCI-DSS Compliant</span>
-                    </div>
-                  </>
-                }
-                id="save-payment"
-                setCheck={() => setSavePayment(!savePayment)}
-                check={savePayment}
-              />
-            </div>
-
-            {/* Payment Summary */}
-            <PaymentSummary
-              card="Visa****6342"
-              date="05/10/2026"
-              totalAmount={amount}
-              className="mb-6"
-            />
-
-            {/* Terms */}
-            <div className="flex items-start space-x-2 mb-6">
-              <svg
-                className="w-4 h-4 text-yellow-500 mt-0.5"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                  clipRule="evenodd"
+                <AmountDisplay
+                  label="Montant à ajouter"
+                  amount={amount ? `${parseFloat(amount || 0).toFixed(2)} DH` : "0,00 DH"}
+                  icon="wallet"
+                  className="shadow-xl transform hover:scale-[1.01] transition-transform"
                 />
-              </svg>
-              <p className="text-white/50 text-xs leading-relaxed">
-                J'accepte les{" "}
-                <button className="text-yellow-500 underline">
-                  conditions générales
-                </button>
-                {" "}de vente
-              </p>
-            </div>
 
-            {/* Confirm Button */}
-            <ActionButtonCard
-              variant="validation"
-              icon={
-                <svg
-                  className="w-5 h-5 text-white/50"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                    clipRule="evenodd"
+                <div className="space-y-4">
+                  <InputField
+                    type="number"
+                    id="recharge-amount"
+                    label="Entrez le montant (DH)"
+                    placeholder="Ex: 50"
+                    var={amount}
+                    setVar={onAmountChange}
+                    error={!!error}
+                    errorMessage={error}
                   />
-                </svg>
-              }
-              label={`Confirmer le paiement • ${amount}`}
-              onClick={handleConfirmPayment}
-              showArrow={false}
-              className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#3a4f5a] to-[#2a3f4a] hover:from-[#4a5f6a] hover:to-[#3a4f5a] border border-white/10"
-            />
+                  <div className="flex items-center space-x-2 bg-yellow-500/10 border border-yellow-500/20 p-3 rounded-xl">
+                    <svg className="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <p className="text-yellow-500/80 text-[10px] leading-tight">
+                      Limite de rechargement : Min 5 DH - Max 500 DH par transaction.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest px-1">Montants rapides</p>
+                  <div className="grid grid-cols-3 gap-3">
+                    {["10", "20", "50", "100", "200", "500"].map((preset) => (
+                      <button
+                        key={preset}
+                        onClick={() => {
+                          setAmount(preset);
+                          setError("");
+                        }}
+                        className={`py-3 rounded-xl border transition-all duration-200 font-bold ${
+                          amount === preset 
+                          ? 'border-yellow-500 bg-yellow-500/20 text-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.2)]' 
+                          : 'border-white/10 bg-white/5 text-white/60 hover:border-white/30 hover:bg-white/10'
+                        }`}
+                      >
+                        {preset}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleProceedToPayment}
+                  className="w-full py-4 mt-4 rounded-2xl bg-gradient-to-r from-yellow-600 to-yellow-500 text-white font-bold shadow-2xl hover:from-yellow-500 hover:to-yellow-400 transform active:scale-[0.98] transition-all"
+                >
+                  Continuer vers le paiement
+                </button>
+              </div>
+            ) : (
+              <Elements stripe={stripePromise}>
+                <div className="mt-4">
+                  <CheckoutForm 
+                    amount={amount} 
+                    onSuccess={onSuccess} 
+                    onBack={() => setStep(1)} 
+                  />
+                </div>
+              </Elements>
+            )}
           </div>
         </ValidationCard>
       </div>

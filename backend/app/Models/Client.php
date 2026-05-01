@@ -54,6 +54,7 @@ class Client extends Authenticatable implements CanResetPasswordContract
             'is_active' => 'boolean',
             'remember_me' => 'boolean',
             'created_at' => 'datetime',
+            'password_hash' => 'hashed',
         ];
     }
 
@@ -73,18 +74,24 @@ class Client extends Authenticatable implements CanResetPasswordContract
         });
     }
 
-    public function setPasswordHashAttribute(?string $value): void
-    {
-        if ($value === null || $value === '') {
-            $this->attributes['password_hash'] = $value;
-            return;
-        }
-
-        $this->attributes['password_hash'] = Hash::make($value);
-    }
-
     public function sendPasswordResetNotification($token): void
     {
         $this->notify(new ClientResetPasswordNotification($token));
+    }
+
+    /**
+     * Get the wallet associated with the client.
+     */
+    public function wallet()
+    {
+        return $this->hasOne(Wallet::class, 'user_id');
+    }
+
+    /**
+     * Get the transactions for the client.
+     */
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class, 'user_id');
     }
 }
