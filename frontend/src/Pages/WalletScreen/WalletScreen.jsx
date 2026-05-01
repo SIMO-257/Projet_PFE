@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../Components/Layout/Header';
 import BalanceCard from '../../Components/Cards/BalanceCard';
@@ -7,15 +7,51 @@ import BottomNavigation from '../../Components/Layout/BottomNavigation';
 import TransactionItem from '../../Components/Cards/TransactionItem';
 import SectionHeader from '../../Components/Layout/SectionHeader';
 import styles from '../../Styles/WalletScreen.module.css';
-
+import { fetchWalletDetails, fetchTransactionHistory } from '../../services/clientService';
 
 const WalletScreen = () => {
   const [activeTab, setActiveTab] = useState('wallet');
+  const [balanceInfo, setBalanceInfo] = useState({ balance: 0, card_last_four: '****' });
+  const [transactions, setTransactions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const navigateHook = useNavigate();
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [walletRes, transRes] = await Promise.all([
+          fetchWalletDetails(),
+          fetchTransactionHistory()
+        ]);
+        
+        setBalanceInfo(walletRes.data);
+        
+        // Map backend transactions to frontend format
+        const mappedTransactions = transRes.data.map(t => ({
+          id: t.id,
+          type: t.type,
+          title: t.reference || (t.type === 'recharge' ? 'Rechargement' : 'Achat'),
+          date: new Date(t.created_at).toLocaleString('fr-FR', { 
+            day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' 
+          }),
+          amount: `${t.type === 'recharge' ? '+' : '-'}${parseFloat(t.amount).toFixed(2)} DH`,
+          isPositive: t.type === 'recharge',
+          icon: t.type === 'recharge' ? 'plus' : 'ticket'
+        }));
+        
+        setTransactions(mappedTransactions);
+      } catch (error) {
+        console.error('Error fetching wallet data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
 
   const navigate = (section) => {
     setActiveTab(section);
-    console.log('Navigating to:', section);
     if (section === 'profile') navigateHook('/profile');
     if (section === 'home') navigateHook('/home');
     if (section === 'tickets') navigateHook('/mytickets');
@@ -23,7 +59,7 @@ const WalletScreen = () => {
   };
 
   const handleRecharge = () => {
-    console.log('Recharge wallet');
+    navigateHook('/recharge/payment'); // Assuming this is the route for recharge
   };
 
   const handleChangeCard = () => {
@@ -37,28 +73,6 @@ const WalletScreen = () => {
   const viewAllTransactions = () => {
     console.log('View all transactions');
   };
-
-  // Sample transactions data
-  const transactions = [
-    {
-      id: 1,
-      type: 'recharge',
-      title: 'Rechargement',
-      date: "Aujourd'hui, 14:32",
-      amount: '+50,00 €',
-      isPositive: true,
-      icon: 'plus'
-    },
-    {
-      id: 2,
-      type: 'ticket',
-      title: 'Trajet Premium',
-      date: 'Hier, 18:45',
-      amount: '-8,50 €',
-      isPositive: false,
-      icon: 'ticket'
-    }
-  ];
 
   return (
     <>
@@ -82,9 +96,9 @@ const WalletScreen = () => {
               {/* Balance Card */}
               <BalanceCard 
                 title="Solde disponible"
-                amount="245 DH"
+                amount={`${parseFloat(balanceInfo.balance).toFixed(2)} DH`}
                 cardType="Carte Virtuelle"
-                cardNumber="**** 4729"
+                cardNumber={`**** ${balanceInfo.card_last_four}`}
                 gradientFrom="#7A3B47"
                 gradientTo="#5C2A36"
                 showCircles={false}
@@ -127,17 +141,23 @@ const WalletScreen = () => {
 
                 {/* Transaction List */}
                 <div className="space-y-3">
-                  {transactions.map((transaction) => (
-                    <TransactionItem
-                      key={transaction.id}
-                      type={transaction.type}
-                      title={transaction.title}
-                      date={transaction.date}
-                      amount={transaction.amount}
-                      isPositive={transaction.isPositive}
-                      icon={transaction.icon}
-                    />
-                  ))}
+                  {isLoading ? (
+                    <div className="text-center text-white/50 py-4">Chargement...</div>
+                  ) : transactions.length > 0 ? (
+                    transactions.map((transaction) => (
+                      <TransactionItem
+                        key={transaction.id}
+                        type={transaction.type}
+                        title={transaction.title}
+                        date={transaction.date}
+                        amount={transaction.amount}
+                        isPositive={transaction.isPositive}
+                        icon={transaction.icon}
+                      />
+                    ))
+                  ) : (
+                    <div className="text-center text-white/50 py-4">Aucune transaction récente</div>
+                  )}
                 </div>
               </div>
             </div>

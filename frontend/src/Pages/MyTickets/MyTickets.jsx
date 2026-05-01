@@ -31,9 +31,10 @@ export default function MyTickets() {
         
         // Fetch Available Ticket Types
         const typesRes = await clientApi.get('/ticket-types');
+        const filteredTypes = (typesRes.data || []).filter(t => t.code !== 'CARTE_RECHARGE');
 
         setTickets(ticketsRes.data || []);
-        setTicketTypes(typesRes.data || []);
+        setTicketTypes(filteredTypes);
       } catch (err) {
         console.error("Error fetching tickets data:", err);
       } finally {
@@ -122,7 +123,6 @@ export default function MyTickets() {
                         status: "Disponible",
                         description: simpleBilletType.description,
                         price: `${simpleBilletType.price} DH`,
-                        duration: `${simpleBilletType.duration_minutes} min`,
                         buttonText: "Acheter le billet",
                         buttonVariant: "secondary",
                         isActive: false
@@ -145,7 +145,6 @@ export default function MyTickets() {
                           status: "Disponible",
                           description: type.description,
                           price: `${type.price} DH`,
-                          duration: `${type.duration_minutes} min`,
                           buttonText: "Acheter",
                           buttonVariant: "secondary",
                           isActive: false

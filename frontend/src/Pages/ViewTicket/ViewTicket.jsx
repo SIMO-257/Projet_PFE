@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import clientApi from '../../services/clientService';
 import { ArrowLeft, CheckCircle, Ticket, Clock, Calendar, ShieldCheck } from 'lucide-react';
 import Header from '../../Components/Layout/Header';
 import styles from '../../Styles/ViewTicket.module.css';
@@ -8,7 +8,6 @@ import styles from '../../Styles/ViewTicket.module.css';
 export default function ViewTicket() {
     const { id: uuid } = useParams();
     const navigate = useNavigate();
-    const apiBase = import.meta.env.VITE_API_URL ?? '';
     
     const [ticket, setTicket] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -17,7 +16,7 @@ export default function ViewTicket() {
     useEffect(() => {
         const fetchTicketDetails = async () => {
             try {
-                const res = await axios.get(`${apiBase}/api/tickets/${uuid}`);
+                const res = await clientApi.get(`/tickets/${uuid}`);
                 setTicket(res.data);
             } catch (err) {
                 console.error("Failed to fetch ticket details", err);
@@ -30,7 +29,7 @@ export default function ViewTicket() {
         if (uuid) {
             fetchTicketDetails();
         }
-    }, [uuid, apiBase]);
+    }, [uuid]);
 
     const goBack = () => navigate('/mytickets');
 
@@ -102,7 +101,6 @@ export default function ViewTicket() {
                     <div className="space-y-4 bg-black/20 rounded-2xl p-4 border border-white/5">
                         <DetailRow icon={<Ticket size={18} />} label="Type de Billet" value={ticket.ticket_type?.name_fr} />
                         <DetailRow icon={<ShieldCheck size={18} />} label="ID Unique" value={ticket.uuid.substring(0, 18).toUpperCase() + '...'} />
-                        <DetailRow icon={<Clock size={18} />} label="Validité" value={`${ticket.ticket_type?.duration_minutes} Minutes`} />
                         <DetailRow icon={<Calendar size={18} />} label="Date d'Achat" value={purchaseDate} />
                         <div className="pt-2 border-t border-white/5 flex justify-between items-center">
                             <span className="text-white/40 text-sm">Prix payé</span>

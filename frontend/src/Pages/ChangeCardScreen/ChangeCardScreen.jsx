@@ -85,7 +85,7 @@ const ChangeCardScreen = () => {
       alert('Cette carte est expirée. Veuillez en ajouter une nouvelle.');
       return;
     }
-    setPendingAction({ type: 'switch', cardId });
+    setPendingAction({ type: 'switch', cardId });   
     setShowVerificationModal(true);
     setVerificationCode('');
     setVerificationError('');

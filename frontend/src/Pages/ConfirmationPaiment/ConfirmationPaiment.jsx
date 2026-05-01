@@ -15,7 +15,7 @@ const Confirmation = () => {
         if (!ticket || !ticket.ticket_type) return "1 trajet";
         const code = ticket.ticket_type.code;
         
-        if (code === 'BILLET_SIMPLE' || code === 'VOYAGE_REGULIER') return "1 trajet";
+        if (code === 'BILLET_SIMPLE') return "1 trajet";
         if (code === 'CARTE_NORMALE') return "2 trajets";
         if (code === 'BILLET_SEMAINE') return "Illimité (7 jours)";
         if (code === 'BILLET_MOIS') return "Illimité (30 jours)";

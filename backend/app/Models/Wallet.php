@@ -17,7 +17,16 @@ class Wallet extends Model
         'user_id',
         'balance',
         'card_number',
+        'card_last_four',
     ];
+
+    /**
+     * Get the client that owns the wallet.
+     */
+    public function client()
+    {
+        return $this->belongsTo(Client::class, 'user_id');
+    }
 
     /**
      * @return array<string, string>

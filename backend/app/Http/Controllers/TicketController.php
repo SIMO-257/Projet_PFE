@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\TicketPurchaseRequest;
 use App\Models\Ticket;
 use App\Models\TicketType;
 use App\Models\Wallet;
@@ -25,13 +26,9 @@ class TicketController extends Controller
     /**
      * Purchase a ticket.
      */
-    public function purchase(Request $request)
+    public function purchase(TicketPurchaseRequest $request)
     {
-        $validated = $request->validate([
-            'ticket_type_id' => 'required|exists:ticket_types,id',
-            'quantity' => 'required|integer|min:1|max:10',
-            'client_uuid' => 'required|exists:clients,uuid',
-        ]);
+        $validated = $request->validated();
 
         $client = \App\Models\Client::where('uuid', $validated['client_uuid'])->first();
         $ticketType = TicketType::find($validated['ticket_type_id']);
@@ -68,6 +65,7 @@ class TicketController extends Controller
                     'uuid' => (string) Str::uuid(),
                     'user_id' => $client->id,
                     'type' => 'purchase',
+                    'status' => 'completed',
                     'amount' => $totalPrice,
                     'balance_before' => $balanceBefore,
                     'balance_after' => $wallet->balance,
@@ -98,7 +96,7 @@ class TicketController extends Controller
             });
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Une erreur est survenue lors de la transaction.',
+                'message' => 'Une erreur est survenue lors du transaction.',
                 'error' => $e->getMessage()
             ], 500);
         }

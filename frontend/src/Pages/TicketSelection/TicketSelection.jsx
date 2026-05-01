@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import clientApi from '../../services/clientService';
 import ProgressSteps from '../../Components/NavBar/ProgressSteps';
 import styles from '../../Styles/TicketSelection.module.css';
 
 export default function TicketSelection() {
 
-    const apiBase = import.meta.env.VITE_API_URL ?? '';
     const navigate = useNavigate();
     const location = useLocation();
     const { selectedTypeId } = location.state || {};
@@ -22,8 +21,8 @@ export default function TicketSelection() {
     useEffect(() => {
         const fetchTypes = async () => {
             try {
-                const res = await axios.get(`${apiBase}/api/ticket-types`);
-                let types = res.data;
+                const res = await clientApi.get('/ticket-types');
+                let types = (res.data || []).filter(t => t.code !== 'CARTE_RECHARGE');
 
                 if (selectedTypeId) {
                     const found = types.find(t => t.id === selectedTypeId);
@@ -46,7 +45,7 @@ export default function TicketSelection() {
 
         fetchTypes();
 
-    }, [apiBase, selectedTypeId]);
+    }, [selectedTypeId]);
 
     const incrementQuantity = () => setQuantity(prev => prev < 10 ? prev + 1 : prev);
     const decrementQuantity = () => setQuantity(prev => prev > 1 ? prev - 1 : prev);
@@ -79,7 +78,7 @@ export default function TicketSelection() {
                 client_uuid: clientUuid
             };
 
-            const res = await axios.post(`${apiBase}/api/tickets/purchase`, payload);
+            const res = await clientApi.post('/tickets/purchase', payload);
 
             navigate('/payment-confirmation', {
                 state: {
@@ -215,9 +214,17 @@ export default function TicketSelection() {
                         </div>
 
                         {errors.balance && (
-                            <p className="text-red-500 text-sm">
-                                {errors.balance[0]}
-                            </p>
+                            <div className="bg-red-900/20 border border-red-500/50 rounded-lg p-3 mb-4">
+                                <p className="text-red-400 text-sm mb-2">
+                                    {errors.balance[0]}
+                                </p>
+                                <button 
+                                    onClick={() => navigate('/recharge/payment')}
+                                    className="text-yellow-500 text-xs font-bold underline"
+                                >
+                                    Recharger mon compte maintenant
+                                </button>
+                            </div>
                         )}
 
                         {errors.form && (

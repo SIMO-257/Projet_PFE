@@ -24,4 +24,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/tickets/purchase', [TicketController::class, 'purchase'])->name('api.tickets.purchase');
     Route::get('/tickets', [TicketController::class, 'index'])->name('api.tickets.index');
     Route::get('/tickets/{uuid}', [TicketController::class, 'show'])->name('api.tickets.show');
+
+    // Wallet Routes
+    Route::get('/wallet', [\App\Http\Controllers\WalletController::class, 'index'])->name('api.wallet.index');
+    Route::get('/wallet/transactions', [\App\Http\Controllers\WalletController::class, 'transactions'])->name('api.wallet.transactions');
+    Route::post('/wallet/recharge/init', [\App\Http\Controllers\WalletController::class, 'rechargeInit'])->name('api.wallet.recharge.init');
+    Route::post('/wallet/recharge/confirm', [\App\Http\Controllers\WalletController::class, 'rechargeConfirm'])->name('api.wallet.recharge.confirm');
 });

@@ -70,4 +70,18 @@ export const logoutAllClient = () => clientApi.post('/logout-all');
 
 export const fetchClientHome = () => clientApi.get('/home');
 
+export const fetchWalletDetails = () => clientApi.get('/wallet');
+
+export const fetchTransactionHistory = () => clientApi.get('/wallet/transactions');
+
+export const initRecharge = (payload) => clientApi.post('/wallet/recharge/init', payload);
+
+export const confirmRecharge = (payload) => clientApi.post('/wallet/recharge/confirm', payload);
+
+export const fetchTicketTypes = () => clientApi.get('/ticket-types');
+
+export const purchaseTicket = (payload) => clientApi.post('/tickets/purchase', payload);
+
+export const fetchMyTickets = () => clientApi.get('/tickets');
+
 export default clientApi;

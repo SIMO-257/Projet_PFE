@@ -1,13 +1,12 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
-import axios from 'axios';
+import { forgotPasswordClient } from '../../services/clientService';
 
 import InputField from '../../Components/Inputs/InputField';
 import ConnexionButton from '../../Components/Buttons/ConnexionButton';
 import styles from '../../Styles/Auth.module.css';
 
 export default function ForgotPassword() {
-    const apiBase = import.meta.env.VITE_API_URL ?? '';
     const [form, setForm] = useState({ email: '' });
     const [errors, setErrors] = useState({});
     const [processing, setProcessing] = useState(false);
@@ -24,7 +23,7 @@ export default function ForgotPassword() {
 
         try {
             setProcessing(true);
-            const res = await axios.post(`${apiBase}/api/forgot-password`, { email: form.email }, { withCredentials: false });
+            const res = await forgotPasswordClient({ email: form.email });
             setStatus(res?.data?.message || 'Si le compte existe, un lien de réinitialisation a été envoyé.');
         } catch (err) {
             const responseErrors = err?.response?.data?.errors;
