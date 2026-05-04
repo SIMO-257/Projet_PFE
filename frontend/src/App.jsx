@@ -29,13 +29,26 @@ const PaimentHistory = lazy(() => import("./Pages/PaimentHistory/PaimentHistory"
 const Notifications = lazy(() => import("./Pages/Notifications/Notifications"));
 const OfflineMode = lazy(() => import("./Pages/OfflineMode/OfflineMode"));
 
+function RootRedirect() {
+  const { isAuthenticated, isAuthChecked } = useAuth();
+
+  if (!isAuthChecked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#1a0507] text-white">
+        Loading...
+      </div>
+    );
+  }
+
+  return <Navigate to={isAuthenticated ? '/home' : '/login'} replace />;
+}
+
 function App() {
   const { refreshProfile } = useAuth();
 
-  // 🔥 FIX: run once فقط (ماشي كل re-render)
   useEffect(() => {
     refreshProfile();
-  }, []);
+  }, [refreshProfile]);
 
   return (
     <BrowserRouter>
@@ -49,7 +62,7 @@ function App() {
         <Routes>
 
           {/* Default route */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/" element={<RootRedirect />} />
 
           {/* PUBLIC ROUTES */}
           <Route element={<PublicRoute />}>
