@@ -1,12 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import clientApi from '../../services/clientService';
+import { fetchMyTickets } from '../../services/clientService';
 import styles from '../../Styles/PaimentHistory.module.css';
 import BottomNavigation from '../../Components/Layout/BottomNavigation';
 
 export default function PaimentHistory () {
-    const navigateHook = useNavigate();
-    const [activeTabNav, setActiveTabNav] = useState('tickets');
     const [activeTab, setActiveTab] = useState('all');
     const [activeDateFilter, setActiveDateFilter] = useState('all');
     const [tickets, setTickets] = useState([]);
@@ -14,15 +11,10 @@ export default function PaimentHistory () {
 
     useEffect(() => {
         const fetchTickets = async () => {
-            const uuid = sessionStorage.getItem('client_uuid');
-            if (!uuid) return;
-
             try {
                 setLoading(true);
-                const res = await clientApi.get('/tickets', {
-                    headers: { 'X-Client-UUID': uuid }
-                });
-                setTickets(res.data || []);
+                const res = await fetchMyTickets();
+                setTickets(res || []);
             } catch (err) {
                 console.error("Error fetching history:", err);
             } finally {
@@ -31,15 +23,6 @@ export default function PaimentHistory () {
         };
         fetchTickets();
     }, []);
-
-    const onNavigate = (section) => {
-        setActiveTabNav(section);
-        if (section === 'home') navigateHook('/home');
-        if (section === 'wallet') navigateHook('/wallet');
-        if (section === 'profile') navigateHook('/profile');
-        if (section === 'tickets') navigateHook('/mytickets');
-        if (section === 'validation') navigateHook('/validation');
-    };
 
     const tabs = [
         { id: 'all', label: 'Tous' },
@@ -82,7 +65,9 @@ export default function PaimentHistory () {
         }
     };
 
-    const filteredTickets = tickets.filter(t => {
+    const safeTickets = Array.isArray(tickets) ? tickets : [];
+
+    const filteredTickets = safeTickets.filter(t => {
         if (activeTab !== 'all' && t.status !== activeTab) return false;
         
         const ticketDate = new Date(t.created_at);
@@ -211,7 +196,7 @@ export default function PaimentHistory () {
                             <p className="text-white/50 text-center py-10">Aucun billet trouvé</p>
                         )}
                     </div>
-                    <BottomNavigation activeTab={activeTabNav} onNavigate={onNavigate} />
+                    <BottomNavigation />
                 </div>
             </div>
         </div>

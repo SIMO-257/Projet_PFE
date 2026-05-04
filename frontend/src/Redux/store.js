@@ -1,10 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit";
+import AuthReducer from "./Slices/AuthSlice";
+import WalletReducer from "./Slices/WalletSlice";
 import TicketsReducer from "./Slices/TicketsSlice";
-import PurchasesReducer from "./Slices/PurchaseseSlice";
+
 const store = configureStore({
-    reducer:{
-        Tickets:TicketsReducer,
-        Purchases:PurchasesReducer
+    reducer: {
+        auth: AuthReducer,
+        wallet: WalletReducer,
+        tickets: TicketsReducer,
     }
 })
-export default store
+
+export default store;

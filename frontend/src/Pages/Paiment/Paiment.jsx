@@ -15,6 +15,8 @@ export default function Paiment() {
       id: 'card',
       title: 'Carte virtuelle',
       icon: '💳',
+      bgColor: '#6B2020, #4A1515',
+      borderColor: '#8B3030',
       details: [
         { label: 'Sonde d\'approbation', value: '42,50 €' },
         { label: 'Numéro', value: '*** 7905' }
@@ -25,6 +27,8 @@ export default function Paiment() {
       id: 'bank',
       title: 'Carte bancaire',
       icon: '💳',
+      bgColor: '#1F3A1F, #152615',
+      borderColor: '#2F4A2F',
       details: [
         { label: 'Visa', value: '***** 4532' },
         { label: 'Expire', value: '12/27' }
@@ -35,6 +39,8 @@ export default function Paiment() {
       id: 'portfolio',
       title: 'Portefeuille',
       icon: '💰',
+      bgColor: '#3A3A1F, #262615',
+      borderColor: '#4A4A2F',
       details: [
         { label: 'Solde', value: '42,50 €' },
         { label: 'Disponible', value: 'Solde suffisant' }
@@ -45,6 +51,8 @@ export default function Paiment() {
       id: 'apple',
       title: 'Apple Pay',
       icon: '🍎',
+      bgColor: '#1A1A1A, #0F0F0F',
+      borderColor: '#2A2A2A',
       details: [
         { label: 'Numéro', value: '***** 8901' }
       ],

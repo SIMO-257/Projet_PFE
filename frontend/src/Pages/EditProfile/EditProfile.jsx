@@ -37,7 +37,7 @@ const EditProfileScreen = () => {
 
     fetchClientProfile()
       .then((res) => {
-        const data = res?.data ?? null;
+        const data = res ?? null;
         if (!data) return;
         setFullName(data?.name ?? '');
         setEmail(data?.email ?? '');

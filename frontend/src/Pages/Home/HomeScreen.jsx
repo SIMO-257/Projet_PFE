@@ -1,88 +1,36 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BottomNavigation from '../../Components/Layout/BottomNavigation';
 import BalanceCard from '../../Components/Cards/BalanceCard';
 import styles from '../../Styles/HomeScreen.module.css';
-import { clearAuthData, fetchClientHome, getAuthToken } from '../../services/clientService';
-
-// Mock data
-const mockUser = {
-  name: 'Amina',
-  avatar: null,
-};
-
-const mockCard = {
-  id: 1,
-  cardNumber: '**** **** **** 1234',
-  balance: 125.50,
-  validUntil: '12/2026',
-};
-
-const mockActiveTickets = [
-  { id: 1, type: 'Ticket unique', validUntil: '2026-04-05', remaining: null, price: 8 },
-  { id: 2, type: 'Abonnement mensuel', validUntil: '2026-04-30', remaining: 'Illimité', price: 250 },
-  { id: 3, type: 'Ticket 10 trajets', validUntil: '2026-06-01', remaining: '7 trajets', price: 70 },
-];
-
-const mockLastTransaction = {
-  id: 1,
-  type: 'Validation',
-  amount: -2.00,
-  timestamp: '2026-03-31T09:45:00Z',
-  location: 'Station Casa-Port',
-};
-
-const mockPromotions = [
-  { id: 1, title: '-20% sur les abonnements', description: 'Jusqu’au 30 avril', image: null },
-];
-
-const formatRelativeTime = (dateStr) => {
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diffMins = Math.floor((now - date) / 60000);
-  if (diffMins < 1) return 'à l’instant';
-  if (diffMins < 60) return `il y a ${diffMins} min`;
-  const diffHours = Math.floor(diffMins / 60);
-  if (diffHours < 24) return `il y a ${diffHours} h`;
-  const diffDays = Math.floor(diffHours / 24);
-  if (diffDays === 1) return 'hier';
-  if (diffDays < 7) return `il y a ${diffDays} jours`;
-  return date.toLocaleDateString('fr-FR');
-};
+import { useAuth } from '../../hooks/useAuth';
+import { useWallet } from '../../hooks/useWallet';
+import { useTickets } from '../../hooks/useTickets';
 
 const HomeScreen = () => {
-  const [user] = useState(mockUser);
-  const [card] = useState(mockCard);
-  const [activeTickets] = useState(mockActiveTickets);
-  const [lastTransaction] = useState(mockLastTransaction);
-  const [promotions] = useState(mockPromotions);
-  const [unreadCount] = useState(3);
-  const [activeTab, setActiveTab] = useState('home');
+  const { user } = useAuth();
+  const { balance, card_last_four, refreshWallet, transactions } = useWallet();
+  const { tickets, refreshTickets } = useTickets();
   const navigateHook = useNavigate();
 
   useEffect(() => {
-    const token = getAuthToken();
-    if (!token) {
-      navigateHook('/login');
-      return;
-    }
+    refreshWallet();
+    refreshTickets();
+  }, [refreshWallet, refreshTickets]);
 
-    fetchClientHome().catch((err) => {
-      if (err?.response?.status === 401) {
-        clearAuthData();
-        navigateHook('/login');
-      }
-    });
-  }, [navigateHook]);
+  const safeBalance = Number.isFinite(balance) ? balance : 0;
+  const safeCardLastFour = card_last_four || '****';
+  const safeTransactions = Array.isArray(transactions) ? transactions : [];
+  const safeTickets = Array.isArray(tickets) ? tickets : [];
 
-  // Navigation handlers
-  const onNavigate = (section) => {
-    setActiveTab(section);
-    if (section === 'wallet') navigateHook('/wallet');
-    if (section === 'profile') navigateHook('/profile');
-    if (section === 'tickets') navigateHook('/mytickets');
-    if (section === 'validation') navigateHook('/validation');
-  };
+  // Safety check: don't render if user is not loaded yet
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#2a0b0f] to-[#1a0507] flex items-center justify-center">
+        <div className="text-white text-lg">Loading user data...</div>
+      </div>
+    );
+  }
 
   const handleNotifications = () => navigateHook('/notifications');
   const handleRecharge = () => navigateHook('/payment');
@@ -90,9 +38,26 @@ const HomeScreen = () => {
   const handleValidateNFC = () => navigateHook('/validation');
   const handleShowQRCode = () => navigateHook('/validation');
   const handleBuyTicket = () => navigateHook('/mytickets');
-  const handleTicketPress = (ticket) => navigateHook(`/viewticket/${ticket.id}`);
+  const handleTicketPress = (ticket) => navigateHook(`/viewticket/${ticket.uuid}`);
   const handleTransactionHistory = () => navigateHook('/payment-history');
-  const handlePromoPress = (promo) => console.log('Open promotion:', promo);
+  
+  const activeTickets = safeTickets.filter(t => t.status === 'active');
+  const lastTransaction = safeTransactions.length > 0 ? safeTransactions[0] : null;
+
+  const formatRelativeTime = (dateStr) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMins = Math.floor((now - date) / 60000);
+    if (diffMins < 1) return 'à l’instant';
+    if (diffMins < 60) return `il y a ${diffMins} min`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `il y a ${diffHours} h`;
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays === 1) return 'hier';
+    if (diffDays < 7) return `il y a ${diffDays} jours`;
+    return date.toLocaleDateString('fr-FR');
+  };
 
   return (
     <>
@@ -122,7 +87,7 @@ const HomeScreen = () => {
             <div className="flex items-center justify-between px-6 pt-8 pb-4">
               <div>
                 <p className="text-white/60 text-xs">Bonjour,</p>
-                <h1 className="text-white text-xl font-bold">{user.name}</h1>
+                <h1 className="text-white text-xl font-bold">{user?.name || user?.email}</h1>
               </div>
               <button
                 onClick={handleNotifications}
@@ -131,30 +96,24 @@ const HomeScreen = () => {
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                 </svg>
-                {unreadCount > 0 && (
-                  <span className="absolute top-0 right-0 w-4 h-4 bg-yellow-500 text-[#400106] text-[10px] font-bold rounded-full flex items-center justify-center">
-                    {unreadCount}
-                  </span>
-                )}
               </button>
             </div>
 
             {/* Main Content - Scrollable */}
             <div className={`max-h-[calc(100vh-200px)] overflow-y-auto ${styles.hideScrollbar} custom-scrollbar px-6 pb-24`}>
               
-              {/* Wallet Card - Matches Wallet Screen Design */}
+              {/* Wallet Card */}
               <div className="mb-4 mt-2">
                 <BalanceCard 
                   title="Solde disponible"
-                  amount={`${card.balance.toFixed(2)} MAD`}
+                  amount={`${safeBalance.toFixed(2)} MAD`}
                   cardType="Carte virtuelle"
-                  cardNumber={card.cardNumber}
+                  cardNumber={`**** **** **** ${safeCardLastFour}`}
                   gradientFrom="#7A3B47"
                   gradientTo="#5C2A36"
                   circlesPosition="right"
                 />
                 
-                {/* Change Card Button - Same style as Wallet Screen */}
                 <div className="flex justify-end -mt-4 mb-4 pr-2">
                   <button 
                     onClick={handleChangeCard}
@@ -167,7 +126,6 @@ const HomeScreen = () => {
                   </button>
                 </div>
 
-                {/* Recharge Button - Full width like Wallet Screen or part of Quick Actions */}
                 <button
                   onClick={handleRecharge}
                   className="w-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 py-3 rounded-2xl text-xs font-bold uppercase tracking-widest hover:bg-yellow-500/20 transition-all flex items-center justify-center space-x-2"
@@ -216,7 +174,7 @@ const HomeScreen = () => {
                 </button>
               </div>
 
-              {/* Active Tickets (horizontal scroll) */}
+              {/* Active Tickets */}
               <div className="mb-6">
                 <div className="flex justify-between items-center mb-3">
                   <h2 className="text-white/60 text-xs uppercase tracking-widest font-bold">Tickets actifs</h2>
@@ -225,15 +183,15 @@ const HomeScreen = () => {
                 <div className="overflow-x-auto custom-scrollbar flex space-x-3 pb-2">
                   {activeTickets.map(ticket => (
                     <button
-                      key={ticket.id}
+                      key={ticket.uuid}
                       onClick={() => handleTicketPress(ticket)}
                       className="flex-shrink-0 w-48 bg-black/40 rounded-xl border border-white/10 p-4 text-left hover:border-yellow-500/30 transition-all"
                     >
-                      <p className="text-white font-semibold text-sm">{ticket.type}</p>
+                      <p className="text-white font-semibold text-sm">{ticket.ticket_type?.name_fr || 'Billet'}</p>
                       <p className="text-white/40 text-xs mt-1">
-                        {ticket.remaining ? `${ticket.remaining} restants` : `Valide jusqu'au ${ticket.validUntil}`}
+                        {ticket.remaining_uses > 1 ? `${ticket.remaining_uses} utilisations` : `Expire le ${new Date(ticket.valid_until).toLocaleDateString()}`}
                       </p>
-                      <p className="text-yellow-500 font-bold text-sm mt-3">{ticket.price} MAD</p>
+                      <p className="text-yellow-500 font-bold text-sm mt-3">{ticket.price_paid} MAD</p>
                     </button>
                   ))}
                   {activeTickets.length === 0 && (
@@ -243,55 +201,28 @@ const HomeScreen = () => {
               </div>
 
               {/* Last Transaction */}
-              <div className="mb-6">
-                <div className="flex justify-between items-center mb-3">
-                  <h2 className="text-white/60 text-xs uppercase tracking-widest font-bold">Dernière activité</h2>
-                  <button
-                    onClick={handleTransactionHistory}
-                    className="text-yellow-500 text-xs font-medium"
-                  >
-                    Historique
-                  </button>
-                </div>
-                <div className="bg-black/40 rounded-xl border border-white/10 p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-white text-sm font-semibold">{lastTransaction.type}</p>
-                      <p className="text-white/40 text-[10px] uppercase mt-0.5">{formatRelativeTime(lastTransaction.timestamp)}</p>
-                      {lastTransaction.location && (
-                        <p className="text-white/60 text-xs mt-2 flex items-center">
-                          <svg className="w-3 h-3 mr-1 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/>
-                          </svg>
-                          {lastTransaction.location}
-                        </p>
-                      )}
-                    </div>
-                    <span className={`text-sm font-bold ${lastTransaction.amount < 0 ? 'text-red-400' : 'text-green-400'}`}>
-                      {lastTransaction.amount < 0 ? `- ${Math.abs(lastTransaction.amount).toFixed(2)}` : `+ ${lastTransaction.amount.toFixed(2)}`} MAD
-                    </span>
+              {lastTransaction && (
+                <div className="mb-6">
+                  <div className="flex justify-between items-center mb-3">
+                    <h2 className="text-white/60 text-xs uppercase tracking-widest font-bold">Dernière activité</h2>
+                    <button onClick={handleTransactionHistory} className="text-yellow-500 text-xs font-medium">Historique</button>
                   </div>
-                </div>
-              </div>
-
-              {/* Promotional Banner */}
-              {promotions.length > 0 && (
-                <div className="mb-2">
-                  {promotions.map(promo => (
-                    <button
-                      key={promo.id}
-                      onClick={() => handlePromoPress(promo)}
-                      className="w-full bg-gradient-to-r from-yellow-500/10 to-yellow-600/10 rounded-xl border border-yellow-500/20 p-4 text-left hover:from-yellow-500/20 transition-all"
-                    >
-                      <p className="text-white font-bold text-sm">{promo.title}</p>
-                      <p className="text-white/60 text-xs mt-1">{promo.description}</p>
-                    </button>
-                  ))}
+                  <div className="bg-black/40 rounded-xl border border-white/10 p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-white text-sm font-semibold">{lastTransaction.reference || (lastTransaction.type === 'recharge' ? 'Rechargement' : 'Achat')}</p>
+                        <p className="text-white/40 text-[10px] uppercase mt-0.5">{formatRelativeTime(lastTransaction.created_at)}</p>
+                      </div>
+                      <span className={`text-sm font-bold ${lastTransaction.type === 'purchase' ? 'text-red-400' : 'text-green-400'}`}>
+                        {lastTransaction.type === 'purchase' ? `- ${lastTransaction.amount}` : `+ ${lastTransaction.amount}`} MAD
+                      </span>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
 
-            <BottomNavigation activeTab={activeTab} onNavigate={onNavigate} />
+            <BottomNavigation />
           </div>
         </div>
       </div>

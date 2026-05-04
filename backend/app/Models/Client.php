@@ -80,6 +80,14 @@ class Client extends Authenticatable implements CanResetPasswordContract
     }
 
     /**
+     * Use password_hash as the auth password field.
+     */
+    public function getAuthPassword(): string
+    {
+        return (string) $this->password_hash;
+    }
+
+    /**
      * Get the wallet associated with the client.
      */
     public function wallet()

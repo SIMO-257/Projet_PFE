@@ -112,11 +112,9 @@ const ChangeCardScreen = () => {
         setSwitchSuccessCard(pendingAction.cardId);
         setShowSwitchConfirmation(true);
         setTimeout(() => setShowSwitchConfirmation(false), 3000);
-        console.log(`Switched to card ${pendingAction.cardId}`);
       } else if (pendingAction.type === 'remove') {
         // Remove card
         setCards(cards.filter(card => card.id !== pendingAction.cardId));
-        console.log(`Removed card ${pendingAction.cardId}`);
       }
       setShowVerificationModal(false);
       setPendingAction(null);
@@ -149,11 +147,10 @@ const ChangeCardScreen = () => {
     setShowAddCardModal(false);
     setNewCardNumber('');
     setAddCardError('');
-    console.log('New card added:', newCard);
   };
 
   // Help / Support
-  const handleSupport = () => console.log('Navigate to support');
+  const handleSupport = () => {};
 
   // Balance transfer (optional – not implemented in MVP)
   // Could be added later.
@@ -206,7 +203,7 @@ const ChangeCardScreen = () => {
               <div className="mb-6">
                 <h2 className="text-white/60 text-xs uppercase tracking-wide mb-3">Vos autres cartes</h2>
                 <div className="space-y-3">
-                  {cards.filter(c => c.id !== activeCardId).map(card => {
+                  {(Array.isArray(cards) ? cards : []).filter(c => c.id !== activeCardId).map(card => {
                     const statusInfo = getStatusInfo(card.status);
                     return (
                       <div key={card.id} className="bg-black/40 rounded-xl border border-white/10 p-4">
@@ -247,7 +244,7 @@ const ChangeCardScreen = () => {
                       </div>
                     );
                   })}
-                  {cards.filter(c => c.id !== activeCardId).length === 0 && (
+                  {(Array.isArray(cards) ? cards : []).filter(c => c.id !== activeCardId).length === 0 && (
                     <p className="text-white/40 text-sm text-center py-4">
                       Aucune autre carte. Ajoutez-en une ci-dessous.
                     </p>

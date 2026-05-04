@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Log;
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
 
+use App\Models\AuditLog;
+
 class WalletController extends Controller
 {
     public function __construct()
@@ -43,15 +45,14 @@ class WalletController extends Controller
                 ],
             ]);
 
-            return response()->json([
+            AuditLog::log('wallet_recharge_init', $user->id, ['amount' => $request->amount, 'pi_id' => $paymentIntent->id]);
+
+            return $this->successResponse([
                 'clientSecret' => $paymentIntent->client_secret,
                 'paymentIntentId' => $paymentIntent->id,
             ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Erreur lors de l\'initialisation du paiement.',
-                'error' => $e->getMessage()
-            ], 500);
+            return $this->errorResponse('Erreur lors de l\'initialisation du paiement.', 500);
         }
     }
 
@@ -64,10 +65,7 @@ class WalletController extends Controller
             $paymentIntent = PaymentIntent::retrieve($request->paymentIntentId);
 
             if ($paymentIntent->status !== 'succeeded') {
-                return response()->json([
-                    'message' => 'Le paiement n\'a pas été validé.',
-                    'status' => $paymentIntent->status
-                ], 400);
+                return $this->errorResponse('Le paiement n\'a pas été validé.', 400);
             }
 
             $user = Auth::user();
@@ -76,7 +74,7 @@ class WalletController extends Controller
             return DB::transaction(function () use ($user, $amount, $paymentIntent) {
                 $wallet = Wallet::firstOrCreate(
                     ['user_id' => $user->id],
-                    ['balance' => 0.00, 'card_last_four' => '4729']
+                    ['balance' => 0.00, 'card_last_four' => '****']
                 );
 
                 $wallet = Wallet::where('user_id', $user->id)->lockForUpdate()->first();
@@ -106,17 +104,15 @@ class WalletController extends Controller
                     'metadata' => ['stripe_payment_intent' => $paymentIntent->id],
                 ]);
 
-                return response()->json([
-                    'message' => 'Portefeuille rechargé avec succès.',
+                AuditLog::log('wallet_recharge_success', $user->id, ['amount' => $amount, 'pi_id' => $paymentIntent->id]);
+
+                return $this->successResponse([
                     'balance' => (float) $wallet->balance,
                     'card_last_four' => $wallet->card_last_four,
-                ]);
+                ], 'Portefeuille rechargé avec succès.');
             });
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Erreur lors de la confirmation du paiement.',
-                'error' => $e->getMessage()
-            ], 500);
+            return $this->errorResponse('Erreur lors de la confirmation du paiement.', 500);
         }
     }
 
@@ -128,10 +124,10 @@ class WalletController extends Controller
         $user = Auth::user();
         $wallet = Wallet::firstOrCreate(
             ['user_id' => $user->id],
-            ['balance' => 0.00, 'card_last_four' => '4729'] // Default mock if new
+            ['balance' => 0.00, 'card_last_four' => '****']
         );
 
-        return response()->json([
+        return $this->successResponse([
             'balance' => (float) $wallet->balance,
             'card_last_four' => $wallet->card_last_four,
         ]);
@@ -148,6 +144,6 @@ class WalletController extends Controller
             ->take(20)
             ->get();
 
-        return response()->json($transactions);
+        return $this->successResponse($transactions);
     }
 }
