@@ -29,11 +29,10 @@ export const getProfile = createAsyncThunk('auth/getProfile', async (_, { reject
 
 export const logout = createAsyncThunk('auth/logout', async (_, { rejectWithValue }) => {
   try {
+    await fetchCsrfToken();
     await logoutClient();
-    localStorage.removeItem('is_authenticated');
     return true;
   } catch (err) {
-    localStorage.removeItem('is_authenticated');
     return rejectWithValue(err.response?.data || { message: 'Logout failed' });
   }
 });
@@ -63,14 +62,12 @@ const authSlice = createSlice({
         state.isAuthenticated = true;
         state.user = action.payload?.user ?? action.payload;
         state.initialized = true;
-        localStorage.setItem('is_authenticated', 'true');
       })
       .addCase(login.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload;
         state.isAuthenticated = false;
         state.initialized = true;
-        localStorage.removeItem('is_authenticated');
       })
       .addCase(getProfile.pending, (state) => {
         state.status = 'loading';
@@ -82,7 +79,6 @@ const authSlice = createSlice({
         state.user = action.payload;
         state.isAuthenticated = true;
         state.initialized = true;
-        localStorage.setItem('is_authenticated', 'true');
       })
       .addCase(getProfile.rejected, (state, action) => {
         state.status = 'failed';
@@ -90,7 +86,6 @@ const authSlice = createSlice({
         state.user = null;
         state.isAuthenticated = false;
         state.initialized = true;
-        localStorage.removeItem('is_authenticated');
       })
       .addCase(logout.fulfilled, (state) => {
         state.user = null;

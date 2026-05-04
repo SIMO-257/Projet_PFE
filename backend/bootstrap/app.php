@@ -19,7 +19,6 @@ return Application::configure(basePath: dirname(__DIR__))
     $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
     $middleware->validateCsrfTokens(except: [
         'api/webhooks/stripe',
-        'api/login',
     ]);
     $middleware->web(append: [
         HandleInertiaRequests::class,

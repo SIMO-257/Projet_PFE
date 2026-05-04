@@ -104,10 +104,15 @@ class TicketController extends Controller
      */
     public function show($identifier)
     {
-        // Try to find by UUID first, then by ID
+        $client = Auth::user();
+
+        // Find by UUID or ID, restricted to the authenticated user
         $ticket = Ticket::with('ticketType')
-            ->where('uuid', $identifier)
-            ->orWhere('id', $identifier)
+            ->where('user_id', $client->id)
+            ->where(function ($query) use ($identifier) {
+                $query->where('uuid', $identifier)
+                      ->orWhere('id', $identifier);
+            })
             ->first();
 
         if (!$ticket) {

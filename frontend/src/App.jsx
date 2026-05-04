@@ -30,25 +30,34 @@ const Notifications = lazy(() => import("./Pages/Notifications/Notifications"));
 const OfflineMode = lazy(() => import("./Pages/OfflineMode/OfflineMode"));
 
 function RootRedirect() {
-  const { isAuthenticated, isAuthChecked } = useAuth();
+  const { isAuthenticated, isAuthChecked, isLoading } = useAuth();
 
-  if (!isAuthChecked) {
+  // Wait until we have a definitive answer from the backend
+  if (!isAuthChecked || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#1a0507] text-white">
-        Loading...
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
       </div>
     );
   }
 
-  return <Navigate to={isAuthenticated ? '/home' : '/login'} replace />;
+  // If we checked and user is NOT authenticated, they MUST see login
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Otherwise, go to home
+  return <Navigate to="/home" replace />;
 }
 
 function App() {
-  const { refreshProfile } = useAuth();
+  const { refreshProfile, isAuthChecked } = useAuth();
 
   useEffect(() => {
-    refreshProfile();
-  }, [refreshProfile]);
+    if (!isAuthChecked) {
+      refreshProfile();
+    }
+  }, []); // Empty dependency array to prevent infinite loops
 
   return (
     <BrowserRouter>

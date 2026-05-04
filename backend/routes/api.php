@@ -5,13 +5,13 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\TicketController;
 
 // Public Routes
-Route::post('/signup', [ClientController::class, 'signup'])->name('api.client.signup');
+Route::post('/signup', [ClientController::class, 'signup'])->middleware('throttle:6,1')->name('api.client.signup');
 Route::post('/login', [ClientController::class, 'login'])->middleware('throttle:login')->name('api.client.login');
-Route::post('/forgot-password', [ClientController::class, 'forgotPassword'])->name('api.client.forgot_password');
-Route::post('/reset-password', [ClientController::class, 'resetPassword'])->name('api.client.reset_password');
+Route::post('/forgot-password', [ClientController::class, 'forgotPassword'])->middleware('throttle:3,1')->name('api.client.forgot_password');
+Route::post('/reset-password', [ClientController::class, 'resetPassword'])->middleware('throttle:3,1')->name('api.client.reset_password');
 
 // Stripe Webhook (Public, CSRF excluded in bootstrap/app.php)
-Route::post('/webhooks/stripe', [\App\Http\Controllers\StripeWebhookController::class, 'handle'])->name('api.stripe.webhook');
+Route::post('/webhooks/stripe', [\App\Http\Controllers\StripeWebhookController::class, 'handle'])->middleware('throttle:60,1')->name('api.stripe.webhook');
 
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -24,7 +24,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Ticket Routes
     Route::get('/ticket-types', [TicketController::class, 'getTicketTypes'])->name('api.tickets.types');
-    Route::post('/tickets/purchase', [TicketController::class, 'purchase'])->name('api.tickets.purchase');
+    Route::post('/tickets/purchase', [TicketController::class, 'purchase'])->middleware('throttle:10,1')->name('api.tickets.purchase');
     Route::get('/tickets', [TicketController::class, 'index'])->name('api.tickets.index');
     Route::get('/tickets/{uuid}', [TicketController::class, 'show'])->name('api.tickets.show');
     Route::post('/tickets/{uuid}/validate', [TicketController::class, 'validateTicket'])->middleware('throttle:validation')->name('api.tickets.validate');
@@ -33,5 +33,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/wallet', [\App\Http\Controllers\WalletController::class, 'index'])->name('api.wallet.index');
     Route::get('/wallet/transactions', [\App\Http\Controllers\WalletController::class, 'transactions'])->name('api.wallet.transactions');
     Route::post('/wallet/recharge/init', [\App\Http\Controllers\WalletController::class, 'rechargeInit'])->middleware('throttle:recharge')->name('api.wallet.recharge.init');
-    Route::post('/wallet/recharge/confirm', [\App\Http\Controllers\WalletController::class, 'rechargeConfirm'])->name('api.wallet.recharge.confirm');
+    Route::post('/wallet/recharge/confirm', [\App\Http\Controllers\WalletController::class, 'rechargeConfirm'])->middleware('throttle:10,1')->name('api.wallet.recharge.confirm');
 });

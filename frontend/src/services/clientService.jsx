@@ -10,6 +10,8 @@ axios.defaults.xsrfHeaderName = 'X-XSRF-TOKEN';
 const clientApi = axios.create({
   baseURL: `${apiBase}/api`,
   withCredentials: true,
+  xsrfCookieName: 'XSRF-TOKEN',
+  xsrfHeaderName: 'X-XSRF-TOKEN',
   headers: {
     Accept: 'application/json',
     'X-Requested-With': 'XMLHttpRequest',
@@ -22,15 +24,14 @@ export const fetchCsrfToken = () => axios.get(`${apiBase}/sanctum/csrf-cookie`, 
 const extractPayload = (response) => response?.data?.data ?? null;
 
 // These are now legacy/placeholder as we use cookies
-export const getAuthToken = () => localStorage.getItem('is_authenticated') === 'true';
+export const getAuthToken = () => true; // Always return true, let interceptors handle 401s
 
 export const setAuthToken = () => {
-  // We don't use the token from response anymore, but we'll store a flag
-  localStorage.setItem('is_authenticated', 'true');
+  // We don't use the token from response anymore
 };
 
 export const clearAuthData = () => {
-  localStorage.removeItem('is_authenticated');
+  // No-op, session is handled by cookies
 };
 
 clientApi.interceptors.request.use((config) => {
