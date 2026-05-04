@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { signupClient } from '../../services/clientService';
 
@@ -6,6 +6,7 @@ import InputField from '../../Components/Inputs/InputField';
 import CheckboxInput from '../../Components/Inputs/CheckboxInput';
 import ConnexionButton from '../../Components/Buttons/ConnexionButton';
 import FormOptions from '../../Components/Form/FormOptions';
+import AuthLayout from '../../Components/Layout/AuthLayout';
 import styles from '../../Styles/Auth.module.css';
 
 export default function SignUp() {
@@ -41,7 +42,8 @@ export default function SignUp() {
             return;
         }
 
-        const nameParts = form.full_name.trim().split(/\s+/);
+        const fullName = form.full_name || '';
+        const nameParts = fullName.trim().split(/\s+/);
         const firstName = nameParts.shift() || null;
         const lastName = nameParts.length ? nameParts.join(' ') : null;
 
@@ -72,79 +74,83 @@ export default function SignUp() {
     };
 
     return (
-        <div className={styles.authContainer}>
-            <div className={styles.authCard}>
-                <header className={styles.authHeader}>
-                    <h1 className={styles.authLogo}>CasaWay</h1>
-                    <hr className={styles.goldenLine}/>
-                    <h2 className={styles.authSubtitle}>Créer un Compte</h2>
-                    <p className={styles.authDescription}>
-Rejoinier l'expérience premium du mobile intelligent
-                    </p>
-                </header>
+        <AuthLayout
+            subtitle="Créer un Compte"
+            description="Rejoignez l'expérience premium du mobile intelligent"
+            footerText="Déjà un compte?"
+            footerLinkText="Se connecter"
+            footerLinkTo="/login"
+            onSubmit={Sign_up}
+        >
+             <InputField
+                label="Nom Complet"
+                type="text"
+                placeholder="Entrez votre nom complet"
+                id="signup-name"
+                var={form.full_name}
+                setVar={setField('full_name')}
+                error={Boolean(errors.full_name)}
+                errorMessage={errors.full_name}
+                required
+            />
 
-                <form className={styles.authForm} onSubmit={Sign_up}>
+            <InputField
+                label="Email"
+                type="email"
+                placeholder="votre@email.com"
+                id="signup-email"
+                var={form.email}
+                setVar={setField('email')}
+                error={Boolean(errors.email)}                        
+                errorMessage={errors.email}                        
+                required
+            />
 
-                     <InputField
-                        label="Nom Complet"
-                        type="text"
-                        placeholder="Entrez votre nom complet"
-                        id="signup-name"
-                        var={form.full_name}
-                        setVar={setField('full_name')}
-                        error={Boolean(errors.full_name)}
-                        errorMessage={errors.full_name}
-                        required
-                    />
+            <InputField
+                label="Téléphone"
+                type="number"
+                placeholder="06 12 34 56 78"
+                id="signup-number"
+                var={form.phone}
+                setVar={setField('phone')}
+                error={Boolean(errors.phone)}
+                errorMessage={errors.phone}
+                required
+            />
 
-                    <InputField
-                        label="Email"
-                        type="email"
-                        placeholder="votre@email.com"
-                        id="signup-email"
-                        var={form.email}
-                        setVar={setField('email')}
-                        error={Boolean(errors.email)}                        
-                        errorMessage={errors.email}                        
-                        required
-                    />
+            <InputField
+                label="Mot de passe"
+                type="password"
+                placeholder="********"
+                id="signup-password"
+                var={form.password}
+                setVar={setField('password')}
+                error={Boolean(errors.password)}
+                errorMessage={errors.password}
+                required
+            />
 
-                    <InputField
-                        label="Téléphone"
-                        type="number"
-                        placeholder="06 12 34 56 78"
-                        id="signup-number"
-                        var={form.phone}
-                        setVar={setField('phone')}
-                        error={Boolean(errors.phone)}
-                        errorMessage={errors.phone}
-                        required
-                    />
+            <InputField
+                label="Confirmer le mot de passe"
+                type="password"
+                placeholder="********"
+                id="signup-password-confirmation"
+                var={form.password_confirmation}
+                setVar={setField('password_confirmation')}
+                error={Boolean(errors.password_confirmation)}
+                errorMessage={errors.password_confirmation}
+                required
+            />
 
-                    <InputField
-                        label="Mot de passe"
-                        type="password"
-                        placeholder="********"
-                        id="signup-password"
-                        var={form.password}
-                        setVar={setField('password')}
-                        error={Boolean(errors.password)}
-                        errorMessage={errors.password}
-                        required
-                    />
+            <FormOptions
+                leftContent={<CheckboxInput  label={<>J'accepte les <a className={styles.authLink} href='#'>Conditions d'utilisation</a> et <a className={styles.authLink} href='#'>Politique de Confidentialité</a></>} id="remember" setCheck={toggleTerms} check={form.accept_terms} />}
+                rightContent=""
+            />
 
-                    <InputField
-                        label="Confirmer le mot de passe"
-                        type="password"
-                        placeholder="********"
-                        id="signup-password-confirmation"
-                        var={form.password_confirmation}
-                        setVar={setField('password_confirmation')}
-                        error={Boolean(errors.password_confirmation)}
-                        errorMessage={errors.password_confirmation}
-                        required
-                    />
+            {errors.accept_terms && <p className={styles.fieldError}>{errors.accept_terms}</p>}
+            {errors.form && <p className={styles.fieldError}>{errors.form}</p>}
 
+<<<<<<< HEAD
                     <FormOptions
                         leftContent={<CheckboxInput  label={<>Jaccept les <a className={styles.authLink} href='#'>Conditions d'utilisation</a> et <a className={styles.authLink} href='#'>Politique de Confidentialité</a></>} id="remember" setCheck={toggleTerms} check={form.accept_terms} />}
                         rightContent=""
@@ -166,5 +172,11 @@ Rejoinier l'expérience premium du mobile intelligent
                 </div>
             </div>
         </div>
+=======
+            <ConnexionButton type="submit" variant="primary" disabled={processing}>
+                {processing ? 'Inscription...' : 'Inscription'}
+            </ConnexionButton>
+        </AuthLayout>
+>>>>>>> 110b8f3fa71656180ae4f0799404b59fdf5310e6
     );
 }

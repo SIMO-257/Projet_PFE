@@ -3,10 +3,15 @@
 import styles from '../../Styles/Paiment.module.css';
 
 const PaymentMethod = ({ method, isSelected, onSelect }) => {
+  if (!method) return null;
+
+  const bgColor = method.bgColor || '';
+  const bgColorParts = bgColor.includes(', ') ? bgColor.split(', ') : [bgColor, bgColor];
+
   const cardStyle = isSelected ? {
-    '--bg-from': method.bgColor.split(', ')[0],
-    '--bg-to': method.bgColor.split(', ')[1],
-    '--border-color': method.borderColor
+    '--bg-from': bgColorParts[0] || 'transparent',
+    '--bg-to': bgColorParts[1] || 'transparent',
+    '--border-color': method.borderColor || 'transparent'
   } : {};
 
   return (

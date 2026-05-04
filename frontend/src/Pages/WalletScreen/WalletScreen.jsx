@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../Components/Layout/Header';
 import BalanceCard from '../../Components/Cards/BalanceCard';
@@ -7,59 +7,18 @@ import BottomNavigation from '../../Components/Layout/BottomNavigation';
 import TransactionItem from '../../Components/Cards/TransactionItem';
 import SectionHeader from '../../Components/Layout/SectionHeader';
 import styles from '../../Styles/WalletScreen.module.css';
-import { fetchWalletDetails, fetchTransactionHistory } from '../../services/clientService';
+import { useWallet } from '../../hooks/useWallet';
 
 const WalletScreen = () => {
-  const [activeTab, setActiveTab] = useState('wallet');
-  const [balanceInfo, setBalanceInfo] = useState({ balance: 0, card_last_four: '****' });
-  const [transactions, setTransactions] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { balance, card_last_four, transactions, isLoading, refreshWallet } = useWallet();
   const navigateHook = useNavigate();
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const [walletRes, transRes] = await Promise.all([
-          fetchWalletDetails(),
-          fetchTransactionHistory()
-        ]);
-        
-        setBalanceInfo(walletRes.data);
-        
-        // Map backend transactions to frontend format
-        const mappedTransactions = transRes.data.map(t => ({
-          id: t.id,
-          type: t.type,
-          title: t.reference || (t.type === 'recharge' ? 'Rechargement' : 'Achat'),
-          date: new Date(t.created_at).toLocaleString('fr-FR', { 
-            day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' 
-          }),
-          amount: `${t.type === 'recharge' ? '+' : '-'}${parseFloat(t.amount).toFixed(2)} DH`,
-          isPositive: t.type === 'recharge',
-          icon: t.type === 'recharge' ? 'plus' : 'ticket'
-        }));
-        
-        setTransactions(mappedTransactions);
-      } catch (error) {
-        console.error('Error fetching wallet data:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadData();
-  }, []);
-
-  const navigate = (section) => {
-    setActiveTab(section);
-    if (section === 'profile') navigateHook('/profile');
-    if (section === 'home') navigateHook('/home');
-    if (section === 'tickets') navigateHook('/mytickets');
-    if (section === 'validation') navigateHook('/validation');
-  };
+    refreshWallet();
+  }, [refreshWallet]);
 
   const handleRecharge = () => {
-    navigateHook('/recharge/payment'); // Assuming this is the route for recharge
+    navigateHook('/payment'); 
   };
 
   const handleChangeCard = () => {
@@ -67,44 +26,53 @@ const WalletScreen = () => {
   };
 
   const handleMenuAction = () => {
-    console.log('Menu action');
   };
 
   const viewAllTransactions = () => {
-    console.log('View all transactions');
+    navigateHook('/payment-history');
   };
+
+  const safeBalance = Number.isFinite(balance) ? balance : 0;
+  const safeCardLastFour = card_last_four || '****';
+  const safeTransactions = Array.isArray(transactions) ? transactions : [];
+
+  const mappedTransactions = safeTransactions.map(t => ({
+    id: t.id,
+    type: t.type,
+    title: t.reference || (t.type === 'recharge' ? 'Rechargement' : 'Achat'),
+    date: new Date(t.created_at).toLocaleString('fr-FR', { 
+      day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' 
+    }),
+    amount: `${t.type === 'recharge' ? '+' : '-'}${parseFloat(t.amount).toFixed(2)} DH`,
+    isPositive: t.type === 'recharge',
+    icon: t.type === 'recharge' ? 'plus' : 'ticket'
+  }));
 
   return (
     <>
       <div className="min-h-screen bg-gradient-to-br from-[#2a0b0f] to-[#1a0507] flex items-center justify-center p-4">
-        {/* Main Container */}
         <div className="w-full max-w-md mx-auto">
-          {/* Wallet Card */}
           <div className={`${styles.walletCard} relative rounded-3xl shadow-2xl border border-yellow-500/20 overflow-hidden 
             bg-gradient-to-br from-[#400106]/90 to-[#260101]/90 backdrop-blur-sm`}>
             
-            {/* Header */}
             <Header 
               title="Portefeuille" 
               onMenu={handleMenuAction}
               showMenuButton={true}
             />
 
-            {/* Main Content - Scrollable */}
             <div className="max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar px-6 pb-24">
               
-              {/* Balance Card */}
               <BalanceCard 
                 title="Solde disponible"
-                amount={`${parseFloat(balanceInfo.balance).toFixed(2)} DH`}
+                amount={`${safeBalance.toFixed(2)} DH`}
                 cardType="Carte Virtuelle"
-                cardNumber={`**** ${balanceInfo.card_last_four}`}
+                cardNumber={`**** **** **** ${safeCardLastFour}`}
                 gradientFrom="#7A3B47"
                 gradientTo="#5C2A36"
                 showCircles={false}
               />
 
-              {/* Change Card Button */}
               <div className="flex justify-end -mt-4 mb-4 pr-2">
                 <button 
                   onClick={handleChangeCard}
@@ -117,7 +85,6 @@ const WalletScreen = () => {
                 </button>
               </div>
 
-              {/* Recharge Button */}
               <ActionButtonCard
                 variant="validation"
                 icon={
@@ -131,7 +98,6 @@ const WalletScreen = () => {
                 showArrow={false}
               />
 
-              {/* Transactions Section */}
               <div className="mb-6">
                 <SectionHeader 
                   title="Transactions récentes"
@@ -139,12 +105,11 @@ const WalletScreen = () => {
                   onButtonClick={viewAllTransactions}
                 />
 
-                {/* Transaction List */}
                 <div className="space-y-3">
-                  {isLoading ? (
+                  {isLoading && transactions.length === 0 ? (
                     <div className="text-center text-white/50 py-4">Chargement...</div>
-                  ) : transactions.length > 0 ? (
-                    transactions.map((transaction) => (
+                  ) : mappedTransactions.length > 0 ? (
+                    mappedTransactions.map((transaction) => (
                       <TransactionItem
                         key={transaction.id}
                         type={transaction.type}
@@ -162,11 +127,7 @@ const WalletScreen = () => {
               </div>
             </div>
 
-            {/* Bottom Navigation */}
-            <BottomNavigation 
-              activeTab={activeTab}
-              onNavigate={navigate}
-            />
+            <BottomNavigation />
           </div>
         </div>
       </div>

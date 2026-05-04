@@ -41,14 +41,18 @@ const Confirmation = () => {
         price: mainTicket ? `${(mainTicket.price_paid * quantity).toFixed(2)} DH` : "0.00 DH",
         paymentMethod: "Portefeuille Interne",
         status: mainTicket?.status === 'active' ? "Prêt à l'emploi" : "Activé",
-        transactionNumber: mainTicket ? `#TRX-${mainTicket.uuid.split('-')[0].toUpperCase()}` : "#TRX-UNKNOWN",
+        transactionNumber: mainTicket?.uuid ? `#TRX-${mainTicket.uuid.split('-')[0].toUpperCase()}` : "#TRX-UNKNOWN",
         transactionDateTime: formatDate(mainTicket?.created_at),
         paymentMethodFull: "Paiement par Portefeuille",
         receiptEmail: "Client@PFE.com"
     };
 
     const handleViewTicket = () => {
-        if (mainTicket) {
+        if (quantity > 1) {
+            // If multiple tickets, go to the list so they can see all of them
+            navigate('/mytickets');
+        } else if (mainTicket) {
+            // If single ticket, go straight to the detail/QR
             navigate(`/viewticket/${mainTicket.uuid}`);
         } else {
             navigate('/mytickets');

@@ -2,27 +2,39 @@ import axios from 'axios';
 
 const apiBase = import.meta.env.VITE_API_URL ?? '';
 
+// Global axios defaults for CSRF support
+axios.defaults.withCredentials = true;
+axios.defaults.xsrfCookieName = 'XSRF-TOKEN';
+axios.defaults.xsrfHeaderName = 'X-XSRF-TOKEN';
+
 const clientApi = axios.create({
   baseURL: `${apiBase}/api`,
-  withCredentials: false,
+  withCredentials: true,
+  headers: {
+    Accept: 'application/json',
+    'X-Requested-With': 'XMLHttpRequest',
+  },
 });
 
-export const getAuthToken = () =>
-  localStorage.getItem('auth_token') ?? sessionStorage.getItem('auth_token');
+// CSRF cookie fetch (required for Sanctum SPA auth)
+export const fetchCsrfToken = () => axios.get(`${apiBase}/sanctum/csrf-cookie`, { withCredentials: true });
 
+<<<<<<< HEAD
 export const getClientUuid = () =>
   localStorage.getItem('client_uuid') ?? sessionStorage.getItem('client_uuid');
 
 export const setAuthToken = (token, rememberMe = false) => {
   if (!token) return;
+=======
+const extractPayload = (response) => response?.data?.data ?? null;
+>>>>>>> 110b8f3fa71656180ae4f0799404b59fdf5310e6
 
-  if (rememberMe) {
-    localStorage.setItem('auth_token', token);
-    sessionStorage.removeItem('auth_token');
-  } else {
-    sessionStorage.setItem('auth_token', token);
-    localStorage.removeItem('auth_token');
-  }
+// These are now legacy/placeholder as we use cookies
+export const getAuthToken = () => localStorage.getItem('is_authenticated') === 'true';
+
+export const setAuthToken = () => {
+  // We don't use the token from response anymore, but we'll store a flag
+  localStorage.setItem('is_authenticated', 'true');
 };
 
 export const setClientUuid = (uuid, rememberMe = false) => {
@@ -38,19 +50,34 @@ export const setClientUuid = (uuid, rememberMe = false) => {
 };
 
 export const clearAuthData = () => {
+<<<<<<< HEAD
   localStorage.removeItem('auth_token');
   sessionStorage.removeItem('auth_token');
   localStorage.removeItem('client_uuid');
   sessionStorage.removeItem('client_uuid');
+=======
+  localStorage.removeItem('is_authenticated');
+>>>>>>> 110b8f3fa71656180ae4f0799404b59fdf5310e6
 };
 
 clientApi.interceptors.request.use((config) => {
-  const token = getAuthToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+  // No need to manually add Bearer token as withCredentials handles cookies
   return config;
 });
+
+clientApi.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error('[AXIOS] Response error:', error.message, 'Status:', error.response?.status);
+    if (error.response?.status === 401) {
+      console.log('[AXIOS] 401 detected, clearing auth data');
+      clearAuthData();
+      // Don't redirect here - let the component/thunk handle it
+      // This prevents conflicts with React routing
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const signupClient = (payload) => clientApi.post('/signup', payload);
 
@@ -62,7 +89,7 @@ export const forgotPasswordClient = (payload) =>
 export const resetPasswordClient = (payload) =>
   clientApi.post('/reset-password', payload);
 
-export const fetchClientProfile = () => clientApi.get('/profile');
+export const fetchClientProfile = () => clientApi.get('/profile').then(extractPayload);
 
 export const updateClientProfile = ({ payload = {}, avatarFile = null }) => {
   if (avatarFile) {
@@ -85,20 +112,22 @@ export const logoutClient = () => clientApi.post('/logout');
 
 export const logoutAllClient = () => clientApi.post('/logout-all');
 
-export const fetchClientHome = () => clientApi.get('/home');
+export const fetchClientHome = () => clientApi.get('/home').then(extractPayload);
 
-export const fetchWalletDetails = () => clientApi.get('/wallet');
+export const fetchWalletDetails = () => clientApi.get('/wallet').then(extractPayload);
 
-export const fetchTransactionHistory = () => clientApi.get('/wallet/transactions');
+export const fetchTransactionHistory = () => clientApi.get('/wallet/transactions').then(extractPayload);
 
 export const initRecharge = (payload) => clientApi.post('/wallet/recharge/init', payload);
 
 export const confirmRecharge = (payload) => clientApi.post('/wallet/recharge/confirm', payload);
 
-export const fetchTicketTypes = () => clientApi.get('/ticket-types');
+export const fetchTicketTypes = () => clientApi.get('/ticket-types').then(extractPayload);
 
 export const purchaseTicket = (payload) => clientApi.post('/tickets/purchase', payload);
 
-export const fetchMyTickets = () => clientApi.get('/tickets');
+export const fetchMyTickets = () => clientApi.get('/tickets').then(extractPayload);
+
+export const validateTicket = (uuid, payload) => clientApi.post(`/tickets/${uuid}/validate`, payload);
 
 export default clientApi;

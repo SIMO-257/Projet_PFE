@@ -23,20 +23,17 @@ const SecurityScreen = () => {
 
   // --- Handlers ---
   const goBack = () => navigate(-1);
-  const handleChangePassword = () => console.log('Change password flow');
-  const handleSetRecovery = () => console.log('Set recovery email/phone');
+  const handleChangePassword = () => {};
+  const handleSetRecovery = () => {};
   const handleRevokeSession = (id) => {
     setSessions(sessions.filter(s => s.id !== id));
-    console.log(`Session ${id} revoked`);
   };
   const handleLogoutAll = () => {
     setSessions(sessions.filter(s => s.current));
-    console.log('Logged out of all other devices');
   };
   const handleFreezeCard = () => {
     const newState = !cardFrozen;
     setCardFrozen(newState);
-    console.log(`Card ${newState ? 'frozen' : 'unfrozen'}`);
   };
 
   return (

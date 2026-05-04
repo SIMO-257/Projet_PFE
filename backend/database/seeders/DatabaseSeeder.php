@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
             [
                 'first_name' => 'Test',
                 'last_name' => 'Client',
-                'password_hash' => 'password',
+                'password_hash' => \Illuminate\Support\Facades\Hash::make('password'),
             ]
         );
 

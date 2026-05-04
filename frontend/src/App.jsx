@@ -1,90 +1,89 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { useEffect, useState } from "react";
-import WalletScreen from "./Pages/WalletScreen/WalletScreen";
-import Login from "./Pages/Login/Login";
-import SignUp from "./Pages/SignUp/SignUp";
-import ForgotPassword from "./Pages/ForgotPassword/ForgotPassword";
-import ResetPassword from "./Pages/ResetPassword/ResetPassword";
-import HomeScreen from "./Pages/Home/HomeScreen";
-import ViewTicket from "./Pages/ViewTicket/ViewTicket";
-import ProfileScreen from "./Pages/ProfileScreen/ProfileScreen";
-import EditProfileScreen from "./Pages/EditProfile/EditProfile";
-import SettingsScreen from "./Pages/Settings/SettingsScreen";
-import HelpSupportScreen from "./Pages/HelpSupport/HelpSupportScreen";
-import SecurityScreen from "./Pages/SecurityScreen/SecurityScreen";
-import MyTickets from "./Pages/MyTickets/MyTickets";
-import Paiment from "./Pages/Paiment/Paiment";
-import ConfirmationPaiment from "./Pages/ConfirmationPaiment/ConfirmationPaiment";
-import PaimentHistory from "./Pages/PaimentHistory/PaimentHistory";
-import OfflineMode from "./Pages/OfflineMode/OfflineMode";
-import Notifications from "./Pages/Notifications/Notifications";
-import ChangeCardScreen from "./Pages/ChangeCardScreen/ChangeCardScreen";
-import ValidationScreen from "./Pages/ValidationScreen/ValidationScreen";
-import RechargePaymentScreen from "./Pages/RechargePaymentScreen/RechargePaymentScreen";
+import { useEffect, lazy, Suspense } from "react";
+import PublicRoute from "./Components/Layout/PublicRoute";
+import ProtectedRoute from "./Components/Layout/ProtectedRoute";
+import { useAuth } from "./hooks/useAuth";
 
-import TicketSelection from "./Pages/TicketSelection/TicketSelection";
+// Lazy pages
+const Login = lazy(() => import("./Pages/Login/Login"));
+const SignUp = lazy(() => import("./Pages/SignUp/SignUp"));
+const ForgotPassword = lazy(() => import("./Pages/ForgotPassword/ForgotPassword"));
+const ResetPassword = lazy(() => import("./Pages/ResetPassword/ResetPassword"));
 
-import { clearAuthData, fetchClientHome, getAuthToken } from "./services/clientService";
+const HomeScreen = lazy(() => import("./Pages/Home/HomeScreen"));
+const WalletScreen = lazy(() => import("./Pages/WalletScreen/WalletScreen"));
+const ProfileScreen = lazy(() => import("./Pages/ProfileScreen/ProfileScreen"));
+const EditProfileScreen = lazy(() => import("./Pages/EditProfile/EditProfile"));
+const SettingsScreen = lazy(() => import("./Pages/Settings/SettingsScreen"));
+const HelpSupportScreen = lazy(() => import("./Pages/HelpSupport/HelpSupportScreen"));
+const SecurityScreen = lazy(() => import("./Pages/SecurityScreen/SecurityScreen"));
 
-function RootRedirect() {
-  const [target, setTarget] = useState(null);
+const MyTickets = lazy(() => import("./Pages/MyTickets/MyTickets"));
+const ViewTicket = lazy(() => import("./Pages/ViewTicket/ViewTicket"));
+const ValidationScreen = lazy(() => import("./Pages/ValidationScreen/ValidationScreen"));
 
-  useEffect(() => {
-    const token = getAuthToken();
-    if (!token) {
-      setTarget("/login");
-      return;
-    }
+const Paiment = lazy(() => import("./Pages/Paiment/Paiment"));
+const ConfirmationPaiment = lazy(() => import("./Pages/ConfirmationPaiment/ConfirmationPaiment"));
+const PaimentHistory = lazy(() => import("./Pages/PaimentHistory/PaimentHistory"));
 
-    fetchClientHome()
-      .then(() => setTarget("/home"))
-      .catch(() => {
-        clearAuthData();
-        setTarget("/login");
-      });
-  }, []);
-
-  if (!target) return null;
-
-  return <Navigate to={target} replace />;
-}
-
+const Notifications = lazy(() => import("./Pages/Notifications/Notifications"));
+const OfflineMode = lazy(() => import("./Pages/OfflineMode/OfflineMode"));
 
 function App() {
+  const { refreshProfile } = useAuth();
+
+  // 🔥 FIX: run once فقط (ماشي كل re-render)
+  useEffect(() => {
+    refreshProfile();
+  }, []);
+
   return (
-    <>
-      <BrowserRouter>
+    <BrowserRouter>
+      <Suspense
+        fallback={
+          <div className="min-h-screen flex items-center justify-center bg-[#1a0507] text-white">
+            Loading...
+          </div>
+        }
+      >
         <Routes>
-          <Route path="/" element={<RootRedirect />} />
-          <Route path="/home" element={<HomeScreen />} />
 
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/forgot_password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
+          {/* Default route */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
 
-          <Route path="/profile" element={<ProfileScreen />} />
-          <Route path="/edit-profile" element={<EditProfileScreen />} />
-          <Route path="/settings" element={<SettingsScreen />} />
-          <Route path="/help-support" element={<HelpSupportScreen />} />
-          <Route path="/change-card" element={<ChangeCardScreen />} />
-          <Route path="/security" element={<SecurityScreen />} />
+          {/* PUBLIC ROUTES */}
+          <Route element={<PublicRoute />}>
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/forgot_password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+          </Route>
 
-          <Route path="/wallet" element={<WalletScreen />} />
-          <Route path="/recharge/payment" element={<RechargePaymentScreen />} />
-          <Route path="/viewticket/:id" element={<ViewTicket />} />
-          <Route path="/ticket-selection" element={<TicketSelection />} />
-          
-          <Route path="/mytickets" element={<MyTickets />} />
-          <Route path="/validation" element={<ValidationScreen />} />
-          <Route path="/payment" element={<Paiment />} />
-          <Route path="/payment-confirmation" element={<ConfirmationPaiment />} />
-          <Route path="/payment-history" element={<PaimentHistory />} />
-          <Route path="/offline" element={<OfflineMode />} />
-          <Route path="/notifications" element={<Notifications />} />
+          {/* PROTECTED ROUTES */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/home" element={<HomeScreen />} />
+            <Route path="/wallet" element={<WalletScreen />} />
+            <Route path="/profile" element={<ProfileScreen />} />
+            <Route path="/edit-profile" element={<EditProfileScreen />} />
+            <Route path="/settings" element={<SettingsScreen />} />
+            <Route path="/help-support" element={<HelpSupportScreen />} />
+            <Route path="/security" element={<SecurityScreen />} />
+
+            <Route path="/mytickets" element={<MyTickets />} />
+            <Route path="/viewticket/:id" element={<ViewTicket />} />
+            <Route path="/validation" element={<ValidationScreen />} />
+
+            <Route path="/payment" element={<Paiment />} />
+            <Route path="/payment-confirmation" element={<ConfirmationPaiment />} />
+            <Route path="/payment-history" element={<PaimentHistory />} />
+
+            <Route path="/notifications" element={<Notifications />} />
+            <Route path="/offline" element={<OfflineMode />} />
+          </Route>
+
         </Routes>
-      </BrowserRouter>
-    </>
+      </Suspense>
+    </BrowserRouter>
   );
 }
 

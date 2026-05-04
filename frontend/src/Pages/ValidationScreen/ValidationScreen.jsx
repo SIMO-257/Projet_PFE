@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTickets } from '../../hooks/useTickets';
 import Header from '../../Components/Layout/Header';
 import BottomNavigation from '../../Components/Layout/BottomNavigation';
 import ValidationCard from '../../Components/Cards/ValidationCard';
@@ -15,11 +16,15 @@ import TimerDisplay from '../../Components/UI/TimerDisplay';
 import styles from '../../Styles/ValidationScreen.module.css';
 
 export default function ValidationScreen() {
+  const { tickets, validateTicket } = useTickets();
   const [activeTab, setActiveTab] = useState('validation');
   const [showNFCModal, setShowNFCModal] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
   const [qrTimeRemaining, setQRTimeRemaining] = useState(30);
   const [notification, setNotification] = useState(null);
+
+  // Find the first active ticket to validate
+  const activeTicket = tickets.find(t => t.status === 'active' && t.remaining_uses > 0);
 
   const closeQRModal = () => {
     setShowQRModal(false);
@@ -53,26 +58,49 @@ export default function ValidationScreen() {
   }, [showQRModal, qrTimeRemaining]);
 
   const goBack = () => {
-    console.log('Going back...');
   };
 
   const navigateHook = useNavigate();
 
-  const navigate = (section) => {
-    setActiveTab(section);
-    console.log('Navigating to:', section);
-    if (section === 'home') navigateHook('/home');
-    if (section === 'wallet') navigateHook('/wallet');
-    if (section === 'tickets') navigateHook('/mytickets');
-    if (section === 'profile') navigateHook('/profile');
-  };
+  const validateNFC = async () => {
+    if (!activeTicket) {
+      setNotification({
+        type: 'error',
+        title: 'Aucun billet',
+        message: 'Vous n\'avez pas de billet actif à valider.'
+      });
+      return;
+    }
 
-  const validateNFC = () => {
     setShowNFCModal(true);
-    setTimeout(() => {
+    
+    try {
+      const resultAction = await validateTicket({ 
+        uuid: activeTicket.uuid, 
+        validation_type: 'nfc' 
+      });
+
+      if (resultAction.meta?.requestStatus === 'fulfilled') {
+        setTimeout(() => {
+          setShowNFCModal(false);
+          showValidationSuccess(resultAction.payload.message);
+        }, 1500);
+      } else {
+        setShowNFCModal(false);
+        setNotification({
+          type: 'error',
+          title: 'Échec de validation',
+          message: resultAction.payload?.message || 'Erreur lors de la validation'
+        });
+      }
+    } catch (err) {
       setShowNFCModal(false);
-      showValidationSuccess();
-    }, 3000);
+      setNotification({
+        type: 'error',
+        title: 'Erreur',
+        message: 'Une erreur inattendue est survenue'
+      });
+    }
   };
 
   const closeNFCModal = () => {
@@ -80,15 +108,23 @@ export default function ValidationScreen() {
   };
 
   const validateQR = () => {
+    if (!activeTicket) {
+      setNotification({
+        type: 'error',
+        title: 'Aucun billet',
+        message: 'Vous n\'avez pas de billet actif à valider.'
+      });
+      return;
+    }
     setShowQRModal(true);
     setQRTimeRemaining(30);
   };
 
-  const showValidationSuccess = () => {
+  const showValidationSuccess = (msg) => {
     setNotification({
       type: 'success',
       title: 'Validation réussie!',
-      message: 'Votre titre a été validé avec succès'
+      message: msg || 'Votre titre a été validé avec succès'
     });
   };
 
@@ -180,10 +216,7 @@ export default function ValidationScreen() {
             </div>
 
             {/* Bottom Navigation */}
-            <BottomNavigation 
-              activeTab={activeTab}
-              onNavigate={navigate}
-            />
+            <BottomNavigation />
           </ValidationCard>
         </div>
 

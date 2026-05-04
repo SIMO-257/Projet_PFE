@@ -24,7 +24,6 @@ class TicketPurchaseRequest extends FormRequest
         return [
             'ticket_type_id' => 'required|exists:ticket_types,id',
             'quantity' => 'required|integer|min:1|max:10',
-            'client_uuid' => 'required|exists:clients,uuid',
         ];
     }
 
@@ -42,8 +41,6 @@ class TicketPurchaseRequest extends FormRequest
             'quantity.integer' => 'La quantité doit être un nombre entier.',
             'quantity.min' => 'Vous devez acheter au moins 1 billet.',
             'quantity.max' => 'Vous ne pouvez pas acheter plus de 10 billets à la fois.',
-            'client_uuid.required' => 'L\'identifiant du client est obligatoire.',
-            'client_uuid.exists' => 'Le client est introuvable.',
         ];
     }
 }

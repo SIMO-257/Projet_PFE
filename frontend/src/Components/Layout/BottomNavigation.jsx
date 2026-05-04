@@ -1,8 +1,40 @@
 import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import NavButton from '../Buttons/NavButton';
 import styles from '../../Styles/HomeScreen.module.css';
 
-const BottomNavigation = ({ activeTab = 'validation', onNavigate }) => {
+const BottomNavigation = ({ onNavigate }) => {
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const getActiveTab = () => {
+        const path = location.pathname;
+        if (path.startsWith('/home')) return 'home';
+        if (path.startsWith('/mytickets') || path.startsWith('/viewticket')) return 'tickets';
+        if (path.startsWith('/validation')) return 'validation';
+        if (path.startsWith('/wallet')) return 'wallet';
+        if (path.startsWith('/profile') || path.startsWith('/edit-profile') || path.startsWith('/settings')) return 'profile';
+        return '';
+    };
+
+    const activeTab = getActiveTab();
+
+    const handleNavigate = (id) => {
+        if (onNavigate) {
+            onNavigate(id);
+            return;
+        }
+
+        switch (id) {
+            case 'home': navigate('/home'); break;
+            case 'tickets': navigate('/mytickets'); break;
+            case 'validation': navigate('/validation'); break;
+            case 'wallet': navigate('/wallet'); break;
+            case 'profile': navigate('/profile'); break;
+            default: break;
+        }
+    };
+
     const navItems = [
         { id: 'home', label: 'Home', icon: (
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
@@ -40,7 +72,7 @@ const BottomNavigation = ({ activeTab = 'validation', onNavigate }) => {
                         icon={item.icon}
                         label={item.label}
                         isActive={activeTab === item.id}
-                        onClick={() => onNavigate(item.id)}
+                        onClick={() => handleNavigate(item.id)}
                         isCenter={item.isCenter}
                     />
                 ))}

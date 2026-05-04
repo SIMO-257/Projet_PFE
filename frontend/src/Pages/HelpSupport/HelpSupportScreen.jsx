@@ -33,11 +33,11 @@ const HelpSupportScreen = () => {
   // Handlers
   const goBack = () => navigate(-1);
   const toggleFaq = (index) => setOpenFaq(openFaq === index ? null : index);
-  const handleSendReport = () => console.log('Report sent:', { problemType, description, attachScreenshot });
-  const handleCall = () => console.log('Call support');
-  const handleEmail = () => console.log('Open email client');
-  const handleChat = () => console.log('Start live chat');
-  const handleGuideClick = (title) => console.log(`Open guide: ${title}`);
+  const handleSendReport = () => {};
+  const handleCall = () => {};
+  const handleEmail = () => {};
+  const handleChat = () => {};
+  const handleGuideClick = (title) => {};
 
   // Filter FAQs based on search term
   const filteredFaqs = faqs.filter(faq =>

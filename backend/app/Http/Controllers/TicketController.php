@@ -11,6 +11,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use App\Models\ValidationLog;
+use Illuminate\Support\Carbon;
+use App\Models\AuditLog;
 
 class TicketController extends Controller
 {
@@ -20,7 +23,7 @@ class TicketController extends Controller
     public function getTicketTypes()
     {
         $types = TicketType::where('is_active', true)->get();
-        return response()->json($types);
+        return $this->successResponse($types);
     }
 
     /**
@@ -29,8 +32,7 @@ class TicketController extends Controller
     public function purchase(TicketPurchaseRequest $request)
     {
         $validated = $request->validated();
-
-        $client = \App\Models\Client::where('uuid', $validated['client_uuid'])->first();
+        $client = Auth::user();
         $ticketType = TicketType::find($validated['ticket_type_id']);
         
         $totalPrice = $ticketType->price * $validated['quantity'];
@@ -48,10 +50,7 @@ class TicketController extends Controller
                 }
 
                 if ($wallet->balance < $totalPrice) {
-                    return response()->json([
-                        'message' => 'Solde insuffisant.',
-                        'errors' => ['balance' => ['Votre solde est insuffisant pour cet achat.']]
-                    ], 422);
+                    return $this->errorResponse('Solde insuffisant.', 422, ['balance' => ['Votre solde est insuffisant pour cet achat.']]);
                 }
 
                 $balanceBefore = $wallet->balance;
@@ -88,17 +87,15 @@ class TicketController extends Controller
                     $tickets[] = $ticket;
                 }
 
-                return response()->json([
-                    'message' => 'Achat réussi !',
+                AuditLog::log('ticket_purchase', $client->id, ['ticket_type' => $ticketType->name, 'quantity' => $validated['quantity']]);
+
+                return $this->successResponse([
                     'tickets' => $tickets,
                     'new_balance' => $wallet->balance
-                ], 201);
+                ], 'Achat réussi !', 201);
             });
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Une erreur est survenue lors du transaction.',
-                'error' => $e->getMessage()
-            ], 500);
+            return $this->errorResponse('Une erreur est survenue lors de l\'achat.', 500);
         }
     }
 
@@ -114,10 +111,10 @@ class TicketController extends Controller
             ->first();
 
         if (!$ticket) {
-            return response()->json(['message' => 'Ticket non trouvé.'], 404);
+            return $this->errorResponse('Ticket non trouvé.', 404);
         }
 
-        return response()->json($ticket);
+        return $this->successResponse($ticket);
     }
 
     /**
@@ -125,11 +122,10 @@ class TicketController extends Controller
      */
     public function index(Request $request)
     {
-        $uuid = $request->header('X-Client-UUID');
-        $client = \App\Models\Client::where('uuid', $uuid)->first();
+        $client = Auth::user();
 
         if (!$client) {
-            return response()->json(['message' => 'Unauthenticated.'], 401);
+            return $this->errorResponse('Unauthenticated.', 401);
         }
 
         $tickets = Ticket::where('user_id', $client->id)
@@ -137,6 +133,94 @@ class TicketController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return response()->json($tickets);
+        return $this->successResponse($tickets);
+    }
+
+    /**
+     * Validate a ticket.
+     */
+    public function validateTicket(Request $request, $uuid)
+    {
+        $client = Auth::user();
+        $validationType = $request->input('validation_type', 'qr');
+        $validatorId = $request->input('validator_id', 'DEV-001'); // Mock validator ID
+        $location = $request->input('location');
+
+        try {
+            return DB::transaction(function () use ($uuid, $client, $validationType, $validatorId, $location) {
+                // 1. Fetch ticket with lock to prevent race conditions
+                $ticket = Ticket::where('uuid', $uuid)
+                    ->where('user_id', $client->id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$ticket) {
+                    $this->logValidation(null, $client->id, $validatorId, $validationType, 'failure', 'Ticket non trouvé ou non autorisé.');
+                    AuditLog::log('ticket_validation_failed_not_found', $client->id, ['uuid' => $uuid]);
+                    return $this->errorResponse('Ticket non trouvé ou non autorisé.', 404);
+                }
+
+                // 2. Security & Business Rules Validation
+                $failureReason = null;
+
+                if ($ticket->status !== 'active') {
+                    $failureReason = "Le billet est déjà {$ticket->status}.";
+                } elseif ($ticket->remaining_uses <= 0) {
+                    $failureReason = "Plus d'utilisations restantes.";
+                    $ticket->status = 'used';
+                    $ticket->save();
+                } elseif ($ticket->valid_until && Carbon::parse($ticket->valid_until)->isPast()) {
+                    $failureReason = "Le billet a expiré.";
+                    $ticket->status = 'expired';
+                    $ticket->save();
+                }
+
+                if ($failureReason) {
+                    $this->logValidation($ticket->id, $client->id, $validatorId, $validationType, 'failure', $failureReason, $location);
+                    AuditLog::log('ticket_validation_failed', $client->id, ['uuid' => $uuid, 'reason' => $failureReason]);
+                    return $this->errorResponse($failureReason, 422);
+                }
+
+                // 3. Perform Validation (Decrement Use)
+                $ticket->remaining_uses -= 1;
+                
+                if ($ticket->remaining_uses <= 0) {
+                    $ticket->status = 'used';
+                }
+                
+                $ticket->save();
+
+                // 4. Log Success
+                $this->logValidation($ticket->id, $client->id, $validatorId, $validationType, 'success', null, $location);
+                AuditLog::log('ticket_validation_success', $client->id, ['uuid' => $uuid]);
+
+                return $this->successResponse([
+                    'remaining_uses' => $ticket->remaining_uses,
+                    'status_after' => $ticket->status
+                ], 'Billet validé avec succès.');
+            });
+        } catch (\Exception $e) {
+            return $this->errorResponse('Une erreur est survenue lors de la validation.', 500);
+        }
+    }
+
+    /**
+     * Helper to log validation attempts.
+     */
+    private function logValidation($ticketId, $userId, $validatorId, $type, $status, $reason = null, $location = null)
+    {
+        ValidationLog::create([
+            'ticket_id' => $ticketId,
+            'user_id' => $userId,
+            'validator_id' => $validatorId,
+            'validation_type' => $type,
+            'status' => $status,
+            'failure_reason' => $reason,
+            'location' => $location,
+            'metadata' => [
+                'ip' => request()->ip(),
+                'user_agent' => request()->userAgent()
+            ]
+        ]);
     }
 }

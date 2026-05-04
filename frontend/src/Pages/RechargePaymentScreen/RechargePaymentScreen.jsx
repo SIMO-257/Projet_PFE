@@ -13,7 +13,8 @@ import AmountDisplay from "../../Components/Cards/AmountDisplay";
 import CheckoutForm from "./CheckoutForm";
 import InputField from "../../Components/Inputs/InputField";
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
 
 const RechargePaymentScreen = () => {
   const navigate = useNavigate();
@@ -145,15 +146,21 @@ const RechargePaymentScreen = () => {
                 </button>
               </div>
             ) : (
-              <Elements stripe={stripePromise}>
-                <div className="mt-4">
-                  <CheckoutForm 
-                    amount={amount} 
-                    onSuccess={onSuccess} 
-                    onBack={() => setStep(1)} 
-                  />
+              stripePromise ? (
+                <Elements stripe={stripePromise}>
+                  <div className="mt-4">
+                    <CheckoutForm 
+                      amount={amount} 
+                      onSuccess={onSuccess} 
+                      onBack={() => setStep(1)} 
+                    />
+                  </div>
+                </Elements>
+              ) : (
+                <div className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
+                  Clé Stripe manquante. Ajoutez `VITE_STRIPE_PUBLISHABLE_KEY` dans votre fichier d'environnement frontend.
                 </div>
-              </Elements>
+              )
             )}
           </div>
         </ValidationCard>

@@ -1,8 +1,9 @@
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useState } from 'react';
 import { resetPasswordClient } from '../../services/clientService';
 import InputField from '../../Components/Inputs/InputField';
 import ConnexionButton from '../../Components/Buttons/ConnexionButton';
+import AuthLayout from '../../Components/Layout/AuthLayout';
 import styles from '../../Styles/Auth.module.css';
 
 export default function ResetPassword() {
@@ -32,7 +33,7 @@ export default function ResetPassword() {
     return val ?? '';
   };
 
-  const onSubmit = async (e) => {
+  const onResetSubmit = async (e) => {
     e.preventDefault();
     setErrors({});
     setStatus('');
@@ -60,67 +61,57 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className={styles.authContainer}>
-      <div className={styles.authCard}>
-        <header className={styles.authHeader}>
-          <h1 className={styles.authLogo}>CasaWay</h1>
-          <hr className={styles.goldenLine} />
-        </header>
+    <AuthLayout
+        subtitle="Reset Password"
+        description="Choose a new password for your account."
+        footerText="Back to"
+        footerLinkText="Login"
+        footerLinkTo="/login"
+        showSocial={false}
+        onSubmit={onResetSubmit}
+    >
+      <InputField
+        label="Email"
+        type="email"
+        placeholder="your@email.com"
+        id="reset-email"
+        var={form.email}
+        setVar={setField('email')}
+        error={Boolean(fieldError('email'))}
+        errorMessage={fieldError('email')}
+        required
+      />
 
-        <h2 className={styles.authSubtitle}>Reset Password</h2>
-        <p className={styles.authDescription}>Choose a new password for your account.</p>
+      <InputField
+        label="New Password"
+        type="password"
+        placeholder="At least 8 characters"
+        id="reset-password"
+        var={form.password}
+        setVar={setField('password')}
+        error={Boolean(fieldError('password'))}
+        errorMessage={fieldError('password')}
+        required
+      />
 
-        <form className={styles.authForm} onSubmit={onSubmit}>
-          <InputField
-            label="Email"
-            type="email"
-            placeholder="your@email.com"
-            id="reset-email"
-            var={form.email}
-            setVar={setField('email')}
-            error={Boolean(fieldError('email'))}
-            errorMessage={fieldError('email')}
-            required
-          />
+      <InputField
+        label="Confirm Password"
+        type="password"
+        placeholder="Repeat your password"
+        id="reset-password-confirmation"
+        var={form.password_confirmation}
+        setVar={setField('password_confirmation')}
+        error={Boolean(fieldError('password_confirmation'))}
+        errorMessage={fieldError('password_confirmation')}
+        required
+      />
 
-          <InputField
-            label="New Password"
-            type="password"
-            placeholder="At least 8 characters"
-            id="reset-password"
-            var={form.password}
-            setVar={setField('password')}
-            error={Boolean(fieldError('password'))}
-            errorMessage={fieldError('password')}
-            required
-          />
+      {errors.form && <p className={styles.fieldError}>{errors.form}</p>}
+      {status && <p className={styles.authDescription}>{status}</p>}
 
-          <InputField
-            label="Confirm Password"
-            type="password"
-            placeholder="Repeat your password"
-            id="reset-password-confirmation"
-            var={form.password_confirmation}
-            setVar={setField('password_confirmation')}
-            error={Boolean(fieldError('password_confirmation'))}
-            errorMessage={fieldError('password_confirmation')}
-            required
-          />
-
-          {errors.form && <p className={styles.fieldError}>{errors.form}</p>}
-          {status && <p className={styles.authDescription}>{status}</p>}
-
-          <ConnexionButton type="submit" variant="primary" disabled={processing}>
-            {processing ? 'Resetting...' : 'Reset Password'}
-          </ConnexionButton>
-        </form>
-
-        <div className={styles.authFooter}>
-          <p>
-            Back to <Link to="/login" className={styles.authLink}>Login</Link>
-          </p>
-        </div>
-      </div>
-    </div>
+      <ConnexionButton type="submit" variant="primary" disabled={processing}>
+        {processing ? 'Resetting...' : 'Reset Password'}
+      </ConnexionButton>
+    </AuthLayout>
   );
 }

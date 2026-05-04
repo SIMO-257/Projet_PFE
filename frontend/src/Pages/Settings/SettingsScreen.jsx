@@ -19,11 +19,11 @@ const SettingsScreen = () => {
 
   // --- Handlers ---
   const goBack = () => navigate(-1);
-  const handleClearCache = () => console.log('Cache cleared');
-  const handleManageOffline = () => console.log('Manage offline data');
-  const handleHelpSupport = () => console.log('Navigate to Help & Support');
-  const handleAbout = () => console.log('Open About');
-  const handlePrivacyPolicy = () => console.log('Open privacy policy');
+  const handleClearCache = () => {};
+  const handleManageOffline = () => {};
+  const handleHelpSupport = () => {};
+  const handleAbout = () => {};
+  const handlePrivacyPolicy = () => {};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#2a0b0f] to-[#1a0507] flex items-center justify-center p-4">

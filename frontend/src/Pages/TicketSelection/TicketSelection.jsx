@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import clientApi from '../../services/clientService';
+import { fetchTicketTypes, purchaseTicket } from '../../services/clientService';
 import ProgressSteps from '../../Components/NavBar/ProgressSteps';
 import styles from '../../Styles/TicketSelection.module.css';
 import { getClientUuid } from '../../services/clientService';
@@ -22,8 +22,8 @@ export default function TicketSelection() {
     useEffect(() => {
         const fetchTypes = async () => {
             try {
-                const res = await clientApi.get('/ticket-types');
-                let types = (res.data || []).filter(t => t.code !== 'CARTE_RECHARGE');
+                const res = await fetchTicketTypes();
+                let types = (res || []).filter(t => t.code !== 'CARTE_RECHARGE');
 
                 if (selectedTypeId) {
                     const found = types.find(t => t.id === selectedTypeId);
@@ -60,6 +60,7 @@ export default function TicketSelection() {
             return;
         }
 
+<<<<<<< HEAD
         const clientUuid = getClientUuid() || '';
 
         if (!clientUuid) {
@@ -68,6 +69,8 @@ export default function TicketSelection() {
             return;
         }
 
+=======
+>>>>>>> 110b8f3fa71656180ae4f0799404b59fdf5310e6
         setProcessing(true);
         setErrors({});
 
@@ -75,11 +78,10 @@ export default function TicketSelection() {
 
             const payload = {
                 ticket_type_id: selectedType.id,
-                quantity: quantity,
-                client_uuid: clientUuid
+                quantity: quantity
             };
 
-            const res = await clientApi.post('/tickets/purchase', payload);
+            const res = await purchaseTicket(payload);
 
             navigate('/payment-confirmation', {
                 state: {

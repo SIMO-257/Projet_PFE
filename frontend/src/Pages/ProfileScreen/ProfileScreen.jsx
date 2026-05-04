@@ -5,45 +5,23 @@ import BottomNavigation from '../../Components/Layout/BottomNavigation';
 import ProfilInfo from '../../Components/Cards/ProfilInfo';
 import ProfileOpt from '../../Components/Cards/ProfileOpt';
 import styles from '../../Styles/ProfileScreen.module.css';
+import { useAuth } from '../../hooks/useAuth';
 import {
-  clearAuthData,
   fetchClientProfile,
-  getAuthToken,
-  logoutClient,
 } from '../../services/clientService';
 
 const ProfileScreen = () => {
-  const [activeTab, setActiveTab] = useState('profile');
   const [profile, setProfile] = useState(null);
   const navigateHook = useNavigate();
+  const { logout } = useAuth();
 
   useEffect(() => {
-    const token = getAuthToken();
-    if (!token) {
-      navigateHook('/login');
-      return;
-    }
-
     fetchClientProfile()
-      .then((res) => setProfile(res?.data ?? null))
-      .catch((err) => {
-        if (err?.response?.status === 401) {
-          clearAuthData();
-          navigateHook('/login');
-          return;
-        }
+      .then((res) => setProfile(res ?? null))
+      .catch(() => {
         setProfile(null);
       });
-  }, [navigateHook]);
-
-  const navigate = (section) => {
-    setActiveTab(section);
-    console.log('Navigating to:', section);
-    if (section === 'home') navigateHook('/home');
-    if (section === 'wallet') navigateHook('/wallet');
-    if (section === 'tickets') navigateHook('/mytickets');
-    if (section === 'validation') navigateHook('/validation');
-  };
+  }, []);
 
   const handleEditProfile = () => {
     navigateHook('/edit-profile', { state: { profile } });
@@ -54,16 +32,15 @@ const ProfileScreen = () => {
   };
 
   const handleSupport = () => {
-    console.log('Navigating to support...');
   };
 
-  const handleLogout = () => {
-    logoutClient()
-      .catch(() => {})
-      .finally(() => {
-        clearAuthData();
-        navigateHook('/login');
-      });
+  const handleLogout = async () => {
+    const result = await logout();
+    if (result && result.meta && result.meta.requestStatus === 'fulfilled') {
+      navigateHook('/login');
+    } else {
+      navigateHook('/login');
+    }
   };
 
   return (
@@ -215,10 +192,7 @@ const ProfileScreen = () => {
             </div>
           </div>
 
-          <BottomNavigation 
-            activeTab={activeTab}
-            onNavigate={navigate}
-          />
+          <BottomNavigation />
         </div>
       </div>
     </div>

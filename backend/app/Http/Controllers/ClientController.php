@@ -6,18 +6,19 @@ use App\Http\Requests\ClientRequest;
 use App\Http\Requests\ProfileRequest;
 use App\Models\Client;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 
 
+use App\Models\AuditLog;
+
 class ClientController extends Controller
 {
     public function home()
     {
-        return response()->json([
-            'message' => 'Home endpoint is available.',
-        ]);
+        return $this->successResponse(null, 'Home endpoint is available.');
     }
 
     public function fetch_profile(Request $request)
@@ -29,7 +30,7 @@ class ClientController extends Controller
             $name = $client->email;
         }
 
-        return response()->json([
+        return $this->successResponse([
             'name' => $name,
             'client_uuid' => $client->uuid,
             'email' => $client->email,
@@ -55,56 +56,59 @@ class ClientController extends Controller
 
         $client->save();
 
+        AuditLog::log('profile_update', $client->id);
+
         $name = trim(($client->first_name ?? '').' '.($client->last_name ?? ''));
         if ($name === '') {
             $name = $client->email;
         }
 
-        return response()->json([
+        return $this->successResponse([
             'name' => $name,
             'email' => $client->email,
             'phone' => $client->phone,
             'created_at' => $client->created_at->toDateString(),
             'has_profile_file' => !is_null($client->profile_file),
             'avatar_url' => $this->avatarDataUrl($client->profile_file),
-        ]);
+        ], 'Profile updated successfully.');
     }
 
 
     public function login(Request $request)
     {
-        $data = $request->validate([
+        $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required|string',
             'remember_me' => 'nullable|boolean',
         ]);
 
-        $email = trim($data['email']);
+        $remember = (bool) ($credentials['remember_me'] ?? false);
 
-        $client = Client::where('email', $email)
-            ->where('is_active', true)
-            ->first();
+        if (Auth::guard('client')->attempt(['email' => $credentials['email'], 'password' => $credentials['password']], $remember)) {
+            if ($request->hasSession()) {
+                $request->session()->regenerate();
+            }
 
-        if (!$client || !Hash::check($data['password'], $client->password_hash)) {
-            return response()->json([
-                'message' => 'Invalid credentials.',
-                'errors' => [
-                    'email' => ['The provided credentials do not match our records.'],
-                ],
-            ], 422);
+            /** @var Client $client */
+            $client = Auth::guard('client')->user();
+            
+            if (!$client->is_active) {
+                AuditLog::log('login_failed_inactive', $client->id, ['email' => $credentials['email']]);
+                Auth::guard('client')->logout();
+                return $this->errorResponse('Account is inactive.', 403);
+            }
+
+            AuditLog::log('login_success', $client->id);
+
+            return $this->successResponse([
+                'remember_me' => $client->remember_me,
+            ], 'Login successful.');
         }
 
-        $client->remember_me = (bool) ($data['remember_me'] ?? false);
-        $client->save();
+        AuditLog::log('login_failed', null, ['email' => $credentials['email']]);
 
-        $token = $client->createToken('client-api-token')->plainTextToken;
-
-        return response()->json([
-            'message' => 'Login successful.',
-            'token' => $token,
-            'token_type' => 'Bearer',
-            'remember_me' => $client->remember_me,
-            'client_uuid' => $client->uuid,
+        return $this->errorResponse('Invalid credentials.', 422, [
+            'email' => ['The provided credentials do not match our records.'],
         ]);
     }
 
@@ -116,7 +120,7 @@ class ClientController extends Controller
         $client = Client::create([
             'email' => $data['email'],
             'phone' => $data['phone'] ?? null,
-            'password_hash' => $data['password'],
+            'password_hash' => Hash::make($data['password']),
             'profile_file' => $this->defaultAvatarBinary(),
             'is_active' => true,
         ]);
@@ -124,28 +128,33 @@ class ClientController extends Controller
         $this->applyProfileFile($client, $request, 'profile_file');
         $client->save();
 
-        return response()->json([
-            'message' => 'Account created successfully.',
-        ], 201);
+        AuditLog::log('signup', $client->id);
+
+        return $this->successResponse(null, 'Account created successfully.', 201);
     }
 
 
     public function logout(Request $request)
     {
-        $request->user()?->currentAccessToken()?->delete();
+        $userId = Auth::guard('client')->id();
+        Auth::guard('client')->logout();
 
-        return response()->json([
-            'message' => 'Logout successful.',
-        ]);
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        AuditLog::log('logout', $userId);
+
+        return $this->successResponse(null, 'Logout successful.');
     }
 
     public function logoutAll(Request $request)
     {
+        $userId = $request->user()?->id;
         $request->user()?->tokens()->delete();
 
-        return response()->json([
-            'message' => 'Logged out from all devices.',
-        ]);
+        AuditLog::log('logout_all', $userId);
+
+        return $this->successResponse(null, 'Logged out from all devices.');
     }
 
     public function forgotPassword(Request $request)
@@ -159,14 +168,13 @@ class ClientController extends Controller
             ->first();
 
         if ($client) {
+            AuditLog::log('forgot_password_request', $client->id, ['email' => $data['email']]);
             Password::broker('clients')->sendResetLink([
                 'email' => $data['email'],
             ]);
         }
 
-        return response()->json([
-            'message' => 'If the account exists, a reset link has been sent to the email.',
-        ]);
+        return $this->successResponse(null, 'If the account exists, a reset link has been sent to the email.');
     }
 
     public function resetPassword(Request $request)
@@ -182,18 +190,18 @@ class ClientController extends Controller
             function (Client $client, string $password): void {
                 $client->password_hash = $password;
                 $client->save();
+                AuditLog::log('password_reset_success', $client->id);
             }
         );
 
         if ($status !== Password::PASSWORD_RESET) {
+            AuditLog::log('password_reset_failed', null, ['email' => $data['email'], 'status' => $status]);
             throw ValidationException::withMessages([
                 'email' => [__($status)],
             ]);
         }
 
-        return response()->json([
-            'message' => 'Password has been reset successfully.',
-        ]);
+        return $this->successResponse(null, 'Password has been reset successfully.');
     }
 
     private function applyName(Client $client, array $data): void
