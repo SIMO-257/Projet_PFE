@@ -1,11 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
-<<<<<<< HEAD
-import { useState } from 'react';
-import { loginClient, setAuthToken, setClientUuid } from '../../services/clientService';
-=======
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
->>>>>>> 110b8f3fa71656180ae4f0799404b59fdf5310e6
+
 
 import InputField from '../../Components/Inputs/InputField';
 import CheckboxInput from '../../Components/Inputs/CheckboxInput';
@@ -111,28 +107,10 @@ export default function Login() {
             {errors.form && <p className={styles.fieldError}>{errors.form}</p>}
             {authError && !errors.form && <p className={styles.fieldError}>{authError.message || 'Authentication failed'}</p>}
 
-<<<<<<< HEAD
-                    {errors.form && <p className={styles.fieldError}>{errors.form}</p>}
-
-                    <ConnexionButton type="submit" variant="primary" disabled={processing}>
-                        {processing ? 'Connexion...' : 'Connexion'}
-                    </ConnexionButton>
-                </form>
-
-                <div className={styles.authFooter}>
-                    <p>
-                        Pas encore membre?{' '}
-                        <Link to="/signup" className={styles.authLink}>Créer un compte</Link>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </>        
-=======
             <ConnexionButton type="submit" variant="primary" disabled={isLoading}>
                 {isLoading ? 'Connexion...' : 'Connexion'}
             </ConnexionButton>
         </AuthLayout>
->>>>>>> 110b8f3fa71656180ae4f0799404b59fdf5310e6
+
     );
 }

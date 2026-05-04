@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { fetchTicketTypes, purchaseTicket } from '../../services/clientService';
 import ProgressSteps from '../../Components/NavBar/ProgressSteps';
 import styles from '../../Styles/TicketSelection.module.css';
-import { getClientUuid } from '../../services/clientService';
 
 export default function TicketSelection() {
 
@@ -38,7 +37,7 @@ export default function TicketSelection() {
                 setTicketTypes(types);
 
             } catch (err) {
-                console.error("Failed to fetch ticket types", err);
+                console.error('Failed to fetch ticket types', err);
             } finally {
                 setLoading(false);
             }
@@ -56,21 +55,10 @@ export default function TicketSelection() {
         if (!selectedType) return;
 
         if (!acceptedTerms) {
-            setErrors({ terms: "Vous devez accepter les conditions générales." });
+            setErrors({ terms: 'Vous devez accepter les conditions generales.' });
             return;
         }
 
-<<<<<<< HEAD
-        const clientUuid = getClientUuid() || '';
-
-        if (!clientUuid) {
-            setErrors({ form: "Session expirée. Veuillez vous reconnecter." });
-            setTimeout(() => navigate('/login'), 2000);
-            return;
-        }
-
-=======
->>>>>>> 110b8f3fa71656180ae4f0799404b59fdf5310e6
         setProcessing(true);
         setErrors({});
 
@@ -98,7 +86,7 @@ export default function TicketSelection() {
                 setErrors(responseErrors);
             } else {
                 setErrors({
-                    form: err?.response?.data?.message || "Échec de l'achat. Réessayez."
+                    form: err?.response?.data?.message || "Echec de l'achat. Reessayez."
                 });
             }
 
@@ -129,14 +117,14 @@ export default function TicketSelection() {
                         <div className={styles.headerContent}>
 
                             <h1 className={styles.headerTitle}>
-                                Sélection du Billet
+                                Selection du Billet
                             </h1>
 
                             <button
                                 className={styles.closeButton}
                                 onClick={() => navigate('/home')}
                             >
-                                ✕
+                                x
                             </button>
 
                         </div>
@@ -194,7 +182,7 @@ export default function TicketSelection() {
                                     onClick={decrementQuantity}
                                     className={styles.quantityButton}
                                 >
-                                    −
+                                    -
                                 </button>
 
                                 <div className={styles.quantityDisplay}>
@@ -221,7 +209,7 @@ export default function TicketSelection() {
                                 <p className="text-red-400 text-sm mb-2">
                                     {errors.balance[0]}
                                 </p>
-                                <button 
+                                <button
                                     onClick={() => navigate('/recharge/payment')}
                                     className="text-yellow-500 text-xs font-bold underline"
                                 >
@@ -251,7 +239,7 @@ export default function TicketSelection() {
                             />
 
                             <span className={styles.termsText}>
-                                J'accepte les conditions générales de vente
+                                J'accepte les conditions generales de vente
                             </span>
 
                         </label>

@@ -19,7 +19,6 @@ return Application::configure(basePath: dirname(__DIR__))
     $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
     $middleware->validateCsrfTokens(except: [
         'api/webhooks/stripe',
-        'api/login',
     ]);
     $middleware->web(append: [
         HandleInertiaRequests::class,
@@ -68,7 +67,6 @@ return Application::configure(basePath: dirname(__DIR__))
                 return response()->json([
                     'status' => 'error',
                     'message' => config('app.debug') ? $e->getMessage() : $message,
-                    'trace' => config('app.debug') ? $e->getTrace() : null
                 ], $status);
             }
         });

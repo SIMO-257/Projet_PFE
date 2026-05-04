@@ -3,89 +3,22 @@ import { useNavigate } from 'react-router-dom';
 import { useTickets } from '../../hooks/useTickets';
 import Header from '../../Components/Layout/Header';
 import BottomNavigation from '../../Components/Layout/BottomNavigation';
-<<<<<<< HEAD
-import Ticket from "../../Components/Cards/Ticket";
-import PurchaseCard from '../../Components/Cards/PurchaseCard';
-import styles from '../../Styles/Ticket.module.css';
-import {
-  clearAuthData,
-  fetchClientProfile,
-  getAuthToken,
-  getClientUuid,
-  setClientUuid,
-} from '../../services/clientService';
-=======
 import TicketCard from '../../Components/Cards/TicketCard';
->>>>>>> 110b8f3fa71656180ae4f0799404b59fdf5310e6
 
 export default function MyTickets() {
   const navigateHook = useNavigate();
   const { tickets, availableTypes, isLoading, refreshTickets } = useTickets();
 
   useEffect(() => {
-<<<<<<< HEAD
-    const fetchData = async () => {
-      const token = getAuthToken();
-      if (!token) {
-        navigateHook('/login');
-        return;
-      }
-=======
     console.log('[COMPONENT] MyTickets: useEffect running, dispatching refreshTickets');
     refreshTickets();
   }, [refreshTickets]);
->>>>>>> 110b8f3fa71656180ae4f0799404b59fdf5310e6
 
   const safeAvailableTypes = Array.isArray(availableTypes) ? availableTypes : [];
   const safeTickets = Array.isArray(tickets) ? tickets : [];
 
-<<<<<<< HEAD
-        setTickets(ticketsRes.data || []);
-        setTicketTypes(filteredTypes);
-      } catch (err) {
-        if (err?.response?.status === 401) {
-          clearAuthData();
-          navigateHook('/login');
-          return;
-        }
-        console.error("Error fetching tickets data:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [navigateHook]);
-
-  // Group tickets by type
-  const groupedTickets = tickets.reduce((acc, t) => {
-    const typeId = t.ticket_type_id;
-    if (!acc[typeId]) {
-      acc[typeId] = { 
-        ...t, 
-        count: 0,
-        instances: [] 
-      };
-    }
-    acc[typeId].count += 1;
-    acc[typeId].instances.push(t);
-    return acc;
-  }, {});
-
-  const onNavigate = (section) => {
-    setActiveTab(section);
-    if (section === 'home') navigateHook('/home');
-    if (section === 'wallet') navigateHook('/wallet');
-    if (section === 'profile') navigateHook('/profile');
-    if (section === 'validation') navigateHook('/validation');
-  };
-
-  const simpleBilletType = ticketTypes.find(t => t.code === 'BILLET_SIMPLE' || t.name_fr === 'Billet');
-  const otherTicketTypes = ticketTypes.filter(t => t.id !== simpleBilletType?.id);
-=======
   const simpleBilletType = safeAvailableTypes.find(t => t.code === 'BILLET_SIMPLE' || t.name_fr === 'Billet');
   const otherTicketTypes = safeAvailableTypes.filter(t => t.id !== simpleBilletType?.id && t.code !== 'CARTE_RECHARGE');
->>>>>>> 110b8f3fa71656180ae4f0799404b59fdf5310e6
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#2a0b0f] to-[#1a0507] flex items-center justify-center p-4">

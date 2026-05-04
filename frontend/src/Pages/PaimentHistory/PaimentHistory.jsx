@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { fetchMyTickets } from '../../services/clientService';
 import styles from '../../Styles/PaimentHistory.module.css';
 import BottomNavigation from '../../Components/Layout/BottomNavigation';
-import { getClientUuid } from '../../services/clientService';
 
 export default function PaimentHistory () {
     const [activeTab, setActiveTab] = useState('all');
@@ -12,12 +11,6 @@ export default function PaimentHistory () {
 
     useEffect(() => {
         const fetchTickets = async () => {
-<<<<<<< HEAD
-            const uuid = getClientUuid();
-            if (!uuid) return;
-
-=======
->>>>>>> 110b8f3fa71656180ae4f0799404b59fdf5310e6
             try {
                 setLoading(true);
                 const res = await fetchMyTickets();

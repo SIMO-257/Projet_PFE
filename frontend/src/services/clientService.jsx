@@ -4,12 +4,14 @@ const apiBase = import.meta.env.VITE_API_URL ?? '';
 
 // Global axios defaults for CSRF support
 axios.defaults.withCredentials = true;
+axios.defaults.withXSRFToken = true;
 axios.defaults.xsrfCookieName = 'XSRF-TOKEN';
 axios.defaults.xsrfHeaderName = 'X-XSRF-TOKEN';
 
 const clientApi = axios.create({
   baseURL: `${apiBase}/api`,
   withCredentials: true,
+  withXSRFToken: true,
   headers: {
     Accept: 'application/json',
     'X-Requested-With': 'XMLHttpRequest',
@@ -19,15 +21,9 @@ const clientApi = axios.create({
 // CSRF cookie fetch (required for Sanctum SPA auth)
 export const fetchCsrfToken = () => axios.get(`${apiBase}/sanctum/csrf-cookie`, { withCredentials: true });
 
-<<<<<<< HEAD
-export const getClientUuid = () =>
-  localStorage.getItem('client_uuid') ?? sessionStorage.getItem('client_uuid');
 
-export const setAuthToken = (token, rememberMe = false) => {
-  if (!token) return;
-=======
+
 const extractPayload = (response) => response?.data?.data ?? null;
->>>>>>> 110b8f3fa71656180ae4f0799404b59fdf5310e6
 
 // These are now legacy/placeholder as we use cookies
 export const getAuthToken = () => localStorage.getItem('is_authenticated') === 'true';
@@ -50,14 +46,9 @@ export const setClientUuid = (uuid, rememberMe = false) => {
 };
 
 export const clearAuthData = () => {
-<<<<<<< HEAD
-  localStorage.removeItem('auth_token');
-  sessionStorage.removeItem('auth_token');
-  localStorage.removeItem('client_uuid');
-  sessionStorage.removeItem('client_uuid');
-=======
+
   localStorage.removeItem('is_authenticated');
->>>>>>> 110b8f3fa71656180ae4f0799404b59fdf5310e6
+
 };
 
 clientApi.interceptors.request.use((config) => {

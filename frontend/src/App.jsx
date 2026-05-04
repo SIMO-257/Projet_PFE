@@ -19,6 +19,7 @@ const HelpSupportScreen = lazy(() => import("./Pages/HelpSupport/HelpSupportScre
 const SecurityScreen = lazy(() => import("./Pages/SecurityScreen/SecurityScreen"));
 
 const MyTickets = lazy(() => import("./Pages/MyTickets/MyTickets"));
+const TicketSelection = lazy(() => import("./Pages/TicketSelection/TicketSelection"));
 const ViewTicket = lazy(() => import("./Pages/ViewTicket/ViewTicket"));
 const ValidationScreen = lazy(() => import("./Pages/ValidationScreen/ValidationScreen"));
 
@@ -83,6 +84,7 @@ function App() {
             <Route path="/security" element={<SecurityScreen />} />
 
             <Route path="/mytickets" element={<MyTickets />} />
+            <Route path="/ticket-selection" element={<TicketSelection />} />
             <Route path="/viewticket/:id" element={<ViewTicket />} />
             <Route path="/validation" element={<ValidationScreen />} />
 

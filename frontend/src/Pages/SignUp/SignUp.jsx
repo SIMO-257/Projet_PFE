@@ -66,7 +66,7 @@ export default function SignUp() {
             if (responseErrors) {
                 setErrors(responseErrors);
             } else {
-                setErrors({ form: "Inscription échouée. Réessayez." });
+                setErrors({ form: "Inscription echouee. Reessayez." });
             }
         } finally {
             setProcessing(false);
@@ -75,9 +75,9 @@ export default function SignUp() {
 
     return (
         <AuthLayout
-            subtitle="Créer un Compte"
-            description="Rejoignez l'expérience premium du mobile intelligent"
-            footerText="Déjà un compte?"
+            subtitle="Creer un Compte"
+            description="Rejoignez l'experience premium du mobile intelligent"
+            footerText="Deja un compte?"
             footerLinkText="Se connecter"
             footerLinkTo="/login"
             onSubmit={Sign_up}
@@ -101,13 +101,13 @@ export default function SignUp() {
                 id="signup-email"
                 var={form.email}
                 setVar={setField('email')}
-                error={Boolean(errors.email)}                        
-                errorMessage={errors.email}                        
+                error={Boolean(errors.email)}
+                errorMessage={errors.email}
                 required
             />
 
             <InputField
-                label="Téléphone"
+                label="Telephone"
                 type="number"
                 placeholder="06 12 34 56 78"
                 id="signup-number"
@@ -143,40 +143,16 @@ export default function SignUp() {
             />
 
             <FormOptions
-                leftContent={<CheckboxInput  label={<>J'accepte les <a className={styles.authLink} href='#'>Conditions d'utilisation</a> et <a className={styles.authLink} href='#'>Politique de Confidentialité</a></>} id="remember" setCheck={toggleTerms} check={form.accept_terms} />}
+                leftContent={<CheckboxInput label={<>J'accepte les <a className={styles.authLink} href='#'>Conditions d'utilisation</a> et <a className={styles.authLink} href='#'>Politique de Confidentialite</a></>} id="remember" setCheck={toggleTerms} check={form.accept_terms} />}
                 rightContent=""
             />
 
             {errors.accept_terms && <p className={styles.fieldError}>{errors.accept_terms}</p>}
             {errors.form && <p className={styles.fieldError}>{errors.form}</p>}
 
-<<<<<<< HEAD
-                    <FormOptions
-                        leftContent={<CheckboxInput  label={<>Jaccept les <a className={styles.authLink} href='#'>Conditions d'utilisation</a> et <a className={styles.authLink} href='#'>Politique de Confidentialité</a></>} id="remember" setCheck={toggleTerms} check={form.accept_terms} />}
-                        rightContent=""
-                    />
-
-                    {errors.accept_terms && <p className={styles.fieldError}>{errors.accept_terms}</p>}
-                    {errors.form && <p className={styles.fieldError}>{errors.form}</p>}
-
-                    <ConnexionButton type="submit" variant="primary" disabled={processing}>
-                        {processing ? 'Inscription...' : 'Inscription'}
-                    </ConnexionButton>
-                </form>
-
-                <div className={styles.authFooter}>
-                    <p>
-                        Déja un compte?{' '}
-                        <Link to="/login" className={styles.authLink}>Se connecter</Link>
-                    </p>
-                </div>
-            </div>
-        </div>
-=======
             <ConnexionButton type="submit" variant="primary" disabled={processing}>
                 {processing ? 'Inscription...' : 'Inscription'}
             </ConnexionButton>
         </AuthLayout>
->>>>>>> 110b8f3fa71656180ae4f0799404b59fdf5310e6
     );
 }
