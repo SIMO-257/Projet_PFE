@@ -61,7 +61,7 @@ const WalletScreen = () => {
               showMenuButton={true}
             />
 
-            <div className="max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar px-6 pb-24">
+            <div className="max-h-[calc(100vh-200px)] overflow-y-auto no-scrollbar px-6 pb-24">
               
               <BalanceCard 
                 title="Solde disponible"

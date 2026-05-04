@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import clientApi from '../../services/clientService';
+import { fetchTicketDetails } from '../../services/clientService';
 import { ArrowLeft, CheckCircle, Ticket, Clock, Calendar, ShieldCheck } from 'lucide-react';
 import Header from '../../Components/Layout/Header';
 import styles from '../../Styles/ViewTicket.module.css';
@@ -14,10 +14,14 @@ export default function ViewTicket() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const fetchTicketDetails = async () => {
+        const loadTicket = async () => {
             try {
-                const res = await clientApi.get(`/tickets/${uuid}`);
-                setTicket(res.data);
+                const data = await fetchTicketDetails(uuid);
+                if (data) {
+                    setTicket(data);
+                } else {
+                    setError("Billet non trouvé.");
+                }
             } catch (err) {
                 console.error("Failed to fetch ticket details", err);
                 setError("Billet non trouvé ou erreur de connexion.");
@@ -27,7 +31,7 @@ export default function ViewTicket() {
         };
 
         if (uuid) {
-            fetchTicketDetails();
+            loadTicket();
         }
     }, [uuid]);
 
