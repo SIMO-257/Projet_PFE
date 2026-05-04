@@ -69,9 +69,29 @@ class WalletController extends Controller
             }
 
             $user = Auth::user();
-            $amount = $paymentIntent->amount / 100; // Convert back to DH
+
+            // 1. HARD Ownership Check: Cross-check PI metadata against authenticated user
+            if (($paymentIntent->metadata->user_id ?? null) != $user->id) {
+                AuditLog::log('suspicious_payment_claim', $user->id, ['pi_id' => $paymentIntent->id, 'pi_user_id' => $paymentIntent->metadata->user_id ?? 'none']);
+                return $this->errorResponse('Accès non autorisé à ce paiement.', 403);
+            }
+
+            $amount = $paymentIntent->amount / 100;
 
             return DB::transaction(function () use ($user, $amount, $paymentIntent) {
+                // 2. Idempotency Check using unique payment_intent_id
+                $existingTransaction = Transaction::where('payment_intent_id', $paymentIntent->id)->first();
+                if ($existingTransaction) {
+                    $wallet = Wallet::where('user_id', $user->id)->first();
+                    return $this->successResponse([
+                        'balance' => (float) ($wallet->balance ?? 0),
+                        'card_last_four' => $wallet->card_last_four ?? '****',
+                        'processed_via' => $existingTransaction->metadata['source'] ?? 'unknown'
+                    ], 'Paiement déjà traité.');
+                }
+
+                // 3. Fallback processing (if webhook is slow)
+                // We keep the logic but it uses the same unique constraint to prevent race conditions with webhook
                 $wallet = Wallet::firstOrCreate(
                     ['user_id' => $user->id],
                     ['balance' => 0.00, 'card_last_four' => '****']
@@ -81,7 +101,6 @@ class WalletController extends Controller
                 $balanceBefore = $wallet->balance;
                 $wallet->balance += $amount;
 
-                // Update card info from Stripe if available
                 $charge = $paymentIntent->latest_charge;
                 if ($charge) {
                     $chargeObj = \Stripe\Charge::retrieve($charge);
@@ -100,19 +119,25 @@ class WalletController extends Controller
                     'balance_before' => $balanceBefore,
                     'balance_after' => $wallet->balance,
                     'payment_method' => 'card',
-                    'reference' => 'Rechargement via Stripe',
-                    'metadata' => ['stripe_payment_intent' => $paymentIntent->id],
+                    'reference' => 'Recharge via API',
+                    'payment_intent_id' => $paymentIntent->id,
+                    'metadata' => [
+                        'stripe_payment_intent' => $paymentIntent->id,
+                        'source' => 'api_confirmation'
+                    ],
                 ]);
 
-                AuditLog::log('wallet_recharge_success', $user->id, ['amount' => $amount, 'pi_id' => $paymentIntent->id]);
+                AuditLog::log('wallet_recharge_success', $user->id, ['amount' => $amount, 'pi_id' => $paymentIntent->id, 'source' => 'api']);
 
                 return $this->successResponse([
                     'balance' => (float) $wallet->balance,
                     'card_last_four' => $wallet->card_last_four,
+                    'processed_via' => 'api'
                 ], 'Portefeuille rechargé avec succès.');
             });
         } catch (\Exception $e) {
-            return $this->errorResponse('Erreur lors de la confirmation du paiement.', 500);
+            Log::error("Wallet Recharge Confirm Error: " . $e->getMessage());
+            return $this->errorResponse('Erreur lors de la confirmation.', 500);
         }
     }
 
