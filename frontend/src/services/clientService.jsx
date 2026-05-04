@@ -102,6 +102,8 @@ export const purchaseTicket = (payload) => clientApi.post('/tickets/purchase', p
 
 export const fetchMyTickets = () => clientApi.get('/tickets').then(extractPayload);
 
+export const fetchTicketDetails = (uuid) => clientApi.get(`/tickets/${uuid}`).then(extractPayload);
+
 export const validateTicket = (uuid, payload) => clientApi.post(`/tickets/${uuid}/validate`, payload);
 
 export default clientApi;

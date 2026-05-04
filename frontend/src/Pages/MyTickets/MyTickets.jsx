@@ -28,7 +28,7 @@ export default function MyTickets() {
           
           <Header title="Mes Billets" />
 
-          <div className="max-h-[calc(100vh-200px)] min-h-[400px] overflow-y-auto custom-scrollbar px-6 pb-24">
+          <div className="max-h-[calc(100vh-200px)] min-h-[400px] overflow-y-auto no-scrollbar px-6 pb-24">
             <p className="text-white/60 text-sm mb-6 mt-4">Sélectionnez ou achetez votre titre de transport</p>
             
             {isLoading && safeTickets.length === 0 ? (

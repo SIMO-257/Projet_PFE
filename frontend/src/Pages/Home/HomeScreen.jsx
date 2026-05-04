@@ -61,23 +61,6 @@ const HomeScreen = () => {
 
   return (
     <>
-      <style>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: rgba(255, 255, 255, 0.05);
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(212, 175, 55, 0.3);
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: rgba(212, 175, 55, 0.5);
-        }
-      `}</style>
-
       <div className="min-h-screen bg-gradient-to-br from-[#2a0b0f] to-[#1a0507] flex items-center justify-center p-4">
         <div className="w-full max-w-md mx-auto">
           <div className={`${styles.homeCard} relative rounded-3xl shadow-2xl border border-yellow-500/20 overflow-hidden 
@@ -100,7 +83,7 @@ const HomeScreen = () => {
             </div>
 
             {/* Main Content - Scrollable */}
-            <div className={`max-h-[calc(100vh-200px)] overflow-y-auto ${styles.hideScrollbar} custom-scrollbar px-6 pb-24`}>
+            <div className={`max-h-[calc(100vh-200px)] overflow-y-auto ${styles.hideScrollbar} no-scrollbar px-6 pb-24`}>
               
               {/* Wallet Card */}
               <div className="mb-4 mt-2">
