@@ -7,6 +7,7 @@ use App\Models\Ticket;
 use App\Models\TicketType;
 use App\Models\Wallet;
 use App\Models\Transaction;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +15,7 @@ use Illuminate\Support\Str;
 use App\Models\ValidationLog;
 use Illuminate\Support\Carbon;
 use App\Models\AuditLog;
+use Illuminate\Support\Facades\Log;
 
 class TicketController extends Controller
 {
@@ -26,7 +28,7 @@ class TicketController extends Controller
         return $ticket->valid_until ? Carbon::parse($ticket->valid_until)->isPast() : false;
     }
 
-    private function resolveDefaultTicketForClient($client, bool $persistFallback = true): ?Ticket
+    private function resolveDefaultTicketForClient(User $client, bool $persistFallback = true): ?Ticket
     {
         $defaultTicket = null;
 
@@ -47,7 +49,7 @@ class TicketController extends Controller
             ->first();
 
         if ($persistFallback) {
-            $client->default_ticket_id = $fallback?->id;
+            $client->default_ticket_id = $fallback ? $fallback->id : null;
             $client->save();
         }
 
@@ -131,7 +133,13 @@ class TicketController extends Controller
                     'new_balance' => $wallet->balance
                 ], 'Achat réussi !', 201);
             });
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            Log::error('Ticket purchase failed', [
+                'client_id' => $client ? $client->id : null,
+                'ticket_type_id' => $validated['ticket_type_id'] ?? null,
+                'quantity' => $validated['quantity'] ?? null,
+                'error' => $e->getMessage(),
+            ]);
             return $this->errorResponse('Une erreur est survenue lors de l\'achat.', 500);
         }
     }
@@ -213,6 +221,7 @@ class TicketController extends Controller
             'ticket_id' => 'required|integer',
         ]);
 
+        /** @var User $client */
         $client = Auth::user();
         $ticket = Ticket::with('ticketType')
             ->where('id', $validated['ticket_id'])
@@ -297,7 +306,14 @@ class TicketController extends Controller
                     'status_after' => $ticket->status
                 ], 'Billet validé avec succès.');
             });
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            Log::error('Ticket validation failed', [
+                'client_id' => $client ? $client->id : null,
+                'ticket_uuid' => $uuid,
+                'validation_type' => $validationType,
+                'validator_id' => $validatorId,
+                'error' => $e->getMessage(),
+            ]);
             return $this->errorResponse('Une erreur est survenue lors de la validation.', 500);
         }
     }
@@ -322,4 +338,3 @@ class TicketController extends Controller
         ]);
     }
 }
-

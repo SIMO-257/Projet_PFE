@@ -210,7 +210,7 @@ export default function TicketSelection() {
                                     {errors.balance[0]}
                                 </p>
                                 <button
-                                    onClick={() => navigate('/recharge/payment')}
+                                    onClick={() => navigate('/recharge-payment')}
                                     className="text-yellow-500 text-xs font-bold underline"
                                 >
                                     Recharger mon compte maintenant
