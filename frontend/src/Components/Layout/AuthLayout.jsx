@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import SocialButton from '../Buttons/SocialButton';
 import styles from '../../Styles/Auth.module.css';
 
 const AuthLayout = ({ 
@@ -11,12 +10,8 @@ const AuthLayout = ({
     footerText, 
     footerLinkText, 
     footerLinkTo,
-    showSocial = true,
     onSubmit
 }) => {
-    const handleGoogleLogin = () => {};
-    const handleAppleLogin = () => {};
-
     return (
         <div className={styles.authContainer}>
             <div className={styles.authCard}>
@@ -30,30 +25,6 @@ const AuthLayout = ({
                 <form className={styles.authForm} onSubmit={onSubmit}>
                     {children}
                 </form>
-
-                {showSocial && (
-                    <>
-                        <div className={styles.divider}>
-                            <span>ou</span>
-                        </div>
-
-                        <div className={styles.socialButtons}>
-                            <SocialButton
-                                provider="google"
-                                icon="G"
-                                onClick={handleGoogleLogin}
-                            >
-                                Continuer avec Google
-                            </SocialButton>
-                            <SocialButton
-                                provider="apple"
-                                onClick={handleAppleLogin}
-                            >
-                                Continuer avec Apple
-                            </SocialButton>
-                        </div>
-                    </>
-                )}
 
                 <div className={styles.authFooter}>
                     <p>

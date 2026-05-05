@@ -27,3 +27,24 @@ now i want you to add a new column in the client table "remember_me" if the user
 -- so the default page is the home page , if the token is still valid the app should open on the home page .
 -- if it is not it take you to login page .
 what is your plan ?  
+
+
+now i you know how the home show a card with balance and code card i dont want it to show that i want it to selct the latest purchased by the user card :
+-- if the card exists it will be the one appearing in the home page .
+-- if it does not then it will say no card purchased.
+-- also that "changer carte" link should take me to all the avaible purchased cards by user.
+-- the user can select what card it will he wish to be the default.
+-- so even if the user close the app the chosen card should remain .
+-- unless it expired then it should chhose te latest purchased card in the db again.
+-- before that made a new folder and a jsx page for listing all the tickets you should also make a new component in the component folder for the card since it will be reused.
+so what is your plan?
+
+here is how the default validation should work:
+-- if the user press on the default card in the home page it will be directlly scanned it will be directlly ready to validat by nfc.
+-- in the validation tab there are alraedy 2 optiones nfc and qr code when you press one of them a list of all the cards will appear and then the user choose which one to choose and will be emidiatly validated.  
+-- there is this golden rectngle in the default card at the bottom right of the home card if the user press it infos about that card will appear.
+-- the usuall infos just like view ticket but with a switch button for nfc or qr that will be teh default method for scanning the card.
+-- by default when a card is created it is nfc but the user should be able switch it .
+so what is your plan ?
+
+remove the continue with google or apple buttons from the login and sign up page along side with that "ou".
