@@ -19,16 +19,12 @@ use App\Models\AuditLog;
 
 class WalletController extends Controller
 {
-    public function __construct()
-    {
-        Stripe::setApiKey(config('services.stripe.secret'));
-    }
-
     /**
      * Initialize a wallet recharge by creating a Stripe PaymentIntent.
      */
     public function rechargeInit(RechargeInitRequest $request)
     {
+        Stripe::setApiKey(config('services.stripe.secret'));
         $user = Auth::user();
         $amount = (int) ($request->amount * 100); // Amount in cents for Stripe
 
@@ -58,86 +54,39 @@ class WalletController extends Controller
 
     /**
      * Confirm the wallet recharge after successful Stripe payment.
+     * Note: This is now a "wait and verify" check. The webhook is the source of truth for balance updates.
      */
     public function rechargeConfirm(RechargeConfirmRequest $request)
     {
+        Stripe::setApiKey(config('services.stripe.secret'));
         try {
             $paymentIntent = PaymentIntent::retrieve($request->paymentIntentId);
 
             if ($paymentIntent->status !== 'succeeded') {
-                return $this->errorResponse('Le paiement n\'a pas été validé.', 400);
+                return $this->errorResponse('Le paiement n\'a pas encore été validé par Stripe.', 400);
             }
 
             $user = Auth::user();
 
-            // 1. HARD Ownership Check: Cross-check PI metadata against authenticated user
+            // 1. Ownership Check
             if (($paymentIntent->metadata->user_id ?? null) != $user->id) {
-                AuditLog::log('suspicious_payment_claim', $user->id, ['pi_id' => $paymentIntent->id, 'pi_user_id' => $paymentIntent->metadata->user_id ?? 'none']);
-                return $this->errorResponse('Accès non autorisé à ce paiement.', 403);
+                return $this->errorResponse('Accès non autorisé.', 403);
             }
 
-            $amount = $paymentIntent->amount / 100;
+            // 2. Check if webhook has already processed it
+            $transaction = Transaction::where('payment_intent_id', $paymentIntent->id)->first();
+            
+            $wallet = Wallet::where('user_id', $user->id)->first();
 
-            return DB::transaction(function () use ($user, $amount, $paymentIntent) {
-                // 2. Idempotency Check using unique payment_intent_id
-                $existingTransaction = Transaction::where('payment_intent_id', $paymentIntent->id)->first();
-                if ($existingTransaction) {
-                    $wallet = Wallet::where('user_id', $user->id)->first();
-                    return $this->successResponse([
-                        'balance' => (float) ($wallet->balance ?? 0),
-                        'card_last_four' => $wallet->card_last_four ?? '****',
-                        'processed_via' => $existingTransaction->metadata['source'] ?? 'unknown'
-                    ], 'Paiement déjà traité.');
-                }
+            return $this->successResponse([
+                'balance' => (float) ($wallet->balance ?? 0),
+                'status' => 'succeeded',
+                'processed' => !!$transaction
+            ], $transaction ? 'Paiement confirmé et traité.' : 'Paiement réussi, mise à jour du solde en cours.');
 
-                // 3. Fallback processing (if webhook is slow)
-                // We keep the logic but it uses the same unique constraint to prevent race conditions with webhook
-                $wallet = Wallet::firstOrCreate(
-                    ['user_id' => $user->id],
-                    ['balance' => 0.00, 'card_last_four' => '****']
-                );
-
-                $wallet = Wallet::where('user_id', $user->id)->lockForUpdate()->first();
-                $balanceBefore = $wallet->balance;
-                $wallet->balance += $amount;
-
-                $charge = $paymentIntent->latest_charge;
-                if ($charge) {
-                    $chargeObj = \Stripe\Charge::retrieve($charge);
-                    if ($chargeObj->payment_method_details->card) {
-                        $wallet->card_last_four = $chargeObj->payment_method_details->card->last4;
-                    }
-                }
-
-                $wallet->save();
-
-                Transaction::create([
-                    'user_id' => $user->id,
-                    'type' => 'recharge',
-                    'status' => 'completed',
-                    'amount' => $amount,
-                    'balance_before' => $balanceBefore,
-                    'balance_after' => $wallet->balance,
-                    'payment_method' => 'card',
-                    'reference' => 'Recharge via API',
-                    'payment_intent_id' => $paymentIntent->id,
-                    'metadata' => [
-                        'stripe_payment_intent' => $paymentIntent->id,
-                        'source' => 'api_confirmation'
-                    ],
-                ]);
-
-                AuditLog::log('wallet_recharge_success', $user->id, ['amount' => $amount, 'pi_id' => $paymentIntent->id, 'source' => 'api']);
-
-                return $this->successResponse([
-                    'balance' => (float) $wallet->balance,
-                    'card_last_four' => $wallet->card_last_four,
-                    'processed_via' => 'api'
-                ], 'Portefeuille rechargé avec succès.');
-            });
         } catch (\Exception $e) {
             Log::error("Wallet Recharge Confirm Error: " . $e->getMessage());
-            return $this->errorResponse('Erreur lors de la confirmation.', 500);
+            return $this->errorResponse('Erreur lors de la vérification.', 500);
         }
     }
 

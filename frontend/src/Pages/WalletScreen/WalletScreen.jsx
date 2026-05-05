@@ -18,9 +18,8 @@ const WalletScreen = () => {
   }, [refreshWallet]);
 
   const handleRecharge = () => {
-    navigateHook('/payment'); 
+    navigateHook('/recharge-payment');
   };
-
   const handleChangeCard = () => {
     navigateHook('/change-card');
   };

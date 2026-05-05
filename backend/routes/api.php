@@ -34,4 +34,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/wallet/transactions', [\App\Http\Controllers\WalletController::class, 'transactions'])->name('api.wallet.transactions');
     Route::post('/wallet/recharge/init', [\App\Http\Controllers\WalletController::class, 'rechargeInit'])->middleware('throttle:recharge')->name('api.wallet.recharge.init');
     Route::post('/wallet/recharge/confirm', [\App\Http\Controllers\WalletController::class, 'rechargeConfirm'])->middleware('throttle:10,1')->name('api.wallet.recharge.confirm');
+
+    // Checkout & Payment Routes
+    Route::post('/payments/create-intent', [\App\Http\Controllers\PaymentController::class, 'createIntent'])->middleware('throttle:10,1')->name('api.payments.create_intent');
+    Route::post('/payments/billing-details', [\App\Http\Controllers\PaymentController::class, 'saveBillingDetails'])->name('api.payments.billing_details');
 });

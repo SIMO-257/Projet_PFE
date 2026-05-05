@@ -123,4 +123,8 @@ export const fetchTicketDetails = (uuid) => clientApi.get(`/tickets/${uuid}`).th
 
 export const validateTicket = (uuid, payload) => clientApi.post(`/tickets/${uuid}/validate`, payload);
 
+export const createPaymentIntent = (payload) => clientApi.post('/payments/create-intent', payload);
+
+export const saveBillingDetails = (payload) => clientApi.post('/payments/billing-details', payload);
+
 export default clientApi;

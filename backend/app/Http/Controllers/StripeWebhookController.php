@@ -63,19 +63,28 @@ class StripeWebhookController extends Controller
     {
         $paymentIntentId = $paymentIntent->id;
         $userId = $paymentIntent->metadata->user_id ?? null;
+        $type = $paymentIntent->metadata->type ?? 'wallet_recharge';
         $amountInCents = $paymentIntent->amount;
         $amountInDh = $amountInCents / 100;
+        $currency = strtoupper($paymentIntent->currency);
 
         if (!$userId) {
             Log::warning("Stripe Webhook: payment_intent.succeeded missing user_id in metadata. PI: $paymentIntentId");
             return response()->json(['message' => 'User ID missing in metadata'], 200);
         }
 
+        // Strictly enforce wallet_recharge only
+        if ($type !== 'wallet_recharge') {
+            Log::info("Stripe Webhook: Received non-recharge type: $type. PI: $paymentIntentId");
+            return response()->json(['message' => 'Not a wallet recharge'], 200);
+        }
+
         try {
-            return DB::transaction(function () use ($userId, $amountInDh, $paymentIntentId, $paymentIntent) {
+            return DB::transaction(function () use ($userId, $amountInDh, $paymentIntentId, $paymentIntent, $type, $currency) {
                 // 3. Idempotency Check using unique payment_intent_id column
                 $existingTransaction = Transaction::where('payment_intent_id', $paymentIntentId)->first();
                 if ($existingTransaction) {
+                    Log::info("Stripe Webhook: Payment $paymentIntentId already processed.");
                     return response()->json(['message' => 'Payment already processed'], 200);
                 }
 
@@ -92,16 +101,22 @@ class StripeWebhookController extends Controller
 
                 $balanceBefore = $wallet->balance;
 
-                // 5. Update balance
+                // 5. Update balance for wallet_recharge
                 $wallet->balance += $amountInDh;
                 
-                if (isset($paymentIntent->latest_charge)) {
-                    $charge = \Stripe\Charge::retrieve($paymentIntent->latest_charge);
-                    if (isset($charge->payment_method_details->card)) {
-                        $wallet->card_last_four = $charge->payment_method_details->card->last4;
+                // Update last 4 digits if available
+                $latestChargeId = $paymentIntent->latest_charge;
+                if ($latestChargeId) {
+                    try {
+                        $charge = \Stripe\Charge::retrieve($latestChargeId);
+                        if (isset($charge->payment_method_details->card)) {
+                            $wallet->card_last_four = $charge->payment_method_details->card->last4;
+                        }
+                    } catch (\Exception $e) {
+                        Log::warning("Stripe Webhook: Could not retrieve charge details for card_last_four: " . $e->getMessage());
                     }
                 }
-
+                
                 $wallet->save();
 
                 // 6. Record Transaction with unique payment_intent_id
@@ -110,22 +125,25 @@ class StripeWebhookController extends Controller
                     'type' => 'recharge',
                     'status' => 'completed',
                     'amount' => $amountInDh,
+                    'currency' => $currency,
                     'balance_before' => $balanceBefore,
                     'balance_after' => $wallet->balance,
                     'payment_method' => 'card',
-                    'reference' => 'Recharge via Webhook',
+                    'reference' => 'Rechargement via Stripe',
                     'payment_intent_id' => $paymentIntentId,
                     'metadata' => [
                         'stripe_payment_intent' => $paymentIntentId,
                         'source' => 'stripe_webhook',
-                        'stripe_event_id' => request()->header('Stripe-Signature') ? 'verified' : 'internal'
+                        'type' => 'wallet_recharge'
                     ],
                 ]);
 
-                return response()->json(['message' => 'Wallet successfully recharged'], 200);
+                Log::info("Stripe Webhook: Successfully processed wallet_recharge for user $userId. Amount: $amountInDh $currency");
+
+                return response()->json(['message' => 'Wallet recharged successfully'], 200);
             });
         } catch (\Exception $e) {
-            Log::error("Stripe Webhook: Error processing wallet recharge for PI $paymentIntentId: " . $e->getMessage());
+            Log::error("Stripe Webhook: Error processing payment for PI $paymentIntentId: " . $e->getMessage());
             return response()->json(['message' => 'Internal server error'], 500);
         }
     }

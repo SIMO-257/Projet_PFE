@@ -33,7 +33,7 @@ const HomeScreen = () => {
   }
 
   const handleNotifications = () => navigateHook('/notifications');
-  const handleRecharge = () => navigateHook('/payment');
+  const handleRecharge = () => navigateHook('/recharge-payment');
   const handleChangeCard = () => navigateHook('/change-card');
   const handleValidateNFC = () => navigateHook('/validation');
   const handleShowQRCode = () => navigateHook('/validation');
