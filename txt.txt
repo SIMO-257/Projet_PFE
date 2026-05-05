@@ -48,3 +48,8 @@ here is how the default validation should work:
 so what is your plan ?
 
 remove the continue with google or apple buttons from the login and sign up page along side with that "ou".
+
+
+-- in the home page if i press on the nfc icon the default card in the home screen will be active for validation.
+-- what is your plan to implement this feature using web nfc.
+-- how will i be able to test it.

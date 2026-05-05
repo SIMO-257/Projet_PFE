@@ -7,7 +7,7 @@ use App\Models\Ticket;
 use App\Models\TicketType;
 use App\Models\Wallet;
 use App\Models\Transaction;
-use App\Models\User;
+use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -28,7 +28,7 @@ class TicketController extends Controller
         return $ticket->valid_until ? Carbon::parse($ticket->valid_until)->isPast() : false;
     }
 
-    private function resolveDefaultTicketForClient(User $client, bool $persistFallback = true): ?Ticket
+    private function resolveDefaultTicketForClient(Client $client, bool $persistFallback = true): ?Ticket
     {
         $defaultTicket = null;
 
@@ -221,7 +221,7 @@ class TicketController extends Controller
             'ticket_id' => 'required|integer',
         ]);
 
-        /** @var User $client */
+        /** @var Client $client */
         $client = Auth::user();
         $ticket = Ticket::with('ticketType')
             ->where('id', $validated['ticket_id'])

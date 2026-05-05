@@ -8,54 +8,15 @@ use App\Models\Wallet;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 use Illuminate\Support\Facades\Log;
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
 
 use App\Models\AuditLog;
-use App\Models\Ticket;
-use Illuminate\Support\Carbon;
 
 class WalletController extends Controller
 {
-
-    private function isTicketExpired(Ticket $ticket): bool
-    {
-        if ($ticket->status === 'expired') {
-            return true;
-        }
-
-        return $ticket->valid_until ? Carbon::parse($ticket->valid_until)->isPast() : false;
-    }
-
-    private function resolveDefaultTicketForUser($user): ?Ticket
-    {
-        $defaultTicket = null;
-        if (!empty($user->default_ticket_id)) {
-            $defaultTicket = Ticket::with('ticketType')
-                ->where('id', $user->default_ticket_id)
-                ->where('user_id', $user->id)
-                ->first();
-        }
-
-        if ($defaultTicket) {
-            return $defaultTicket;
-        }
-
-        $fallback = Ticket::with('ticketType')
-            ->where('user_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->first();
-
-        $user->default_ticket_id = $fallback?->id;
-        $user->save();
-
-        return $fallback;
-    }
-
     /**
      * Initialize a wallet recharge by creating a Stripe PaymentIntent.
      */
@@ -138,20 +99,9 @@ class WalletController extends Controller
             ['balance' => 0.00, 'card_last_four' => '****']
         );
 
-        $activeTicket = $this->resolveDefaultTicketForUser($user);
-
         return $this->successResponse([
             'balance' => (float) $wallet->balance,
             'card_last_four' => $wallet->card_last_four,
-            'active_ticket' => $activeTicket ? [
-                'id' => $activeTicket->id,
-                'uuid' => $activeTicket->uuid,
-                'status' => $activeTicket->status,
-                'valid_until' => $activeTicket->valid_until,
-                'remaining_uses' => $activeTicket->remaining_uses,
-                'price_paid' => $activeTicket->price_paid,
-                'ticket_type' => $activeTicket->ticketType,
-            ] : null,
         ]);
     }
 
