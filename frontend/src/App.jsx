@@ -25,7 +25,7 @@ const ValidationScreen = lazy(() => import("./Pages/ValidationScreen/ValidationS
 
 const Paiment = lazy(() => import("./Pages/Paiment/Paiment"));
 const RechargePaymentScreen = lazy(() => import("./Pages/RechargePaymentScreen/RechargePaymentScreen"));
-const ChangeCardScreen = lazy(() => import("./Pages/ChangeCardScreen/ChangeCardScreen"));
+const PurchasedCards = lazy(() => import("./Pages/PurchasedCards/PurchasedCards"));
 const ConfirmationPaiment = lazy(() => import("./Pages/ConfirmationPaiment/ConfirmationPaiment"));
 const PaimentHistory = lazy(() => import("./Pages/PaimentHistory/PaimentHistory"));
 
@@ -101,7 +101,7 @@ function App() {
 
             <Route path="/payment" element={<Paiment />} />
             <Route path="/recharge-payment" element={<RechargePaymentScreen />} />
-            <Route path="/change-card" element={<ChangeCardScreen />} />
+            <Route path="/change-card" element={<PurchasedCards />} />
             <Route path="/payment-confirmation" element={<ConfirmationPaiment />} />
             <Route path="/payment-history" element={<PaimentHistory />} />
 

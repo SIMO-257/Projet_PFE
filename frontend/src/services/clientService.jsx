@@ -118,6 +118,8 @@ export const fetchTicketTypes = () => clientApi.get('/ticket-types').then(extrac
 export const purchaseTicket = (payload) => clientApi.post('/tickets/purchase', payload);
 
 export const fetchMyTickets = () => clientApi.get('/tickets').then(extractPayload);
+export const fetchPurchasedCards = () => clientApi.get('/tickets/cards').then(extractPayload);
+export const setDefaultPurchasedCard = (ticketId) => clientApi.post('/tickets/cards/default', { ticket_id: ticketId }).then(extractPayload);
 
 export const fetchTicketDetails = (uuid) => clientApi.get(`/tickets/${uuid}`).then(extractPayload);
 

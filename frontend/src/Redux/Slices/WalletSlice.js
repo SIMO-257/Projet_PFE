@@ -24,6 +24,7 @@ const walletSlice = createSlice({
   initialState: {
     balance: 0,
     card_last_four: '****',
+    active_ticket: null,
     transactions: [],
     status: 'idle',
     error: null,
@@ -44,6 +45,7 @@ const walletSlice = createSlice({
         state.status = 'succeeded';
         state.balance = action.payload.wallet.balance;
         state.card_last_four = action.payload.wallet.card_last_four;
+        state.active_ticket = action.payload.wallet.active_ticket ?? null;
         state.transactions = action.payload.transactions;
         console.log('[REDUCER] getWalletData.fulfilled: New balance:', state.balance);
       })

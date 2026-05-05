@@ -32,6 +32,7 @@ class Client extends Authenticatable implements CanResetPasswordContract
         'profile_file',
         'is_active',
         'remember_me',
+        'default_ticket_id',
     ];
 
     /**
@@ -101,5 +102,10 @@ class Client extends Authenticatable implements CanResetPasswordContract
     public function transactions()
     {
         return $this->hasMany(Transaction::class, 'user_id');
+    }
+
+    public function defaultTicket()
+    {
+        return $this->belongsTo(Ticket::class, 'default_ticket_id');
     }
 }

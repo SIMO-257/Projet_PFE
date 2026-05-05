@@ -17,6 +17,43 @@ use App\Models\AuditLog;
 
 class TicketController extends Controller
 {
+    private function isTicketExpired(Ticket $ticket): bool
+    {
+        if ($ticket->status === 'expired') {
+            return true;
+        }
+
+        return $ticket->valid_until ? Carbon::parse($ticket->valid_until)->isPast() : false;
+    }
+
+    private function resolveDefaultTicketForClient($client, bool $persistFallback = true): ?Ticket
+    {
+        $defaultTicket = null;
+
+        if (!empty($client->default_ticket_id)) {
+            $defaultTicket = Ticket::with('ticketType')
+                ->where('id', $client->default_ticket_id)
+                ->where('user_id', $client->id)
+                ->first();
+        }
+
+        if ($defaultTicket) {
+            return $defaultTicket;
+        }
+
+        $fallback = Ticket::with('ticketType')
+            ->where('user_id', $client->id)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        if ($persistFallback) {
+            $client->default_ticket_id = $fallback?->id;
+            $client->save();
+        }
+
+        return $fallback;
+    }
+
     /**
      * Get all active ticket types.
      */
@@ -141,6 +178,62 @@ class TicketController extends Controller
         return $this->successResponse($tickets);
     }
 
+    public function cards(Request $request)
+    {
+        $client = Auth::user();
+
+        $activeDefault = $this->resolveDefaultTicketForClient($client, true);
+        $tickets = Ticket::where('user_id', $client->id)
+            ->with('ticketType')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function (Ticket $ticket) use ($activeDefault) {
+                $isExpired = $this->isTicketExpired($ticket);
+
+                return [
+                    'id' => $ticket->id,
+                    'uuid' => $ticket->uuid,
+                    'status' => $ticket->status,
+                    'valid_from' => $ticket->valid_from,
+                    'valid_until' => $ticket->valid_until,
+                    'remaining_uses' => $ticket->remaining_uses,
+                    'price_paid' => $ticket->price_paid,
+                    'created_at' => $ticket->created_at,
+                    'ticket_type' => $ticket->ticketType,
+                    'is_expired' => $isExpired,
+                    'is_default' => $activeDefault ? $activeDefault->id === $ticket->id : false,
+                ];
+            });
+
+        return $this->successResponse($tickets);
+    }
+    public function setDefaultCard(Request $request)
+    {
+        $validated = $request->validate([
+            'ticket_id' => 'required|integer',
+        ]);
+
+        $client = Auth::user();
+        $ticket = Ticket::with('ticketType')
+            ->where('id', $validated['ticket_id'])
+            ->where('user_id', $client->id)
+            ->first();
+
+        if (!$ticket) {
+            return $this->errorResponse('Ticket non trouve ou non autorise.', 404);
+        }
+
+        $client->default_ticket_id = $ticket->id;
+        $client->save();
+
+        $ticket = Ticket::with('ticketType')->find($ticket->id);
+
+        return $this->successResponse([
+            'default_ticket_id' => $ticket->id,
+            'default_ticket' => $ticket,
+        ], 'Ticket par defaut mis a jour.');
+    }
+
     /**
      * Validate a ticket.
      */
@@ -229,3 +322,4 @@ class TicketController extends Controller
         ]);
     }
 }
+
