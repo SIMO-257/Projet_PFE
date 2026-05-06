@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
 use App\Models\ValidationLog;
 use Illuminate\Support\Carbon;
 use App\Models\AuditLog;
@@ -19,13 +20,17 @@ use Illuminate\Support\Facades\Log;
 
 class TicketController extends Controller
 {
+    private function normalizeTicketStatus(Ticket $ticket): void
+    {
+        if ($ticket->status === 'active' && $ticket->remaining_uses <= 0) {
+            $ticket->status = 'used';
+            $ticket->save();
+        }
+    }
+
     private function isTicketExpired(Ticket $ticket): bool
     {
-        if ($ticket->status === 'expired') {
-            return true;
-        }
-
-        return $ticket->valid_until ? Carbon::parse($ticket->valid_until)->isPast() : false;
+        return $ticket->status === 'expired';
     }
 
     private function resolveDefaultTicketForClient(Client $client, bool $persistFallback = true): ?Ticket
@@ -196,6 +201,7 @@ class TicketController extends Controller
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function (Ticket $ticket) use ($activeDefault) {
+                $this->normalizeTicketStatus($ticket);
                 $isExpired = $this->isTicketExpired($ticket);
 
                 return [
@@ -244,6 +250,97 @@ class TicketController extends Controller
     }
 
     /**
+     * Create a short-lived NFC challenge token (60s).
+     */
+    public function createNfcChallenge(Request $request)
+    {
+        /** @var Client $client */
+        $client = Auth::user();
+        $token = strtoupper(Str::random(12));
+        $expiresIn = 60;
+        $expiresAt = now()->addSeconds($expiresIn);
+        $cacheKey = "nfc_challenge:{$client->id}:{$token}";
+
+        Cache::put($cacheKey, [
+            'user_id' => $client->id,
+            'expires_at' => $expiresAt->toIso8601String(),
+        ], $expiresAt);
+
+        return $this->successResponse([
+            'nfc_token' => $token,
+            'expires_in' => $expiresIn,
+            'expires_at' => $expiresAt->toIso8601String(),
+        ], 'Challenge NFC genere.');
+    }
+
+    /**
+     * Consume NFC challenge and validate an active ticket by UUID.
+     */
+    public function consumeNfcChallenge(Request $request)
+    {
+        $validated = $request->validate([
+            'ticket_uuid' => 'required|string',
+            'nfc_token' => 'required|string',
+        ]);
+
+        /** @var Client $client */
+        $client = Auth::user();
+        $token = strtoupper(trim($validated['nfc_token']));
+        $ticketUuid = trim($validated['ticket_uuid']);
+        $cacheKey = "nfc_challenge:{$client->id}:{$token}";
+        $challenge = Cache::get($cacheKey);
+
+        if (!$challenge) {
+            return $this->errorResponse('Token NFC invalide ou expire.', 422);
+        }
+
+        Cache::forget($cacheKey);
+
+        try {
+            return DB::transaction(function () use ($client, $ticketUuid) {
+                $ticket = Ticket::where('uuid', $ticketUuid)
+                    ->where('user_id', $client->id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$ticket) {
+                    $this->logValidation(null, $client->id, 'DEV-NFC-CHALLENGE', 'nfc', 'failure', 'Ticket non trouve.');
+                    return $this->errorResponse('Ticket non trouve ou non autorise.', 404);
+                }
+
+                if ($ticket->status !== 'active') {
+                    $this->logValidation($ticket->id, $client->id, 'DEV-NFC-CHALLENGE', 'nfc', 'failure', "Ticket deja {$ticket->status}.");
+                    return $this->errorResponse("Le billet est deja {$ticket->status}.", 422);
+                }
+
+                $ticket->remaining_uses -= 1;
+
+                if ($ticket->remaining_uses <= 0) {
+                    $ticket->status = 'used';
+                }
+
+                $ticket->save();
+
+                $this->logValidation($ticket->id, $client->id, 'DEV-NFC-CHALLENGE', 'nfc', 'success', null);
+                AuditLog::log('ticket_validation_nfc_challenge_success', $client->id, ['uuid' => $ticket->uuid]);
+
+                return $this->successResponse([
+                    'uuid' => $ticket->uuid,
+                    'remaining_uses' => $ticket->remaining_uses,
+                    'status_after' => $ticket->status,
+                ], 'Billet valide via NFC.');
+            });
+        } catch (\Throwable $e) {
+            Log::error('NFC challenge consume failed', [
+                'client_id' => $client ? $client->id : null,
+                'ticket_uuid' => $ticketUuid,
+                'error' => $e->getMessage(),
+            ]);
+            return $this->errorResponse('Erreur lors de la validation NFC.', 500);
+        }
+    }
+
+    /**
      * Validate a ticket.
      */
     public function validateTicket(Request $request, $uuid)
@@ -275,10 +372,6 @@ class TicketController extends Controller
                 } elseif ($ticket->remaining_uses <= 0) {
                     $failureReason = "Plus d'utilisations restantes.";
                     $ticket->status = 'used';
-                    $ticket->save();
-                } elseif ($ticket->valid_until && Carbon::parse($ticket->valid_until)->isPast()) {
-                    $failureReason = "Le billet a expiré.";
-                    $ticket->status = 'expired';
                     $ticket->save();
                 }
 

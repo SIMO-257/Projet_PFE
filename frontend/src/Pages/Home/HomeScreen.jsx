@@ -52,9 +52,18 @@ const HomeScreen = () => {
 
   const handleNotifications = () => navigateHook('/notifications');
   const handleChangeCard = () => navigateHook('/change-card');
-  const handleValidateNFC = () => navigateHook('/validation');
-  const handleShowQRCode = () => navigateHook('/validation');
-  const handleBuyTicket = () => navigateHook('/mytickets');
+  const handleDefaultCardPress = () => {
+    if (!defaultCard?.uuid) {
+      return;
+    }
+
+    navigateHook('/validation', {
+      state: {
+        source: 'home-card',
+        ticketUuid: defaultCard.uuid,
+      },
+    });
+  };
   const handleTicketPress = (ticket) => navigateHook(`/viewticket/${ticket.uuid}`);
   const handleTransactionHistory = () => navigateHook('/payment-history');
 
@@ -95,15 +104,22 @@ const HomeScreen = () => {
 
             <div className={`max-h-[calc(100vh-200px)] overflow-y-auto ${styles.hideScrollbar} no-scrollbar px-6 pb-24`}>
               <div className="mb-4 mt-2">
-                <BalanceCard
-                  title="Ticket par defaut"
-                  amount={`${activeTicketPrice.toFixed(2)} MAD`}
-                  cardType={activeTicketName}
-                  cardNumber={defaultCard ? `Code: ${activeTicketCode}` : 'Aucun ticket achete'}
-                  gradientFrom="#7A3B47"
-                  gradientTo="#5C2A36"
-                  circlesPosition="right"
-                />
+                <button
+                  type="button"
+                  onClick={handleDefaultCardPress}
+                  disabled={!defaultCard?.uuid}
+                  className="w-full text-left disabled:cursor-not-allowed"
+                >
+                  <BalanceCard
+                    title="Ticket par defaut"
+                    amount={`${activeTicketPrice.toFixed(2)} MAD`}
+                    cardType={activeTicketName}
+                    cardNumber={defaultCard ? `Code: ${activeTicketCode}` : 'Aucun ticket achete'}
+                    gradientFrom="#7A3B47"
+                    gradientTo="#5C2A36"
+                    circlesPosition="right"
+                  />
+                </button>
 
                 <div className="flex justify-end -mt-4 mb-4 pr-2">
                   <button onClick={handleChangeCard} className="text-yellow-500 text-[10px] font-bold uppercase tracking-wider hover:text-yellow-400 flex items-center space-x-1">
@@ -114,12 +130,6 @@ const HomeScreen = () => {
                   </button>
                 </div>
 
-              </div>
-
-              <div className="grid grid-cols-3 gap-3 mb-6">
-                <button onClick={handleValidateNFC} className="bg-white/5 hover:bg-white/10 rounded-xl p-3 text-center transition-colors border border-white/10"><span className="text-white text-xs">NFC</span></button>
-                <button onClick={handleShowQRCode} className="bg-white/5 hover:bg-white/10 rounded-xl p-3 text-center transition-colors border border-white/10"><span className="text-white text-xs">QR Code</span></button>
-                <button onClick={handleBuyTicket} className="bg-white/5 hover:bg-white/10 rounded-xl p-3 text-center transition-colors border border-white/10"><span className="text-white text-xs">Acheter</span></button>
               </div>
 
               <div className="mb-6">

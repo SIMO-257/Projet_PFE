@@ -12,8 +12,7 @@ const PurchasedCards = () => {
   const [savingId, setSavingId] = useState(null);
   const [error, setError] = useState('');
 
-  const activeCards = cards.filter((card) => card.status === 'active');
-  const expiredCards = cards.filter((card) => card.status === 'expired');
+  const visibleCards = cards.filter((card) => card.status === 'active');
 
   const loadCards = async () => {
     setLoading(true);
@@ -55,19 +54,11 @@ const PurchasedCards = () => {
             {error && <p className="text-red-300 text-xs mb-3">{error}</p>}
             {loading ? (
               <p className="text-white/60 text-sm py-4">Chargement...</p>
-            ) : cards.length === 0 ? (
+            ) : visibleCards.length === 0 ? (
               <p className="text-white/60 text-sm py-4 italic">Aucun ticket achete.</p>
             ) : (
               <div className="space-y-3 py-2">
-                {activeCards.map((card) => (
-                  <PurchasedCardItem
-                    key={card.id}
-                    card={card}
-                    onSelect={handleSelect}
-                    isSubmitting={savingId === card.id}
-                  />
-                ))}
-                {expiredCards.map((card) => (
+                {visibleCards.map((card) => (
                   <PurchasedCardItem
                     key={card.id}
                     card={card}
