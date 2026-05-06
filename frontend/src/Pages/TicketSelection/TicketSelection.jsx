@@ -47,6 +47,12 @@ export default function TicketSelection() {
 
     }, [selectedTypeId]);
 
+    useEffect(() => {
+        if (selectedType?.is_reusable) {
+            setQuantity(1);
+        }
+    }, [selectedType]);
+
     const incrementQuantity = () => setQuantity(prev => prev < 10 ? prev + 1 : prev);
     const decrementQuantity = () => setQuantity(prev => prev > 1 ? prev - 1 : prev);
 
@@ -66,7 +72,7 @@ export default function TicketSelection() {
 
             const payload = {
                 ticket_type_id: selectedType.id,
-                quantity: quantity
+                quantity: selectedType.is_reusable ? 1 : quantity
             };
 
             const res = await purchaseTicket(payload);
@@ -174,35 +180,37 @@ export default function TicketSelection() {
 
                         </div>
 
-                        <div className={styles.quantityCard}>
+                        {!selectedType?.is_reusable && (
+                            <div className={styles.quantityCard}>
 
-                            <div className={styles.quantityControls}>
+                                <div className={styles.quantityControls}>
 
-                                <button
-                                    onClick={decrementQuantity}
-                                    className={styles.quantityButton}
-                                >
-                                    -
-                                </button>
+                                    <button
+                                        onClick={decrementQuantity}
+                                        className={styles.quantityButton}
+                                    >
+                                        -
+                                    </button>
 
-                                <div className={styles.quantityDisplay}>
-                                    {quantity}
+                                    <div className={styles.quantityDisplay}>
+                                        {quantity}
+                                    </div>
+
+                                    <button
+                                        onClick={incrementQuantity}
+                                        className={styles.quantityButton}
+                                    >
+                                        +
+                                    </button>
+
                                 </div>
 
-                                <button
-                                    onClick={incrementQuantity}
-                                    className={styles.quantityButton}
-                                >
-                                    +
-                                </button>
+                                <div className={styles.totalPrice}>
+                                    {totalPrice} DH
+                                </div>
 
                             </div>
-
-                            <div className={styles.totalPrice}>
-                                {totalPrice} DH
-                            </div>
-
-                        </div>
+                        )}
 
                         {errors.balance && (
                             <div className="bg-red-900/20 border border-red-500/50 rounded-lg p-3 mb-4">

@@ -117,18 +117,42 @@ class TicketController extends Controller
 
                 // 3. Create Tickets
                 $tickets = [];
+                $baseStartAt = now();
+                $nextReusableStartAt = $baseStartAt->copy();
+
+                if ($ticketType->is_reusable) {
+                    $lastReusableTicket = Ticket::where('user_id', $client->id)
+                        ->where('ticket_type_id', $ticketType->id)
+                        ->whereNotNull('valid_until')
+                        ->where('valid_until', '>', $baseStartAt)
+                        ->orderBy('valid_until', 'desc')
+                        ->lockForUpdate()
+                        ->first();
+
+                    if ($lastReusableTicket) {
+                        $nextReusableStartAt = Carbon::parse($lastReusableTicket->valid_until);
+                    }
+                }
+
                 for ($i = 0; $i < $validated['quantity']; $i++) {
+                    $validFrom = $ticketType->is_reusable ? $nextReusableStartAt->copy() : $baseStartAt->copy();
+                    $validUntil = $validFrom->copy()->addMinutes($ticketType->duration_minutes ?? 60);
+
                     $ticket = Ticket::create([
                         'uuid' => (string) Str::uuid(),
                         'user_id' => $client->id,
                         'ticket_type_id' => $ticketType->id,
                         'status' => 'active',
-                        'valid_from' => now(),
-                        'valid_until' => now()->addMinutes($ticketType->duration_minutes ?? 60),
+                        'valid_from' => $validFrom,
+                        'valid_until' => $validUntil,
                         'remaining_uses' => $ticketType->max_uses ?? 1,
                         'price_paid' => $ticketType->price,
                     ]);
                     $tickets[] = $ticket;
+
+                    if ($ticketType->is_reusable) {
+                        $nextReusableStartAt = $validUntil->copy();
+                    }
                 }
 
                 AuditLog::log('ticket_purchase', $client->id, ['ticket_type' => $ticketType->name, 'quantity' => $validated['quantity']]);
