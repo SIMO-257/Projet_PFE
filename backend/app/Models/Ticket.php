@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 class Ticket extends Model
 {
@@ -16,6 +17,7 @@ class Ticket extends Model
      */
     protected $fillable = [
         'uuid',
+        'secure_token',
         'user_id',
         'ticket_type_id',
         'purchase_id',
@@ -50,6 +52,11 @@ class Ticket extends Model
         static::creating(function (Ticket $ticket): void {
             if (empty($ticket->uuid)) {
                 $ticket->uuid = (string) Str::uuid();
+            }
+
+            // Generate secure token using HMAC-SHA256
+            if (empty($ticket->secure_token)) {
+                $ticket->secure_token = hash_hmac('sha256', $ticket->uuid, config('app.key'));
             }
         });
     }

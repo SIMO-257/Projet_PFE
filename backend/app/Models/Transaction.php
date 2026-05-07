@@ -20,10 +20,12 @@ class Transaction extends Model
         'type',
         'status',
         'amount',
+        'currency',
         'balance_before',
         'balance_after',
         'payment_method',
         'reference',
+        'payment_intent_id',
         'metadata',
     ];
 

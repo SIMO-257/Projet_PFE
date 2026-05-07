@@ -22,6 +22,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Set Stripe API Key globally
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+
         // Login Rate Limiter: 5 attempts per minute per IP
         RateLimiter::for('login', function (Request $request) {
             return Limit::perMinute(5)->by($request->ip());
