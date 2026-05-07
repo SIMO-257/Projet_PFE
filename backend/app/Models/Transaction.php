@@ -16,10 +16,12 @@ class Transaction extends Model
      */
     protected $fillable = [
         'uuid',
+        'payment_intent_id',
         'user_id',
         'type',
         'status',
         'amount',
+        'currency',
         'balance_before',
         'balance_after',
         'payment_method',

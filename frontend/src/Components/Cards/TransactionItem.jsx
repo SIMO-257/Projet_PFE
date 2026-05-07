@@ -90,7 +90,7 @@ const TransactionItem = ({
 
                 {/* Amount */}
                 <div className={`text-lg font-semibold ${
-                    isPositive ? 'text-yellow-500' : 'text-white'
+                    isPositive ? 'text-green-400' : 'text-red-400'
                 }`}>
                     {amount}
                 </div>

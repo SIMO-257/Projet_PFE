@@ -39,12 +39,12 @@ class DatabaseSeeder extends Seeder
                 'status' => 'active',
                 'valid_from' => now(),
                 'valid_until' => now()->addDays(1),
-                'remaining_uses' => 1,
+                'remaining_uses' => 2,
                 'price_paid' => $simpleTicketType->price,
             ]);
         }
 
-        $carnetType = \App\Models\TicketType::where('code', 'CARTE_NORMALE')->first();
+        $carnetType = \App\Models\TicketType::where('code', 'BILLET_DOUBLE')->first();
         if ($carnetType) {
             \App\Models\Ticket::create([
                 'uuid' => (string) \Illuminate\Support\Str::uuid(),
@@ -53,7 +53,7 @@ class DatabaseSeeder extends Seeder
                 'status' => 'active',
                 'valid_from' => now(),
                 'valid_until' => now()->addDays(7),
-                'remaining_uses' => 2,
+                'remaining_uses' => 4,
                 'price_paid' => $carnetType->price,
             ]);
         }
@@ -78,20 +78,20 @@ class DatabaseSeeder extends Seeder
                 'name_ar' => 'تذكرة',
                 'description' => 'Valable pour un trajet avec 2 correspondances.',
                 'price' => 8.00,
-                'duration_minutes' => 5,
+                'duration_minutes' => 10080,
                 'is_reusable' => false,
-                'max_uses' => 1,
+                'max_uses' => 2,
                 'is_active' => true,
             ],
             [
-                'code' => 'CARTE_NORMALE',
+                'code' => 'BILLET_DOUBLE',
                 'name_fr' => 'Carte Normale (A/R)',
                 'name_ar' => 'بطاقة عادية',
                 'description' => 'Valable pour un trajet aller-retour.',
                 'price' => 14.00,
-                'duration_minutes' => 120,
+                'duration_minutes' => 10080,
                 'is_reusable' => false,
-                'max_uses' => 2,
+                'max_uses' => 4,
                 'is_active' => true,
             ],
             [

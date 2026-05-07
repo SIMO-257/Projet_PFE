@@ -8,6 +8,7 @@ use App\Models\Wallet;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 use Illuminate\Support\Facades\Log;
 use Stripe\Stripe;
@@ -52,7 +53,7 @@ class WalletController extends Controller
 
     /**
      * Confirm the wallet recharge after successful Stripe payment.
-     * Note: This is now a "wait and verify" check. The webhook is the source of truth for balance updates.
+     * Webhook remains source of truth; this method now has an idempotent fallback.
      */
     public function rechargeConfirm(RechargeConfirmRequest $request)
     {
@@ -61,30 +62,78 @@ class WalletController extends Controller
             $paymentIntent = PaymentIntent::retrieve($request->paymentIntentId);
 
             if ($paymentIntent->status !== 'succeeded') {
-                return $this->errorResponse('Le paiement n\'a pas encore été validé par Stripe.', 400);
+                return $this->errorResponse('Le paiement n\'a pas encore ete valide par Stripe.', 400);
             }
 
             $user = Auth::user();
 
             // 1. Ownership Check
             if (($paymentIntent->metadata->user_id ?? null) != $user->id) {
-                return $this->errorResponse('Accès non autorisé.', 403);
+                return $this->errorResponse('Acces non autorise.', 403);
             }
 
-            // 2. Check if webhook has already processed it
+            // 2. Check if already processed (typically by webhook)
             $transaction = Transaction::where('payment_intent_id', $paymentIntent->id)->first();
-            
+
+            // 3. Fallback processing when webhook is delayed
+            if (!$transaction) {
+                DB::transaction(function () use ($user, $paymentIntent, &$transaction) {
+                    $existing = Transaction::where('payment_intent_id', $paymentIntent->id)
+                        ->lockForUpdate()
+                        ->first();
+
+                    if ($existing) {
+                        $transaction = $existing;
+                        return;
+                    }
+
+                    $wallet = Wallet::where('user_id', $user->id)->lockForUpdate()->first();
+                    if (!$wallet) {
+                        $wallet = Wallet::create([
+                            'user_id' => $user->id,
+                            'balance' => 0.00,
+                            'card_last_four' => '****',
+                        ]);
+                    }
+
+                    $amountInDh = ((int) $paymentIntent->amount) / 100;
+                    $balanceBefore = $wallet->balance;
+                    $wallet->balance += $amountInDh;
+                    $wallet->save();
+
+                    $transaction = Transaction::firstOrCreate(
+                        ['payment_intent_id' => $paymentIntent->id],
+                        [
+                            'user_id' => $user->id,
+                            'type' => 'recharge',
+                            'status' => 'completed',
+                            'amount' => $amountInDh,
+                            'currency' => strtoupper($paymentIntent->currency ?? 'MAD'),
+                            'balance_before' => $balanceBefore,
+                            'balance_after' => $wallet->balance,
+                            'payment_method' => 'card',
+                            'reference' => 'Rechargement via Stripe',
+                            'metadata' => [
+                                'source' => 'wallet_confirm_fallback',
+                                'stripe_payment_intent' => $paymentIntent->id,
+                                'type' => 'wallet_recharge',
+                            ],
+                        ]
+                    );
+                });
+            }
+
             $wallet = Wallet::where('user_id', $user->id)->first();
 
             return $this->successResponse([
                 'balance' => (float) ($wallet->balance ?? 0),
                 'status' => 'succeeded',
-                'processed' => !!$transaction
-            ], $transaction ? 'Paiement confirmé et traité.' : 'Paiement réussi, mise à jour du solde en cours.');
+                'processed' => !!$transaction,
+            ], 'Paiement confirme et traite.');
 
         } catch (\Exception $e) {
-            Log::error("Wallet Recharge Confirm Error: " . $e->getMessage());
-            return $this->errorResponse('Erreur lors de la vérification.', 500);
+            Log::error('Wallet Recharge Confirm Error: ' . $e->getMessage());
+            return $this->errorResponse('Erreur lors de la verification.', 500);
         }
     }
 

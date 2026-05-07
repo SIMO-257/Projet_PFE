@@ -21,9 +21,6 @@ const WalletScreen = () => {
     navigateHook('/recharge-payment');
   };
 
-  const handleMenuAction = () => {
-  };
-
   const viewAllTransactions = () => {
     navigateHook('/payment-history');
   };
@@ -31,8 +28,11 @@ const WalletScreen = () => {
   const safeBalance = Number.isFinite(balance) ? balance : 0;
   const safeCardLastFour = card_last_four || '****';
   const safeTransactions = Array.isArray(transactions) ? transactions : [];
+  const latestSixTransactions = [...safeTransactions]
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    .slice(0, 6);
 
-  const mappedTransactions = safeTransactions.map(t => ({
+  const mappedTransactions = latestSixTransactions.map(t => ({
     id: t.id,
     type: t.type,
     title: t.reference || (t.type === 'recharge' ? 'Rechargement' : 'Achat'),
@@ -53,8 +53,6 @@ const WalletScreen = () => {
             
             <Header 
               title="Portefeuille" 
-              onMenu={handleMenuAction}
-              showMenuButton={true}
             />
 
             <div className="max-h-[calc(100vh-200px)] overflow-y-auto no-scrollbar px-6 pb-24">

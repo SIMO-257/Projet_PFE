@@ -7,7 +7,7 @@ import {
   LinkAuthenticationElement,
   ExpressCheckoutElement,
 } from '@stripe/react-stripe-js';
-import { saveBillingDetails } from '../../services/clientService';
+import { confirmRecharge } from '../../services/clientService';
 
 const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel }) => {
   const stripe = useStripe();
@@ -15,6 +15,14 @@ const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel }) => {
   const [message, setMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
+
+  const extractPaymentIntentId = (secret) => {
+    if (!secret || typeof secret !== 'string') return null;
+    const marker = '_secret_';
+    const idx = secret.indexOf(marker);
+    if (idx === -1) return null;
+    return secret.slice(0, idx);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,7 +46,7 @@ const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel }) => {
     // but Stripe handles most of it. We'll rely on Stripe for now as per "No frontend trust".
     
     // 3. Confirm the payment
-    const { error } = await stripe.confirmPayment({
+    const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       confirmParams: {
         // Return URL for redirection-based flows (like 3DS)
@@ -55,8 +63,23 @@ const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel }) => {
         setMessage("Une erreur inattendue est survenue.");
       }
     } else {
-      // Payment succeeded or is processing (for redirect flows)
-      onSuccess();
+      try {
+        const paymentIntentId = paymentIntent?.id || extractPaymentIntentId(clientSecret);
+
+        if (!paymentIntentId) {
+          setMessage("Paiement confirmé, mais identifiant de transaction introuvable.");
+          setIsLoading(false);
+          return;
+        }
+
+        await confirmRecharge({ paymentIntentId });
+        onSuccess();
+      } catch (confirmErr) {
+        setMessage(
+          confirmErr?.response?.data?.message ||
+          "Paiement réussi, mais l'enregistrement du rechargement a échoué."
+        );
+      }
     }
 
     setIsLoading(false);

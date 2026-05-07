@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BottomNavigation from '../../Components/Layout/BottomNavigation';
 import BalanceCard from '../../Components/Cards/BalanceCard';
+import TicketHistoryCard from '../../Components/Cards/TicketHistoryCard';
 import styles from '../../Styles/HomeScreen.module.css';
 import { useAuth } from '../../hooks/useAuth';
 import { useWallet } from '../../hooks/useWallet';
@@ -10,7 +11,7 @@ import { fetchPurchasedCards } from '../../services/clientService';
 
 const HomeScreen = () => {
   const { user } = useAuth();
-  const { refreshWallet, transactions } = useWallet();
+  const { refreshWallet } = useWallet();
   const { tickets, refreshTickets } = useTickets();
   const navigateHook = useNavigate();
   const [purchasedCards, setPurchasedCards] = useState([]);
@@ -23,11 +24,16 @@ const HomeScreen = () => {
       .catch(() => setPurchasedCards([]));
   }, [refreshWallet, refreshTickets]);
 
-  const safeTransactions = Array.isArray(transactions) ? transactions : [];
   const safeTickets = Array.isArray(tickets) ? tickets : [];
 
-  const activeTickets = safeTickets.filter((ticket) => ticket.status === 'active');
-  const expiredTickets = safeTickets.filter((ticket) => ticket.status === 'expired');
+  const lastSixTickets = useMemo(() => {
+    const allowedStatuses = new Set(['active', 'expired', 'used']);
+
+    return [...safeTickets]
+      .filter((ticket) => allowedStatuses.has(String(ticket?.status || '').toLowerCase()))
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      .slice(0, 6);
+  }, [safeTickets]);
 
   const defaultCard = useMemo(() => {
     const safeCards = Array.isArray(purchasedCards) ? purchasedCards : [];
@@ -65,24 +71,7 @@ const HomeScreen = () => {
     });
   };
   const handleTicketPress = (ticket) => navigateHook(`/viewticket/${ticket.uuid}`);
-  const handleTransactionHistory = () => navigateHook('/payment-history');
-
-  const lastTransaction = safeTransactions.length > 0 ? safeTransactions[0] : null;
-
-  const formatRelativeTime = (dateStr) => {
-    if (!dateStr) return '';
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diffMins = Math.floor((now - date) / 60000);
-    if (diffMins < 1) return 'a l\'instant';
-    if (diffMins < 60) return `il y a ${diffMins} min`;
-    const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return `il y a ${diffHours} h`;
-    const diffDays = Math.floor(diffHours / 24);
-    if (diffDays === 1) return 'hier';
-    if (diffDays < 7) return `il y a ${diffDays} jours`;
-    return date.toLocaleDateString('fr-FR');
-  };
+  const handleAllTickets = () => navigateHook('/all-tickets');
 
   return (
     <>
@@ -134,42 +123,28 @@ const HomeScreen = () => {
 
               <div className="mb-6">
                 <div className="flex justify-between items-center mb-3">
-                  <h2 className="text-white/60 text-xs uppercase tracking-widest font-bold">Tickets actifs</h2>
-                  <button onClick={() => navigateHook('/mytickets')} className="text-yellow-500 text-xs font-medium">Voir tout</button>
+                  <h2 className="text-white/60 text-xs uppercase tracking-widest font-bold">Historique</h2>
+                  <button onClick={handleAllTickets} className="text-yellow-500 text-xs font-medium">Voir tout</button>
                 </div>
-                <div className="overflow-x-auto custom-scrollbar flex space-x-3 pb-2">
-                  {activeTickets.map((ticket) => (
-                    <button key={ticket.uuid} onClick={() => handleTicketPress(ticket)} className="flex-shrink-0 w-48 bg-black/40 rounded-xl border border-white/10 p-4 text-left hover:border-yellow-500/30 transition-all">
-                      <p className="text-white font-semibold text-sm">{ticket.ticket_type?.name_fr || 'Billet'}</p>
-                      <p className="text-white/40 text-xs mt-1">
-                        {ticket.remaining_uses > 1 ? `${ticket.remaining_uses} utilisations` : `Expire le ${new Date(ticket.valid_until).toLocaleDateString()}`}
-                      </p>
-                      <p className="text-yellow-500 font-bold text-sm mt-3">{ticket.price_paid} MAD</p>
-                    </button>
-                  ))}
-                  {activeTickets.length === 0 && <p className="text-white/40 text-sm italic py-4">Aucun ticket actif</p>}
+                <div className="space-y-3">
+                  {lastSixTickets.length > 0 ? (
+                    lastSixTickets.map((ticket) => (
+                      <TicketHistoryCard
+                        key={ticket.uuid}
+                        ticketName={ticket.ticket_type?.name_fr || 'Billet'}
+                        price={`${ticket.price_paid} DH`}
+                        date={new Date(ticket.updated_at || ticket.created_at).toLocaleString('fr-FR', { 
+                          day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' 
+                        })}
+                        status={ticket.status}
+                        onClick={() => handleTicketPress(ticket)}
+                      />
+                    ))
+                  ) : (
+                    <p className="text-white/40 text-sm italic py-4">Aucun ticket trouvé</p>
+                  )}
                 </div>
               </div>
-
-              {lastTransaction && (
-                <div className="mb-6">
-                  <div className="flex justify-between items-center mb-3">
-                    <h2 className="text-white/60 text-xs uppercase tracking-widest font-bold">Derniere activite</h2>
-                    <button onClick={handleTransactionHistory} className="text-yellow-500 text-xs font-medium">Historique</button>
-                  </div>
-                  <div className="bg-black/40 rounded-xl border border-white/10 p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-white text-sm font-semibold">{lastTransaction.reference || (lastTransaction.type === 'recharge' ? 'Rechargement' : 'Achat')}</p>
-                        <p className="text-white/40 text-[10px] uppercase mt-0.5">{formatRelativeTime(lastTransaction.created_at)}</p>
-                      </div>
-                      <span className={`text-sm font-bold ${lastTransaction.type === 'purchase' ? 'text-red-400' : 'text-green-400'}`}>
-                        {lastTransaction.type === 'purchase' ? `- ${lastTransaction.amount}` : `+ ${lastTransaction.amount}`} MAD
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
 
             <BottomNavigation />

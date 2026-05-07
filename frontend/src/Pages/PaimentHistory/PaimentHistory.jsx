@@ -1,134 +1,130 @@
 import { useState, useEffect } from 'react';
-import { fetchMyTickets } from '../../services/clientService';
+import { fetchTransactionHistory } from '../../services/clientService';
 import styles from '../../Styles/PaimentHistory.module.css';
 import BottomNavigation from '../../Components/Layout/BottomNavigation';
+import TransactionItem from '../../Components/Cards/TransactionItem';
 
-export default function PaimentHistory () {
-    const [activeTab, setActiveTab] = useState('all');
+export default function PaimentHistory() {
     const [activeDateFilter, setActiveDateFilter] = useState('all');
-    const [tickets, setTickets] = useState([]);
+    const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchTickets = async () => {
+        const fetchTransactions = async () => {
             try {
                 setLoading(true);
-                const res = await fetchMyTickets();
-                setTickets(res || []);
+                const res = await fetchTransactionHistory();
+                setTransactions(res || []);
             } catch (err) {
-                console.error("Error fetching history:", err);
+                console.error('Error fetching history:', err);
             } finally {
                 setLoading(false);
             }
         };
-        fetchTickets();
+        fetchTransactions();
     }, []);
-
-    const tabs = [
-        { id: 'all', label: 'Tous' },
-        { id: 'active', label: 'Actifs' },
-        { id: 'used', label: 'Utilisés' },
-        { id: 'expired', label: 'Expirés' }
-    ];
 
     const dateFilters = [
         { id: 'today', label: "Aujourd'hui" },
         { id: 'week', label: 'Cette semaine' },
-        { id: 'all', label: 'Tout' }
+        { id: 'all', label: 'Tout' },
     ];
 
-    const getValidity = (ticket) => {
-        if (!ticket.ticket_type) return "1 trajet";
-        const code = ticket.ticket_type.code;
-        if (code === 'BILLET_SIMPLE') return "1 trajet";
-        if (code === 'CARTE_NORMALE') return "2 trajets";
-        if (code === 'BILLET_SEMAINE') return "Illimité (7j)";
-        if (code === 'BILLET_MOIS') return "Illimité (30j)";
-        return "1 trajet";
-    };
-
-    const getStatusText = (status) => {
-        switch (status) {
-            case 'active': return 'Actif';
-            case 'used': return 'Utilisé';
-            case 'expired': return 'Expiré';
-            default: return status;
+    const safeTransactions = Array.isArray(transactions) ? transactions : [];
+    const parseTxDate = (value) => {
+        if (!value) return null;
+        if (value instanceof Date) return value;
+        if (typeof value === 'string') {
+            // Normalize "YYYY-MM-DD HH:mm:ss" into ISO-like local datetime
+            const normalized = value.includes('T') ? value : value.replace(' ', 'T');
+            const parsed = new Date(normalized);
+            return Number.isNaN(parsed.getTime()) ? null : parsed;
         }
+        const parsed = new Date(value);
+        return Number.isNaN(parsed.getTime()) ? null : parsed;
     };
 
-    const getStatusStyle = (status) => {
-        switch (status) {
-            case 'active': return styles.statusValid;
-            case 'used': return styles.statusUsed;
-            case 'expired': return styles.statusExpired;
-            default: return '';
-        }
-    };
-
-    const safeTickets = Array.isArray(tickets) ? tickets : [];
-
-    const filteredTickets = safeTickets.filter(t => {
-        if (activeTab !== 'all' && t.status !== activeTab) return false;
-        
-        const ticketDate = new Date(t.created_at);
+    const filteredTransactions = safeTransactions.filter((t) => {
+        const txDate = parseTxDate(t.created_at);
+        if (!txDate) return false;
         const now = new Date();
-        
+
         if (activeDateFilter === 'today') {
-            return ticketDate.toDateString() === now.toDateString();
+            const startOfToday = new Date(now);
+            startOfToday.setHours(0, 0, 0, 0);
+            const endOfToday = new Date(now);
+            endOfToday.setHours(23, 59, 59, 999);
+            return txDate >= startOfToday && txDate <= endOfToday;
         }
         if (activeDateFilter === 'week') {
             const weekAgo = new Date();
             weekAgo.setDate(now.getDate() - 7);
-            return ticketDate >= weekAgo;
+            weekAgo.setHours(0, 0, 0, 0);
+            return txDate >= weekAgo;
         }
-        return true;
+
+        const twoWeeksAgo = new Date();
+        twoWeeksAgo.setDate(now.getDate() - 14);
+        return txDate >= twoWeeksAgo;
     });
 
-    const groupedTickets = filteredTickets.reduce((groups, ticket) => {
-        const date = new Date(ticket.created_at).toLocaleDateString('fr-FR', {
-            day: 'numeric', month: 'long', year: 'numeric'
+    const groupedTransactions = filteredTransactions.reduce((groups, tx) => {
+        const txDate = parseTxDate(tx.created_at);
+        const date = (txDate || new Date()).toLocaleDateString('fr-FR', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
         });
         const today = new Date().toLocaleDateString('fr-FR', {
-            day: 'numeric', month: 'long', year: 'numeric'
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
         });
         const groupTitle = date === today ? "Aujourd'hui" : date;
-        
+
         if (!groups[groupTitle]) groups[groupTitle] = [];
-        groups[groupTitle].push(ticket);
+        groups[groupTitle].push(tx);
         return groups;
     }, {});
 
     const stats = {
-        spent: tickets.reduce((sum, t) => sum + parseFloat(t.price_paid), 0).toFixed(2),
-        count: tickets.length
+        spent: filteredTransactions
+            .filter((t) => t.type !== 'recharge')
+            .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0)
+            .toFixed(2),
+        count: filteredTransactions.length,
     };
+
+    const mappedTransactions = (list) =>
+        list.map((t) => {
+            const isPositive = t.type === 'recharge';
+            return {
+                id: t.id,
+                title: t.reference || (isPositive ? 'Rechargement portefeuille' : 'Achat de billet'),
+                date: (parseTxDate(t.created_at) || new Date()).toLocaleString('fr-FR', {
+                    day: 'numeric',
+                    month: 'long',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                }),
+                amount: `${isPositive ? '+' : '-'}${parseFloat(t.amount || 0).toFixed(2)} DH`,
+                isPositive,
+                icon: isPositive ? 'plus' : 'ticket',
+            };
+        });
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-[#2a0b0f] to-[#1a0507] flex items-center justify-center p-4">
             <div className="w-full max-w-md mx-auto">
-                <div className="relative rounded-3xl shadow-2xl border border-yellow-500/20 overflow-hidden 
-                    bg-gradient-to-br from-[#400106]/90 to-[#260101]/90 backdrop-blur-sm">
-                    
+                <div className="relative rounded-3xl shadow-2xl border border-yellow-500/20 overflow-hidden bg-gradient-to-br from-[#400106]/90 to-[#260101]/90 backdrop-blur-sm">
                     <div className="max-h-[calc(100vh-100px)] overflow-y-auto custom-scrollbar px-6 pb-24">
                         <header className={styles.header}>
                             <div className={styles.headerTop}>
                                 <h1 className={styles.mainTitle}>Historique</h1>
                             </div>
-                            
-                            <div className={styles.filterTabs}>
-                                {tabs.map(tab => (
-                                    <button
-                                        key={tab.id}
-                                        className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`}
-                                        onClick={() => setActiveTab(tab.id)}
-                                    >
-                                        {tab.label}
-                                    </button>
-                                ))}
-                            </div>
 
                             <div className={styles.dateFilters}>
-                                {dateFilters.map(filter => (
+                                {dateFilters.map((filter) => (
                                     <button
                                         key={filter.id}
                                         className={`${styles.dateFilter} ${activeDateFilter === filter.id ? styles.dateFilterActive : ''}`}
@@ -151,7 +147,7 @@ export default function PaimentHistory () {
                                 </div>
                                 <div className={styles.statCard}>
                                     <div className={styles.statContent}>
-                                        <div className={styles.statLabel}>Total billets</div>
+                                        <div className={styles.statLabel}>Total transactions</div>
                                         <div className={styles.statValue}>{stats.count}</div>
                                     </div>
                                 </div>
@@ -161,39 +157,26 @@ export default function PaimentHistory () {
                         {loading ? (
                             <p className="text-white text-center py-10">Chargement...</p>
                         ) : (
-                            Object.entries(groupedTickets).map(([date, dayTickets]) => (
+                            Object.entries(groupedTransactions).map(([date, dayTransactions]) => (
                                 <section key={date} className={styles.daySection}>
                                     <h3 className={styles.dayHeader}>{date}</h3>
                                     <div className={styles.ticketList}>
-                                        {dayTickets.map(ticket => (
-                                            <div key={ticket.uuid} className={styles.ticketCard}>
-                                                <div className={styles.ticketHeader}>
-                                                    <div className={styles.ticketIcon}>🎫</div>
-                                                    <div className={styles.ticketInfo}>
-                                                        <div className={styles.ticketType}>{ticket.ticket_type?.name_fr || "Billet"}</div>
-                                                        <div className={styles.ticketDate}>
-                                                            {new Date(ticket.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-                                                        </div>
-                                                    </div>
-                                                    <div className={styles.ticketPrice}>{ticket.price_paid} DH</div>
-                                                </div>
-                                                <div className={styles.ticketDetails}>
-                                                    <span className={styles.detailText}>{getValidity(ticket)}</span>
-                                                </div>
-                                                <div className={styles.ticketFooter}>
-                                                    <div className={`${styles.ticketStatus} ${getStatusStyle(ticket.status)}`}>
-                                                        <span className={styles.statusDot}></span>
-                                                        {getStatusText(ticket.status)}
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        {mappedTransactions(dayTransactions).map((tx) => (
+                                            <TransactionItem
+                                                key={tx.id}
+                                                title={tx.title}
+                                                date={tx.date}
+                                                amount={tx.amount}
+                                                isPositive={tx.isPositive}
+                                                icon={tx.icon}
+                                            />
                                         ))}
                                     </div>
                                 </section>
                             ))
                         )}
-                        {(!loading && filteredTickets.length === 0) && (
-                            <p className="text-white/50 text-center py-10">Aucun billet trouvé</p>
+                        {!loading && filteredTransactions.length === 0 && (
+                            <p className="text-white/50 text-center py-10">Aucune transaction trouvée</p>
                         )}
                     </div>
                     <BottomNavigation />
@@ -201,4 +184,4 @@ export default function PaimentHistory () {
             </div>
         </div>
     );
-};
+}
