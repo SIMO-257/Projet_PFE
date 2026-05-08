@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BottomNavigation from '../../Components/Layout/BottomNavigation';
 import BalanceCard from '../../Components/Cards/BalanceCard';
+import TicketHistoryCard from '../../Components/Cards/TicketHistoryCard';
 import styles from '../../Styles/HomeScreen.module.css';
 import { useAuth } from '../../hooks/useAuth';
 import { useWallet } from '../../hooks/useWallet';
@@ -13,8 +14,9 @@ import { useTranslation } from '../../hooks/useTranslation';
 
 const HomeScreen = () => {
   const { user } = useAuth();
-  const { refreshWallet, transactions } = useWallet();
+  const { refreshWallet } = useWallet();
   const { tickets, refreshTickets } = useTickets();
+  const { transactions } = useWallet();
   const navigateHook = useNavigate();
   const dispatch = useDispatch();
   const { t } = useTranslation();
@@ -30,9 +32,17 @@ const HomeScreen = () => {
       .catch(() => setPurchasedCards([]));
   }, [refreshWallet, refreshTickets, dispatch]);
 
-  const safeTransactions = Array.isArray(transactions) ? transactions : [];
   const safeTickets = Array.isArray(tickets) ? tickets : [];
   const activeTickets = safeTickets.filter((ticket) => ticket.status === 'active');
+
+  const lastSixTickets = useMemo(() => {
+    const allowedStatuses = new Set(['active', 'expired', 'used']);
+
+    return [...safeTickets]
+      .filter((ticket) => allowedStatuses.has(String(ticket?.status || '').toLowerCase()))
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      .slice(0, 6);
+  }, [safeTickets]);
 
   const defaultCard = useMemo(() => {
     const safeCards = Array.isArray(purchasedCards) ? purchasedCards : [];
@@ -56,14 +66,28 @@ const HomeScreen = () => {
   }
 
   const handleNotifications = () => navigateHook('/notifications');
-  const handleRecharge = () => navigateHook('/recharge-payment');
   const handleChangeCard = () => navigateHook('/change-card');
-  const handleValidateNFC = () => navigateHook('/validation');
-  const handleShowQRCode = () => navigateHook('/validation');
-  const handleBuyTicket = () => navigateHook('/mytickets');
+  const handleRecharge = () => navigateHook('/recharge-payment');
+  const handleDefaultCardPress = () => {
+    if (!defaultCard?.uuid) {
+      return;
+    }
+
+    navigateHook('/validation', {
+      state: {
+        source: 'home-card',
+        ticketUuid: defaultCard.uuid,
+      },
+    });
+  };
   const handleTicketPress = (ticket) => navigateHook(`/viewticket/${ticket.uuid}`);
+  const handleAllTickets = () => navigateHook('/all-tickets');
+  const handleBuyTicket = () => navigateHook('/ticket-selection');
+  const handleValidateNFC = () => navigateHook('/validation', { state: { method: 'NFC' } });
+  const handleShowQRCode = () => navigateHook('/validation', { state: { method: 'QR' } });
   const handleTransactionHistory = () => navigateHook('/payment-history');
 
+  const safeTransactions = Array.isArray(transactions) ? transactions : [];
   const lastTransaction = safeTransactions.length > 0 ? safeTransactions[0] : null;
 
   return (
@@ -89,21 +113,28 @@ const HomeScreen = () => {
             </button>
           </div>
 
-          <div className="max-h-[calc(100vh-200px)] overflow-y-auto no-scrollbar px-6 pb-24">
+          <div className={`max-h-[calc(100vh-200px)] overflow-y-auto ${styles.hideScrollbar || ''} no-scrollbar px-6 pb-24`}>
             <div className="mb-4 mt-2">
-              <BalanceCard
-                title={t('default_ticket')}
-                amount={`${activeTicketPrice.toFixed(2)} MAD`}
-                cardType={activeTicketName}
-                cardNumber={defaultCard ? `Code: ${activeTicketCode}` : t('no_tickets')}
-                gradientFrom="#7A3B47"
-                gradientTo="#5C2A36"
-                circlesPosition="right"
-              />
+              <button
+                type="button"
+                onClick={handleDefaultCardPress}
+                disabled={!defaultCard?.uuid}
+                className="w-full text-left disabled:cursor-not-allowed"
+              >
+                <BalanceCard
+                  title={t('default_ticket')}
+                  amount={`${activeTicketPrice.toFixed(2)} MAD`}
+                  cardType={activeTicketName}
+                  cardNumber={defaultCard ? `Code: ${activeTicketCode}` : t('no_tickets')}
+                  gradientFrom="#7A3B47"
+                  gradientTo="#5C2A36"
+                  circlesPosition="right"
+                />
+              </button>
 
               <div className="flex justify-end -mt-4 mb-4 pr-2">
                 <button onClick={handleChangeCard} className="text-yellow-500 text-[10px] font-bold uppercase tracking-wider hover:text-yellow-400 flex items-center space-x-1">
-                  <span>{t('confirm')}</span>
+                  <span>{t('change_card')}</span>
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/>
                   </svg>
@@ -140,6 +171,31 @@ const HomeScreen = () => {
                   </button>
                 ))}
                 {activeTickets.length === 0 && <p className="text-white/40 text-sm italic py-4">{t('no_active_tickets')}</p>}
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <div className="flex justify-between items-center mb-3">
+                <h2 className="text-white/60 text-xs uppercase tracking-widest font-bold">{t('history')}</h2>
+                <button onClick={handleAllTickets} className="text-yellow-500 text-xs font-medium">{t('see_all')}</button>
+              </div>
+              <div className="space-y-3">
+                {lastSixTickets.length > 0 ? (
+                  lastSixTickets.map((ticket) => (
+                    <TicketHistoryCard
+                      key={ticket.uuid}
+                      ticketName={ticket.ticket_type?.name_fr || 'Billet'}
+                      price={`${ticket.price_paid} DH`}
+                      date={new Date(ticket.updated_at || ticket.created_at).toLocaleString('fr-FR', { 
+                        day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' 
+                      })}
+                      status={ticket.status}
+                      onClick={() => handleTicketPress(ticket)}
+                    />
+                  ))
+                ) : (
+                  <p className="text-white/40 text-sm italic py-4">{t('no_tickets')}</p>
+                )}
               </div>
             </div>
 

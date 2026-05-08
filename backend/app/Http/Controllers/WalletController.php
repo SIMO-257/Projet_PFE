@@ -6,21 +6,19 @@ use App\Http\Requests\RechargeInitRequest;
 use App\Http\Requests\RechargeConfirmRequest;
 use App\Models\Wallet;
 use App\Models\Transaction;
+use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-
 use Illuminate\Support\Facades\Log;
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
-
 use App\Models\AuditLog;
-use App\Models\Ticket;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 
 class WalletController extends Controller
 {
+
     private function isTicketExpired(Ticket $ticket): bool
     {
         if ($ticket->status === 'expired') {
@@ -54,6 +52,7 @@ class WalletController extends Controller
 
         return $fallback;
     }
+
     /**
      * Initialize a wallet recharge by creating a Stripe PaymentIntent.
      */
@@ -89,7 +88,6 @@ class WalletController extends Controller
 
     /**
      * Confirm the wallet recharge after successful Stripe payment.
-     * Fallback: If the webhook hasn't processed it yet, we do it here.
      */
     public function rechargeConfirm(RechargeConfirmRequest $request)
     {
@@ -113,34 +111,47 @@ class WalletController extends Controller
             }
 
             if ($paymentIntent->status !== 'succeeded') {
-                return $this->errorResponse('Le paiement n\'a pas encore été validé par Stripe.', 400);
+                return $this->errorResponse('Le paiement n\'a pas encore ete valide par Stripe.', 400);
             }
 
             $user = Auth::user();
 
             // 1. Ownership Check
             if (($paymentIntent->metadata->user_id ?? null) != $user->id) {
-                return $this->errorResponse('Accès non autorisé.', 403);
+                return $this->errorResponse('Acces non autorise.', 403);
             }
 
-            // 2. Check if already processed (Idempotency)
+            // 2. Check if already processed (typically by webhook)
             $transaction = Transaction::where('payment_intent_id', $paymentIntent->id)->first();
-            
+
+            // 3. Fallback processing when webhook is delayed
             if (!$transaction) {
-                // WEBHOOK FALLBACK: Process it manually
-                $amountInDh = $paymentIntent->amount / 100;
-                
-                DB::transaction(function () use ($user, $amountInDh, $paymentIntent) {
+                DB::transaction(function () use ($user, $paymentIntent, &$transaction) {
+                    $existing = Transaction::where('payment_intent_id', $paymentIntent->id)
+                        ->lockForUpdate()
+                        ->first();
+
+                    if ($existing) {
+                        $transaction = $existing;
+                        return;
+                    }
+
                     $wallet = Wallet::where('user_id', $user->id)->lockForUpdate()->first();
                     if (!$wallet) {
-                        $wallet = Wallet::create(['user_id' => $user->id, 'balance' => 0.00]);
+                        $wallet = Wallet::create([
+                            'user_id' => $user->id,
+                            'balance' => 0.00,
+                            'card_last_four' => '****',
+                        ]);
                     }
+
+                    $amountInDh = ((int) $paymentIntent->amount) / 100;
 
                     $balanceBefore = $wallet->balance;
                     $wallet->balance += $amountInDh;
                     $wallet->save();
 
-                    Transaction::create([
+                    $transaction = Transaction::create([
                         'user_id' => $user->id,
                         'type' => 'recharge',
                         'status' => 'completed',
@@ -148,7 +159,7 @@ class WalletController extends Controller
                         'balance_before' => $balanceBefore,
                         'balance_after' => $wallet->balance,
                         'payment_intent_id' => $paymentIntent->id,
-                        'reference' => 'Rechargement (Vérification directe)',
+                        'reference' => 'Rechargement via Stripe',
                     ]);
 
                     // Send Notification
@@ -157,25 +168,23 @@ class WalletController extends Controller
                         'payment',
                         'success',
                         'Recharge réussie',
-                        "Votre compte a été crédité de {$amountInDh} DH via vérification directe.",
+                        "Votre compte a été crédité de {$amountInDh} DH.",
                         ['amount' => $amountInDh, 'new_balance' => $wallet->balance]
                     );
                 });
-
-                $transaction = Transaction::where('payment_intent_id', $paymentIntent->id)->first();
             }
-            
+
             $wallet = Wallet::where('user_id', $user->id)->first();
 
             return $this->successResponse([
                 'balance' => (float) ($wallet?->balance ?? 0),
                 'status' => 'succeeded',
-                'processed' => !!$transaction
-            ], 'Paiement confirmé et solde mis à jour.');
+                'processed' => !!$transaction,
+            ], 'Paiement confirme et traite.');
 
         } catch (\Exception $e) {
-            Log::error("Wallet Recharge Confirm Error: " . $e->getMessage());
-            return $this->errorResponse('Erreur lors de la vérification.', 500);
+            Log::error('Wallet Recharge Confirm Error: ' . $e->getMessage());
+            return $this->errorResponse('Erreur lors de la verification.', 500);
         }
     }
 
@@ -190,20 +199,9 @@ class WalletController extends Controller
             ['balance' => 0.00, 'card_last_four' => '****']
         );
 
-        $activeTicket = $this->resolveDefaultTicketForUser($user);
-
         return $this->successResponse([
             'balance' => (float) $wallet->balance,
             'card_last_four' => $wallet->card_last_four,
-            'active_ticket' => $activeTicket ? [
-                'id' => $activeTicket->id,
-                'uuid' => $activeTicket->uuid,
-                'status' => $activeTicket->status,
-                'valid_until' => $activeTicket->valid_until,
-                'remaining_uses' => $activeTicket->remaining_uses,
-                'price_paid' => $activeTicket->price_paid,
-                'ticket_type' => $activeTicket->ticketType,
-            ] : null,
         ]);
     }
 

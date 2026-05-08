@@ -48,3 +48,29 @@ here is how the default validation should work:
 so what is your plan ?
 
 remove the continue with google or apple buttons from the login and sign up page along side with that "ou".
+
+
+-- in the home page if i press on the nfc icon the default card in the home screen will be active for validation.
+-- what is your plan to implement this feature using web nfc.
+-- how will i be able to test it.
+
+
+-- tout : will show all the tickets in the last 2 weeks 
+-- one semaine  :  show the last week 
+-- and aujourdh'hui show the day were they are 
+
+-- instead of that complicated card for the ticket purchase after pressin the link just use the normal one before pressing "voir tout".
+-- also the price color should be red because it is purchased .
+-- instead of just purchased ticket we need also transactions that got added to the wallet 
+-- the transaction card should look exactly the same but with th green color for the price.
+
+-- in the wallet page there should only appear 8 in total for the total of transaction and purchases the last 8 by date until the user press on the link to see all
+
+-- remove the "dernier activite" part from home so does the ticket active loop but keep the "tickets actives" label and change it to historique.
+-- keep that "voir tout" link too.
+-- in this Historique part you are gonna list the last 6 tickets active/used/expired by the user based on the date .
+-- when you press "voir tout" you go to the see all the tickets just like in the wallet page .
+-- the way each ticket is shown by cards just like the transaction card in wallet but with the name of the ticket the price the time and it is status active / expired / used .
+-- each status for each card will have a specific color green for active red for expired and yellow for used.
+-- what is your plan.
+

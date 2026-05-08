@@ -83,24 +83,6 @@ export default function ViewTicket() {
                         </div>
                     </div>
 
-                    {/* QR Code Section */}
-                    <div className="flex flex-col items-center mb-8">
-                        <div className="bg-white p-6 rounded-3xl shadow-2xl mb-4 border-4 border-yellow-500/30">
-                            {/* Simulated QR Code for now */}
-                            <div className="w-48 h-48 bg-gray-100 flex items-center justify-center relative overflow-hidden">
-                                <div className="absolute inset-0 opacity-10 flex flex-wrap">
-                                    {Array(100).fill(0).map((_, i) => (
-                                        <div key={i} className={`w-2 h-2 ${Math.random() > 0.5 ? 'bg-black' : 'bg-transparent'}`}></div>
-                                    ))}
-                                </div>
-                                <span className="text-[10px] text-black font-mono break-all text-center px-4">
-                                    {ticket.uuid}
-                                </span>
-                            </div>
-                        </div>
-                        <p className="text-white/40 text-[10px] uppercase tracking-widest font-bold">Scannez ce code pour valider</p>
-                    </div>
-
                     {/* Ticket Details List */}
                     <div className="space-y-4 bg-black/20 rounded-2xl p-4 border border-white/5">
                         <DetailRow icon={<Ticket size={18} />} label="Type de Billet" value={ticket.ticket_type?.name_fr} />

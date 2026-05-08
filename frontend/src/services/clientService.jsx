@@ -124,6 +124,8 @@ export const setDefaultPurchasedCard = (ticketId) => clientApi.post('/tickets/ca
 export const fetchTicketDetails = (uuid) => clientApi.get(`/tickets/${uuid}`).then(extractPayload);
 
 export const validateTicket = (uuid, payload) => clientApi.post(`/tickets/${uuid}/validate`, payload);
+export const createNfcChallenge = () => clientApi.post('/tickets/nfc/challenge').then(extractPayload);
+export const consumeNfcChallenge = (payload) => clientApi.post('/tickets/nfc/consume', payload).then(extractPayload);
 
 export const createPaymentIntent = (payload) => clientApi.post('/payments/create-intent', payload);
 

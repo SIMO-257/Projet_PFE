@@ -7,8 +7,11 @@ import {
   LinkAuthenticationElement,
   ExpressCheckoutElement,
 } from '@stripe/react-stripe-js';
+
 import { saveBillingDetails, createPaymentIntent } from '../../services/clientService';
 import * as notificationService from '../../services/notificationService';
+
+import { confirmRecharge } from '../../services/clientService';
 
 const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel }) => {
   const stripe = useStripe();
@@ -16,6 +19,14 @@ const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel }) => {
   const [message, setMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
+
+  const extractPaymentIntentId = (secret) => {
+    if (!secret || typeof secret !== 'string') return null;
+    const marker = '_secret_';
+    const idx = secret.indexOf(marker);
+    if (idx === -1) return null;
+    return secret.slice(0, idx);
+  };
 
   const handleSubmit = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
@@ -75,7 +86,7 @@ const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel }) => {
       }
     } catch (err) {
       console.error("[Stripe] Unexpected error:", err);
-      setMessage("Une erreur inattendue est survenue.");
+      setMessage("Une erreur inatendue est survenue.");
     } finally {
       setIsLoading(false);
     }

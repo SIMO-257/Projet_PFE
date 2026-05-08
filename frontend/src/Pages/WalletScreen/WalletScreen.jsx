@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Header from '../../Components/Layout/Header';
 import BalanceCard from '../../Components/Cards/BalanceCard';
 import ActionButtonCard from '../../Components/Cards/ActionButtonCard';
@@ -18,6 +18,10 @@ const WalletScreen = () => {
   const { t } = useTranslation();
   const [verifyingPayment, setVerifyingPayment] = useState(false);
   const [successMessage, setSuccessMessage] = useState(location.state?.successMessage || null);
+
+  const handleMenuAction = () => {
+    navigateHook('/settings');
+  };
 
   useEffect(() => {
     const verifyAndRefresh = async () => {
@@ -51,12 +55,6 @@ const WalletScreen = () => {
   const handleRecharge = () => {
     navigateHook('/recharge-payment');
   };
-  const handleChangeCard = () => {
-    navigateHook('/change-card');
-  };
-
-  const handleMenuAction = () => {
-  };
 
   const viewAllTransactions = () => {
     navigateHook('/payment-history');
@@ -65,8 +63,11 @@ const WalletScreen = () => {
   const safeBalance = Number.isFinite(balance) ? balance : 0;
   const safeCardLastFour = card_last_four || '****';
   const safeTransactions = Array.isArray(transactions) ? transactions : [];
+  const latestSixTransactions = [...safeTransactions]
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    .slice(0, 6);
 
-  const mappedTransactions = safeTransactions.map(t => ({
+  const mappedTransactions = latestSixTransactions.map(t => ({
     id: t.id,
     type: t.type,
     title: t.reference || (t.type === 'recharge' ? t('recharge') : t('buy')),
@@ -121,7 +122,7 @@ const WalletScreen = () => {
 
               <div className="flex justify-end -mt-4 mb-4 pr-2">
                 <button 
-                  onClick={handleChangeCard}
+                  onClick={() => navigateHook('/change-card')}
                   className="text-yellow-500 text-xs font-medium hover:text-yellow-400 flex items-center space-x-1"
                 >
                   <span>{t('change_card')}</span>
@@ -130,7 +131,6 @@ const WalletScreen = () => {
                   </svg>
                 </button>
               </div>
-
               <ActionButtonCard
                 variant="validation"
                 icon={

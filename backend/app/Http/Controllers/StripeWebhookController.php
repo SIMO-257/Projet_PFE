@@ -149,24 +149,26 @@ class StripeWebhookController extends Controller
                 
                 $wallet->save();
 
-                // 6. Record Transaction with unique payment_intent_id
-                Transaction::create([
-                    'user_id' => $userId,
-                    'type' => 'recharge',
-                    'status' => 'completed',
-                    'amount' => $amountInDh,
-                    'currency' => $currency,
-                    'balance_before' => $balanceBefore,
-                    'balance_after' => $wallet->balance,
-                    'payment_method' => 'card',
-                    'reference' => 'Rechargement via Stripe',
-                    'payment_intent_id' => $paymentIntentId,
-                    'metadata' => [
-                        'stripe_payment_intent' => $paymentIntentId,
-                        'source' => 'stripe_webhook',
-                        'type' => 'wallet_recharge'
-                    ],
-                ]);
+                // 6. Record Transaction (idempotent safeguard by payment_intent_id)
+                Transaction::firstOrCreate(
+                    ['payment_intent_id' => $paymentIntentId],
+                    [
+                        'user_id' => $userId,
+                        'type' => 'recharge',
+                        'status' => 'completed',
+                        'amount' => $amountInDh,
+                        'currency' => $currency,
+                        'balance_before' => $balanceBefore,
+                        'balance_after' => $wallet->balance,
+                        'payment_method' => 'card',
+                        'reference' => 'Rechargement via Stripe',
+                        'metadata' => [
+                            'stripe_payment_intent' => $paymentIntentId,
+                            'source' => 'stripe_webhook',
+                            'type' => 'wallet_recharge'
+                        ],
+                    ]
+                );
 
                 // 7. Send Notification
                 $client = Client::find($userId);
