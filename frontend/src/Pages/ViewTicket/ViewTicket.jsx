@@ -39,7 +39,7 @@ export default function ViewTicket() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-[#2a0b0f] to-[#1a0507] flex items-center justify-center p-4">
+            <div className="app-shell">
                 <p className="text-white text-center">Chargement des détails...</p>
             </div>
         );
@@ -47,7 +47,7 @@ export default function ViewTicket() {
 
     if (error || !ticket) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-[#2a0b0f] to-[#1a0507] flex items-center justify-center p-4">
+            <div className="app-shell">
                 <div className="w-full max-w-md bg-[#400106]/90 p-8 rounded-3xl border border-yellow-500/20 text-center">
                     <p className="text-red-400 mb-6">{error || "Erreur inconnue."}</p>
                     <button onClick={goBack} className="text-yellow-500 font-medium">Retour à mes billets</button>
@@ -65,12 +65,13 @@ export default function ViewTicket() {
     });
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[#2a0b0f] to-[#1a0507] flex items-center justify-center p-4">
-            <div className="w-full max-w-md mx-auto relative rounded-3xl shadow-2xl border border-yellow-500/20 overflow-hidden bg-gradient-to-br from-[#400106]/90 to-[#260101]/90 backdrop-blur-sm">
+        <div className="app-shell">
+            <div className="app-frame">
+                <div className="app-card relative rounded-3xl shadow-2xl border border-yellow-500/20 overflow-hidden bg-gradient-to-br from-[#400106]/90 to-[#260101]/90 backdrop-blur-sm">
                 
                 <Header title="Détails du Billet" showBackButton={true} onBack={goBack} />
 
-                <div className="p-6 pb-12 overflow-y-auto max-h-[calc(100vh-100px)] custom-scrollbar">
+                <div className="app-content p-6 pb-12 custom-scrollbar">
                     
                     {/* Status Banner */}
                     <div className={`flex items-center space-x-3 p-4 rounded-2xl mb-6 ${ticket.status === 'active' ? 'bg-green-500/10 border border-green-500/20' : 'bg-red-500/10 border border-red-500/20'}`}>
@@ -98,6 +99,7 @@ export default function ViewTicket() {
                         Ce billet est personnel et non transmissible. En cas de contrôle, présentez votre QR Code ainsi qu'une pièce d'identité si nécessaire.
                     </p>
                 </div>
+              </div>
             </div>
         </div>
     );

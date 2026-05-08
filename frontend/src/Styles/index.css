@@ -7,6 +7,30 @@ body {
   font-family: 'Arial', sans-serif;
 }
 
+html,
+body {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+
+* {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+*::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar {
     display: none;
@@ -15,4 +39,32 @@ body {
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
   }
+}
+
+.app-shell {
+  min-height: 100svh;
+  background: linear-gradient(135deg, #2a0b0f 0%, #1a0507 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.app-frame {
+  width: 100%;
+  max-width: 28rem;
+  height: min(820px, calc(100svh - 2rem));
+  margin: 0 auto;
+}
+
+.app-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }

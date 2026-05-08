@@ -13,6 +13,9 @@ class EventServiceProvider extends ServiceProvider
      * @var array<class-string, array<int, class-string>>
      */
     protected $listen = [
+        \App\Events\TicketPurchasedEvent::class => [
+            \App\Listeners\ScheduleTicketExpiration::class,
+        ],
         \App\Events\TicketValidatedEvent::class => [
             \App\Listeners\SendTicketValidatedNotification::class,
         ],

@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { fetchTransactionHistory } from '../../services/clientService';
 import styles from '../../Styles/PaimentHistory.module.css';
 import BottomNavigation from '../../Components/Layout/BottomNavigation';
 import TransactionItem from '../../Components/Cards/TransactionItem';
 
 export default function PaimentHistory() {
+    const navigate = useNavigate();
     const [activeDateFilter, setActiveDateFilter] = useState('all');
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -113,6 +115,14 @@ export default function PaimentHistory() {
             };
         });
 
+    const handleBack = () => {
+        if (window.history.length > 1) {
+            navigate(-1);
+            return;
+        }
+        navigate('/wallet');
+    };
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-[#2a0b0f] to-[#1a0507] flex items-center justify-center p-4">
             <div className="w-full max-w-md mx-auto">
@@ -120,7 +130,17 @@ export default function PaimentHistory() {
                     <div className="max-h-[calc(100vh-100px)] overflow-y-auto custom-scrollbar px-6 pb-24">
                         <header className={styles.header}>
                             <div className={styles.headerTop}>
+                                <button
+                                    type="button"
+                                    onClick={handleBack}
+                                    className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors"
+                                >
+                                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                                    </svg>
+                                </button>
                                 <h1 className={styles.mainTitle}>Historique</h1>
+                                <div className="w-10"></div>
                             </div>
 
                             <div className={styles.dateFilters}>

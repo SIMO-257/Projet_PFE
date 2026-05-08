@@ -89,23 +89,30 @@ class WalletController extends Controller
     /**
      * Confirm the wallet recharge after successful Stripe payment.
      */
-    public function rechargeConfirm(RechargeConfirmRequest $request)
+        public function rechargeConfirm(RechargeConfirmRequest $request)
     {
         Stripe::setApiKey(config('services.stripe.secret'));
         try {
             $paymentIntent = PaymentIntent::retrieve($request->paymentIntentId);
 
             if ($paymentIntent->status === 'requires_payment_method' || $paymentIntent->status === 'canceled') {
-                $errorMessage = $paymentIntent->last_payment_error ? $paymentIntent->last_payment_error->message : 'Le paiement a été refusé.';
-                
-                app(\App\Services\NotificationService::class)->send(
-                    Auth::user(),
-                    'payment',
-                    'danger',
-                    'Paiement refusé',
-                    "Votre tentative de rechargement a échoué : {$errorMessage}",
-                    ['payment_intent' => $paymentIntent->id]
-                );
+                $errorMessage = $paymentIntent->last_payment_error ? $paymentIntent->last_payment_error->message : 'Le paiement a ete refuse.';
+
+                try {
+                    app(\App\Services\NotificationService::class)->send(
+                        Auth::user(),
+                        'payment',
+                        'danger',
+                        'Paiement refuse',
+                        "Votre tentative de rechargement a echoue : {$errorMessage}",
+                        ['payment_intent' => $paymentIntent->id]
+                    );
+                } catch (\Throwable $notificationError) {
+                    Log::warning('Wallet Confirm: failure notification skipped', [
+                        'payment_intent_id' => $paymentIntent->id ?? null,
+                        'error' => $notificationError->getMessage(),
+                    ]);
+                }
 
                 return $this->errorResponse($errorMessage, 422);
             }
@@ -115,64 +122,76 @@ class WalletController extends Controller
             }
 
             $user = Auth::user();
-
-            // 1. Ownership Check
             if (($paymentIntent->metadata->user_id ?? null) != $user->id) {
                 return $this->errorResponse('Acces non autorise.', 403);
             }
 
-            // 2. Check if already processed (typically by webhook)
-            $transaction = Transaction::where('payment_intent_id', $paymentIntent->id)->first();
-
-            // 3. Fallback processing when webhook is delayed
-            if (!$transaction) {
-                DB::transaction(function () use ($user, $paymentIntent, &$transaction) {
-                    $existing = Transaction::where('payment_intent_id', $paymentIntent->id)
-                        ->lockForUpdate()
-                        ->first();
-
-                    if ($existing) {
-                        $transaction = $existing;
-                        return;
-                    }
-
-                    $wallet = Wallet::where('user_id', $user->id)->lockForUpdate()->first();
-                    if (!$wallet) {
-                        $wallet = Wallet::create([
-                            'user_id' => $user->id,
-                            'balance' => 0.00,
-                            'card_last_four' => '****',
-                        ]);
-                    }
-
-                    $amountInDh = ((int) $paymentIntent->amount) / 100;
-
-                    $balanceBefore = $wallet->balance;
-                    $wallet->balance += $amountInDh;
-                    $wallet->save();
-
-                    $transaction = Transaction::create([
+            $transaction = null;
+            DB::transaction(function () use ($user, $paymentIntent, &$transaction) {
+                $wallet = Wallet::where('user_id', $user->id)->lockForUpdate()->first();
+                if (!$wallet) {
+                    $wallet = Wallet::create([
                         'user_id' => $user->id,
-                        'type' => 'recharge',
-                        'status' => 'completed',
-                        'amount' => $amountInDh,
-                        'balance_before' => $balanceBefore,
-                        'balance_after' => $wallet->balance,
-                        'payment_intent_id' => $paymentIntent->id,
-                        'reference' => 'Rechargement via Stripe',
+                        'balance' => 0.00,
+                        'card_last_four' => '****',
                     ]);
+                    $wallet->refresh();
+                }
 
-                    // Send Notification
+                $existing = Transaction::where('payment_intent_id', $paymentIntent->id)->first();
+                if ($existing) {
+                    $transaction = $existing;
+                    Log::info("Wallet Confirm: existing transaction reused for {$paymentIntent->id}", [
+                        'transaction_id' => $existing->id,
+                        'user_id' => $user->id,
+                    ]);
+                    return;
+                }
+
+                $amountInDh = ((int) $paymentIntent->amount) / 100;
+                $balanceBefore = (float) $wallet->balance;
+                $wallet->balance = $balanceBefore + $amountInDh;
+                $wallet->save();
+
+                $transaction = Transaction::create([
+                    'user_id' => $user->id,
+                    'type' => 'recharge',
+                    'status' => 'completed',
+                    'amount' => $amountInDh,
+                    'currency' => strtoupper($paymentIntent->currency ?? 'MAD'),
+                    'balance_before' => $balanceBefore,
+                    'balance_after' => (float) $wallet->balance,
+                    'payment_method' => 'card',
+                    'payment_intent_id' => $paymentIntent->id,
+                    'reference' => 'Rechargement via Stripe',
+                    'metadata' => [
+                        'source' => 'wallet_confirm_fallback',
+                        'stripe_payment_intent' => $paymentIntent->id,
+                        'type' => 'wallet_recharge',
+                    ],
+                ]);
+
+                Log::info("Wallet Confirm: transaction created for {$paymentIntent->id}", [
+                    'transaction_id' => $transaction->id,
+                    'user_id' => $user->id,
+                ]);
+
+                try {
                     app(\App\Services\NotificationService::class)->send(
                         $user,
                         'payment',
                         'success',
-                        'Recharge réussie',
-                        "Votre compte a été crédité de {$amountInDh} DH.",
+                        'Recharge reussie',
+                        "Votre compte a ete credite de {$amountInDh} DH.",
                         ['amount' => $amountInDh, 'new_balance' => $wallet->balance]
                     );
-                });
-            }
+                } catch (\Throwable $notificationError) {
+                    Log::warning('Wallet Confirm: success notification skipped', [
+                        'payment_intent_id' => $paymentIntent->id ?? null,
+                        'error' => $notificationError->getMessage(),
+                    ]);
+                }
+            });
 
             $wallet = Wallet::where('user_id', $user->id)->first();
 
@@ -180,14 +199,17 @@ class WalletController extends Controller
                 'balance' => (float) ($wallet?->balance ?? 0),
                 'status' => 'succeeded',
                 'processed' => !!$transaction,
+                'transaction_id' => $transaction?->id,
             ], 'Paiement confirme et traite.');
 
         } catch (\Exception $e) {
-            Log::error('Wallet Recharge Confirm Error: ' . $e->getMessage());
+            Log::error('Wallet Recharge Confirm Error: ' . $e->getMessage(), [
+                'payment_intent_id' => $request->paymentIntentId ?? null,
+                'user_id' => Auth::id(),
+            ]);
             return $this->errorResponse('Erreur lors de la verification.', 500);
         }
     }
-
     /**
      * Get wallet details for the authenticated user.
      */
@@ -219,3 +241,4 @@ class WalletController extends Controller
         return $this->successResponse($transactions);
     }
 }
+

@@ -1,6 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { useEffect, lazy, Suspense } from "react";
-import { useSelector } from "react-redux";
 import PublicRoute from "./Components/Layout/PublicRoute";
 import ProtectedRoute from "./Components/Layout/ProtectedRoute";
 import { useAuth } from "./hooks/useAuth";
@@ -37,46 +36,48 @@ const OfflineMode = lazy(() => import("./Pages/OfflineMode/OfflineMode"));
 function RootRedirect() {
   const { isAuthenticated, isAuthChecked, isLoading } = useAuth();
 
+  // Wait until we have a definitive answer from the backend
   if (!isAuthChecked || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#1a0507] text-white">
-        Loading...
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
       </div>
     );
   }
 
-  return isAuthenticated ? <Navigate to="/home" replace /> : <Navigate to="/login" replace />;
+  // If we checked and user is NOT authenticated, they MUST see login
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Otherwise, go to home
+  return <Navigate to="/home" replace />;
 }
 
 function App() {
   const { refreshProfile, isAuthChecked } = useAuth();
-  const language = useSelector((state) => state.settings?.language || 'fr');
 
   useEffect(() => {
     if (!isAuthChecked) {
       refreshProfile();
     }
-  }, [isAuthChecked, refreshProfile]);
-
-  useEffect(() => {
-    const dir = language === 'ar' ? 'rtl' : 'ltr';
-    document.documentElement.dir = dir;
-    document.documentElement.lang = language;
-    document.body.dir = dir;
-  }, [language]);
+  }, []); // Empty dependency array to prevent infinite loops
 
   return (
     <BrowserRouter>
       <Suspense
         fallback={
           <div className="min-h-screen flex items-center justify-center bg-[#1a0507] text-white">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-yellow-500"></div>
+            Loading...
           </div>
         }
       >
         <Routes>
+
+          {/* Default route */}
           <Route path="/" element={<RootRedirect />} />
 
+          {/* PUBLIC ROUTES */}
           <Route element={<PublicRoute />}>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
@@ -84,6 +85,7 @@ function App() {
             <Route path="/reset-password" element={<ResetPassword />} />
           </Route>
 
+          {/* PROTECTED ROUTES */}
           <Route element={<ProtectedRoute />}>
             <Route path="/home" element={<HomeScreen />} />
             <Route path="/wallet" element={<WalletScreen />} />
@@ -108,6 +110,7 @@ function App() {
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/offline" element={<OfflineMode />} />
           </Route>
+
         </Routes>
       </Suspense>
     </BrowserRouter>

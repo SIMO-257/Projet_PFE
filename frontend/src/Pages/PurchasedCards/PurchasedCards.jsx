@@ -45,12 +45,12 @@ const PurchasedCards = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#2a0b0f] to-[#1a0507] flex items-center justify-center p-4">
-      <div className="w-full max-w-md mx-auto">
-        <div className="relative rounded-3xl shadow-2xl border border-yellow-500/20 overflow-hidden bg-gradient-to-br from-[#400106]/90 to-[#260101]/90 backdrop-blur-sm">
+    <div className="app-shell">
+      <div className="app-frame">
+        <div className="app-card relative rounded-3xl shadow-2xl border border-yellow-500/20 overflow-hidden bg-gradient-to-br from-[#400106]/90 to-[#260101]/90 backdrop-blur-sm">
           <Header title="Mes cartes achetees" showBackButton={true} onBack={() => navigate(-1)} />
 
-          <div className="max-h-[calc(100vh-200px)] overflow-y-auto no-scrollbar px-6 pb-24">
+          <div className="app-content no-scrollbar px-6 pb-24">
             {error && <p className="text-red-300 text-xs mb-3">{error}</p>}
             {loading ? (
               <p className="text-white/60 text-sm py-4">Chargement...</p>

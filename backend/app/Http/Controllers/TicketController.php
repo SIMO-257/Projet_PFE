@@ -17,6 +17,7 @@ use App\Models\ValidationLog;
 use Illuminate\Support\Carbon;
 use App\Models\AuditLog;
 use Illuminate\Support\Facades\Log;
+use App\Events\TicketPurchasedEvent;
 
 class TicketController extends Controller
 {
@@ -149,6 +150,7 @@ class TicketController extends Controller
                         'price_paid' => $ticketType->price,
                     ]);
                     $tickets[] = $ticket;
+                    event(new TicketPurchasedEvent($ticket->id, $ticket->valid_until));
 
                     if ($ticketType->is_reusable) {
                         $nextReusableStartAt = $validUntil->copy();
