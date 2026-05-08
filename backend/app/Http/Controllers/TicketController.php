@@ -126,6 +126,19 @@ class TicketController extends Controller
 
                 AuditLog::log('ticket_purchase', $client->id, ['ticket_type' => $ticketType->name, 'quantity' => $validated['quantity']]);
 
+                // 4. Send Notification
+                app(\App\Services\NotificationService::class)->send(
+                    $client,
+                    'payment',
+                    'success',
+                    'Confirmation d\'achat',
+                    "Vous avez acheté {$validated['quantity']} " . ($validated['quantity'] > 1 ? 'billets' : 'billet') . " ({$ticketType->name_fr}). {$totalPrice} DH débités.",
+                    ['ticket_type' => $ticketType->name, 'quantity' => $validated['quantity'], 'amount' => $totalPrice]
+                );
+
+                // Dispatch Low Balance Event
+                event(new \App\Events\LowBalanceEvent($client, $wallet->balance));
+
                 return $this->successResponse([
                     'tickets' => $tickets,
                     'new_balance' => $wallet->balance
@@ -291,6 +304,15 @@ class TicketController extends Controller
                 // 4. Log Success
                 $this->logValidation($ticket->id, $client->id, $validatorId, $validationType, 'success', null, $location);
                 AuditLog::log('ticket_validation_success', $client->id, ['uuid' => $uuid]);
+
+                // Dispatch Notification Event
+                event(new \App\Events\TicketValidatedEvent(
+                    $client,
+                    $ticket->id,
+                    6.00, // Fixed price for a ride in Casablanca (example)
+                    'Tramway T1',
+                    $location ?? $validatorId
+                ));
 
                 return $this->successResponse([
                     'remaining_uses' => $ticket->remaining_uses,

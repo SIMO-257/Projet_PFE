@@ -1,21 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import Header from '../../Components/Layout/Header';
 import styles from '../../Styles/Settings.module.css';
+import { getNotificationPreferences, updateNotificationPreferences } from '../../services/notificationService';
+import { setTheme, setLanguage } from '../../Redux/Slices/settingsSlice';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const SettingsScreen = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { theme, language } = useSelector((state) => state.settings);
+  const { t } = useTranslation();
 
   // --- State for toggles ---
-  const [pushEnabled, setPushEnabled] = useState(true);
-  const [reminderEnabled, setReminderEnabled] = useState(true);
-  const [promoEnabled, setPromoEnabled] = useState(false);
-  const [darkMode, setDarkMode] = useState(true);
   const [offlineEnabled, setOfflineEnabled] = useState(true);
   const [wifiSyncOnly, setWifiSyncOnly] = useState(false);
   const [analyticsEnabled, setAnalyticsEnabled] = useState(true);
   const [authPurchase, setAuthPurchase] = useState(false);
-  const [language, setLanguage] = useState('fr');
+
+  // Notification preferences
+  const [notificationPrefs, setNotificationPrefs] = useState({
+    validation: true,
+    payment: true,
+    security: true,
+    promo: false,
+  });
+
+  useEffect(() => {
+    // Load notification preferences on mount
+    getNotificationPreferences()
+      .then((prefs) => {
+        if (prefs) {
+          setNotificationPrefs(prefs);
+        }
+      })
+      .catch((err) => console.error('Failed to load notification preferences:', err));
+  }, []);
 
   // --- Handlers ---
   const goBack = () => navigate(-1);
@@ -25,6 +46,21 @@ const SettingsScreen = () => {
   const handleAbout = () => {};
   const handlePrivacyPolicy = () => {};
 
+  const handleNotificationPrefChange = (type, value) => {
+    const newPrefs = { ...notificationPrefs, [type]: value };
+    setNotificationPrefs(newPrefs);
+    updateNotificationPreferences(newPrefs)
+      .catch((err) => console.error('Failed to update notification preferences:', err));
+  };
+
+  const handleThemeChange = (isDark) => {
+    dispatch(setTheme(isDark ? 'dark' : 'light'));
+  };
+
+  const handleLanguageChange = (e) => {
+    dispatch(setLanguage(e.target.value));
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#2a0b0f] to-[#1a0507] flex items-center justify-center p-4">
       <div className="w-full max-w-md mx-auto">
@@ -32,7 +68,7 @@ const SettingsScreen = () => {
         <div className={styles.settingsCard}>
           
           <Header 
-            title="Paramètres" 
+            title={t('settings')} 
             showBackButton={true} 
             onBack={goBack} 
           />
@@ -40,38 +76,45 @@ const SettingsScreen = () => {
           {/* Scrollable content */}
           <div className={styles.scrollContainer}>
             
-            {/* ========== NOTIFICATIONS ========== */}
-            <Section title="Notifications">
+            {/* ========== PRÉFÉRENCES DE NOTIFICATIONS ========== */}
+            <Section title={t('notifications_pref')}>
               <ToggleItem
-                icon="bell"
-                label="Notifications push"
-                description="Toutes les alertes"
-                value={pushEnabled}
-                onChange={setPushEnabled}
+                icon="validation"
+                label={t('validation')}
+                description="Notifications de validation de tickets"
+                value={notificationPrefs.validation}
+                onChange={(value) => handleNotificationPrefChange('validation', value)}
               />
               <ToggleItem
-                icon="alert"
-                label="Rappels de validation"
-                description="Avant chaque trajet"
-                value={reminderEnabled}
-                onChange={setReminderEnabled}
+                icon="payment"
+                label={t('payment')}
+                description="Recharges, débits, solde faible"
+                value={notificationPrefs.payment}
+                onChange={(value) => handleNotificationPrefChange('payment', value)}
+              />
+              <ToggleItem
+                icon="security"
+                label={t('security')}
+                description="Connexions suspectes, changements"
+                value={notificationPrefs.security}
+                onChange={(value) => handleNotificationPrefChange('security', value)}
               />
               <ToggleItem
                 icon="promo"
-                label="Offres promotionnelles"
-                description="Messages marketing"
-                value={promoEnabled}
-                onChange={setPromoEnabled}
+                label={t('promo')}
+                description="Offres spéciales, alertes trafic"
+                value={notificationPrefs.promo}
+                onChange={(value) => handleNotificationPrefChange('promo', value)}
               />
             </Section>
 
             {/* ========== LANGUE ========== */}
-            <Section title="Langue">
+            <Section title={t('language')}>
               <SelectItem
                 icon="language"
-                label="Langue de l'application"
+                label={t('language')}
                 value={language}
-                onChange={(e) => setLanguage(e.target.value)}
+                onChange={handleLanguageChange}
                 options={[
                   { value: 'fr', label: 'Français' },
                   { value: 'ar', label: 'العربية' },
@@ -84,10 +127,10 @@ const SettingsScreen = () => {
             <Section title="Apparence">
               <ToggleItem
                 icon="darkmode"
-                label="Mode sombre"
+                label={t('dark_mode')}
                 description="Thème sombre / clair"
-                value={darkMode}
-                onChange={setDarkMode}
+                value={theme === 'dark'}
+                onChange={handleThemeChange}
               />
             </Section>
 

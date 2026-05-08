@@ -6,14 +6,14 @@ import ProfilInfo from '../../Components/Cards/ProfilInfo';
 import ProfileOpt from '../../Components/Cards/ProfileOpt';
 import styles from '../../Styles/ProfileScreen.module.css';
 import { useAuth } from '../../hooks/useAuth';
-import {
-  fetchClientProfile,
-} from '../../services/clientService';
+import { fetchClientProfile } from '../../services/clientService';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const ProfileScreen = () => {
   const [profile, setProfile] = useState(null);
   const navigateHook = useNavigate();
   const { logout } = useAuth();
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchClientProfile()
@@ -31,33 +31,23 @@ const ProfileScreen = () => {
     navigateHook("/settings");
   };
 
-  const handleSupport = () => {
+  const handleLogout = async () => {
+    await logout();
+    navigateHook('/login');
   };
 
-  const handleLogout = async () => {
-    const result = await logout();
-    if (result && result.meta && result.meta.requestStatus === 'fulfilled') {
-      navigateHook('/login');
-    } else {
-      navigateHook('/login');
-    }
+  const handleSupport = () => {
+    navigateHook("/help-support");
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#2a0b0f] to-[#1a0507] flex items-center justify-center p-4">
-      {/* Main Container */}
+    <div className="min-h-screen bg-gradient-to-br from-[#2a0b0f] to-[#1a0507] flex items-center justify-center p-4 transition-colors duration-300">
       <div className="w-full max-w-md mx-auto">
-        {/* Profile Card */}
         <div className={styles.profileCard}>
-          
-          <Header title="Mon Profil" />
+          <Header title={t('profile')} />
 
-          {/* Main Content - Scrollable */}
           <div className={styles.scrollContainer}>
-            
-            {/* Profile Info Card */}
             <div className="bg-gradient-to-br from-[#5C2A36] to-[#3D1A24] rounded-3xl p-6 mb-6 border border-white/10 shadow-xl">
-              {/* Profile Avatar */}
               <div className="flex justify-center mb-6">
                 <div className="relative">
                   <div className="w-28 h-28 rounded-full border-4 border-yellow-500 bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center overflow-hidden">
@@ -69,7 +59,6 @@ const ProfileScreen = () => {
                       </svg>
                     )}
                   </div>
-                  {/* Premium Badge */}
                   <div className="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-gradient-to-br from-yellow-500 to-yellow-600 border-4 border-[#3D1A24] flex items-center justify-center">
                     <svg className="w-5 h-5 text-[#400106]" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"/>
@@ -78,15 +67,12 @@ const ProfileScreen = () => {
                 </div>
               </div>
 
-              {/* Name & Status */}
               <div className="text-center mb-6">
                 <h2 className="text-white text-2xl font-bold mb-1">{profile?.name ?? '—'}</h2>
-                <p className="text-yellow-500 text-sm font-medium">Membre Premium</p>
+                <p className="text-yellow-500 text-sm font-medium">{t('member_premium')}</p>
               </div>
 
-              {/* Contact Info */}
               <div className="space-y-3">
-                {/* Email */}
                 <ProfilInfo
                   label="Email"
                   value={profile?.email ?? '—'}
@@ -99,9 +85,8 @@ const ProfileScreen = () => {
                   }
                 />
 
-                {/* Phone */}
                 <ProfilInfo
-                  label="Téléphone"
+                  label={t('phone')}
                   value={profile?.phone ?? '—'}
                   icon={
                     <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
@@ -110,10 +95,9 @@ const ProfileScreen = () => {
                   }
                 />
 
-                {/* Member Since */}
                 <ProfilInfo
-                  label="Membre depuis"
-                  value={profile?.created_at ?? '—'}
+                  label={t('member_since')}
+                  value={profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : '—'}
                   icon={
                     <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
                       <path
@@ -126,7 +110,6 @@ const ProfileScreen = () => {
                 />
               </div>
 
-              {/* Edit Profile Button */}
               <button
                 onClick={handleEditProfile}
                 className="w-full mt-6 bg-gradient-to-r from-[#8B4049] to-[#5C2A2E] text-white font-semibold py-3 rounded-2xl hover:from-[#9B5059] hover:to-[#6C3A3E] transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg"
@@ -134,15 +117,13 @@ const ProfileScreen = () => {
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
                 </svg>
-                <span>Modifier le profil</span>
+                <span>{t('edit_profile')}</span>
               </button>
             </div>
 
-            {/* Menu Options */}
             <div className="space-y-3 mb-6">
-              {/* Settings */}
               <ProfileOpt
-                label="Paramètres"
+                label={t('settings')}
                 onClick={handleSettings}
                 icon={
                   <svg className="w-6 h-6 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
@@ -155,9 +136,8 @@ const ProfileScreen = () => {
                 }
               />
 
-              {/* Help & Support */}
               <ProfileOpt
-                label="Aide & Support"
+                label={t('help')}
                 onClick={handleSupport}
                 icon={
                   <svg className="w-6 h-6 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
@@ -170,7 +150,6 @@ const ProfileScreen = () => {
                 }
               />
 
-              {/* Logout */}
               <button
                 onClick={handleLogout}
                 className="w-full bg-white/5 rounded-2xl p-4 border border-white/5 hover:border-red-500/30 hover:bg-red-500/10 transition-all"
@@ -182,7 +161,7 @@ const ProfileScreen = () => {
                         <path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clipRule="evenodd"/>
                       </svg>
                     </div>
-                    <span className="text-red-400 font-medium text-sm">Déconnexion</span>
+                    <span className="text-red-400 font-medium text-sm">{t('logout')}</span>
                   </div>
                   <svg className="w-5 h-5 text-red-400/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/>

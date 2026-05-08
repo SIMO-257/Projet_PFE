@@ -8,6 +8,7 @@
     @apply animate-rotate-slow;
   }
 
+  
   @keyframes rotate {
     from {
       transform: rotate(0deg);

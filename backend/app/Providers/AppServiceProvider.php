@@ -7,6 +7,12 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 
+use Illuminate\Support\Facades\Event;
+use App\Events\TicketValidatedEvent;
+use App\Listeners\SendTicketValidatedNotification;
+use App\Events\LowBalanceEvent;
+use App\Listeners\SendLowBalanceNotification;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -24,6 +30,16 @@ class AppServiceProvider extends ServiceProvider
     {
         // Set Stripe API Key globally
         \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+
+        // Register Event Listeners
+        Event::listen(
+            TicketValidatedEvent::class,
+            SendTicketValidatedNotification::class,
+        );
+        Event::listen(
+            LowBalanceEvent::class,
+            SendLowBalanceNotification::class,
+        );
 
         // Login Rate Limiter: 5 attempts per minute per IP
         RateLimiter::for('login', function (Request $request) {

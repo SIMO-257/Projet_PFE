@@ -7,7 +7,8 @@ import {
   LinkAuthenticationElement,
   ExpressCheckoutElement,
 } from '@stripe/react-stripe-js';
-import { saveBillingDetails } from '../../services/clientService';
+import { saveBillingDetails, createPaymentIntent } from '../../services/clientService';
+import * as notificationService from '../../services/notificationService';
 
 const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel }) => {
   const stripe = useStripe();
@@ -17,49 +18,67 @@ const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel }) => {
   const [email, setEmail] = useState('');
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
 
     if (!stripe || !elements) {
+      console.error("[Stripe] Stripe.js or Elements not loaded.");
       return;
     }
 
     setIsLoading(true);
+    setMessage(null);
 
-    // 1. Trigger form validation and wallet saving (Link)
-    const { error: submitError } = await elements.submit();
-    if (submitError) {
-      setMessage(submitError.message);
-      setIsLoading(false);
-      return;
-    }
-
-    // 2. Optionally save billing details to our backend (from AddressElement)
-    // In a real production app, you might want to extract data from AddressElement 
-    // but Stripe handles most of it. We'll rely on Stripe for now as per "No frontend trust".
-    
-    // 3. Confirm the payment
-    const { error } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        // Return URL for redirection-based flows (like 3DS)
-        return_url: `${window.location.origin}/payment-confirmation`,
-      },
-      // If we want to stay on the same page for simple card payments:
-      redirect: 'if_required',
-    });
-
-    if (error) {
-      if (error.type === "card_error" || error.type === "validation_error") {
-        setMessage(error.message);
-      } else {
-        setMessage("Une erreur inattendue est survenue.");
+    try {
+      // 1. Trigger form validation and wallet saving (Link)
+      const { error: submitError } = await elements.submit();
+      if (submitError) {
+        console.error("[Stripe] Submit error:", submitError);
+        setMessage(submitError.message);
+        setIsLoading(false);
+        return;
       }
-    } else {
-      // Payment succeeded or is processing (for redirect flows)
-      onSuccess();
-    }
 
-    setIsLoading(false);
+      // 2. Confirm the payment
+      const result = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: `${window.location.origin}/payment-confirmation`,
+        },
+        redirect: 'if_required',
+      });
+
+      if (result.error) {
+        console.error("[Stripe] Confirm error:", result.error);
+        const errorMsg = result.error.message || "Une erreur est survenue.";
+        
+        // Trigger a "failed" notification locally
+        try {
+            notificationService.logFailure({
+                type: 'payment',
+                title: 'Échec de paiement',
+                body: `La transaction de ${amount} DH a échoué : ${errorMsg}`,
+                meta: { error: errorMsg, amount }
+            });
+        } catch (e) {
+            console.error("Failed to log notification:", e);
+        }
+
+        if (result.error.type === "card_error" || result.error.type === "validation_error") {
+          setMessage(errorMsg);
+        } else {
+          setMessage("Une erreur est survenue lors de la validation du paiement.");
+        }
+      } else {
+        // Payment succeeded or is processing (for redirect flows)
+        console.log("[Stripe] Payment successful:", result.paymentIntent);
+        onSuccess(result.paymentIntent.id);
+      }
+    } catch (err) {
+      console.error("[Stripe] Unexpected error:", err);
+      setMessage("Une erreur inattendue est survenue.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const paymentElementOptions = {

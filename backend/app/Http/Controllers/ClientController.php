@@ -100,6 +100,16 @@ class ClientController extends Controller
 
             AuditLog::log('login_success', $client->id);
 
+            // Send Security Notification
+            app(\App\Services\NotificationService::class)->send(
+                $client,
+                'security',
+                'info',
+                'Nouvelle connexion',
+                "Une nouvelle connexion a été détectée sur votre compte le " . now()->format('d/m à H:i') . ".",
+                ['ip' => $request->ip(), 'agent' => $request->userAgent()]
+            );
+
             return $this->successResponse([
                 'remember_me' => $client->remember_me,
             ], 'Login successful.');
@@ -202,6 +212,40 @@ class ClientController extends Controller
         }
 
         return $this->successResponse(null, 'Password has been reset successfully.');
+    }
+
+    public function updateFcmToken(Request $request)
+    {
+        $request->validate(['fcm_token' => 'required|string']);
+        $request->user()->update(['fcm_token' => $request->fcm_token]);
+        return $this->successResponse(null, 'FCM token updated');
+    }
+
+    public function getNotificationPreferences(Request $request)
+    {
+        return $this->successResponse([
+            'notification_prefs' => $request->user()->notification_prefs ?? [
+                'validation' => true,
+                'payment' => true,
+                'security' => true,
+                'promo' => false,
+            ]
+        ], 'Notification preferences fetched successfully');
+    }
+
+    public function updateNotificationPreferences(Request $request)
+    {
+        $validated = $request->validate([
+            'preferences' => 'required|array',
+            'preferences.validation' => 'boolean',
+            'preferences.payment' => 'boolean',
+            'preferences.security' => 'boolean',
+            'preferences.promo' => 'boolean',
+        ]);
+
+        $request->user()->update(['notification_prefs' => $validated['preferences']]);
+        
+        return $this->successResponse(null, 'Notification preferences updated');
     }
 
     private function applyName(Client $client, array $data): void

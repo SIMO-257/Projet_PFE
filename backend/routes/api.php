@@ -40,4 +40,18 @@ Route::middleware('auth:sanctum')->group(function () {
     // Checkout & Payment Routes
     Route::post('/payments/create-intent', [\App\Http\Controllers\PaymentController::class, 'createIntent'])->middleware('throttle:10,1')->name('api.payments.create_intent');
     Route::post('/payments/billing-details', [\App\Http\Controllers\PaymentController::class, 'saveBillingDetails'])->name('api.payments.billing_details');
+
+    // Notification Routes
+    Route::prefix('notifications')->group(function () {
+        Route::get('/', [\App\Http\Controllers\NotificationController::class, 'index'])->name('api.notifications.index');
+        Route::get('/unread-count', [\App\Http\Controllers\NotificationController::class, 'unreadCount'])->name('api.notifications.unread_count');
+        Route::post('/log-failure', [\App\Http\Controllers\NotificationController::class, 'logFailure'])->name('api.notifications.log_failure');
+        Route::patch('/read-all', [\App\Http\Controllers\NotificationController::class, 'markAllRead'])->name('api.notifications.read_all');
+        Route::patch('/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markRead'])->name('api.notifications.read');
+        Route::delete('/{id}', [\App\Http\Controllers\NotificationController::class, 'destroy'])->name('api.notifications.destroy');
+    });
+
+    Route::put('/user/fcm-token', [ClientController::class, 'updateFcmToken'])->name('api.client.fcm_token.update');
+    Route::get('/user/notification-preferences', [ClientController::class, 'getNotificationPreferences'])->name('api.client.notification_preferences.get');
+    Route::patch('/user/notification-preferences', [ClientController::class, 'updateNotificationPreferences'])->name('api.client.notification_preferences.update');
 });

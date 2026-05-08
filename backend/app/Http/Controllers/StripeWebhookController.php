@@ -44,16 +44,46 @@ class StripeWebhookController extends Controller
         switch ($event->type) {
             case 'payment_intent.succeeded':
                 $result = $this->handlePaymentIntentSucceeded($event->data->object);
-                
-                // 2. Mark event as processed only after successful handling
-                if ($result->getStatusCode() === 200) {
-                    DB::table('processed_stripe_events')->insert(['event_id' => $event->id]);
-                }
-                return $result;
+                break;
+
+            case 'payment_intent.payment_failed':
+                $result = $this->handlePaymentIntentFailed($event->data->object);
+                break;
 
             default:
                 return response()->json(['message' => 'Received unknown event type: ' . $event->type], 200);
         }
+
+        // 2. Mark event as processed only after successful handling
+        if ($result->getStatusCode() === 200) {
+            DB::table('processed_stripe_events')->insert(['event_id' => $event->id]);
+        }
+        return $result;
+    }
+
+    /**
+     * Process failed payment intent.
+     */
+    protected function handlePaymentIntentFailed($paymentIntent)
+    {
+        $userId = $paymentIntent->metadata->user_id ?? null;
+        $errorMessage = $paymentIntent->last_payment_error ? $paymentIntent->last_payment_error->message : 'Une erreur est survenue lors du paiement.';
+
+        if ($userId) {
+            $client = Client::find($userId);
+            if ($client) {
+                app(\App\Services\NotificationService::class)->send(
+                    $client,
+                    'payment',
+                    'danger',
+                    'Échec de paiement',
+                    "Votre rechargement a échoué : {$errorMessage}",
+                    ['payment_intent' => $paymentIntent->id, 'error' => $errorMessage]
+                );
+            }
+        }
+
+        return response()->json(['message' => 'Failure handled'], 200);
     }
 
     /**
@@ -137,6 +167,24 @@ class StripeWebhookController extends Controller
                         'type' => 'wallet_recharge'
                     ],
                 ]);
+
+                // 7. Send Notification
+                $client = Client::find($userId);
+                if ($client) {
+                    // Success notification
+                    app(\App\Services\NotificationService::class)->send(
+                        $client,
+                        'payment',
+                        'success',
+                        'Recharge réussie',
+                        "Votre compte a été crédité de {$amountInDh} DH. Nouveau solde : {$wallet->balance} DH.",
+                        ['amount' => $amountInDh, 'new_balance' => $wallet->balance]
+                    );
+
+                    // Clear low balance throttle and update
+                    \Illuminate\Support\Facades\Redis::del("low_balance_notif:{$client->id}");
+                    event(new \App\Events\LowBalanceEvent($client, $wallet->balance));
+                }
 
                 Log::info("Stripe Webhook: Successfully processed wallet_recharge for user $userId. Amount: $amountInDh $currency");
 

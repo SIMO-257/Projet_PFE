@@ -68,8 +68,13 @@ const RechargePaymentScreen = () => {
     }
   };
 
-  const onSuccess = () => {
-    navigate("/wallet", { state: { successMessage: "Rechargement en cours de traitement !" } });
+  const onSuccess = (paymentIntentId) => {
+    navigate("/wallet", { 
+      state: { 
+        successMessage: "Paiement réussi !",
+        paymentIntentId: paymentIntentId
+      } 
+    });
   };
 
   const onAmountChange = (e) => {
