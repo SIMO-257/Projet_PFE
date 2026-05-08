@@ -4,6 +4,7 @@ import { useTickets } from '../../hooks/useTickets';
 import {
   createNfcChallenge,
   consumeNfcChallenge,
+  createQrValidationToken,
 } from '../../services/clientService';
 import Header from '../../Components/Layout/Header';
 import BottomNavigation from '../../Components/Layout/BottomNavigation';
@@ -26,7 +27,7 @@ export default function ValidationScreen() {
 
   const [showNFCModal, setShowNFCModal] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
-  const [qrTimeRemaining, setQRTimeRemaining] = useState(30);
+  const [qrTimeRemaining, setQRTimeRemaining] = useState(300);
   const [qrPayload, setQrPayload] = useState('');
   const [notification, setNotification] = useState(null);
   const [nfcStatusMessage, setNfcStatusMessage] = useState('');
@@ -42,6 +43,7 @@ export default function ValidationScreen() {
   }, [tickets.length, refreshTickets]);
 
   const selectedTicketUuid = location.state?.ticketUuid ?? null;
+  const hideBottomNav = location.state?.hideBottomNav === true || location.state?.source === 'home-card';
   const selectedTicket = selectedTicketUuid
     ? tickets.find((t) => t.uuid === selectedTicketUuid)
     : null;
@@ -83,7 +85,7 @@ export default function ValidationScreen() {
               title: 'QR Code expire',
               message: 'Generez un nouveau code pour continuer',
             });
-            return 30;
+            return 300;
           }
           return prev - 1;
         });
@@ -120,7 +122,7 @@ export default function ValidationScreen() {
     setIsNfcSubmitting(false);
   };
 
-  const validateQR = () => {
+  const validateQR = async () => {
     if (!activeTicket) {
       setNotification({
         type: 'error',
@@ -129,19 +131,31 @@ export default function ValidationScreen() {
       });
       return;
     }
-    const issuedAt = new Date();
-    const expiresAt = new Date(issuedAt.getTime() + 30000);
-    setQrPayload(
-      JSON.stringify({
-        type: 'ticket_validation',
-        ticket_uuid: activeTicket.uuid,
-        validation_type: 'qr',
-        issued_at: issuedAt.toISOString(),
-        expires_at: expiresAt.toISOString(),
-      })
-    );
-    setShowQRModal(true);
-    setQRTimeRemaining(30);
+
+    try {
+      const tokenData = await createQrValidationToken({ ticket_uuid: activeTicket.uuid });
+      const validationToken = tokenData?.validation_token || '';
+      const expiresIn = Number(tokenData?.expires_in || 300);
+
+      if (!validationToken) {
+        setNotification({
+          type: 'error',
+          title: 'Erreur',
+          message: 'Token QR introuvable.',
+        });
+        return;
+      }
+
+      setQrPayload(validationToken);
+      setShowQRModal(true);
+      setQRTimeRemaining(expiresIn);
+    } catch (err) {
+      setNotification({
+        type: 'error',
+        title: 'Erreur',
+        message: err?.response?.data?.message || 'Impossible de generer le token QR.',
+      });
+    }
   };
 
   const startNfcChallenge = async () => {
@@ -209,6 +223,7 @@ export default function ValidationScreen() {
 
       setTimeout(() => {
         closeNFCModal();
+        navigateHook('/home');
       }, 700);
     } catch (err) {
       setNotification({
@@ -240,63 +255,65 @@ export default function ValidationScreen() {
         />
       )}
 
-      <div className="min-h-screen bg-gradient-to-br from-[#2a0b0f] to-[#1a0507] flex items-center justify-center p-4">
-        <div className="w-full max-w-md mx-auto">
-          <ValidationCard>
+      <div className="app-shell">
+        <div className="app-frame">
+          <ValidationCard className="app-card">
             <Header title="Validation" onBack={goBack} showBackButton={true} className="p-6 pb-4" />
 
-            <div className="flex justify-center py-8">
-              <TicketIconAnimation size={128} showWaves={true} pulseSpeed="normal" />
+            <div className="app-content no-scrollbar">
+              <div className="flex justify-center py-8">
+                <TicketIconAnimation size={128} showWaves={true} pulseSpeed="normal" />
+              </div>
+
+              <div className="text-center px-6 pb-6">
+                <h2 className="text-2xl font-bold text-white mb-2">Valider votre titre</h2>
+                <p className="text-white/60 text-sm">Choisissez votre methode de validation</p>
+              </div>
+
+              <div className="px-6 pb-6 space-y-4">
+                <ActionButtonCard
+                  variant="validation"
+                  icon={
+                    <svg className="w-7 h-7 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"
+                      />
+                    </svg>
+                  }
+                  label="Valider avec NFC"
+                  description={selectedTicketUuid ? 'Carte par defaut preselectionnee' : 'Generer un token NFC (60s)'}
+                  onClick={startNfcChallenge}
+                  showArrow={true}
+                />
+
+                <ActionButtonCard
+                  variant="validation"
+                  icon={
+                    <svg className="w-7 h-7 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
+                      />
+                    </svg>
+                  }
+                  label="Valider avec QR Code"
+                  description="Scannez le code"
+                  onClick={validateQR}
+                  showArrow={true}
+                />
+              </div>
+
+              <div className="px-6 pb-8">
+                <InfoCard title="Informations importantes" items={infoItems} maxHeight={128} />
+              </div>
             </div>
 
-            <div className="text-center px-6 pb-6">
-              <h2 className="text-2xl font-bold text-white mb-2">Valider votre titre</h2>
-              <p className="text-white/60 text-sm">Choisissez votre methode de validation</p>
-            </div>
-
-            <div className="px-6 pb-6 space-y-4">
-              <ActionButtonCard
-                variant="validation"
-                icon={
-                  <svg className="w-7 h-7 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"
-                    />
-                  </svg>
-                }
-                label="Valider avec NFC"
-                description={selectedTicketUuid ? 'Carte par defaut preselectionnee' : 'Generer un token NFC (60s)'}
-                onClick={startNfcChallenge}
-                showArrow={true}
-              />
-
-              <ActionButtonCard
-                variant="validation"
-                icon={
-                  <svg className="w-7 h-7 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
-                    />
-                  </svg>
-                }
-                label="Valider avec QR Code"
-                description="Scannez le code"
-                onClick={validateQR}
-                showArrow={true}
-              />
-            </div>
-
-            <div className="px-6 pb-8">
-              <InfoCard title="Informations importantes" items={infoItems} maxHeight={128} />
-            </div>
-
-            <BottomNavigation />
+            {!hideBottomNav && <BottomNavigation />}
           </ValidationCard>
         </div>
 
@@ -361,7 +378,7 @@ export default function ValidationScreen() {
           show={showQRModal}
           onClose={() => {
             setShowQRModal(false);
-            setQRTimeRemaining(30);
+            setQRTimeRemaining(300);
             setQrPayload('');
           }}
           showCloseButton={false}
@@ -389,7 +406,7 @@ export default function ValidationScreen() {
             )}
 
             <div className="bg-yellow-500/20 rounded-xl p-3 mb-6">
-              <TimerDisplay seconds={qrTimeRemaining} totalSeconds={30} showLabel={false} size="sm" />
+              <TimerDisplay seconds={qrTimeRemaining} totalSeconds={300} showLabel={false} size="sm" />
             </div>
 
             <ActionButtonCard
@@ -402,7 +419,7 @@ export default function ValidationScreen() {
               label="Fermer"
               onClick={() => {
                 setShowQRModal(false);
-                setQRTimeRemaining(30);
+                setQRTimeRemaining(300);
                 setQrPayload('');
               }}
               showArrow={false}

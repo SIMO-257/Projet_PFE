@@ -61,9 +61,9 @@ export default function Notifications() {
     ];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[#2a0b0f] to-[#1a0507] flex items-center justify-center p-4">
-            <div className="w-full max-w-md mx-auto">
-                <div className="bg-gradient-to-br from-[#400106]/95 to-[#260101]/95 rounded-[40px] shadow-2xl border border-yellow-500/20 overflow-hidden backdrop-blur-sm h-[85vh] flex flex-col relative">
+        <div className="app-shell">
+            <div className="app-frame">
+                <div className="app-card bg-gradient-to-br from-[#400106]/95 to-[#260101]/95 overflow-hidden backdrop-blur-sm relative">
                     
                     <div className="pt-2">
                         <Header 

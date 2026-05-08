@@ -45,10 +45,10 @@ const HelpSupportScreen = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#2a0b0f] to-[#1a0507] flex items-center justify-center p-4">
-      <div className="w-full max-w-md mx-auto">
+    <div className="app-shell">
+      <div className="app-frame">
         {/* Main Card */}
-        <div className={styles.helpCard}>
+        <div className={`${styles.helpCard} app-card`}>
           
           <Header 
             title="Aide & Support" 
@@ -57,7 +57,7 @@ const HelpSupportScreen = () => {
           />
 
           {/* Scrollable content */}
-          <div className={styles.scrollContainer}>
+          <div className={`app-content ${styles.scrollContainer}`}>
             
             {/* Search Bar */}
             <div className="mb-6 mt-2">

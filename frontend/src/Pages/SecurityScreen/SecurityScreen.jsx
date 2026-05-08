@@ -37,10 +37,10 @@ const SecurityScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#2a0b0f] to-[#1a0507] flex items-center justify-center p-4">
-      <div className="w-full max-w-md mx-auto">
+    <div className="app-shell">
+      <div className="app-frame">
         {/* Security Card */}
-        <div className={styles.securityCard}>
+        <div className={`${styles.securityCard} app-card`}>
           
           <Header 
             title="Sécurité" 
@@ -49,7 +49,7 @@ const SecurityScreen = () => {
           />
 
           {/* Scrollable content */}
-          <div className={styles.scrollContainer}>
+          <div className={`app-content ${styles.scrollContainer}`}>
             
             {/* Authentication Section */}
             <Section title="Authentification de l'application">

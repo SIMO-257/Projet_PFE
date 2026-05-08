@@ -41,12 +41,12 @@ const ProfileScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#2a0b0f] to-[#1a0507] flex items-center justify-center p-4 transition-colors duration-300">
-      <div className="w-full max-w-md mx-auto">
-        <div className={styles.profileCard}>
+    <div className="app-shell">
+      <div className="app-frame">
+        <div className={`${styles.profileCard} app-card`}>
           <Header title={t('profile')} />
 
-          <div className={styles.scrollContainer}>
+          <div className={`app-content ${styles.scrollContainer}`}>
             <div className="bg-gradient-to-br from-[#5C2A36] to-[#3D1A24] rounded-3xl p-6 mb-6 border border-white/10 shadow-xl">
               <div className="flex justify-center mb-6">
                 <div className="relative">
@@ -179,3 +179,4 @@ const ProfileScreen = () => {
 };
 
 export default ProfileScreen;
+

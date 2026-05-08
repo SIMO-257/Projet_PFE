@@ -66,6 +66,7 @@ const HomeScreen = () => {
     navigateHook('/validation', {
       state: {
         source: 'home-card',
+        hideBottomNav: true,
         ticketUuid: defaultCard.uuid,
       },
     });

@@ -23,7 +23,7 @@ class TicketController extends Controller
 {
     private function normalizeTicketStatus(Ticket $ticket): void
     {
-        if ($ticket->status === 'active' && $ticket->remaining_uses <= 0) {
+        if ($ticket->status === 'active' && $this->shouldConsumeUse($ticket) && $ticket->remaining_uses <= 0) {
             $ticket->status = 'used';
             $ticket->save();
         }
@@ -32,6 +32,66 @@ class TicketController extends Controller
     private function isTicketExpired(Ticket $ticket): bool
     {
         return $ticket->status === 'expired';
+    }
+
+    private function shouldConsumeUse(Ticket $ticket): bool
+    {
+        $ticket->loadMissing('ticketType');
+        return !($ticket->ticketType?->is_reusable ?? false);
+    }
+
+    private function canValidateStatus(string $status): bool
+    {
+        return in_array($status, ['active', 'used'], true);
+    }
+
+    private function base64UrlEncode(string $data): string
+    {
+        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+    }
+
+    private function base64UrlDecode(string $data): string|false
+    {
+        $padding = 4 - (strlen($data) % 4);
+        if ($padding < 4) {
+            $data .= str_repeat('=', $padding);
+        }
+        return base64_decode(strtr($data, '-_', '+/'));
+    }
+
+    private function buildValidationToken(array $payload): string
+    {
+        $header = ['alg' => 'HS256', 'typ' => 'JWT'];
+        $headerB64 = $this->base64UrlEncode(json_encode($header, JSON_UNESCAPED_SLASHES));
+        $payloadB64 = $this->base64UrlEncode(json_encode($payload, JSON_UNESCAPED_SLASHES));
+        $signature = hash_hmac('sha256', "{$headerB64}.{$payloadB64}", (string) config('app.key'), true);
+        $signatureB64 = $this->base64UrlEncode($signature);
+        return "{$headerB64}.{$payloadB64}.{$signatureB64}";
+    }
+
+    private function parseValidationToken(string $token): ?array
+    {
+        $parts = explode('.', trim($token));
+        if (count($parts) !== 3) {
+            return null;
+        }
+
+        [$headerB64, $payloadB64, $signatureB64] = $parts;
+        $expected = $this->base64UrlEncode(
+            hash_hmac('sha256', "{$headerB64}.{$payloadB64}", (string) config('app.key'), true)
+        );
+
+        if (!hash_equals($expected, $signatureB64)) {
+            return null;
+        }
+
+        $payloadRaw = $this->base64UrlDecode($payloadB64);
+        if ($payloadRaw === false) {
+            return null;
+        }
+
+        $payload = json_decode($payloadRaw, true);
+        return is_array($payload) ? $payload : null;
     }
 
     private function resolveDefaultTicketForClient(Client $client, bool $persistFallback = true): ?Ticket
@@ -313,6 +373,105 @@ class TicketController extends Controller
     }
 
     /**
+     * Create a short-lived signed QR validation token (5 minutes).
+     */
+    public function createQrValidationToken(Request $request)
+    {
+        $validated = $request->validate([
+            'ticket_uuid' => 'required|string',
+        ]);
+
+        /** @var Client $client */
+        $client = Auth::user();
+        $ticketUuid = trim($validated['ticket_uuid']);
+
+        $ticket = Ticket::where('uuid', $ticketUuid)
+            ->where('user_id', $client->id)
+            ->first();
+
+        if (!$ticket) {
+            return $this->errorResponse('Ticket non trouve ou non autorise.', 404);
+        }
+
+        $issuedAt = now()->timestamp;
+        $expiresAt = now()->addMinutes(5)->timestamp;
+        $jti = (string) Str::uuid();
+
+        $payload = [
+            'sub' => 'ticket_validation',
+            'ticket_uuid' => $ticket->uuid,
+            'user_id' => $client->id,
+            'iat' => $issuedAt,
+            'exp' => $expiresAt,
+            'jti' => $jti,
+            'validation_type' => 'qr',
+        ];
+
+        $token = $this->buildValidationToken($payload);
+
+        return $this->successResponse([
+            'validation_token' => $token,
+            'expires_in' => 300,
+            'expires_at' => date(DATE_ATOM, $expiresAt),
+            'ticket_uuid' => $ticket->uuid,
+        ], 'Token QR genere.');
+    }
+
+    /**
+     * Consume a signed QR validation token and validate ticket.
+     */
+    public function consumeQrValidationToken(Request $request)
+    {
+        $validated = $request->validate([
+            'validation_token' => 'required|string',
+            'validator_id' => 'nullable|string',
+            'location' => 'nullable|string',
+        ]);
+
+        /** @var Client $client */
+        $client = Auth::user();
+        $token = trim($validated['validation_token']);
+        $validatorId = $validated['validator_id'] ?? 'PC-VALIDATOR-01';
+        $location = $validated['location'] ?? null;
+
+        $payload = $this->parseValidationToken($token);
+        if (!$payload) {
+            $this->logValidation(null, $client->id, $validatorId, 'qr', 'failure', 'Token QR invalide.', $location);
+            return $this->errorResponse('Token QR invalide.', 422);
+        }
+
+        $ticketUuid = trim((string) ($payload['ticket_uuid'] ?? ''));
+        $exp = (int) ($payload['exp'] ?? 0);
+        $jti = (string) ($payload['jti'] ?? '');
+        $tokenUserId = (int) ($payload['user_id'] ?? 0);
+
+        if ($ticketUuid === '' || $exp <= 0 || $jti === '') {
+            $this->logValidation(null, $client->id, $validatorId, 'qr', 'failure', 'Token QR mal forme.', $location);
+            return $this->errorResponse('Token QR mal forme.', 422);
+        }
+
+        if ($tokenUserId !== (int) $client->id) {
+            $this->logValidation(null, $client->id, $validatorId, 'qr', 'failure', 'Token QR non autorise.', $location);
+            return $this->errorResponse('Token QR non autorise.', 403);
+        }
+
+        if (now()->timestamp > $exp) {
+            $this->logValidation(null, $client->id, $validatorId, 'qr', 'failure', 'Token QR expire.', $location);
+            return $this->errorResponse('Token QR expire.', 422);
+        }
+
+        $usedJtiKey = "qr_validation_token_used:{$jti}";
+        if (Cache::has($usedJtiKey)) {
+            $this->logValidation(null, $client->id, $validatorId, 'qr', 'failure', 'Token QR deja utilise.', $location);
+            return $this->errorResponse('Token QR deja utilise.', 422);
+        }
+
+        Cache::put($usedJtiKey, true, now()->addSeconds(max(1, $exp - now()->timestamp)));
+
+        return $this->validateTicketByUuid($ticketUuid, $client, 'qr', $validatorId, $location);
+    }
+
+    /**
      * Consume NFC challenge and validate an active ticket by UUID.
      */
     public function consumeNfcChallenge(Request $request)
@@ -347,15 +506,17 @@ class TicketController extends Controller
                     return $this->errorResponse('Ticket non trouve ou non autorise.', 404);
                 }
 
-                if ($ticket->status !== 'active') {
+                if (!$this->canValidateStatus((string) $ticket->status)) {
                     $this->logValidation($ticket->id, $client->id, 'DEV-NFC-CHALLENGE', 'nfc', 'failure', "Ticket deja {$ticket->status}.");
                     return $this->errorResponse("Le billet est deja {$ticket->status}.", 422);
                 }
 
-                $ticket->remaining_uses -= 1;
+                if ($this->shouldConsumeUse($ticket)) {
+                    $ticket->remaining_uses -= 1;
 
-                if ($ticket->remaining_uses <= 0) {
-                    $ticket->status = 'used';
+                    if ($ticket->remaining_uses <= 0) {
+                        $ticket->status = 'used';
+                    }
                 }
 
                 $ticket->save();
@@ -389,6 +550,11 @@ class TicketController extends Controller
         $validatorId = $request->input('validator_id', 'DEV-001'); // Mock validator ID
         $location = $request->input('location');
 
+        return $this->validateTicketByUuid($uuid, $client, $validationType, $validatorId, $location);
+    }
+
+    private function validateTicketByUuid(string $uuid, Client $client, string $validationType, string $validatorId, ?string $location = null)
+    {
         try {
             return DB::transaction(function () use ($uuid, $client, $validationType, $validatorId, $location) {
                 // 1. Fetch ticket with lock to prevent race conditions
@@ -406,9 +572,9 @@ class TicketController extends Controller
                 // 2. Security & Business Rules Validation
                 $failureReason = null;
 
-                if ($ticket->status !== 'active') {
+                if (!$this->canValidateStatus((string) $ticket->status)) {
                     $failureReason = "Le billet est déjà {$ticket->status}.";
-                } elseif ($ticket->remaining_uses <= 0) {
+                } elseif ($this->shouldConsumeUse($ticket) && $ticket->remaining_uses <= 0) {
                     $failureReason = "Plus d'utilisations restantes.";
                     $ticket->status = 'used';
                     $ticket->save();
@@ -421,10 +587,12 @@ class TicketController extends Controller
                 }
 
                 // 3. Perform Validation (Decrement Use)
-                $ticket->remaining_uses -= 1;
-                
-                if ($ticket->remaining_uses <= 0) {
-                    $ticket->status = 'used';
+                if ($this->shouldConsumeUse($ticket)) {
+                    $ticket->remaining_uses -= 1;
+                    
+                    if ($ticket->remaining_uses <= 0) {
+                        $ticket->status = 'used';
+                    }
                 }
                 
                 $ticket->save();
@@ -479,3 +647,4 @@ class TicketController extends Controller
         ]);
     }
 }
+

@@ -124,10 +124,10 @@ export default function PaimentHistory() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[#2a0b0f] to-[#1a0507] flex items-center justify-center p-4">
-            <div className="w-full max-w-md mx-auto">
-                <div className="relative rounded-3xl shadow-2xl border border-yellow-500/20 overflow-hidden bg-gradient-to-br from-[#400106]/90 to-[#260101]/90 backdrop-blur-sm">
-                    <div className="max-h-[calc(100vh-100px)] overflow-y-auto custom-scrollbar px-6 pb-24">
+        <div className="app-shell">
+            <div className="app-frame">
+                <div className="app-card relative rounded-3xl shadow-2xl border border-yellow-500/20 overflow-hidden bg-gradient-to-br from-[#400106]/90 to-[#260101]/90 backdrop-blur-sm">
+                    <div className="app-content custom-scrollbar px-6 pb-24">
                         <header className={styles.header}>
                             <div className={styles.headerTop}>
                                 <button

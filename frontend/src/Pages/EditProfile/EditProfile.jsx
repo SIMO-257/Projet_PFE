@@ -129,11 +129,11 @@ const EditProfileScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#2a0b0f] to-[#1a0507] flex items-center justify-center p-4">
+    <div className="app-shell">
       {/* Main Container */}
-      <div className="w-full max-w-md mx-auto">
+      <div className="app-frame">
         {/* Edit Profile Card */}
-        <div className={styles.editProfileCard}>
+        <div className={`${styles.editProfileCard} app-card`}>
           
           <Header 
             title="Modifier le profil" 
@@ -142,7 +142,7 @@ const EditProfileScreen = () => {
           />
 
           {/* Main Content - Scrollable */}
-          <div className={styles.scrollContainer}>
+          <div className={`app-content ${styles.scrollContainer}`}>
             
             {/* Profile Photo Section */}
             <div className="flex flex-col items-center py-6">
@@ -332,3 +332,4 @@ const EditProfileScreen = () => {
 };
 
 export default EditProfileScreen;
+

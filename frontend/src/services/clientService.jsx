@@ -126,6 +126,8 @@ export const fetchTicketDetails = (uuid) => clientApi.get(`/tickets/${uuid}`).th
 export const validateTicket = (uuid, payload) => clientApi.post(`/tickets/${uuid}/validate`, payload);
 export const createNfcChallenge = () => clientApi.post('/tickets/nfc/challenge').then(extractPayload);
 export const consumeNfcChallenge = (payload) => clientApi.post('/tickets/nfc/consume', payload).then(extractPayload);
+export const createQrValidationToken = (payload) => clientApi.post('/tickets/qr/token', payload).then(extractPayload);
+export const consumeQrValidationToken = (payload) => clientApi.post('/tickets/qr/consume', payload).then(extractPayload);
 
 export const createPaymentIntent = (payload) => clientApi.post('/payments/create-intent', payload);
 

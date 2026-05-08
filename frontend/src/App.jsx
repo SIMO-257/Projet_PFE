@@ -23,6 +23,7 @@ const AllTickets = lazy(() => import("./Pages/AllTickets/AllTickets"));
 const TicketSelection = lazy(() => import("./Pages/TicketSelection/TicketSelection"));
 const ViewTicket = lazy(() => import("./Pages/ViewTicket/ViewTicket"));
 const ValidationScreen = lazy(() => import("./Pages/ValidationScreen/ValidationScreen"));
+const ValidatorScreen = lazy(() => import("./Pages/Validator/ValidatorScreen"));
 
 const Paiment = lazy(() => import("./Pages/Paiment/Paiment"));
 const RechargePaymentScreen = lazy(() => import("./Pages/RechargePaymentScreen/RechargePaymentScreen"));
@@ -100,6 +101,7 @@ function App() {
             <Route path="/ticket-selection" element={<TicketSelection />} />
             <Route path="/viewticket/:id" element={<ViewTicket />} />
             <Route path="/validation" element={<ValidationScreen />} />
+            <Route path="/validator" element={<ValidatorScreen />} />
 
             <Route path="/payment" element={<Paiment />} />
             <Route path="/recharge-payment" element={<RechargePaymentScreen />} />

@@ -96,9 +96,9 @@ const RechargePaymentScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#2a0b0f] to-[#1a0507] flex items-center justify-center p-4">
-      <div className="w-full max-w-md mx-auto">
-        <ValidationCard className="shadow-2xl">
+    <div className="app-shell">
+      <div className="app-frame">
+        <ValidationCard className="app-card shadow-2xl">
           <Header
             title={step === 1 ? "Rechargement" : "Paiement sécurisé"}
             onBack={goBack}
@@ -112,7 +112,7 @@ const RechargePaymentScreen = () => {
             <ProgressDots totalSteps={2} currentStep={step} />
           </div>
 
-          <div className="max-h-[calc(100vh-150px)] overflow-y-auto custom-scrollbar px-6 pb-8">
+          <div className="app-content custom-scrollbar px-6 pb-8">
             {step === 1 ? (
               <div className="space-y-8 mt-4">
                 <div className="space-y-2">

@@ -30,6 +30,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/tickets/cards/default', [TicketController::class, 'setDefaultCard'])->name('api.tickets.cards.default');
     Route::post('/tickets/nfc/challenge', [TicketController::class, 'createNfcChallenge'])->middleware('throttle:validation')->name('api.tickets.nfc.challenge');
     Route::post('/tickets/nfc/consume', [TicketController::class, 'consumeNfcChallenge'])->middleware('throttle:validation')->name('api.tickets.nfc.consume');
+    Route::post('/tickets/qr/token', [TicketController::class, 'createQrValidationToken'])->middleware('throttle:validation')->name('api.tickets.qr.token');
+    Route::post('/tickets/qr/consume', [TicketController::class, 'consumeQrValidationToken'])->middleware('throttle:validation')->name('api.tickets.qr.consume');
     Route::get('/tickets/{uuid}', [TicketController::class, 'show'])->name('api.tickets.show');
     Route::post('/tickets/{uuid}/validate', [TicketController::class, 'validateTicket'])->middleware('throttle:validation')->name('api.tickets.validate');
 

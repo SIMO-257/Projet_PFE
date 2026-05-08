@@ -44,23 +44,25 @@ body::-webkit-scrollbar {
 .app-shell {
   min-height: 100svh;
   background: linear-gradient(135deg, #2a0b0f 0%, #1a0507 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
+  width: 100%;
+  padding: 0;
 }
 
 .app-frame {
   width: 100%;
-  max-width: 28rem;
-  height: min(820px, calc(100svh - 2rem));
-  margin: 0 auto;
+  max-width: none;
+  min-height: 100svh;
+  margin: 0;
 }
 
 .app-card {
-  height: 100%;
+  width: 100%;
+  min-height: 100svh;
   display: flex;
   flex-direction: column;
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 .app-content {

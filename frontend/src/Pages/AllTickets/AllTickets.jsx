@@ -35,7 +35,10 @@ const AllTickets = () => {
 
     return sorted.filter((ticket) => {
       const normalizedStatus = String(ticket?.status || '').toLowerCase();
+      const remainingUses = Number(ticket?.remaining_uses ?? 0);
       const ticketDate = new Date(ticket.created_at);
+      const isAllowedStatus = normalizedStatus === 'active' || normalizedStatus === 'used';
+      const hasRemainingUses = remainingUses > 0;
 
       const matchesStatus = statusFilter === 'all' || normalizedStatus === statusFilter;
       const matchesTime =
@@ -43,7 +46,7 @@ const AllTickets = () => {
         (timeFilter === 'today' && ticketDate >= startOfToday && ticketDate <= endOfToday) ||
         (timeFilter === 'week' && ticketDate >= startOfWeek && ticketDate <= endOfWeek);
 
-      return matchesStatus && matchesTime;
+      return isAllowedStatus && hasRemainingUses && matchesStatus && matchesTime;
     });
   }, [tickets, statusFilter, timeFilter]);
 
@@ -61,11 +64,6 @@ const AllTickets = () => {
     { id: 'used', label: 'Utilise', color: 'text-yellow-400', icon: (
       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" />
-      </svg>
-    ) },
-    { id: 'expired', label: 'Expire', color: 'text-red-400', icon: (
-      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
       </svg>
     ) },
   ];

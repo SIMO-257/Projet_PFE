@@ -6,8 +6,9 @@ export default function Paiment() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-[#1a0507] py-8 px-4 flex flex-col items-center justify-center">
-      <div className="max-w-xl w-full mx-auto text-center">
+    <div className="app-shell">
+      <div className="app-frame">
+      <div className="app-card bg-[#1a0507] py-8 px-6 text-center app-content">
         <ProgressSteps currentStep={2} />
         
         <div className="bg-[#2a0b0f] rounded-3xl shadow-2xl p-12 border border-white/5 mt-8">
@@ -28,6 +29,7 @@ export default function Paiment() {
             Retour à l'accueil
           </button>
         </div>
+      </div>
       </div>
     </div>
   );
