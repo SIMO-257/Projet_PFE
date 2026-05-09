@@ -94,6 +94,19 @@ const notificationSlice = createSlice({
                 hasMore: true,
             };
         },
+        resetState: (state) => {
+            state.items = [];
+            state.unreadCount = 0;
+            state.activeFilter = 'all';
+            state.pagination = {
+                currentPage: 1,
+                lastPage: 1,
+                hasMore: true,
+            };
+            state.loading = false;
+            state.loadingMore = false;
+            state.error = null;
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -171,5 +184,5 @@ const notificationSlice = createSlice({
     },
 });
 
-export const { setFilter } = notificationSlice.actions;
+export const { setFilter, resetState } = notificationSlice.actions;
 export default notificationSlice.reducer;

@@ -34,12 +34,6 @@ class SendLowBalanceNotification implements ShouldQueue
             return;
         }
 
-        // Check if user has enabled payment notifications
-        $prefs = $user->notification_prefs ?? ['payment' => true];
-        if (!($prefs['payment'] ?? true)) {
-            return;
-        }
-
         // Throttle: check Redis key "low_balance_notif:{user_id}" — skip if exists
         $redisKey = "low_balance_notif:{$user->id}";
         try {

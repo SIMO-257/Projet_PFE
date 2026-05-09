@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rules\Password;
 
 class ClientRequest extends FormRequest
 {
@@ -16,9 +17,18 @@ class ClientRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'required|email|max:255|unique:clients,email',
+            'email' => 'required|email:rfc,dns|max:255|unique:clients,email',
             'phone' => ['required', 'string', 'regex:/^(06|07)\d{8}$/', 'unique:clients,phone'],
-            'password' => 'required|string|min:8|confirmed',
+            'password' => [
+                'required',
+                'string',
+                'confirmed',
+                Password::min(8)
+                    ->letters()
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols(),
+            ],
             'full_name' => 'nullable|string|max:255',
             'first_name' => 'nullable|string|max:100',
             'last_name' => 'nullable|string|max:100',

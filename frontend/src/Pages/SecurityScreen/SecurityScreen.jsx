@@ -1,30 +1,68 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../Components/Layout/Header';
 import styles from '../../Styles/Security.module.css';
+import { getClientPreferences, updateClientPreferences } from '../../services/notificationService';
 
 const SecurityScreen = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
   // --- State for toggles ---
   const [pinEnabled, setPinEnabled] = useState(true);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
-  const [requireAuthSensitive, setRequireAuthSensitive] = useState(true);
+  const [requireAuthSensitive, setRequireAuthSensitive] = useState(false);
   const [antiReplayAlerts, setAntiReplayAlerts] = useState(true);
   const [suspiciousActivityAlerts, setSuspiciousActivityAlerts] = useState(true);
   const [cardFrozen, setCardFrozen] = useState(false);
 
-  // --- Mock active sessions ---
-  const [sessions, setSessions] = useState([
-    { id: 1, device: 'iPhone 13 Pro', location: 'Casablanca, Maroc', lastActive: 'Aujourd\'hui, 14:32', current: true },
-    { id: 2, device: 'MacBook Pro', location: 'Casablanca, Maroc', lastActive: 'Hier, 09:15', current: false },
-    { id: 3, device: 'Samsung Galaxy S21', location: 'Rabat, Maroc', lastActive: 'Il y a 3 jours', current: false },
-  ]);
+  useEffect(() => {
+    const loadPrefs = async () => {
+      try {
+        const prefs = await getClientPreferences();
+        if (prefs) {
+          setPinEnabled(prefs.pin_enabled ?? true);
+          setBiometricEnabled(prefs.biometric_enabled ?? false);
+          setRequireAuthSensitive(prefs.auth_purchase ?? false);
+          setAntiReplayAlerts(prefs.anti_replay_alerts ?? true);
+          setSuspiciousActivityAlerts(prefs.suspicious_activity_alerts ?? true);
+          setCardFrozen(prefs.card_frozen ?? false);
+        }
+      } catch (err) {
+        console.error('Failed to load security preferences:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadPrefs();
+  }, []);
 
   // --- Handlers ---
   const goBack = () => navigate(-1);
   const handleChangePassword = () => {};
   const handleSetRecovery = () => {};
+  
+  const handlePreferenceChange = async (key, value) => {
+    // Optimistic update
+    const setters = {
+      pin_enabled: setPinEnabled,
+      biometric_enabled: setBiometricEnabled,
+      auth_purchase: setRequireAuthSensitive,
+      anti_replay_alerts: setAntiReplayAlerts,
+      suspicious_activity_alerts: setSuspiciousActivityAlerts,
+      card_frozen: setCardFrozen
+    };
+
+    if (setters[key]) setters[key](value);
+
+    try {
+      await updateClientPreferences({ [key]: value });
+    } catch (err) {
+      console.error(`Failed to update ${key}:`, err);
+      // Revert on failure
+      if (setters[key]) setters[key](!value);
+    }
+  };
   const handleRevokeSession = (id) => {
     setSessions(sessions.filter(s => s.id !== id));
   };
@@ -32,8 +70,7 @@ const SecurityScreen = () => {
     setSessions(sessions.filter(s => s.current));
   };
   const handleFreezeCard = () => {
-    const newState = !cardFrozen;
-    setCardFrozen(newState);
+    handlePreferenceChange('card_frozen', !cardFrozen);
   };
 
   return (
@@ -58,21 +95,21 @@ const SecurityScreen = () => {
                 label="Code PIN"
                 description="Verrouiller l'application avec un code"
                 value={pinEnabled}
-                onChange={setPinEnabled}
+                onChange={(v) => handlePreferenceChange('pin_enabled', v)}
               />
               <ToggleItem
                 icon="faceid"
                 label="Authentification biométrique"
                 description="Face ID / Touch ID"
                 value={biometricEnabled}
-                onChange={setBiometricEnabled}
+                onChange={(v) => handlePreferenceChange('biometric_enabled', v)}
               />
               <ToggleItem
                 icon="shield"
                 label="Authentification pour actions sensibles"
                 description="Paiements, changement de carte, etc."
                 value={requireAuthSensitive}
-                onChange={setRequireAuthSensitive}
+                onChange={(v) => handlePreferenceChange('auth_purchase', v)}
               />
             </Section>
 
@@ -121,14 +158,14 @@ const SecurityScreen = () => {
                 label="Alertes anti‑rejeu"
                 description="Notifier si un ticket est utilisé deux fois"
                 value={antiReplayAlerts}
-                onChange={setAntiReplayAlerts}
+                onChange={(v) => handlePreferenceChange('anti_replay_alerts', v)}
               />
               <ToggleItem
                 icon="suspicious"
                 label="Alertes d'activité suspecte"
                 description="Connexions multiples, échecs répétés"
                 value={suspiciousActivityAlerts}
-                onChange={setSuspiciousActivityAlerts}
+                onChange={(v) => handlePreferenceChange('suspicious_activity_alerts', v)}
               />
             </Section>
 

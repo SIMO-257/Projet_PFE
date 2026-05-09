@@ -51,7 +51,14 @@ const ticketsSlice = createSlice({
     error: null,
   },
 
-  reducers: {},
+  reducers: {
+    resetState: (state) => {
+      state.items = [];
+      state.availableTypes = [];
+      state.status = 'idle';
+      state.error = null;
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getTicketsData.pending, (state) => {
@@ -87,4 +94,5 @@ const ticketsSlice = createSlice({
   },
 });
 
+export const { resetState } = ticketsSlice.actions;
 export default ticketsSlice.reducer;

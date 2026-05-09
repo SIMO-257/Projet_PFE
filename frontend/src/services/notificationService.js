@@ -28,3 +28,9 @@ export const getNotificationPreferences = () =>
 
 export const updateNotificationPreferences = (preferences) =>
     clientApi.patch('/user/notification-preferences', { preferences }).then(extractPayload);
+
+export const getClientPreferences = () =>
+    clientApi.get('/user/preferences').then(extractPayload);
+
+export const updateClientPreferences = (preferences) =>
+    clientApi.patch('/user/preferences', preferences).then(extractPayload);

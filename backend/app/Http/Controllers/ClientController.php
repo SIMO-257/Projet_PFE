@@ -47,6 +47,11 @@ class ClientController extends Controller
         $client = $request->user();
 
         $validated = $request->validated();
+        \Illuminate\Support\Facades\Log::info('Profile Update Request', [
+            'client_id' => $client->id,
+            'full_name' => $validated['full_name'] ?? 'not provided',
+            'has_file' => $request->hasFile('profile_file')
+        ]);
 
         if (array_key_exists('phone', $validated)) {
             $client->phone = $validated['phone'] ?: null;
@@ -55,6 +60,14 @@ class ClientController extends Controller
         $this->applyProfileFile($client, $request, 'profile_file');
 
         $client->save();
+        $client->refresh();
+
+        \Illuminate\Support\Facades\Log::info('Profile Saved', [
+            'client_id' => $client->id,
+            'first_name' => $client->first_name,
+            'last_name' => $client->last_name,
+            'has_blob' => !empty($client->profile_file)
+        ]);
 
         AuditLog::log('profile_update', $client->id);
 
@@ -246,6 +259,43 @@ class ClientController extends Controller
         $request->user()->update(['notification_prefs' => $validated['preferences']]);
         
         return $this->successResponse(null, 'Notification preferences updated');
+    }
+
+    public function getPreferences(Request $request)
+    {
+        $defaults = [
+            'analytics_enabled'        => true,
+            'auth_purchase'            => false,
+            'pin_enabled'              => true,
+            'biometric_enabled'        => false,
+            'anti_replay_alerts'       => true,
+            'suspicious_activity_alerts' => true,
+            'card_frozen'              => false,
+        ];
+
+        $prefs = array_merge($defaults, $request->user()->client_preferences ?? []);
+
+        return $this->successResponse($prefs, 'Client preferences fetched successfully');
+    }
+
+    public function updatePreferences(Request $request)
+    {
+        $validated = $request->validate([
+            'analytics_enabled'          => 'sometimes|boolean',
+            'auth_purchase'              => 'sometimes|boolean',
+            'pin_enabled'                => 'sometimes|boolean',
+            'biometric_enabled'          => 'sometimes|boolean',
+            'anti_replay_alerts'         => 'sometimes|boolean',
+            'suspicious_activity_alerts' => 'sometimes|boolean',
+            'card_frozen'                => 'sometimes|boolean',
+        ]);
+
+        $current = $request->user()->client_preferences ?? [];
+        $updated = array_merge($current, $validated);
+
+        $request->user()->update(['client_preferences' => $updated]);
+
+        return $this->successResponse($updated, 'Préférences mises à jour');
     }
 
     private function applyName(Client $client, array $data): void

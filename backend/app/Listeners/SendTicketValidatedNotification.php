@@ -28,12 +28,6 @@ class SendTicketValidatedNotification implements ShouldQueue
     {
         $user = $event->user;
         
-        // Check if user has enabled validation notifications
-        $prefs = $user->notification_prefs ?? ['validation' => true];
-        if (!($prefs['validation'] ?? true)) {
-            return;
-        }
-
         $this->notificationService->send(
             $user,
             'validation',

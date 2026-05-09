@@ -33,6 +33,8 @@ class Client extends Authenticatable implements CanResetPasswordContract
         'is_active',
         'remember_me',
         'default_ticket_id',
+        'notification_prefs',
+        'client_preferences',
     ];
 
     /**
@@ -56,6 +58,8 @@ class Client extends Authenticatable implements CanResetPasswordContract
             'remember_me' => 'boolean',
             'created_at' => 'datetime',
             'password_hash' => 'hashed',
+            'notification_prefs' => 'array',
+            'client_preferences' => 'array',
         ];
     }
 

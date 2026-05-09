@@ -20,7 +20,24 @@ class NotificationService
         string $title,
         string $body,
         array  $meta = []
-    ): Notification {
+    ): ?Notification {
+        // Check user preferences
+        $prefs = $user->notification_prefs ?? [
+            'validation' => true,
+            'payment' => true,
+            'security' => true,
+            'promo' => false,
+        ];
+
+        if (isset($prefs[$type]) && $prefs[$type] === false) {
+            Log::info("Notification suppressed by user preference", [
+                'user_id' => $user->id,
+                'type' => $type,
+                'title' => $title
+            ]);
+            return null;
+        }
+
         $notif = Notification::create([
             'user_id'  => $user->id,
             'type'     => $type,

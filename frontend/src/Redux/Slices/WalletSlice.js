@@ -32,6 +32,13 @@ const walletSlice = createSlice({
   reducers: {
     updateBalance: (state, action) => {
       state.balance = action.payload;
+    },
+    resetState: (state) => {
+      state.balance = 0;
+      state.card_last_four = '****';
+      state.transactions = [];
+      state.status = 'idle';
+      state.error = null;
     }
   },
   extraReducers: (builder) => {
@@ -54,5 +61,5 @@ const walletSlice = createSlice({
   },
 });
 
-export const { updateBalance } = walletSlice.actions;
+export const { updateBalance, resetState } = walletSlice.actions;
 export default walletSlice.reducer;

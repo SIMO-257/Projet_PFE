@@ -9,6 +9,14 @@ import FormOptions from '../../Components/Form/FormOptions';
 import AuthLayout from '../../Components/Layout/AuthLayout';
 import styles from '../../Styles/Auth.module.css';
 
+const DISPOSABLE_DOMAINS = [
+    'mailinator.com', 'guerrillamail.com', 'tempmail.com', 'throwaway.email',
+    'fakeinbox.com', 'sharklasers.com', 'yopmail.com', 'maildrop.cc',
+    'dispostable.com', 'trashmail.com', 'spamgourmet.com', 'spamgourmet.org',
+    'spam4.me', 'getairmail.com', 'mailnull.com', 'spamcorpse.com',
+    'mail-temporaire.fr', '10minutemail.com', 'tempinbox.com',
+];
+
 export default function SignUp() {
 
     const navigate = useNavigate();
@@ -24,9 +32,55 @@ export default function SignUp() {
 
     const [errors, setErrors] = useState({});
     const [processing, setProcessing] = useState(false);
+    const [passwordStrength, setPasswordStrength] = useState(null);
+
+    const getPasswordStrength = (password) => {
+        if (!password) return null;
+        const hasMinLength = password.length >= 8;
+        const hasUppercase = /[A-Z]/.test(password);
+        const hasLowercase = /[a-z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+        const hasSpecial = /[^A-Za-z0-9]/.test(password);
+
+        const score = [hasMinLength, hasUppercase, hasLowercase, hasNumber, hasSpecial]
+            .filter(Boolean).length;
+
+        if (score <= 2) return 'weak';
+        if (score <= 4) return 'medium';
+        return 'strong';
+    };
 
     const setField = (field) => (e) => {
-        setForm((prev) => ({ ...prev, [field]: e.target.value }));
+        const value = e.target.value;
+        setForm((prev) => ({ ...prev, [field]: value }));
+
+        if (field === 'password') {
+            setPasswordStrength(getPasswordStrength(value));
+        }
+
+        if (field === 'email' && errors.email) {
+            setErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors.email;
+                return newErrors;
+            });
+        }
+    };
+
+    const handleEmailBlur = () => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!form.email) return;
+
+        if (!emailRegex.test(form.email)) {
+            setErrors(prev => ({ ...prev, email: 'Adresse email invalide.' }));
+            return;
+        }
+
+        const domain = form.email.split('@')[1]?.toLowerCase();
+        if (DISPOSABLE_DOMAINS.includes(domain)) {
+            setErrors(prev => ({ ...prev, email: 'Adresse email temporaire non autorisée.' }));
+            return;
+        }
     };
 
     const toggleTerms = () => {
@@ -35,6 +89,14 @@ export default function SignUp() {
 
     const Sign_up = async (e) => {
         e.preventDefault();
+        
+        // Final frontend check
+        if (errors.email) return;
+        if (passwordStrength === 'weak' || passwordStrength === null) {
+            setErrors(prev => ({ ...prev, password: 'Le mot de passe est trop faible.' }));
+            return;
+        }
+
         setErrors({});
 
         if (!form.accept_terms) {
@@ -101,6 +163,7 @@ export default function SignUp() {
                 id="signup-email"
                 var={form.email}
                 setVar={setField('email')}
+                onBlur={handleEmailBlur}
                 error={Boolean(errors.email)}
                 errorMessage={errors.email}
                 required
@@ -129,6 +192,45 @@ export default function SignUp() {
                 errorMessage={errors.password}
                 required
             />
+
+            {/* Strength Indicator */}
+            {passwordStrength && (
+                <div className="mb-4">
+                    <div className="flex gap-1 mb-1">
+                        <div className={`h-1 flex-1 rounded-full transition-colors ${passwordStrength ? (passwordStrength === 'weak' ? 'bg-red-500' : (passwordStrength === 'medium' ? 'bg-yellow-500' : 'bg-green-500')) : 'bg-gray-200'}`} />
+                        <div className={`h-1 flex-1 rounded-full transition-colors ${passwordStrength === 'medium' || passwordStrength === 'strong' ? (passwordStrength === 'medium' ? 'bg-yellow-500' : 'bg-green-500') : 'bg-gray-200'}`} />
+                        <div className={`h-1 flex-1 rounded-full transition-colors ${passwordStrength === 'strong' ? 'bg-green-500' : 'bg-gray-200'}`} />
+                    </div>
+                    <p className={`text-[10px] font-medium uppercase tracking-wider ${passwordStrength === 'weak' ? 'text-red-500' : (passwordStrength === 'medium' ? 'text-yellow-600' : 'text-green-600')}`}>
+                        Force: {passwordStrength === 'weak' ? 'Faible' : (passwordStrength === 'medium' ? 'Moyenne' : 'Forte')}
+                    </p>
+                </div>
+            )}
+
+            {/* Password Rules */}
+            {form.password && (
+                <div className="mb-6 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    <p className="text-[10px] text-gray-400 uppercase tracking-widest mb-2 font-bold">Exigences:</p>
+                    <ul className="space-y-1">
+                        <li className={`flex items-center gap-2 text-[11px] ${form.password.length >= 8 ? 'text-green-600' : 'text-gray-400'}`}>
+                            <div className={`w-1 h-1 rounded-full ${form.password.length >= 8 ? 'bg-green-600' : 'bg-gray-300'}`} />
+                            Au moins 8 caractères
+                        </li>
+                        <li className={`flex items-center gap-2 text-[11px] ${/[A-Z]/.test(form.password) && /[a-z]/.test(form.password) ? 'text-green-600' : 'text-gray-400'}`}>
+                            <div className={`w-1 h-1 rounded-full ${/[A-Z]/.test(form.password) && /[a-z]/.test(form.password) ? 'bg-green-600' : 'bg-gray-300'}`} />
+                            Majuscules & minuscules
+                        </li>
+                        <li className={`flex items-center gap-2 text-[11px] ${/[0-9]/.test(form.password) ? 'text-green-600' : 'text-gray-400'}`}>
+                            <div className={`w-1 h-1 rounded-full ${/[0-9]/.test(form.password) ? 'bg-green-600' : 'bg-gray-300'}`} />
+                            Au moins un chiffre
+                        </li>
+                        <li className={`flex items-center gap-2 text-[11px] ${/[^A-Za-z0-9]/.test(form.password) ? 'text-green-600' : 'text-gray-400'}`}>
+                            <div className={`w-1 h-1 rounded-full ${/[^A-Za-z0-9]/.test(form.password) ? 'bg-green-600' : 'bg-gray-300'}`} />
+                            Un caractère spécial
+                        </li>
+                    </ul>
+                </div>
+            )}
 
             <InputField
                 label="Confirmer le mot de passe"

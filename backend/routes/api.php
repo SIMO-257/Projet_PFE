@@ -58,4 +58,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/user/fcm-token', [ClientController::class, 'updateFcmToken'])->name('api.client.fcm_token.update');
     Route::get('/user/notification-preferences', [ClientController::class, 'getNotificationPreferences'])->name('api.client.notification_preferences.get');
     Route::patch('/user/notification-preferences', [ClientController::class, 'updateNotificationPreferences'])->name('api.client.notification_preferences.update');
+    Route::get('/user/preferences', [ClientController::class, 'getPreferences'])->name('api.client.preferences.get');
+    Route::patch('/user/preferences', [ClientController::class, 'updatePreferences'])->name('api.client.preferences.update');
 });
