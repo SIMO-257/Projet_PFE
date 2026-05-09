@@ -25,12 +25,34 @@ export const fetchCsrfToken = () => axios.get(`${apiBase}/sanctum/csrf-cookie`, 
 
 const extractPayload = (response) => response?.data?.data ?? null;
 
+const AUTH_FLAG_KEY = 'is_authenticated';
+const AUTH_REMEMBER_KEY = 'auth_remember';
+
 // These are now legacy/placeholder as we use cookies
-export const getAuthToken = () => localStorage.getItem('is_authenticated') === 'true';
+export const getAuthToken = () => localStorage.getItem(AUTH_FLAG_KEY) === 'true';
 
 export const setAuthToken = () => {
   // We don't use the token from response anymore, but we'll store a flag
-  localStorage.setItem('is_authenticated', 'true');
+  localStorage.setItem(AUTH_FLAG_KEY, 'true');
+};
+
+export const setAuthPersistence = (rememberMe = false) => {
+  if (rememberMe) {
+    localStorage.setItem(AUTH_REMEMBER_KEY, 'true');
+    localStorage.setItem(AUTH_FLAG_KEY, 'true');
+    sessionStorage.removeItem(AUTH_FLAG_KEY);
+    return;
+  }
+
+  localStorage.removeItem(AUTH_REMEMBER_KEY);
+  localStorage.removeItem(AUTH_FLAG_KEY);
+  sessionStorage.setItem(AUTH_FLAG_KEY, 'true');
+};
+
+export const shouldRestoreAuthSession = () => {
+  const remembered = localStorage.getItem(AUTH_REMEMBER_KEY) === 'true';
+  const activeSession = sessionStorage.getItem(AUTH_FLAG_KEY) === 'true';
+  return remembered || activeSession;
 };
 
 export const setClientUuid = (uuid, rememberMe = false) => {
@@ -46,9 +68,9 @@ export const setClientUuid = (uuid, rememberMe = false) => {
 };
 
 export const clearAuthData = () => {
-
-  localStorage.removeItem('is_authenticated');
-
+  localStorage.removeItem(AUTH_FLAG_KEY);
+  localStorage.removeItem(AUTH_REMEMBER_KEY);
+  sessionStorage.removeItem(AUTH_FLAG_KEY);
 };
 
 clientApi.interceptors.request.use((config) => {

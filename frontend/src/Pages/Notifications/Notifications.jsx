@@ -105,7 +105,7 @@ export default function Notifications() {
                         </div>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto no-scrollbar px-4 py-4 space-y-3 pb-24">
+                    <div className={`flex-1 overflow-y-auto no-scrollbar px-4 py-4 space-y-3 ${items.length > 0 ? 'pb-24' : 'pb-8'}`}>
                         {loading && items.length === 0 ? (
                             <div className="flex justify-center py-12">
                                 <div className="w-8 h-8 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin"></div>
@@ -115,7 +115,7 @@ export default function Notifications() {
                                 <svg className="w-16 h-16 mx-auto mb-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                                 </svg>
-                                <p className="text-sm">{t('no_notifications')}</p>
+                                <p className="text-sm text-white">{t('no_notifications')}</p>
                             </div>
                         ) : (
                             <>
@@ -140,7 +140,7 @@ export default function Notifications() {
                         )}
                     </div>
 
-                    <BottomNavigation />
+                    {items.length > 0 && <BottomNavigation />}
                 </div>
             </div>
         </div>

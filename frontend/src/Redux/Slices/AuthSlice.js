@@ -1,13 +1,15 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { fetchClientProfile, loginClient, logoutClient, fetchCsrfToken } from '../../services/clientService';
+import { clearAuthData, fetchClientProfile, loginClient, logoutClient, fetchCsrfToken, setAuthPersistence } from '../../services/clientService';
 
 export const login = createAsyncThunk('auth/login', async (credentials, { rejectWithValue }) => {
   try {
     await fetchCsrfToken();
     await loginClient(credentials);
+    setAuthPersistence(Boolean(credentials?.remember_me));
     const profileResponse = await fetchClientProfile();
     return profileResponse;
   } catch (err) {
+    clearAuthData();
     return rejectWithValue(err.response?.data || { message: 'Login failed' });
   }
 });
@@ -31,8 +33,10 @@ export const logout = createAsyncThunk('auth/logout', async (_, { rejectWithValu
   try {
     await fetchCsrfToken();
     await logoutClient();
+    clearAuthData();
     return true;
   } catch (err) {
+    clearAuthData();
     return rejectWithValue(err.response?.data || { message: 'Logout failed' });
   }
 });
@@ -49,6 +53,13 @@ const authSlice = createSlice({
   reducers: {
     setAuthenticated: (state, action) => {
       state.isAuthenticated = action.payload;
+    },
+    markAuthCheckedUnauthenticated: (state) => {
+      state.user = null;
+      state.isAuthenticated = false;
+      state.status = 'idle';
+      state.initialized = true;
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -102,5 +113,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { setAuthenticated } = authSlice.actions;
+export const { setAuthenticated, markAuthCheckedUnauthenticated } = authSlice.actions;
 export default authSlice.reducer;

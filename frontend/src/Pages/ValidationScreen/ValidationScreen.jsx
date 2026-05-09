@@ -321,11 +321,10 @@ export default function ValidationScreen() {
           show={showNFCModal}
           onClose={closeNFCModal}
           showCloseButton={false}
-          className="w-full max-w-sm"
+          className="w-full h-full"
           overlayClassName={styles.noScrollbar}
         >
-          <div className="relative rounded-3xl w-full border border-yellow-500/20 p-8 text-center bg-gradient-to-br from-[#400106]/90 to-[#260101]/90 backdrop-blur-sm">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FFD700] to-[#D4AF37] rounded-t-3xl"></div>
+          <div className="relative rounded-none w-screen h-screen border-0 flex flex-col items-center justify-center p-8 text-center bg-gradient-to-br from-[#400106]/90 to-[#260101]/90 backdrop-blur-sm">
 
             <div className="mb-6">
               <NFCAnimation isActive={true} size={128} showWaves={true} pulseSpeed="normal" />
@@ -382,11 +381,10 @@ export default function ValidationScreen() {
             setQrPayload('');
           }}
           showCloseButton={false}
-          className="w-full max-w-sm"
+          className="w-full h-full"
           overlayClassName={styles.noScrollbar}
         >
-          <div className="relative rounded-3xl w-full border border-yellow-500/20 p-8 text-center bg-gradient-to-br from-[#400106]/90 to-[#260101]/90 backdrop-blur-sm">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FFD700] to-[#D4AF37] rounded-t-3xl"></div>
+          <div className="relative rounded-none w-screen h-screen border-0 flex flex-col items-center justify-center p-8 text-center bg-gradient-to-br from-[#400106]/90 to-[#260101]/90 backdrop-blur-sm">
 
             <div className="mb-6">
               <div className="w-64 h-64 mx-auto">

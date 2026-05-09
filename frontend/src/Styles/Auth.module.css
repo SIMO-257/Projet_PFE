@@ -1,27 +1,10 @@
+.authCard {
+  @apply relative overflow-hidden;
+  background: linear-gradient(135deg, rgba(64, 1, 6, 0.95) 0%, rgba(38, 1, 1, 0.95) 100%);
+}
 
 .authContainer {
-  @apply min-h-screen w-full flex items-center justify-center bg-white;
-  min-height: 100svh;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  padding: 1rem;
-}
-
-.authCard {
-  @apply bg-white w-full border border-gray-100;
-  padding: 40px;
-  max-width: 460px;
-  min-height: calc(100svh - 2rem);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  border-radius: 24px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(212, 175, 55, 0.1);
-}
-
-/* Fixed for ForgotPassword nested cards */
-.authCard .authCard {
-  @apply p-0 border-none bg-none shadow-none m-0;
+  @apply w-full max-w-xl mx-auto px-6 py-10;
 }
 
 .authHeader {
@@ -29,31 +12,30 @@
 }
 
 .authLogo {
-  @apply text-4xl font-normal mb-4 tracking-normal;
-  color: #8B4049;
-  font-family: 'Playfair Display', Georgia, serif;
+  @apply text-4xl font-semibold mb-3 tracking-wide;
+  color: #f5d579;
 }
 
 .goldenLine {
   @apply border-none mx-auto mb-5 block;
-  width: 60px;
+  width: 64px;
   height: 3px;
-  background: linear-gradient(to right, #FFD700, #D4AF37);
+  background: linear-gradient(to right, #ffd700, #d4af37);
   border-radius: 2px;
 }
 
 .authSubtitle {
-  @apply text-gray-900 font-semibold mb-3;
-  font-size: 22px;
+  @apply text-white font-semibold mb-2;
+  font-size: 24px;
 }
 
 .authDescription {
-  @apply text-gray-500 text-sm leading-relaxed mx-auto font-normal;
-  max-width: 320px;
+  @apply text-white/70 text-sm leading-relaxed mx-auto;
+  max-width: 360px;
 }
 
 .authForm {
-  @apply mb-7;
+  @apply mb-6;
 }
 
 .formGroup {
@@ -61,38 +43,41 @@
 }
 
 .formLabel {
-  @apply block text-gray-600 font-semibold mb-2 uppercase tracking-wider;
+  @apply block text-white/70 font-semibold mb-2 uppercase tracking-wider;
   font-size: 11px;
 }
 
 .formInput {
-  @apply w-full px-4 border-gray-200 text-sm bg-gray-50 transition-all text-gray-800 font-normal;
+  @apply w-full text-sm transition-all text-white;
   padding: 14px 16px;
-  border: 1.5px solid #f0f0f0;
+  border: 1.5px solid rgba(212, 175, 55, 0.18);
   border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .formInput::placeholder {
-  @apply text-gray-400 font-normal;
+  @apply text-white/45;
 }
 
 .formInputError {
-  @apply border-red-500 bg-red-50;
+  border-color: rgba(248, 113, 113, 0.8);
+  background: rgba(127, 29, 29, 0.2);
 }
 
 .formInput:focus {
-  @apply outline-none bg-white border-burgundy-light;
-  box-shadow: 0 0 0 3px rgba(139, 64, 73, 0.05);
+  @apply outline-none;
+  border-color: rgba(245, 213, 121, 0.8);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 3px rgba(245, 213, 121, 0.15);
 }
 
 .formInputError:focus {
-  @apply border-red-500;
-  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+  border-color: rgba(248, 113, 113, 0.9);
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.2);
 }
 
 .fieldError {
-  @apply text-red-600 text-xs mt-1;
-  font-family: 'Inter', sans-serif;
+  @apply text-red-300 text-xs mt-1;
 }
 
 .formOptions {
@@ -105,72 +90,77 @@
 }
 
 .checkboxLabel {
-  @apply flex items-center text-gray-500 cursor-pointer font-normal transition-colors;
+  @apply flex items-center text-white/70 cursor-pointer transition-colors;
   font-size: 13px;
 }
 
 .checkboxLabel:hover {
-  @apply text-gray-800;
+  @apply text-white;
 }
 
 .checkboxLabel input {
   @apply w-4 h-4 rounded cursor-pointer transition-all;
   margin-right: 10px;
-  border: 1.5px solid #e0e0e0;
-  accent-color: #8B4049;
+  border: 1.5px solid rgba(212, 175, 55, 0.35);
+  accent-color: #f5d579;
 }
 
 .forgotPassword {
-  @apply no-underline font-medium transition-colors;
-  color: #8B4049;
+  @apply no-underline transition-colors;
+  color: #f5d579;
   font-size: 13px;
 }
 
 .forgotPassword:hover {
-  @apply no-underline text-[#5C2A2E];
+  color: #ffe7a3;
 }
 
 .authButton {
   @apply w-full px-4 py-4 border-none cursor-pointer transition-all;
   border-radius: 12px;
   font-size: 15px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
 }
 
 .authButtonPrimary {
-  @apply text-white shadow-md;
-  background: linear-gradient(135deg, #8B4049 0%, #5C2A2E 100%);
+  color: #230206;
+  background: linear-gradient(135deg, #f5d579 0%, #d4af37 100%);
+  box-shadow: 0 12px 24px rgba(212, 175, 55, 0.25);
 }
 
 .authButtonPrimary:hover:not(:disabled) {
-  @apply scale-[1.01];
-  filter: brightness(1.1);
-  box-shadow: 0 8px 15px rgba(139, 64, 73, 0.2);
+  filter: brightness(1.06);
+  transform: translateY(-1px);
 }
 
 .authButtonPrimary:active:not(:disabled) {
-  @apply scale-[0.99];
+  transform: translateY(0);
 }
 
 .authButton:disabled {
-  @apply opacity-50 cursor-not-allowed;
+  background: linear-gradient(135deg, #8e7e4d 0%, #6f5f30 100%);
+  color: rgba(35, 2, 6, 0.75);
+  box-shadow: none;
+  filter: saturate(0.45) brightness(0.9);
+  cursor: default;
+  transform: none;
 }
 
 .divider {
-  @apply flex items-center my-7 text-gray-500 font-normal;
+  @apply flex items-center my-7 text-white/60;
   font-size: 13px;
-  font-family: 'Inter', sans-serif;
 }
 
 .divider::before,
 .divider::after {
-  @apply flex-1 border-b border-gray-200;
+  @apply flex-1;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
   content: '';
 }
 
 .divider span {
-  @apply px-4 lowercase tracking-normal;
+  @apply px-4;
 }
 
 .socialButtons {
@@ -178,42 +168,43 @@
 }
 
 .socialButton {
-  @apply w-full bg-white text-sm font-medium cursor-pointer flex items-center justify-center transition-all text-gray-800;
+  @apply w-full text-sm font-medium cursor-pointer flex items-center justify-center transition-all text-white;
   padding: 14px;
-  border: 1.5px solid #f0f0f0;
+  border: 1.5px solid rgba(212, 175, 55, 0.22);
   border-radius: 12px;
-  font-family: 'Inter', sans-serif;
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .socialButton:hover {
-  @apply bg-gray-50 scale-[1.01];
-  border-color: #e0e0e0;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(245, 213, 121, 0.55);
 }
 
 .socialButtonGoogle {
-  @apply text-gray-800;
+  @apply text-white;
 }
 
 .socialButtonApple {
-  @apply text-gray-800;
+  @apply text-white;
 }
 
 .socialIcon {
-  @apply font-semibold text-base text-gray-900;
+  @apply font-semibold text-base;
   margin-right: 12px;
 }
 
 .authFooter {
-  @apply text-center text-gray-500 pt-5 border-t border-gray-100 mt-2 font-normal;
+  @apply text-center text-white/70 pt-5 border-t mt-2;
   font-size: 13px;
-  font-family: 'Inter', sans-serif;
+  border-color: rgba(255, 255, 255, 0.14);
 }
 
 .authLink {
   @apply no-underline font-semibold transition-colors;
-  color: #8B4049;
+  color: #f5d579;
 }
 
 .authLink:hover {
-  @apply underline;
+  color: #ffe7a3;
+  text-decoration: underline;
 }

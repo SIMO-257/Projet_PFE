@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('clients', function (Blueprint $table) {
-            $table->json('notification_prefs')->nullable();
-        });
+        if (!Schema::hasColumn('clients', 'notification_prefs')) {
+            Schema::table('clients', function (Blueprint $table) {
+                $table->json('notification_prefs')->nullable();
+            });
+        }
     }
 
     /**
@@ -21,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('clients', function (Blueprint $table) {
-            $table->dropColumn('notification_prefs');
-        });
+        if (Schema::hasColumn('clients', 'notification_prefs')) {
+            Schema::table('clients', function (Blueprint $table) {
+                $table->dropColumn('notification_prefs');
+            });
+        }
     }
 };

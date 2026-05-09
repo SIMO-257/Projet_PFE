@@ -58,7 +58,10 @@ export default function Login() {
                         setErrors(responseErrors);
                     }
                 } else {
-                    setErrors({ form: resultAction.payload?.message || 'Password or Email are not valid' });
+                    const message = resultAction.payload?.message || 'Password or Email are not valid';
+                    if (String(message).toLowerCase() !== 'unauthenticated.') {
+                        setErrors({ form: message });
+                    }
                 }
             }
         } catch (err) {
@@ -103,9 +106,6 @@ export default function Login() {
                 leftContent={<CheckboxInput label="Se souvenir" id="remember" setCheck={toggleRemember} check={form.remember_me} />}
                 rightContent={<Link to="/forgot_password" className={styles.forgotPassword} >Mot de passe oublié?</Link>}
             />
-
-            {errors.form && <p className={styles.fieldError}>{errors.form}</p>}
-            {authError && !errors.form && <p className={styles.fieldError}>{authError.message || 'Authentication failed'}</p>}
 
             <ConnexionButton type="submit" variant="primary" disabled={isLoading}>
                 {isLoading ? 'Connexion...' : 'Connexion'}

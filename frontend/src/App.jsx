@@ -1,8 +1,11 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { useEffect, lazy, Suspense } from "react";
+import { useDispatch } from "react-redux";
 import PublicRoute from "./Components/Layout/PublicRoute";
 import ProtectedRoute from "./Components/Layout/ProtectedRoute";
 import { useAuth } from "./hooks/useAuth";
+import { markAuthCheckedUnauthenticated } from "./Redux/Slices/AuthSlice";
+import { shouldRestoreAuthSession } from "./services/clientService";
 
 // Lazy pages
 const Login = lazy(() => import("./Pages/Login/Login"));
@@ -56,13 +59,20 @@ function RootRedirect() {
 }
 
 function App() {
+  const dispatch = useDispatch();
   const { refreshProfile, isAuthChecked } = useAuth();
 
   useEffect(() => {
-    if (!isAuthChecked) {
-      refreshProfile();
+    if (isAuthChecked) {
+      return;
     }
-  }, []); // Empty dependency array to prevent infinite loops
+
+    if (shouldRestoreAuthSession()) {
+      refreshProfile();
+    } else {
+      dispatch(markAuthCheckedUnauthenticated());
+    }
+  }, [dispatch, isAuthChecked, refreshProfile]);
 
   return (
     <BrowserRouter>

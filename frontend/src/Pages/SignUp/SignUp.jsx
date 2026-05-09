@@ -126,7 +126,23 @@ export default function SignUp() {
         } catch (err) {
             const responseErrors = err?.response?.data?.errors;
             if (responseErrors) {
-                setErrors(responseErrors);
+                const nextErrors = { ...responseErrors };
+                const passwordErrors = Array.isArray(nextErrors.password) ? nextErrors.password : [];
+                const confirmationMsg = passwordErrors.find((msg) =>
+                    String(msg).toLowerCase().includes('confirmation')
+                );
+
+                if (confirmationMsg) {
+                    nextErrors.password = passwordErrors.filter(
+                        (msg) => String(msg).toLowerCase().includes('confirmation') === false
+                    );
+                    nextErrors.password_confirmation = [
+                        ...(Array.isArray(nextErrors.password_confirmation) ? nextErrors.password_confirmation : []),
+                        confirmationMsg,
+                    ];
+                }
+
+                setErrors(nextErrors);
             } else {
                 setErrors({ form: "Inscription echouee. Reessayez." });
             }
@@ -252,7 +268,7 @@ export default function SignUp() {
             {errors.accept_terms && <p className={styles.fieldError}>{errors.accept_terms}</p>}
             {errors.form && <p className={styles.fieldError}>{errors.form}</p>}
 
-            <ConnexionButton type="submit" variant="primary" disabled={processing}>
+            <ConnexionButton type="submit" variant="primary" disabled={processing || !form.accept_terms}>
                 {processing ? 'Inscription...' : 'Inscription'}
             </ConnexionButton>
         </AuthLayout>

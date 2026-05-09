@@ -121,6 +121,8 @@
 
   /* Bottom navigation */
   .bottomNav {
-    @apply border-t border-white/10 py-3 px-6;
+    @apply border-t border-white/10 py-3 px-6 sticky bottom-0 left-0 right-0 z-40;
+    background: linear-gradient(to top, rgba(26, 5, 7, 0.98), rgba(42, 11, 15, 0.95));
+    backdrop-filter: blur(8px);
   }
 }
