@@ -26,7 +26,9 @@ export const fetchCsrfToken = () => axios.get(`${apiBase}/sanctum/csrf-cookie`, 
 const extractPayload = (response) => response?.data?.data ?? null;
 
 // These are now legacy/placeholder as we use cookies
-export const getAuthToken = () => localStorage.getItem('is_authenticated') === 'true';
+export const getAuthToken = () => {
+  return localStorage.getItem('is_authenticated') === 'true';
+};
 
 export const setAuthToken = () => {
   // We don't use the token from response anymore, but we'll store a flag
@@ -73,6 +75,10 @@ clientApi.interceptors.response.use(
 export const signupClient = (payload) => clientApi.post('/signup', payload);
 
 export const loginClient = (payload) => clientApi.post('/login', payload);
+
+export const resendVerificationEmail = (email) => clientApi.post('/email/resend', { email });
+
+export const verifyEmailCode = (email, code) => clientApi.post('/email/verify-code', { email, code });
 
 export const forgotPasswordClient = (payload) =>
   clientApi.post('/forgot-password', payload);

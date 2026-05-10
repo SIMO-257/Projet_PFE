@@ -3,12 +3,19 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\TicketController;
+use App\Http\Controllers\EmailVerificationController;
 
 // Public Routes
 Route::post('/signup', [ClientController::class, 'signup'])->middleware('throttle:6,1')->name('api.client.signup');
 Route::post('/login', [ClientController::class, 'login'])->middleware('throttle:login')->name('api.client.login');
 Route::post('/forgot-password', [ClientController::class, 'forgotPassword'])->middleware('throttle:3,1')->name('api.client.forgot_password');
 Route::post('/reset-password', [ClientController::class, 'resetPassword'])->middleware('throttle:3,1')->name('api.client.reset_password');
+
+// Email verification resend — no auth required (user is not logged in yet)
+Route::post('/email/resend', [EmailVerificationController::class, 'resend'])
+    ->middleware('throttle:3,60');  // max 3 requests per 60 minutes per IP
+Route::post('/email/verify-code', [EmailVerificationController::class, 'verifyCode'])
+    ->middleware('throttle:6,1');   // max 6 attempts per minute per IP
 
 // Stripe Webhook (Public, CSRF excluded in bootstrap/app.php)
 Route::post('/webhooks/stripe', [\App\Http\Controllers\StripeWebhookController::class, 'handle'])->middleware('throttle:60,1')->name('api.stripe.webhook');

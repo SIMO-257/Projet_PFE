@@ -49,7 +49,9 @@ export default function Login() {
             
             const resultAction = await login(payload);
             if (resultAction.meta?.requestStatus !== 'fulfilled') {
-                const responseErrors = resultAction.payload?.errors || resultAction.payload?.data;
+                const response = resultAction.payload;
+                
+                const responseErrors = response?.errors || response?.data;
                 if (responseErrors) {
                     if (responseErrors.email || responseErrors.password) {
                         const generic = 'Password or Email are not valid';

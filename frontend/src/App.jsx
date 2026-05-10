@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { useEffect, lazy, Suspense } from "react";
+import { useSelector } from "react-redux";
 import PublicRoute from "./Components/Layout/PublicRoute";
 import ProtectedRoute from "./Components/Layout/ProtectedRoute";
 import { useAuth } from "./hooks/useAuth";
@@ -7,6 +8,7 @@ import { useAuth } from "./hooks/useAuth";
 // Lazy pages
 const Login = lazy(() => import("./Pages/Login/Login"));
 const SignUp = lazy(() => import("./Pages/SignUp/SignUp"));
+const VerifyEmail = lazy(() => import("./Pages/auth/VerifyEmail"));
 const ForgotPassword = lazy(() => import("./Pages/ForgotPassword/ForgotPassword"));
 const ResetPassword = lazy(() => import("./Pages/ResetPassword/ResetPassword"));
 
@@ -25,7 +27,6 @@ const ViewTicket = lazy(() => import("./Pages/ViewTicket/ViewTicket"));
 const ValidationScreen = lazy(() => import("./Pages/ValidationScreen/ValidationScreen"));
 const ValidatorScreen = lazy(() => import("./Pages/Validator/ValidatorScreen"));
 
-const Paiment = lazy(() => import("./Pages/Paiment/Paiment"));
 const RechargePaymentScreen = lazy(() => import("./Pages/RechargePaymentScreen/RechargePaymentScreen"));
 const PurchasedCards = lazy(() => import("./Pages/PurchasedCards/PurchasedCards"));
 const ConfirmationPaiment = lazy(() => import("./Pages/ConfirmationPaiment/ConfirmationPaiment"));
@@ -57,12 +58,22 @@ function RootRedirect() {
 
 function App() {
   const { refreshProfile, isAuthChecked } = useAuth();
+  const theme = useSelector((state) => state.settings.theme);
 
   useEffect(() => {
     if (!isAuthChecked) {
       refreshProfile();
     }
   }, []); // Empty dependency array to prevent infinite loops
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
 
   return (
     <BrowserRouter>
@@ -82,6 +93,7 @@ function App() {
           <Route element={<PublicRoute />}>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/forgot_password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
           </Route>
@@ -103,7 +115,6 @@ function App() {
             <Route path="/validation" element={<ValidationScreen />} />
             <Route path="/validator" element={<ValidatorScreen />} />
 
-            <Route path="/payment" element={<Paiment />} />
             <Route path="/recharge-payment" element={<RechargePaymentScreen />} />
             <Route path="/change-card" element={<PurchasedCards />} />
             <Route path="/payment-confirmation" element={<ConfirmationPaiment />} />

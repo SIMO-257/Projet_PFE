@@ -14,6 +14,15 @@ class ClientRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('phone')) {
+            $this->merge([
+                'phone' => preg_replace('/\D/', '', $this->phone),
+            ]);
+        }
+    }
+
     public function rules(): array
     {
         return [

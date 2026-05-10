@@ -111,7 +111,7 @@ export default function SignUp() {
 
         const payload = {
             email: form.email,
-            phone: form.phone || null,
+            phone: form.phone ? form.phone.replace(/\D/g, '') : null,
             password: form.password,
             password_confirmation: form.password_confirmation,
             full_name: form.full_name,
@@ -122,7 +122,7 @@ export default function SignUp() {
         try {
             setProcessing(true);
             await signupClient(payload);
-            navigate('/login');
+            navigate('/verify-email?status=pending&email=' + encodeURIComponent(form.email));
         } catch (err) {
             const responseErrors = err?.response?.data?.errors;
             if (responseErrors) {
@@ -171,7 +171,7 @@ export default function SignUp() {
 
             <InputField
                 label="Telephone"
-                type="number"
+                type="tel"
                 placeholder="06 12 34 56 78"
                 id="signup-number"
                 var={form.phone}

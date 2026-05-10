@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import ProgressSteps from '../../Components/NavBar/ProgressSteps';
 import styles from '../../Styles/ConfirmationPaiment.module.css';
 
 const Confirmation = () => {
@@ -76,6 +77,8 @@ const Confirmation = () => {
             <div className={styles.container}>
                 {/* Close button */}
                 <button className={styles.closeBtn} onClick={handleReturnHome}>×</button>
+
+                <ProgressSteps currentStep={2} />
 
                 {/* Success Icon */}
                 <div className={styles.successIcon}>

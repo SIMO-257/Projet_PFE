@@ -94,12 +94,6 @@ const EditProfileScreen = () => {
   const handleSaveChanges = () => {
     setErrors({});
 
-    const token = getAuthToken();
-    if (!token) {
-      navigate('/login');
-      return;
-    }
-
     setProcessing(true);
 
     updateClientProfile({

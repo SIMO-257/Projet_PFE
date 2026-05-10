@@ -104,6 +104,16 @@ class ClientController extends Controller
 
             /** @var Client $client */
             $client = Auth::guard('client')->user();
+
+            if (!$client->hasVerifiedEmail()) {
+                Auth::guard('client')->logout();
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Votre email n\'est pas vérifié. Vérifiez votre boîte mail ou demandez un nouvel email.',
+                    'error'   => 'email_not_verified',
+                    'email'   => $client->email,
+                ], 403);
+            }
             
             if (!$client->is_active) {
                 AuditLog::log('login_failed_inactive', $client->id, ['email' => $credentials['email']]);
@@ -151,9 +161,13 @@ class ClientController extends Controller
         $this->applyProfileFile($client, $request, 'profile_file');
         $client->save();
 
+        // Generate and send verification code
+        $code = $client->generateVerificationCode();
+        $client->notify(new \App\Notifications\VerifyEmailNotification($code));
+
         AuditLog::log('signup', $client->id);
 
-        return $this->successResponse(null, 'Account created successfully.', 201);
+        return $this->successResponse(null, 'Account created successfully. Please check your email for verification code.', 201);
     }
 
 

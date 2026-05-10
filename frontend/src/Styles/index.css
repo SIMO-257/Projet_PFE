@@ -41,9 +41,21 @@ body::-webkit-scrollbar {
   }
 }
 
+:root {
+  --app-bg: linear-gradient(135deg, #2a0b0f 0%, #1a0507 100%);
+  --card-bg: #1a0507;
+  --text-main: #ffffff;
+}
+
+[data-theme='light'] {
+  --app-bg: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  --card-bg: #ffffff;
+  --text-main: #1a0507;
+}
+
 .app-shell {
   min-height: 100svh;
-  background: linear-gradient(135deg, #2a0b0f 0%, #1a0507 100%);
+  background: var(--app-bg);
   width: 100%;
   padding: 0;
 }
