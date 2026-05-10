@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { fetchTicketTypes, purchaseTicket } from '../../services/clientService';
-import ProgressSteps from '../../Components/NavBar/ProgressSteps';
 import styles from '../../Styles/TicketSelection.module.css';
 
 export default function TicketSelection() {
@@ -113,8 +112,6 @@ export default function TicketSelection() {
 
     return (
         <div className={styles.container}>
-            <ProgressSteps currentStep={1} />
-
             <div className={styles.mainContent}>
 
                 <div className={styles.card}>

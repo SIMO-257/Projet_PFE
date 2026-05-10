@@ -38,14 +38,23 @@ class NotificationService
             return null;
         }
 
-        $notif = Notification::create([
-            'user_id'  => $user->id,
-            'type'     => $type,
-            'severity' => $severity,
-            'title'    => $title,
-            'body'     => $body,
-            'meta'     => $meta,
-        ]);
+        try {
+            $notif = Notification::create([
+                'user_id'  => $user->id,
+                'type'     => $type,
+                'severity' => $severity,
+                'title'    => $title,
+                'body'     => $body,
+                'meta'     => $meta,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Notification persistence failed', [
+                'user_id' => $user->id,
+                'type' => $type,
+                'error' => $e->getMessage(),
+            ]);
+            return null;
+        }
 
         $this->invalidateUnreadCache($user->id);
         $this->sendFcmPush($user, $title, $body, ['type' => $type, 'severity' => $severity]);

@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
 use App\Models\AuditLog;
@@ -138,7 +139,10 @@ class WalletController extends Controller
                     $wallet->refresh();
                 }
 
-                $existing = Transaction::where('payment_intent_id', $paymentIntent->id)->first();
+                $hasPaymentIntentColumn = Schema::hasColumn('transactions', 'payment_intent_id');
+                $existing = $hasPaymentIntentColumn
+                    ? Transaction::where('payment_intent_id', $paymentIntent->id)->first()
+                    : null;
                 if ($existing) {
                     $transaction = $existing;
                     Log::info("Wallet Confirm: existing transaction reused for {$paymentIntent->id}", [
@@ -153,7 +157,7 @@ class WalletController extends Controller
                 $wallet->balance = $balanceBefore + $amountInDh;
                 $wallet->save();
 
-                $transaction = Transaction::create([
+                $transactionData = [
                     'user_id' => $user->id,
                     'type' => 'recharge',
                     'status' => 'completed',
@@ -162,14 +166,19 @@ class WalletController extends Controller
                     'balance_before' => $balanceBefore,
                     'balance_after' => (float) $wallet->balance,
                     'payment_method' => 'card',
-                    'payment_intent_id' => $paymentIntent->id,
                     'reference' => 'Rechargement via Stripe',
                     'metadata' => [
                         'source' => 'wallet_confirm_fallback',
                         'stripe_payment_intent' => $paymentIntent->id,
                         'type' => 'wallet_recharge',
                     ],
-                ]);
+                ];
+
+                if ($hasPaymentIntentColumn) {
+                    $transactionData['payment_intent_id'] = $paymentIntent->id;
+                }
+
+                $transaction = Transaction::create($transactionData);
 
                 Log::info("Wallet Confirm: transaction created for {$paymentIntent->id}", [
                     'transaction_id' => $transaction->id,
@@ -241,4 +250,3 @@ class WalletController extends Controller
         return $this->successResponse($transactions);
     }
 }
-

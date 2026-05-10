@@ -35,7 +35,7 @@ Migration table created successfully.
 ⚩ Migrating: 2026_05_10_000400_create_tickets_table
 ⚩ Migrating: 2026_05_10_000500_create_validation_logs_table
 ⚩ Migrating: 2026_05_10_000600_create_audit_logs_table
-⚩ Migrating: 2026_05_10_000700_create_notifications_table
+⚩ Migrating: 2026_05_10_000700_createns_tab_notificatiole
 ⚩ Migrating: 2026_05_10_000800_create_billing_details_table
 ⚩ Migrating: 2026_05_10_000900_create_processed_stripe_events_table
 Database seeding completed successfully.

@@ -92,15 +92,25 @@ clientApi.interceptors.response.use(
   }
 );
 
-export const signupClient = (payload) => clientApi.post('/signup', payload);
+export const signupClient = async (payload) => {
+  await fetchCsrfToken();
+  return clientApi.post('/signup', payload);
+};
 
-export const loginClient = (payload) => clientApi.post('/login', payload);
+export const loginClient = async (payload) => {
+  await fetchCsrfToken();
+  return clientApi.post('/login', payload);
+};
 
-export const forgotPasswordClient = (payload) =>
-  clientApi.post('/forgot-password', payload);
+export const forgotPasswordClient = async (payload) => {
+  await fetchCsrfToken();
+  return clientApi.post('/forgot-password', payload);
+};
 
-export const resetPasswordClient = (payload) =>
-  clientApi.post('/reset-password', payload);
+export const resetPasswordClient = async (payload) => {
+  await fetchCsrfToken();
+  return clientApi.post('/reset-password', payload);
+};
 
 export const fetchClientProfile = () => clientApi.get('/profile').then(extractPayload);
 
