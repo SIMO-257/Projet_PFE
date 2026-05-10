@@ -101,15 +101,23 @@ class ClientController extends Controller
             // Disconnect other active sessions to enforce single device usage
             $client->tokens()->delete();
 
+            if (!$client->hasVerifiedEmail()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Votre email n\'est pas vérifié. Vérifiez votre boîte mail ou demandez un nouvel email.',
+                    'error'   => 'email_not_verified',
+                    'email'   => $client->email,
+                ], 403);
+            }
+
+            if (!$client->is_active) {
+                AuditLog::log('login_failed_inactive', $client->id, ['email' => $credentials['email']]);
+                return $this->errorResponse('Account is inactive.', 403);
+            }
+
             $client->is_active = true;
             $client->last_active_at = now();
             $client->save();
-
-            AuditLog::log('login_success', $client->id);
-
-            // Send Security Notification
-            app(\App\Services\NotificationService::class)->send(
-                $client,
                 'security',
                 'info',
                 'Nouvelle connexion',
@@ -149,9 +157,13 @@ class ClientController extends Controller
         $this->applyProfileFile($client, $request, 'profile_file');
         $client->save();
 
+        // Generate and send verification code
+        $code = $client->generateVerificationCode();
+        $client->notify(new \App\Notifications\VerifyEmailNotification($code));
+
         AuditLog::log('signup', $client->id);
 
-        return $this->successResponse(null, 'Account created successfully.', 201);
+        return $this->successResponse(null, 'Account created successfully. Please check your email for verification code.', 201);
     }
 
 

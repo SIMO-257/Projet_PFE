@@ -53,12 +53,23 @@ input[type="number"] {
   }
 }
 
+:root {
+  --app-bg: linear-gradient(135deg, #2a0b0f 0%, #1a0507 100%);
+  --card-bg: #1a0507;
+  --text-main: #ffffff;
+}
+
+[data-theme='light'] {
+  --app-bg: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  --card-bg: #ffffff;
+  --text-main: #1a0507;
+}
+
 .app-shell {
-  height: 100dvh;
-  overflow: hidden;
-  background: linear-gradient(135deg, #2a0b0f 0%, #1a0507 100%);
+  min-height: 100svh;
   width: 100%;
   padding: 0;
+  background: var(--app-bg);
 }
 
 .app-frame {

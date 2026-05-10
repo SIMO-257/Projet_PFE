@@ -4,8 +4,7 @@ import styles from '../../Styles/TicketSelection.module.css'; // Assuming simila
 export default function ProgressSteps({ currentStep = 1 }) {
     const steps = [
         { number: 1, label: 'Sélection' },
-        { number: 2, label: 'Paiement' },
-        { number: 3, label: 'Confirmation' }
+        { number: 2, label: 'Confirmation' }
     ];
 
     return (

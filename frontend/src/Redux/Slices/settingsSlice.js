@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const getInitialTheme = () => {
     const savedTheme = localStorage.getItem('app_theme');
-    return savedTheme || 'dark';
+    return savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'dark';
 };
 
 const getInitialLanguage = () => {
@@ -20,8 +20,9 @@ const settingsSlice = createSlice({
     initialState,
     reducers: {
         setTheme: (state, action) => {
-            state.theme = action.payload;
-            localStorage.setItem('app_theme', action.payload);
+            const nextTheme = action.payload === 'light' ? 'light' : 'dark';
+            state.theme = nextTheme;
+            localStorage.setItem('app_theme', nextTheme);
         },
         setLanguage: (state, action) => {
             state.language = action.payload;

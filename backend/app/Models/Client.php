@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Notifications\ClientResetPasswordNotification;
 
-class Client extends Authenticatable implements CanResetPasswordContract
+class Client extends Authenticatable implements CanResetPasswordContract, MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\ClientFactory> */
     use HasApiTokens, HasFactory, Notifiable, CanResetPassword;
@@ -36,6 +37,9 @@ class Client extends Authenticatable implements CanResetPasswordContract
         'default_ticket_id',
         'notification_prefs',
         'client_preferences',
+        'email_verification_token',
+        'email_verification_code',
+        'email_verification_sent_at',
     ];
 
     /**
@@ -62,6 +66,8 @@ class Client extends Authenticatable implements CanResetPasswordContract
             'last_active_at' => 'datetime',
             'notification_prefs' => 'array',
             'client_preferences' => 'array',
+            'email_verified_at'           => 'datetime',
+            'email_verification_sent_at'  => 'datetime',
         ];
     }
 
@@ -121,5 +127,33 @@ class Client extends Authenticatable implements CanResetPasswordContract
     public function defaultTicket()
     {
         return $this->belongsTo(Ticket::class, 'default_ticket_id');
+    }
+
+    // Check if email is verified
+    public function hasVerifiedEmail(): bool
+    {
+        return !is_null($this->email_verified_at);
+    }
+
+    // Generate and store a new verification token
+    public function generateVerificationToken(): string
+    {
+        $token = sha1($this->email . $this->created_at . random_bytes(16));
+        $this->update([
+            'email_verification_token'  => $token,
+            'email_verification_sent_at' => now(),
+        ]);
+        return $token;
+    }
+
+    // Generate and store a new 6-digit verification code
+    public function generateVerificationCode(): string
+    {
+        $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        $this->update([
+            'email_verification_code'    => $code,
+            'email_verification_sent_at'  => now(),
+        ]);
+        return $code;
     }
 }
