@@ -1,0 +1,76 @@
+in the forgot password page i am sending an email:
+    -- the controller verify if the email exists in the database .
+    -- if it does and is_active is true it send the password with the account to that email.
+
+--in the profile page there is 4 things you should fetch.
+-- the name , the email , the phone number , and the reted at date of the account .
+-- place every data in the right place .
+-- use minimale code with simple logic
+
+here is what i want:
+-- i created a serviceClient.jsx file in the frontend this file will containe the client methods wich are all the 6 or 7 i think in the api.php.
+-- there will be custom functionnes for each method and it will be exported from the service file and imported in the file where the method will be used (eq:login,signup..).
+-- the pages wil only send the params or reach the response got it.
+
+time to man up now lets get this started:
+-- i want you to remove any minio or avatar related logic we are going to store our profiles in sql it self with the "file" type in migration in the most simple way.
+-- we will only have 1 middleware called "AuthMiddleware" triggerd in the login method but in the sign up and editprofile we will have some "requests" 2 to be exact.
+-- first is "clienRequest" for verifying the sign up infos with theme custom errors too .
+-- second is "profileRequest" for updating the profile infos and verifying if they are correct.
+-- i want things to be well structered and sepereated errors shoul be in the request controller should not containe a verification logic etc 
+-- tell me about your plan and sugejest some tips if you know.
+-- write simple code as short as possible abvouis for a student .
+
+now i want you to add a new column in the client table "remember_me" if the user select it :
+-- the property will be true so when the user reopen he stay loged in.
+-- but if the user didn't choose it it take him directly to login.
+-- so the default page is the home page , if the token is still valid the app should open on the home page .
+-- if it is not it take you to login page .
+what is your plan ?  
+
+
+now i you know how the home show a card with balance and code card i dont want it to show that i want it to selct the latest purchased by the user card :
+-- if the card exists it will be the one appearing in the home page .
+-- if it does not then it will say no card purchased.
+-- also that "changer carte" link should take me to all the avaible purchased cards by user.
+-- the user can select what card it will he wish to be the default.
+-- so even if the user close the app the chosen card should remain .
+-- unless it expired then it should chhose te latest purchased card in the db again.
+-- before that made a new folder and a jsx page for listing all the tickets you should also make a new component in the component folder for the card since it will be reused.
+so what is your plan?
+
+here is how the default validation should work:
+-- if the user press on the default card in the home page it will be directlly scanned it will be directlly ready to validat by nfc.
+-- in the validation tab there are alraedy 2 optiones nfc and qr code when you press one of them a list of all the cards will appear and then the user choose which one to choose and will be emidiatly validated.  
+-- there is this golden rectngle in the default card at the bottom right of the home card if the user press it infos about that card will appear.
+-- the usuall infos just like view ticket but with a switch button for nfc or qr that will be teh default method for scanning the card.
+-- by default when a card is created it is nfc but the user should be able switch it .
+so what is your plan ?
+
+remove the continue with google or apple buttons from the login and sign up page along side with that "ou".
+
+
+-- in the home page if i press on the nfc icon the default card in the home screen will be active for validation.
+-- what is your plan to implement this feature using web nfc.
+-- how will i be able to test it.
+
+
+-- tout : will show all the tickets in the last 2 weeks 
+-- one semaine  :  show the last week 
+-- and aujourdh'hui show the day were they are 
+
+-- instead of that complicated card for the ticket purchase after pressin the link just use the normal one before pressing "voir tout".
+-- also the price color should be red because it is purchased .
+-- instead of just purchased ticket we need also transactions that got added to the wallet 
+-- the transaction card should look exactly the same but with th green color for the price.
+
+-- in the wallet page there should only appear 8 in total for the total of transaction and purchases the last 8 by date until the user press on the link to see all
+
+-- remove the "dernier activite" part from home so does the ticket active loop but keep the "tickets actives" label and change it to historique.
+-- keep that "voir tout" link too.
+-- in this Historique part you are gonna list the last 6 tickets active/used/expired by the user based on the date .
+-- when you press "voir tout" you go to the see all the tickets just like in the wallet page .
+-- the way each ticket is shown by cards just like the transaction card in wallet but with the name of the ticket the price the time and it is status active / expired / used .
+-- each status for each card will have a specific color green for active red for expired and yellow for used.
+-- what is your plan.
+

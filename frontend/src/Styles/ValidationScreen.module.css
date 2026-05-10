@@ -1,0 +1,88 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* Ticket Icon Animation */
+  .ticketIcon {
+    @apply rounded-full flex items-center justify-center relative z-10;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.3), rgba(139, 64, 73, 0.3));
+  }
+
+  .ticketPulse {
+    @apply animate-ticket-pulse;
+  }
+
+  .ticketPulseSlow {
+    @apply animate-ticket-pulse-slow;
+  }
+
+  .ticketPulseFast {
+    @apply animate-ticket-pulse-fast;
+  }
+
+  /* Ticket Wave Animation */
+  .ticketWave {
+    @apply absolute top-1/2 left-1/2 rounded-full w-full h-full z-[5] pointer-events-none;
+    border: 2px solid rgba(255, 215, 0, 0.5);
+    transform: translate(-50%, -50%);
+    animation: ticketWave 2s ease-out infinite;
+  }
+
+  @keyframes ticketWave {
+    0% {
+      transform: translate(-50%, -50%) scale(0.8);
+      opacity: 0.5;
+    }
+    100% {
+      transform: translate(-50%, -50%) scale(1.8);
+      opacity: 0;
+    }
+  }
+
+  /* Notification Slide Down Animation */
+  .animateSlideDown {
+    @apply animate-slide-in;
+    animation: slideDown 0.3s ease-out;
+  }
+
+  @keyframes slideDown {
+    from {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  /* Custom Scrollbar */
+  .customScrollbar::-webkit-scrollbar {
+    @apply w-1;
+  }
+
+  .customScrollbar::-webkit-scrollbar-track {
+    @apply rounded-[10px];
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .customScrollbar::-webkit-scrollbar-thumb {
+    @apply rounded-[10px];
+    background: rgba(255, 215, 0, 0.3);
+  }
+
+  .customScrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 215, 0, 0.5);
+  }
+
+  /* Hide scrollbar */
+  .noScrollbar::-webkit-scrollbar {
+    @apply hidden;
+  }
+
+  .noScrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

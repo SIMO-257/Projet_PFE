@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "codex": "^0.2.3",
+    "qrcode": "^1.5.4"
+  }
+}

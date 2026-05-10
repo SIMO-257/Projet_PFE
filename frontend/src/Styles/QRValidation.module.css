@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* QR Code Container */
+  .qrContainer {
+    @apply bg-white rounded-2xl p-4 w-full flex items-center justify-center;
+    aspect-ratio: 1/1;
+  }
+
+  /* QR Pulse Animation */
+  .qrPulse {
+    @apply animate-pulse;
+    animation: qrPulse 2s infinite;
+  }
+
+  @keyframes qrPulse {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(255, 215, 0, 0);
+    }
+  }
+
+  /* QR Grid */
+  .qrGrid {
+    @apply grid gap-px w-full h-full;
+    grid-template-columns: repeat(21, 1fr);
+    grid-template-rows: repeat(21, 1fr);
+  }
+
+  .qrCell {
+    @apply bg-black rounded-sm;
+  }
+
+  .qrCellWhite {
+    @apply bg-white;
+  }
+
+  /* Modal Card */
+  .modalCard {
+    @apply relative rounded-3xl overflow-hidden border backdrop-blur-lg;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    background: linear-gradient(135deg, rgba(64, 1, 6, 0.95), rgba(38, 1, 1, 0.95));
+    border-color: rgba(212, 175, 55, 0.2);
+  }
+
+  .modalCard::before {
+    content: '';
+    @apply absolute top-0 left-0 right-0 h-1 z-20;
+    background: linear-gradient(to right, #FFD700, #D4AF37);
+    border-radius: 24px 24px 0 0;
+  }
+
+  /* Divider */
+  .divider {
+    @apply h-px my-6;
+    background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.1) 20%,
+      rgba(255, 255, 255, 0.1) 80%,
+      transparent 100%
+    );
+  }
+
+  /* Hide scrollbar */
+  .noScrollbar::-webkit-scrollbar {
+    @apply hidden;
+  }
+
+  .noScrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Fade In Animation */
+  .fadeIn {
+    @apply animate-fade-in;
+  }
+}

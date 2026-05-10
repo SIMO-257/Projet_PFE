@@ -1,0 +1,210 @@
+.authCard {
+  @apply relative overflow-hidden;
+  background: linear-gradient(135deg, rgba(64, 1, 6, 0.95) 0%, rgba(38, 1, 1, 0.95) 100%);
+}
+
+.authContainer {
+  @apply w-full max-w-xl mx-auto px-6 py-10;
+}
+
+.authHeader {
+  @apply text-center mb-8;
+}
+
+.authLogo {
+  @apply text-4xl font-semibold mb-3 tracking-wide;
+  color: #f5d579;
+}
+
+.goldenLine {
+  @apply border-none mx-auto mb-5 block;
+  width: 64px;
+  height: 3px;
+  background: linear-gradient(to right, #ffd700, #d4af37);
+  border-radius: 2px;
+}
+
+.authSubtitle {
+  @apply text-white font-semibold mb-2;
+  font-size: 24px;
+}
+
+.authDescription {
+  @apply text-white/70 text-sm leading-relaxed mx-auto;
+  max-width: 360px;
+}
+
+.authForm {
+  @apply mb-6;
+}
+
+.formGroup {
+  @apply mb-6;
+}
+
+.formLabel {
+  @apply block text-white/70 font-semibold mb-2 uppercase tracking-wider;
+  font-size: 11px;
+}
+
+.formInput {
+  @apply w-full text-sm transition-all text-white;
+  padding: 14px 16px;
+  border: 1.5px solid rgba(212, 175, 55, 0.18);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.formInput::placeholder {
+  @apply text-white/45;
+}
+
+.formInputError {
+  border-color: rgba(248, 113, 113, 0.8);
+  background: rgba(127, 29, 29, 0.2);
+}
+
+.formInput:focus {
+  @apply outline-none;
+  border-color: rgba(245, 213, 121, 0.8);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 3px rgba(245, 213, 121, 0.15);
+}
+
+.formInputError:focus {
+  border-color: rgba(248, 113, 113, 0.9);
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.2);
+}
+
+.fieldError {
+  @apply text-red-300 text-xs mt-1;
+}
+
+.formOptions {
+  @apply flex justify-between items-center mb-7;
+}
+
+.formOptionsLeft,
+.formOptionsRight {
+  @apply flex items-center;
+}
+
+.checkboxLabel {
+  @apply flex items-center text-white/70 cursor-pointer transition-colors;
+  font-size: 13px;
+}
+
+.checkboxLabel:hover {
+  @apply text-white;
+}
+
+.checkboxLabel input {
+  @apply w-4 h-4 rounded cursor-pointer transition-all;
+  margin-right: 10px;
+  border: 1.5px solid rgba(212, 175, 55, 0.35);
+  accent-color: #f5d579;
+}
+
+.forgotPassword {
+  @apply no-underline transition-colors;
+  color: #f5d579;
+  font-size: 13px;
+}
+
+.forgotPassword:hover {
+  color: #ffe7a3;
+}
+
+.authButton {
+  @apply w-full px-4 py-4 border-none cursor-pointer transition-all;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.authButtonPrimary {
+  color: #230206;
+  background: linear-gradient(135deg, #f5d579 0%, #d4af37 100%);
+  box-shadow: 0 12px 24px rgba(212, 175, 55, 0.25);
+}
+
+.authButtonPrimary:hover:not(:disabled) {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+.authButtonPrimary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.authButton:disabled {
+  background: linear-gradient(135deg, #8e7e4d 0%, #6f5f30 100%);
+  color: rgba(35, 2, 6, 0.75);
+  box-shadow: none;
+  filter: saturate(0.45) brightness(0.9);
+  cursor: default;
+  transform: none;
+}
+
+.divider {
+  @apply flex items-center my-7 text-white/60;
+  font-size: 13px;
+}
+
+.divider::before,
+.divider::after {
+  @apply flex-1;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  content: '';
+}
+
+.divider span {
+  @apply px-4;
+}
+
+.socialButtons {
+  @apply flex flex-col gap-3 mb-7;
+}
+
+.socialButton {
+  @apply w-full text-sm font-medium cursor-pointer flex items-center justify-center transition-all text-white;
+  padding: 14px;
+  border: 1.5px solid rgba(212, 175, 55, 0.22);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.socialButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(245, 213, 121, 0.55);
+}
+
+.socialButtonGoogle {
+  @apply text-white;
+}
+
+.socialButtonApple {
+  @apply text-white;
+}
+
+.socialIcon {
+  @apply font-semibold text-base;
+  margin-right: 12px;
+}
+
+.authFooter {
+  @apply text-center text-white/70 pt-5 border-t mt-2;
+  font-size: 13px;
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.authLink {
+  @apply no-underline font-semibold transition-colors;
+  color: #f5d579;
+}
+
+.authLink:hover {
+  color: #ffe7a3;
+  text-decoration: underline;
+}

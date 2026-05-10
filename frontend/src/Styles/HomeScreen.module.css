@@ -1,0 +1,128 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* Hide scrollbar */
+  .hideScrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hideScrollbar::-webkit-scrollbar {
+    @apply hidden !important;
+  }
+
+  /* Home card top border - kept as raw CSS for ::before pseudo-element */
+  .homeCard::before {
+    content: '';
+    @apply absolute top-0 left-0 right-0 h-1 z-20;
+    background: linear-gradient(to right, #FFD700, #D4AF37);
+    border-radius: 12px 12px 0 0;
+  }
+
+  /* Float Animation */
+  .animateFloat {
+    @apply animate-float;
+  }
+
+  /* Balance Card Hover Effect */
+  .balanceCard {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  .balanceCard:hover {
+    @apply -translate-y-1;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Action button hover effect - kept as raw CSS for ::before pseudo-element */
+  .actionButton {
+    @apply relative overflow-hidden;
+  }
+
+  .actionButton::before {
+    content: '';
+    @apply absolute rounded-full transition-all duration-500;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(212, 175, 55, 0.2);
+    transform: translate(-50%, -50%);
+  }
+
+  .actionButton:hover::before {
+    width: 200px;
+    height: 200px;
+  }
+
+  /* Card number font */
+  .fontMono {
+    @apply font-mono tracking-wide;
+  }
+
+  /* Notification button */
+  .notificationButton {
+    @apply w-12 h-12 rounded-full flex items-center justify-center transition-transform duration-200;
+    background: linear-gradient(to bottom right, #8B4049, #5C2A2E);
+  }
+
+  .notificationButton:hover {
+    @apply scale-105;
+  }
+
+  /* Nav button active state */
+  .navActive .navIcon {
+    @apply text-gold;
+  }
+
+  .navActive .navText {
+    @apply text-gold font-medium;
+  }
+
+  .navIndicator {
+    @apply absolute -bottom-2 left-1/2 w-1.5 h-1.5 rounded-full bg-gold;
+    transform: translateX(-50%);
+  }
+
+  /* Center navigation button */
+  .centerNavButton {
+    @apply w-14 h-14 rounded-full flex items-center justify-center transition-transform duration-200;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    margin-top: -28px;
+  }
+
+  .centerNavButton:hover {
+    @apply scale-105;
+  }
+
+  .centerNavButton.active {
+    @apply bg-gradient-to-r from-gold-light to-gold;
+  }
+
+  .centerNavButton:not(.active) {
+    background: linear-gradient(to bottom right, #8B4049, #5C2A2E);
+  }
+
+  /* Welcome section */
+  .welcomeText {
+    @apply text-white/60 text-sm mb-1;
+  }
+
+  .userName {
+    @apply text-white text-2xl font-semibold;
+  }
+
+  /* Action buttons grid */
+  .actionButtonsGrid {
+    @apply grid grid-cols-3 gap-4 mb-6;
+  }
+
+  /* Bottom navigation */
+  .bottomNav {
+    @apply border-t border-white/10 py-3 px-6 sticky bottom-0 left-0 right-0 z-40;
+    background: linear-gradient(to top, rgba(26, 5, 7, 0.98), rgba(42, 11, 15, 0.95));
+    backdrop-filter: blur(8px);
+  }
+}

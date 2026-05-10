@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .pageContainer {
+    @apply min-h-screen bg-[#0a0e27] flex items-center justify-center p-5;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+
+  .container {
+    @apply w-full max-w-md bg-[#0a0e27] text-white;
+  }
+
+  .header {
+    @apply flex items-center mb-6 py-4 gap-5;
+  }
+
+  .headerIcon {
+    @apply cursor-pointer;
+  }
+
+  .headerTitle {
+    @apply text-lg font-medium m-0 flex-1 text-center;
+  }
+
+  .statusCard {
+    @apply flex items-center gap-3 rounded-2xl py-4 px-5 mb-6;
+    background-color: #d4af37;
+  }
+
+  .statusTitle {
+    @apply text-[0.95rem] font-semibold text-white mb-0.5;
+  }
+
+  .statusSubtitle {
+    @apply text-xs text-white/90;
+  }
+
+  .detailsCard {
+    @apply rounded-3xl p-6 mb-8;
+    background-color: #1a1f3a;
+  }
+
+  .detailItem {
+    @apply mb-6;
+  }
+
+  .detailItem:last-child {
+    @apply mb-0;
+  }
+
+  .detailHeader {
+    @apply flex items-center gap-3 mb-2;
+  }
+
+  .iconContainer {
+    @apply flex items-center justify-center rounded-lg p-2;
+    background-color: #d4af37;
+  }
+
+  .detailLabel {
+    @apply text-xs uppercase tracking-wide text-[#8b92b0];
+  }
+
+  .detailValue {
+    @apply text-lg font-medium pl-11;
+  }
+
+  .footer {
+    @apply text-center;
+  }
+
+  .footerLink {
+    @apply text-sm font-medium no-underline;
+    color: #d4af37;
+  }
+
+  .footerLink:hover {
+    @apply underline;
+  }
+}

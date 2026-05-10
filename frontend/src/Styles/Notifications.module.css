@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* Notification Card */
+  .notificationCard {
+    @apply transition-all duration-200 ease-in-out;
+  }
+
+  .notificationCard:hover {
+    @apply -translate-y-0.5;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Category Badge */
+  .categoryBadge {
+    @apply backdrop-blur-sm;
+  }
+
+  /* Pulse Icon Animation */
+  .pulseIcon {
+    @apply animate-pulse;
+  }
+
+  /* Slide In Animation */
+  .slideIn {
+    @apply animate-slide-in;
+  }
+
+  /* Fade In Animation */
+  .fadeIn {
+    @apply animate-fade-in;
+  }
+
+  /* Gradient animation for promotional banners */
+  .gradientShift {
+    @apply animate-gradient-shift;
+    background-size: 200% 200%;
+  }
+
+  /* Button hover effects - kept as raw CSS for ::before pseudo-element */
+  .actionButton {
+    @apply relative overflow-hidden;
+  }
+
+  .actionButton::before {
+    content: '';
+    @apply absolute rounded-full transition-all duration-500;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translate(-50%, -50%);
+  }
+
+  .actionButton:hover::before {
+    width: 300px;
+    height: 300px;
+  }
+
+  /* Shimmer effect for new notifications - kept as raw CSS for ::after pseudo-element */
+  .newNotification {
+    @apply relative overflow-hidden;
+  }
+
+  .newNotification::after {
+    content: '';
+    @apply absolute top-0 w-full h-full;
+    left: -100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.05),
+      transparent
+    );
+    animation: shimmer 2s infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      left: -100%;
+    }
+    100% {
+      left: 100%;
+    }
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-[6px];
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #2d0505;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #5d1a1a;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #7d2a2a;
+  }
+}
