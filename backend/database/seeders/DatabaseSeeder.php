@@ -11,6 +11,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Seed ticket types first
+        $this->call(TicketTypeSeeder::class);
 
         // User::factory(10)->create();
 

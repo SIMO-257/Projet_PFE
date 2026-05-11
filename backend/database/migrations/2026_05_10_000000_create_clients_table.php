@@ -23,6 +23,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->boolean('remember_me')->default(false);
             $table->string('fcm_token')->nullable();
+            $table->foreignId('default_ticket_id')->nullable()->constrained('tickets')->nullOnDelete();
             $table->json('notification_prefs')->nullable();
             $table->json('client_preferences')->nullable();
             $table->timestamps();

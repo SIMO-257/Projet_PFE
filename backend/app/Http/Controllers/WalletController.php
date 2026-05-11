@@ -59,7 +59,11 @@ class WalletController extends Controller
      */
     public function rechargeInit(RechargeInitRequest $request)
     {
-        Stripe::setApiKey(config('services.stripe.secret'));
+        $stripeSecret = (string) config('services.stripe.secret');
+        if ($stripeSecret === '' || str_contains($stripeSecret, 'REPLACE_ME')) {
+            return $this->errorResponse('Stripe n\'est pas configure: STRIPE_SECRET manquante.', 500);
+        }
+        Stripe::setApiKey($stripeSecret);
         $user = Auth::user();
         $amount = (int) ($request->amount * 100); // Amount in cents for Stripe
 
@@ -92,7 +96,11 @@ class WalletController extends Controller
      */
         public function rechargeConfirm(RechargeConfirmRequest $request)
     {
-        Stripe::setApiKey(config('services.stripe.secret'));
+        $stripeSecret = (string) config('services.stripe.secret');
+        if ($stripeSecret === '' || str_contains($stripeSecret, 'REPLACE_ME')) {
+            return $this->errorResponse('Stripe n\'est pas configure: STRIPE_SECRET manquante.', 500);
+        }
+        Stripe::setApiKey($stripeSecret);
         try {
             $paymentIntent = PaymentIntent::retrieve($request->paymentIntentId);
 

@@ -1,0 +1,17 @@
+node_modules
+vendor
+.env
+.env.*.local
+.env.local
+.git
+.gitignore
+.dockerignore
+Dockerfile
+docker-compose.yml
+.vscode
+.idea
+*.log
+storage/logs/*
+bootstrap/cache/*
+.DS_Store
+.env.example.bak

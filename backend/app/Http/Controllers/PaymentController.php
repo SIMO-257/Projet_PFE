@@ -17,7 +17,11 @@ class PaymentController extends Controller
     public function createIntent(Request $request)
     {
         $user = Auth::user();
-        Stripe::setApiKey(config('services.stripe.secret'));
+        $stripeSecret = (string) config('services.stripe.secret');
+        if ($stripeSecret === '' || str_contains($stripeSecret, 'REPLACE_ME')) {
+            return $this->errorResponse('Stripe n\'est pas configure: STRIPE_SECRET manquante.', 500);
+        }
+        Stripe::setApiKey($stripeSecret);
 
         $request->validate([
             'amount' => 'required|numeric|min:5|max:500',
