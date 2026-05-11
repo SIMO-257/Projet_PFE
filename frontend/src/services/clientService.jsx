@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const configuredApiBase = import.meta.env.VITE_API_URL ?? import.meta.env.VITE_API_BASE_URL ?? '';
-const apiBase = configuredApiBase.replace(/\/+$/, '').replace(/\/api$/, '');
+const apiBase = configuredApiBase.replace(/\/+$/, '');
 
 // Global axios defaults for CSRF support
 axios.defaults.withCredentials = true;
