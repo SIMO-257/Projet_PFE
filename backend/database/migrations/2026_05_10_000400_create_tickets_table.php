@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            $table->string('secure_token', 255)->nullable()->after('uuid');
-           
+            $table->string('secure_token', 255)->nullable();
             $table->foreignId('user_id')->constrained('clients')->onDelete('cascade');
             $table->foreignId('ticket_type_id')->constrained('ticket_types')->onDelete('cascade');
             $table->foreignId('purchase_id')->nullable()->constrained('transactions')->onDelete('set null');
@@ -35,15 +34,6 @@ return new class extends Migration
             $table->index('valid_until');
             $table->index(['user_id', 'status']);
         });
-
-        // Add foreign key for default_ticket_id in clients table
-        Schema::table('clients', function (Blueprint $table) {
-            $table->foreignId('default_ticket_id')
-                ->nullable()
-                ->after('client_preferences')
-                ->constrained('tickets')
-                ->nullOnDelete();
-        });
     }
 
     /**
@@ -51,9 +41,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('clients', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('default_ticket_id');
-        });
         Schema::dropIfExists('tickets');
     }
 };

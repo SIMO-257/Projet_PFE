@@ -19,14 +19,13 @@ return new class extends Migration
                 if (!Schema::hasColumn('clients', 'fcm_token')) {
                     $table->string('fcm_token')->nullable()->after('remember_me');
                 }
-                if (!Schema::hasColumn('clients', 'default_ticket_id')) {
-                    $table->unsignedBigInteger('default_ticket_id')->nullable()->after('fcm_token');
-                }
+                // Skip default_ticket_id - it's handled by a dedicated migration
+                // to avoid circular foreign key dependencies
                 if (!Schema::hasColumn('clients', 'notification_prefs')) {
-                    $table->json('notification_prefs')->nullable()->after('default_ticket_id');
+                    $table->json('notification_prefs')->nullable();
                 }
                 if (!Schema::hasColumn('clients', 'client_preferences')) {
-                    $table->json('client_preferences')->nullable()->after('notification_prefs');
+                    $table->json('client_preferences')->nullable();
                 }
             });
         }
