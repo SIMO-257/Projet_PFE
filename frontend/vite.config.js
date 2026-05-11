@@ -6,6 +6,11 @@ export default defineConfig({
   plugins: [
     react()
   ],
+  base: '/',  // ← ADD THIS
+  build: {
+    outDir: 'dist',  // ← ADD THIS
+    assetsDir: 'assets',  // ← ADD THIS
+  },
   server: {
     host: '0.0.0.0',
     port: 5173,
