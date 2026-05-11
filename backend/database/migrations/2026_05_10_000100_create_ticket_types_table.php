@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('code', 50)->unique();
             $table->string('name_fr', 100);
-            $table->text('descrription');
+            $table->text('description');
             $table->decimal('price', 10, 2);
             $table->integer('duration_minutes')->nullable();
             $table->boolean('is_reusable')->default(false);
