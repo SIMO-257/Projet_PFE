@@ -1,0 +1,75 @@
+version: '3.8'
+
+# Production Docker Compose Override
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+# This file overrides development settings for production deployments
+
+services:
+  db:
+    # Remove port exposure in production
+    ports: []
+    environment:
+      # Use strong passwords in production!
+      # MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-change-this-password}
+      # MYSQL_PASSWORD: ${DB_PASSWORD:-change-this-password}
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+      interval: 30s
+
+  app:
+    environment:
+      APP_ENV: production
+      APP_DEBUG: false
+      LOG_CHANNEL: stack
+    restart: always
+    # Increase PHP-FPM worker processes in production
+    # Add to Dockerfile or use runtime configuration
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health || exit 1"]
+      timeout: 5s
+      retries: 5
+      interval: 30s
+
+  nginx:
+    # Consider using SSL/TLS in production
+    ports:
+      - "80:80"
+      # - "443:443"  # Enable for HTTPS
+    restart: always
+    # Uncomment for SSL configuration
+    # volumes:
+    #   - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    #   - ./certs/:/etc/nginx/certs/:ro
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      timeout: 5s
+      retries: 5
+      interval: 30s
+
+  frontend:
+    # Build the frontend instead of running dev server
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: builder  # Use builder stage only
+    environment:
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api}  # Use relative path in production
+    # Remove port exposure, serve through Nginx instead
+    ports: []
+    restart: always
+    # Copy built assets to Nginx
+    volumes:
+      - frontend-dist:/app/dist
+
+volumes:
+  mysql_data:
+    driver: local
+  frontend-dist:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge
