@@ -4,6 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\TicketController;
 
+Route::get('/health', function () {
+    return response()->json(['status' => 'ok']);
+});
+
 // Public Routes
 Route::post('/signup', [ClientController::class, 'signup'])->middleware('throttle:6,1')->name('api.client.signup');
 Route::post('/login', [ClientController::class, 'login'])->middleware('throttle:login')->name('api.client.login');
