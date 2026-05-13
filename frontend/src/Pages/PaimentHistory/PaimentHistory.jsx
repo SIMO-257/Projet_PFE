@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchTransactionHistory } from '../../services/clientService';
+import { fetchTransactionHistory } from '../../services/walletService';
 import styles from '../../Styles/PaimentHistory.module.css';
 import BottomNavigation from '../../Components/Layout/BottomNavigation';
 import TransactionItem from '../../Components/Cards/TransactionItem';

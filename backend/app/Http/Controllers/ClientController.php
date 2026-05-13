@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
+use Laravel\Sanctum\Sanctum;
 
 
 use App\Models\AuditLog;
@@ -97,6 +98,9 @@ class ClientController extends Controller
 
         $remember = (bool) ($credentials['remember_me'] ?? false);
 
+        \Illuminate\Support\Facades\Log::info('Login attempt for: ' . $credentials['email']);
+        \Illuminate\Support\Facades\Log::info('Password provided: ' . $credentials['password']);
+
         if (Auth::guard('client')->attempt(['email' => $credentials['email'], 'password' => $credentials['password']], $remember)) {
             if ($request->hasSession()) {
                 $request->session()->regenerate();
@@ -112,6 +116,10 @@ class ClientController extends Controller
             }
 
             AuditLog::log('login_success', $client->id);
+
+            // Ensure the authenticated client is available to Sanctum's auth:sanctum middleware
+            // (frontend uses cookie-based SPA auth)
+            Sanctum::authenticateSession($request, $client);
 
             // Send Security Notification
             app(\App\Services\NotificationService::class)->send(

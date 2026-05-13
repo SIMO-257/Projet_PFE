@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useStripe, useElements, CardNumberElement, CardExpiryElement, CardCvcElement } from '@stripe/react-stripe-js';
-import { initRecharge, confirmRecharge } from '../../services/clientService';
+import { initRecharge, confirmRecharge } from '../../services/walletService';
 import ActionButtonCard from '../../Components/Cards/ActionButtonCard';
 import CheckboxInput from "../../Components/Inputs/CheckboxInput";
 

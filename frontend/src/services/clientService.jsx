@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const configuredApiBase = import.meta.env.VITE_API_URL ?? import.meta.env.VITE_API_BASE_URL ?? '';
+const configuredApiBase = import.meta.env.VITE_API_URL;
 const apiBase = configuredApiBase.replace(/\/+$/, '');
 
 // Global axios defaults for CSRF support
@@ -22,8 +22,6 @@ const clientApi = axios.create({
 // CSRF cookie fetch (required for Sanctum SPA auth)
 export const fetchCsrfToken = () => axios.get(`${apiBase}/sanctum/csrf-cookie`, { withCredentials: true });
 
-
-
 const extractPayload = (response) => response?.data?.data ?? null;
 
 const AUTH_FLAG_KEY = 'is_authenticated';
@@ -33,7 +31,6 @@ const AUTH_REMEMBER_KEY = 'auth_remember';
 export const getAuthToken = () => localStorage.getItem(AUTH_FLAG_KEY) === 'true';
 
 export const setAuthToken = () => {
-  // We don't use the token from response anymore, but we'll store a flag
   localStorage.setItem(AUTH_FLAG_KEY, 'true');
 };
 
@@ -87,11 +84,12 @@ clientApi.interceptors.response.use(
       console.log('[AXIOS] 401 detected, clearing auth data');
       clearAuthData();
       // Don't redirect here - let the component/thunk handle it
-      // This prevents conflicts with React routing
     }
     return Promise.reject(error);
   }
 );
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
 
 export const signupClient = async (payload) => {
   await fetchCsrfToken();
@@ -113,6 +111,8 @@ export const resetPasswordClient = async (payload) => {
   return clientApi.post('/reset-password', payload);
 };
 
+// ── Profile ───────────────────────────────────────────────────────────────────
+
 export const fetchClientProfile = () => clientApi.get('/profile').then(extractPayload);
 
 export const updateClientProfile = ({ payload = {}, avatarFile = null }) => {
@@ -125,45 +125,13 @@ export const updateClientProfile = ({ payload = {}, avatarFile = null }) => {
       }
     });
     form.append('profile_file', avatarFile);
-
     return clientApi.post('/profile', form);
   }
-
   return clientApi.put('/profile', payload);
 };
 
 export const logoutClient = () => clientApi.post('/logout');
 
 export const logoutAllClient = () => clientApi.post('/logout-all');
-
-export const fetchClientHome = () => clientApi.get('/home').then(extractPayload);
-
-export const fetchWalletDetails = () => clientApi.get('/wallet').then(extractPayload);
-
-export const fetchTransactionHistory = () => clientApi.get('/wallet/transactions').then(extractPayload);
-
-export const initRecharge = (payload) => clientApi.post('/wallet/recharge/init', payload);
-
-export const confirmRecharge = (payload) => clientApi.post('/wallet/recharge/confirm', payload);
-
-export const fetchTicketTypes = () => clientApi.get('/ticket-types').then(extractPayload);
-
-export const purchaseTicket = (payload) => clientApi.post('/tickets/purchase', payload);
-
-export const fetchMyTickets = () => clientApi.get('/tickets').then(extractPayload);
-export const fetchPurchasedCards = () => clientApi.get('/tickets/cards').then(extractPayload);
-export const setDefaultPurchasedCard = (ticketId) => clientApi.post('/tickets/cards/default', { ticket_id: ticketId }).then(extractPayload);
-
-export const fetchTicketDetails = (uuid) => clientApi.get(`/tickets/${uuid}`).then(extractPayload);
-
-export const validateTicket = (uuid, payload) => clientApi.post(`/tickets/${uuid}/validate`, payload);
-export const createNfcChallenge = () => clientApi.post('/tickets/nfc/challenge').then(extractPayload);
-export const consumeNfcChallenge = (payload) => clientApi.post('/tickets/nfc/consume', payload).then(extractPayload);
-export const createQrValidationToken = (payload) => clientApi.post('/tickets/qr/token', payload).then(extractPayload);
-export const consumeQrValidationToken = (payload) => clientApi.post('/tickets/qr/consume', payload).then(extractPayload);
-
-export const createPaymentIntent = (payload) => clientApi.post('/payments/create-intent', payload);
-
-export const saveBillingDetails = (payload) => clientApi.post('/payments/billing-details', payload);
 
 export default clientApi;

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../Components/Layout/Header';
-import { consumeQrValidationToken, validateTicket } from '../../services/clientService';
+import { consumeQrValidationToken, validateTicket } from '../../services/ticketService';
 
 const ValidatorScreen = () => {
   const navigate = useNavigate();

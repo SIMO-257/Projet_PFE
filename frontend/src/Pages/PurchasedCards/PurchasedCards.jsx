@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../../Components/Layout/Header';
 import BottomNavigation from '../../Components/Layout/BottomNavigation';
 import PurchasedCardItem from '../../Components/Cards/PurchasedCardItem';
-import { fetchPurchasedCards, setDefaultPurchasedCard } from '../../services/clientService';
+import { fetchPurchasedCards, setDefaultPurchasedCard } from '../../services/ticketService';
 
 const PurchasedCards = () => {
   const navigate = useNavigate();

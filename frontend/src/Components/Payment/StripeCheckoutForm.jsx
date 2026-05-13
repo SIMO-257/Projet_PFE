@@ -9,7 +9,7 @@ import {
 } from '@stripe/react-stripe-js';
 
 import * as notificationService from '../../services/notificationService';
-import { confirmRecharge } from '../../services/clientService';
+import { confirmRecharge } from '../../services/walletService';
 
 const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel }) => {
   const stripe = useStripe();

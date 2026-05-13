@@ -7,7 +7,7 @@ import styles from '../../Styles/HomeScreen.module.css';
 import { useAuth } from '../../hooks/useAuth';
 import { useWallet } from '../../hooks/useWallet';
 import { useTickets } from '../../hooks/useTickets';
-import { fetchPurchasedCards } from '../../services/clientService';
+import { fetchPurchasedCards } from '../../services/ticketService';
 
 const HomeScreen = () => {
   const { user } = useAuth();

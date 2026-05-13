@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { fetchTicketTypes, purchaseTicket } from '../../services/clientService';
+import { fetchTicketTypes, purchaseTicket } from '../../services/ticketService';
 import styles from '../../Styles/TicketSelection.module.css';
 
 export default function TicketSelection() {

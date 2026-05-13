@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { fetchMyTickets, fetchTicketTypes, purchaseTicket as purchaseTicketApi, validateTicket as validateTicketApi } from '../../services/clientService';
+import { fetchMyTickets, fetchTicketTypes, purchaseTicket as purchaseTicketApi, validateTicket as validateTicketApi } from '../../services/ticketService';
 import { updateBalance } from './WalletSlice';
 
 export const getTicketsData = createAsyncThunk('tickets/getData', async (_, { rejectWithValue }) => {

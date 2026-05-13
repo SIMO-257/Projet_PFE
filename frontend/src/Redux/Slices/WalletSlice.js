@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { fetchWalletDetails, fetchTransactionHistory } from '../../services/clientService';
+import { fetchWalletDetails, fetchTransactionHistory } from '../../services/walletService';
 
 export const getWalletData = createAsyncThunk('wallet/getData', async (_, { rejectWithValue }) => {
   try {

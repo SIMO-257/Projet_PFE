@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
-import { createPaymentIntent } from "../../services/clientService";
+import { createPaymentIntent } from "../../services/walletService";
 
 // Layout Components
 import Header from "../../Components/Layout/Header";

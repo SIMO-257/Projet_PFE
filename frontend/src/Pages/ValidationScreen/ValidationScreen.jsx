@@ -5,7 +5,7 @@ import {
   createNfcChallenge,
   consumeNfcChallenge,
   createQrValidationToken,
-} from '../../services/clientService';
+} from '../../services/ticketService';
 import Header from '../../Components/Layout/Header';
 import BottomNavigation from '../../Components/Layout/BottomNavigation';
 import ValidationCard from '../../Components/Cards/ValidationCard';

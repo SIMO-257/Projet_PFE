@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchTicketDetails } from '../../services/clientService';
+import { fetchTicketDetails } from '../../services/ticketService';
 import { CheckCircle, Ticket, Calendar, ShieldCheck } from 'lucide-react';
 import Header from '../../Components/Layout/Header';
 

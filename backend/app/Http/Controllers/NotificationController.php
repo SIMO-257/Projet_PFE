@@ -116,20 +116,20 @@ class NotificationController extends Controller
         return $this->successResponse(new NotificationResource($notification), 'Échec enregistré.');
     }
 
-    private function getUnreadCountForUser($userId)
+    private function getUnreadCountForUser($userId): int
     {
         $cacheKey = 'notif_unread:' . $userId;
         
         try {
             $count = Redis::get($cacheKey);
             if ($count === null) {
-                $count = Notification::where('user_id', $userId)->unread()->count();
+                $count = (int) Notification::where('user_id', $userId)->unread()->count();
                 Redis::setex($cacheKey, 60, $count);
             }
-            return $count;
+            return (int) $count;
         } catch (\Throwable $e) {
             // Fallback if Redis is not available
-            return Notification::where('user_id', $userId)->unread()->count();
+            return (int) Notification::where('user_id', $userId)->unread()->count();
         }
     }
 

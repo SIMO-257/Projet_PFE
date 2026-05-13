@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Stripe\Webhook;
 use Stripe\Exception\SignatureVerificationException;
+use App\Services\NotificationService;
+use Illuminate\Support\Facades\Redis;
+use App\Events\LowBalanceEvent;
+
 
 class StripeWebhookController extends Controller
 {
@@ -68,7 +72,7 @@ class StripeWebhookController extends Controller
             $client = Client::find($userId);
             if ($client) {
                 try {
-                    app(\App\Services\NotificationService::class)->send(
+                    app(NotificationService::class)->send(
                         $client,
                         'payment',
                         'danger',
@@ -175,7 +179,7 @@ class StripeWebhookController extends Controller
                 $client = Client::find($userId);
                 if ($client) {
                     try {
-                        app(\App\Services\NotificationService::class)->send(
+                        app(NotificationService::class)->send(
                             $client,
                             'payment',
                             'success',
@@ -190,8 +194,8 @@ class StripeWebhookController extends Controller
                         ]);
                     }
 
-                    \Illuminate\Support\Facades\Redis::del("low_balance_notif:{$client->id}");
-                    event(new \App\Events\LowBalanceEvent($client, $wallet->balance));
+                    Redis::del("low_balance_notif:{$client->id}");
+                    event(new LowBalanceEvent($client, $wallet->balance));
                 }
 
                 Log::info("Stripe Webhook: Successfully processed wallet_recharge for user $userId. Amount: $amountInDh $currency");
