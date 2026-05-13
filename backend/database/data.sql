@@ -3,7 +3,7 @@ START TRANSACTION;
 SET time_zone = "+00:00";
 
 --
--- Database: `pfe_db`
+-- Database: `projet_pfe`
 --
 
 -- --------------------------------------------------------
@@ -17,29 +17,25 @@ CREATE TABLE `clients` (
   `password_hash` varchar(255) NOT NULL,
   `first_name` varchar(100) DEFAULT NULL,
   `last_name` varchar(100) DEFAULT NULL,
-  `profile_photo` LONGBLOB DEFAULT NULL,
-  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `profile_file` longblob DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 0,
+  `last_active_at` timestamp NULL DEFAULT NULL,
   `remember_me` tinyint(1) NOT NULL DEFAULT 0,
+  `fcm_token` varchar(255) DEFAULT NULL,
+  `remember_token` varchar(100) DEFAULT NULL,
+  `notification_prefs` json DEFAULT NULL,
+  `client_preferences` json DEFAULT NULL,
+  `default_ticket_id` bigint(20) UNSIGNED DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `clients_uuid_unique` (`uuid`),
   UNIQUE KEY `clients_email_unique` (`email`),
-  UNIQUE KEY `clients_phone_unique` (`phone`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
--- Table `wallets`
--- --------------------------------------------------------
-CREATE TABLE `wallets` (
-  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `user_id` bigint(20) UNSIGNED NOT NULL,
-  `balance` decimal(10,2) NOT NULL DEFAULT 0.00,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
-  PRIMARY KEY (`id`),
-  KEY `wallets_user_id_foreign` (`user_id`),
-  CONSTRAINT `wallets_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE
+  UNIQUE KEY `clients_phone_unique` (`phone`),
+  KEY `clients_email_index` (`email`),
+  KEY `clients_uuid_index` (`uuid`),
+  KEY `clients_is_active_index` (`is_active`),
+  KEY `clients_default_ticket_id_index` (`default_ticket_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -49,33 +45,34 @@ CREATE TABLE `ticket_types` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `code` varchar(50) NOT NULL,
   `name_fr` varchar(100) NOT NULL,
+  `description` text NOT NULL,
   `price` decimal(10,2) NOT NULL,
+  `duration_minutes` int(11) DEFAULT NULL,
+  `is_reusable` tinyint(1) NOT NULL DEFAULT 0,
+  `max_uses` int(11) NOT NULL DEFAULT 1,
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
-  `created_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `ticket_types_code_unique` (`code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
--- Table `tickets`
--- --------------------------------------------------------
-CREATE TABLE `tickets` (
-  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `uuid` char(36) NOT NULL,
-  `user_id` bigint(20) UNSIGNED NOT NULL,
-  `ticket_type_id` bigint(20) UNSIGNED NOT NULL,
-  `status` enum('active','used','expired') NOT NULL DEFAULT 'active',
-  `is_default` tinyint(1) NOT NULL DEFAULT 0,
-  `validation_method` enum('nfc','qr') NOT NULL DEFAULT 'nfc',
-  `price_paid` decimal(10,2) NOT NULL,
-  `valid_until` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `tickets_uuid_unique` (`uuid`),
-  KEY `tickets_user_id_foreign` (`user_id`),
-  CONSTRAINT `tickets_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `tickets_ticket_type_id_foreign` FOREIGN KEY (`ticket_type_id`) REFERENCES `ticket_types` (`id`) ON DELETE CASCADE
+  UNIQUE KEY `ticket_types_code_unique` (`code`),
+  KEY `ticket_types_code_index` (`code`),
+  KEY `ticket_types_is_active_index` (`is_active`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+-- Table `wallets`
+-- --------------------------------------------------------
+CREATE TABLE `wallets` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) UNSIGNED NOT NULL,
+  `balance` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `card_last_four` varchar(4) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `wallets_user_id_foreign` (`user_id`),
+  KEY `wallets_user_id_index` (`user_id`),
+  CONSTRAINT `wallets_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -84,14 +81,162 @@ CREATE TABLE `tickets` (
 CREATE TABLE `transactions` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `uuid` char(36) NOT NULL,
+  `payment_intent_id` varchar(100) DEFAULT NULL,
   `user_id` bigint(20) UNSIGNED NOT NULL,
-  `type` enum('purchase','recharge') NOT NULL,
+  `type` varchar(20) NOT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'completed',
   `amount` decimal(10,2) NOT NULL,
+  `currency` varchar(3) NOT NULL DEFAULT 'MAD',
+  `balance_before` decimal(10,2) NOT NULL,
+  `balance_after` decimal(10,2) NOT NULL,
+  `payment_method` varchar(50) NOT NULL DEFAULT 'wallet',
+  `reference` varchar(100) DEFAULT NULL,
+  `metadata` json DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `transactions_uuid_unique` (`uuid`),
+  UNIQUE KEY `transactions_payment_intent_id_unique` (`payment_intent_id`),
   KEY `transactions_user_id_foreign` (`user_id`),
+  KEY `transactions_user_id_index` (`user_id`),
+  KEY `transactions_uuid_index` (`uuid`),
+  KEY `transactions_payment_intent_id_index` (`payment_intent_id`),
+  KEY `transactions_type_index` (`type`),
+  KEY `transactions_status_index` (`status`),
+  KEY `transactions_created_at_index` (`created_at`),
   CONSTRAINT `transactions_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+-- Table `tickets`
+-- --------------------------------------------------------
+CREATE TABLE `tickets` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `uuid` char(36) NOT NULL,
+  `secure_token` varchar(255) DEFAULT NULL,
+  `user_id` bigint(20) UNSIGNED NOT NULL,
+  `ticket_type_id` bigint(20) UNSIGNED NOT NULL,
+  `purchase_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `status` enum('active','used','expired') NOT NULL DEFAULT 'active',
+  `valid_from` timestamp NULL DEFAULT NULL,
+  `valid_until` timestamp NULL DEFAULT NULL,
+  `remaining_uses` int(11) DEFAULT NULL,
+  `price_paid` decimal(10,2) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `tickets_uuid_unique` (`uuid`),
+  KEY `tickets_user_id_foreign` (`user_id`),
+  KEY `tickets_uuid_index` (`uuid`),
+  KEY `tickets_secure_token_index` (`secure_token`),
+  KEY `tickets_ticket_type_id_index` (`ticket_type_id`),
+  KEY `tickets_status_index` (`status`),
+  KEY `tickets_valid_until_index` (`valid_until`),
+  KEY `tickets_user_id_status_index` (`user_id`, `status`),
+  KEY `tickets_purchase_id_foreign` (`purchase_id`),
+  CONSTRAINT `tickets_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `tickets_ticket_type_id_foreign` FOREIGN KEY (`ticket_type_id`) REFERENCES `ticket_types` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `tickets_purchase_id_foreign` FOREIGN KEY (`purchase_id`) REFERENCES `transactions` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+-- Table `validation_logs`
+-- --------------------------------------------------------
+CREATE TABLE `validation_logs` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `ticket_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `user_id` bigint(20) UNSIGNED NOT NULL,
+  `validator_id` varchar(100) NOT NULL,
+  `validation_type` enum('nfc','qr') NOT NULL,
+  `status` enum('success','failure','offline_accepted') NOT NULL,
+  `failure_reason` varchar(255) DEFAULT NULL,
+  `location` json DEFAULT NULL,
+  `metadata` json DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `validation_logs_ticket_id_foreign` (`ticket_id`),
+  KEY `validation_logs_user_id_foreign` (`user_id`),
+  KEY `validation_logs_ticket_id_index` (`ticket_id`),
+  KEY `validation_logs_user_id_index` (`user_id`),
+  KEY `validation_logs_validator_id_index` (`validator_id`),
+  KEY `validation_logs_validation_type_index` (`validation_type`),
+  KEY `validation_logs_status_index` (`status`),
+  KEY `validation_logs_created_at_index` (`created_at`),
+  KEY `validation_logs_user_id_status_index` (`user_id`, `status`),
+  CONSTRAINT `validation_logs_ticket_id_foreign` FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `validation_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+-- Table `audit_logs`
+-- --------------------------------------------------------
+CREATE TABLE `audit_logs` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `action` varchar(255) NOT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` text DEFAULT NULL,
+  `metadata` json DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `audit_logs_user_id_foreign` (`user_id`),
+  KEY `audit_logs_user_id_index` (`user_id`),
+  KEY `audit_logs_action_index` (`action`),
+  KEY `audit_logs_created_at_index` (`created_at`),
+  KEY `audit_logs_user_id_action_index` (`user_id`, `action`),
+  CONSTRAINT `audit_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+-- Table `notifications`
+-- --------------------------------------------------------
+CREATE TABLE `notifications` (
+  `id` char(36) NOT NULL,
+  `user_id` bigint(20) UNSIGNED NOT NULL,
+  `type` enum('validation','payment','security','promo','system') NOT NULL,
+  `severity` enum('info','success','warning','danger') NOT NULL DEFAULT 'info',
+  `title` varchar(255) NOT NULL,
+  `body` varchar(255) NOT NULL,
+  `meta` json DEFAULT NULL,
+  `is_read` tinyint(1) NOT NULL DEFAULT 0,
+  `read_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `notifications_user_id_foreign` (`user_id`),
+  KEY `notifications_user_id_index` (`user_id`),
+  KEY `notifications_user_id_is_read_index` (`user_id`, `is_read`),
+  KEY `notifications_user_id_created_at_index` (`user_id`, `created_at`),
+  KEY `notifications_type_index` (`type`),
+  CONSTRAINT `notifications_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+-- Table `billing_details`
+-- --------------------------------------------------------
+CREATE TABLE `billing_details` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) UNSIGNED NOT NULL,
+  `address` json DEFAULT NULL,
+  `tax_id` varchar(50) DEFAULT NULL,
+  `country` varchar(2) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `billing_details_user_id_foreign` (`user_id`),
+  KEY `billing_details_user_id_index` (`user_id`),
+  CONSTRAINT `billing_details_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+-- Table `processed_stripe_events`
+-- --------------------------------------------------------
+CREATE TABLE `processed_stripe_events` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `event_id` varchar(255) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `processed_stripe_events_event_id_unique` (`event_id`),
+  KEY `processed_stripe_events_event_id_index` (`event_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -120,8 +265,85 @@ CREATE TABLE `cache` (
   `key` varchar(255) NOT NULL,
   `value` mediumtext NOT NULL,
   `expiration` int(11) NOT NULL,
-  PRIMARY KEY (`key`)
+  PRIMARY KEY (`key`),
+  KEY `cache_expiration_index` (`expiration`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `cache_locks` (
+  `key` varchar(255) NOT NULL,
+  `owner` varchar(255) NOT NULL,
+  `expiration` int(11) NOT NULL,
+  PRIMARY KEY (`key`),
+  KEY `cache_locks_expiration_index` (`expiration`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `jobs` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `queue` varchar(255) NOT NULL,
+  `payload` longtext NOT NULL,
+  `attempts` tinyint(3) UNSIGNED NOT NULL,
+  `reserved_at` int(10) UNSIGNED DEFAULT NULL,
+  `available_at` int(10) UNSIGNED NOT NULL,
+  `created_at` int(10) UNSIGNED NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `jobs_queue_index` (`queue`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `job_batches` (
+  `id` varchar(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `total_jobs` int(11) NOT NULL,
+  `pending_jobs` int(11) NOT NULL,
+  `failed_jobs` int(11) NOT NULL,
+  `failed_job_ids` longtext NOT NULL,
+  `options` mediumtext DEFAULT NULL,
+  `cancelled_at` int(11) DEFAULT NULL,
+  `created_at` int(11) NOT NULL,
+  `finished_at` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `failed_jobs` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(255) NOT NULL,
+  `connection` text NOT NULL,
+  `queue` text NOT NULL,
+  `payload` longtext NOT NULL,
+  `exception` longtext NOT NULL,
+  `failed_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `personal_access_tokens` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `tokenable_type` varchar(255) NOT NULL,
+  `tokenable_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `token` varchar(64) NOT NULL,
+  `abilities` text DEFAULT NULL,
+  `last_used_at` timestamp NULL DEFAULT NULL,
+  `expires_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `personal_access_tokens_token_unique` (`token`),
+  KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`, `tokenable_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+-- Foreign Keys for cross-table references
+-- --------------------------------------------------------
+ALTER TABLE `clients` ADD CONSTRAINT `clients_default_ticket_id_foreign`
+  FOREIGN KEY (`default_ticket_id`) REFERENCES `tickets` (`id`) ON DELETE SET NULL;
+
+-- --------------------------------------------------------
+-- MySQL Event: Delete expired tickets every 10 minutes
+-- --------------------------------------------------------
+CREATE EVENT IF NOT EXISTS delete_expired_tickets_daily
+ON SCHEDULE EVERY 24 HOUR
+DO
+    DELETE FROM tickets WHERE status = 'expired';
 
 -- --------------------------------------------------------
 -- Initial Seed Data
@@ -134,20 +356,3 @@ INSERT INTO `ticket_types` (`id`, `code`, `name_fr`, `description`, `price`, `du
 (5, 'BILLET_MOIS', 'Billet de Mois', 'Voyages illimités pendant 30 jours.', 250.00, 43200, 1, 999, 1);
 
 COMMIT;
-```
-
-### Key Changes Implemented:
-
-1.  **Profiles in SQL**: The `clients` table now includes a `profile_photo` column of type `LONGBLOB`. This allows you to store the raw binary data of the image directly in the database, avoiding the need for an external file server or storage service like Minio.
-2.  **Remember Me Logic**: Added the `remember_me` boolean column to the `clients` table. This allows the backend to track whether a session should persist beyond the browser closing.
-3.  **Default Ticket Logic**: 
-   *   Added `is_default` to the `tickets` table. When the user "chooses which card they wish to be the default," your logic should set all other cards for that user to `0` and the selected one to `1`.
-   *   Added `validation_method` (`nfc` or `qr`) to the `tickets` table, defaulting to `nfc` as you requested.
-4.  **Simplified Schema**: I focused on the core tables (`clients`, `wallets`, `tickets`, `ticket_types`, `transactions`) while removing unnecessary columns to keep the code short and "obvious for a student."
-5.  **Laravel Compatibility**: Kept the `sessions`, `cache`, and `password_reset_tokens` tables so that your local Laravel installation works perfectly with standard session and authentication drivers.
-
-To use this, simply import it into your local MySQL database (e.g., via PHPMyAdmin or the MySQL CLI).
-
-<!--
-[PROMPT_SUGGESTION]How do I write the Eloquent model for the Client to handle the LONGBLOB profile photo?[/PROMPT_SUGGESTION]
-[PROMPT_SUGGESTION]Explain how to implement the logic for setting a default ticket in the Laravel controller.[/PROMPT_SUGGESTION]

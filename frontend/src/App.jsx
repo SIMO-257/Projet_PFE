@@ -8,34 +8,34 @@ import { markAuthCheckedUnauthenticated } from "./Redux/Slices/AuthSlice";
 import { shouldRestoreAuthSession } from "./services/clientService";
 
 // Lazy pages
-const Login = lazy(() => import("./Pages/Login/Login"));
-const SignUp = lazy(() => import("./Pages/SignUp/SignUp"));
-const ForgotPassword = lazy(() => import("./Pages/ForgotPassword/ForgotPassword"));
-const ResetPassword = lazy(() => import("./Pages/ResetPassword/ResetPassword"));
+const Login = lazy(() => import("./Pages/Login"));
+const SignUp = lazy(() => import("./Pages/SignUp"));
+const ForgotPassword = lazy(() => import("./Pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./Pages/ResetPassword"));
 
-const HomeScreen = lazy(() => import("./Pages/Home/HomeScreen"));
-const WalletScreen = lazy(() => import("./Pages/WalletScreen/WalletScreen"));
-const ProfileScreen = lazy(() => import("./Pages/ProfileScreen/ProfileScreen"));
-const EditProfileScreen = lazy(() => import("./Pages/EditProfile/EditProfile"));
-const SettingsScreen = lazy(() => import("./Pages/Settings/SettingsScreen"));
-const HelpSupportScreen = lazy(() => import("./Pages/HelpSupport/HelpSupportScreen"));
-const SecurityScreen = lazy(() => import("./Pages/SecurityScreen/SecurityScreen"));
+const HomeScreen = lazy(() => import("./Pages/HomeScreen"));
+const WalletScreen = lazy(() => import("./Pages/WalletScreen"));
+const ProfileScreen = lazy(() => import("./Pages/ProfileScreen"));
+const EditProfileScreen = lazy(() => import("./Pages/EditProfile"));
+const SettingsScreen = lazy(() => import("./Pages/SettingsScreen"));
+const HelpSupportScreen = lazy(() => import("./Pages/HelpSupportScreen"));
+const SecurityScreen = lazy(() => import("./Pages/SecurityScreen"));
 
-const MyTickets = lazy(() => import("./Pages/MyTickets/MyTickets"));
-const AllTickets = lazy(() => import("./Pages/AllTickets/AllTickets"));
-const TicketSelection = lazy(() => import("./Pages/TicketSelection/TicketSelection"));
-const ViewTicket = lazy(() => import("./Pages/ViewTicket/ViewTicket"));
-const ValidationScreen = lazy(() => import("./Pages/ValidationScreen/ValidationScreen"));
-const ValidatorScreen = lazy(() => import("./Pages/Validator/ValidatorScreen"));
+const MyTickets = lazy(() => import("./Pages/MyTickets"));
+const AllTickets = lazy(() => import("./Pages/AllTickets"));
+const TicketSelection = lazy(() => import("./Pages/TicketSelection"));
+const ViewTicket = lazy(() => import("./Pages/ViewTicket"));
+const ValidationScreen = lazy(() => import("./Pages/ValidationScreen"));
+const ValidatorScreen = lazy(() => import("./Pages/Validator"));
 
-const Paiment = lazy(() => import("./Pages/Paiment/Paiment"));
-const RechargePaymentScreen = lazy(() => import("./Pages/RechargePaymentScreen/RechargePaymentScreen"));
-const PurchasedCards = lazy(() => import("./Pages/PurchasedCards/PurchasedCards"));
-const ConfirmationPaiment = lazy(() => import("./Pages/ConfirmationPaiment/ConfirmationPaiment"));
-const PaimentHistory = lazy(() => import("./Pages/PaimentHistory/PaimentHistory"));
+const Paiment = lazy(() => import("./Pages/Paiment"));
+const RechargePaymentScreen = lazy(() => import("./Pages/RechargePaymentScreen"));
+const PurchasedCards = lazy(() => import("./Pages/PurchasedCards"));
+const ConfirmationPaiment = lazy(() => import("./Pages/ConfirmationPaiment"));
+const PaimentHistory = lazy(() => import("./Pages/PaimentHistory"));
 
-const Notifications = lazy(() => import("./Pages/Notifications/Notifications"));
-const OfflineMode = lazy(() => import("./Pages/OfflineMode/OfflineMode"));
+const Notifications = lazy(() => import("./Pages/Notifications"));
+const OfflineMode = lazy(() => import("./Pages/OfflineMode"));
 
 function RootRedirect() {
   const { isAuthenticated, isAuthChecked, isLoading } = useAuth();

@@ -18,7 +18,7 @@ Route::post('/reset-password', [ClientController::class, 'resetPassword'])->midd
 Route::post('/webhooks/stripe', [\App\Http\Controllers\StripeWebhookController::class, 'handle'])->middleware('throttle:60,1')->name('api.stripe.webhook');
 
 // Protected Routes
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'track.activity'])->group(function () {
     Route::get('/profile', [ClientController::class, 'fetch_profile'])->name('api.client.profile');
     Route::post('/profile/avatar', [ClientController::class, 'upload_avatar'])->name('api.client.profile.avatar');
     Route::put('/profile', [ClientController::class, 'update_profile'])->name('api.client.profile.update');

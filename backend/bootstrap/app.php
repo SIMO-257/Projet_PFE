@@ -29,6 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ]);
     $middleware->alias([
         'authMiddleware' => \App\Http\Middleware\AuthMiddleware::class,
+        'track.activity' => \App\Http\Middleware\TrackActivity::class,
     ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

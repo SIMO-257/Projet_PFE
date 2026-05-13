@@ -31,6 +31,7 @@ class Client extends Authenticatable implements CanResetPasswordContract
         'last_name',
         'profile_file',
         'is_active',
+        'last_active_at',
         'remember_me',
         'default_ticket_id',
         'notification_prefs',
@@ -57,7 +58,7 @@ class Client extends Authenticatable implements CanResetPasswordContract
             'is_active' => 'boolean',
             'remember_me' => 'boolean',
             'created_at' => 'datetime',
-            'password_hash' => 'hashed',
+            'last_active_at' => 'datetime',
             'notification_prefs' => 'array',
             'client_preferences' => 'array',
         ];

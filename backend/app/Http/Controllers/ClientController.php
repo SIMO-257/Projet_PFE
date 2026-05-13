@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
-use Laravel\Sanctum\Sanctum;
 
 
 use App\Models\AuditLog;
@@ -98,8 +97,6 @@ class ClientController extends Controller
 
         $remember = (bool) ($credentials['remember_me'] ?? false);
 
-        \Illuminate\Support\Facades\Log::info('Login attempt for: ' . $credentials['email']);
-        \Illuminate\Support\Facades\Log::info('Password provided: ' . $credentials['password']);
 
         if (Auth::guard('client')->attempt(['email' => $credentials['email'], 'password' => $credentials['password']], $remember)) {
             if ($request->hasSession()) {
@@ -108,18 +105,18 @@ class ClientController extends Controller
 
             /** @var Client $client */
             $client = Auth::guard('client')->user();
-            
-            if (!$client->is_active) {
-                AuditLog::log('login_failed_inactive', $client->id, ['email' => $credentials['email']]);
+
+            if ($client->is_active) {
                 Auth::guard('client')->logout();
-                return $this->errorResponse('Account is inactive.', 403);
+                AuditLog::log('login_failed_already_active', $client->id, ['email' => $credentials['email']]);
+                return $this->errorResponse('Account already used by someone else.', 403);
             }
 
-            AuditLog::log('login_success', $client->id);
+            $client->is_active = true;
+            $client->last_active_at = now();
+            $client->save();
 
-            // Ensure the authenticated client is available to Sanctum's auth:sanctum middleware
-            // (frontend uses cookie-based SPA auth)
-            Sanctum::authenticateSession($request, $client);
+            AuditLog::log('login_success', $client->id);
 
             // Send Security Notification
             app(\App\Services\NotificationService::class)->send(
@@ -153,7 +150,7 @@ class ClientController extends Controller
             'phone' => $data['phone'] ?? null,
             'password_hash' => Hash::make($data['password']),
             'profile_file' => $this->defaultAvatarBinary(),
-            'is_active' => true,
+            'is_active' => false,
         ]);
         $this->applyName($client, $data);
         $this->applyProfileFile($client, $request, 'profile_file');
@@ -167,7 +164,16 @@ class ClientController extends Controller
 
     public function logout(Request $request)
     {
-        $userId = Auth::guard('client')->id();
+        /** @var Client|null $client */
+        $client = Auth::guard('client')->user();
+        $userId = $client?->id;
+
+        if ($client) {
+            $client->is_active = false;
+            $client->last_active_at = null;
+            $client->save();
+        }
+
         Auth::guard('client')->logout();
 
         $request->session()->invalidate();
@@ -180,8 +186,17 @@ class ClientController extends Controller
 
     public function logoutAll(Request $request)
     {
-        $userId = $request->user()?->id;
-        $request->user()?->tokens()->delete();
+        /** @var Client|null $client */
+        $client = $request->user();
+        $userId = $client?->id;
+
+        if ($client) {
+            $client->is_active = false;
+            $client->last_active_at = null;
+            $client->save();
+        }
+
+        $client?->tokens()->delete();
 
         AuditLog::log('logout_all', $userId);
 
@@ -219,7 +234,7 @@ class ClientController extends Controller
         $status = Password::broker('clients')->reset(
             $data,
             function (Client $client, string $password): void {
-                $client->password_hash = $password;
+                $client->password_hash = Hash::make($password);
                 $client->save();
                 AuditLog::log('password_reset_success', $client->id);
             }
