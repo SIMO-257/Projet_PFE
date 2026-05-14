@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
+import { Download } from 'lucide-react';
 import styles from '../../Styles/QRValidation.module.css';
 
 const QRCodeDisplay = ({ 
@@ -39,6 +40,19 @@ const QRCodeDisplay = ({
             mounted = false;
         };
     }, [qrText, size]);
+
+    const handleDownload = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (qrDataUrl) {
+            const link = document.createElement('a');
+            link.href = qrDataUrl;
+            link.download = `ticket-${value || 'qrcode'}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    };
 
     const GRID_SIZE = 29; // includes quiet zone
     const INNER_SIZE = 21; // QR-like payload area
@@ -146,7 +160,16 @@ const QRCodeDisplay = ({
     };
 
     return (
-        <div className={`${styles.qrContainer} ${className} ${isValid ? styles.qrPulse : ''}`}>
+        <div className={`relative ${styles.qrContainer} ${className} ${isValid ? styles.qrPulse : ''}`}>
+            {!qrError && qrDataUrl && (
+                <button 
+                  onClick={handleDownload}
+                  title="Download QR Code"
+                  className="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 hover:bg-black/80 text-white shadow backdrop-blur-sm transition-all z-10"
+                >
+                  <Download size={16} />
+                </button>
+            )}
             {!qrError && qrDataUrl ? (
                 <img
                     src={qrDataUrl}

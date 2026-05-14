@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import jsQR from 'jsqr';
 import Header from '../Components/Layout/Header';
 import { consumeQrValidationToken, validateTicket } from '../services/ticketService';
 
@@ -104,21 +105,29 @@ const ValidatorScreen = () => {
 
   const scanFrame = async () => {
     const video = videoRef.current;
-    if (!video || !detectorRef.current || video.readyState < 2) {
+    if (!video || video.readyState < 2) {
       frameRequestRef.current = requestAnimationFrame(scanFrame);
       return;
     }
 
     try {
-      const barcodes = await detectorRef.current.detect(video);
-      if (barcodes.length > 0) {
-        const raw = barcodes[0]?.rawValue || '';
-        if (raw) {
-          setScanValue(raw);
-          stopCamera();
-          await processValidation(raw);
-          return;
-        }
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      
+      const code = jsQR(imageData.data, imageData.width, imageData.height, {
+        inversionAttempts: "dontInvert",
+      });
+
+      if (code && code.data) {
+        const raw = code.data;
+        setScanValue(raw);
+        stopCamera();
+        await processValidation(raw);
+        return;
       }
     } catch (_) {
       // Ignore intermittent detector errors and continue scanning
@@ -131,16 +140,7 @@ const ValidatorScreen = () => {
     setError('');
     setResult(null);
 
-    if (!('BarcodeDetector' in window)) {
-      setError('BarcodeDetector non supporte sur ce navigateur. Utilisez le mode manuel ou upload image.');
-      return;
-    }
-
     try {
-      detectorRef.current = new window.BarcodeDetector({
-        formats: ['qr_code', 'code_128', 'code_39', 'ean_13', 'ean_8'],
-      });
-
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: 'environment' },
         audio: false,
@@ -155,7 +155,7 @@ const ValidatorScreen = () => {
       setIsScanning(true);
       frameRequestRef.current = requestAnimationFrame(scanFrame);
     } catch (err) {
-      setError(err?.message || 'Impossible de demarrer la camera.');
+      setError(err?.message || 'Impossible de demarrer la camera. Verifiez les permissions.');
       stopCamera();
     }
   };
@@ -166,10 +166,8 @@ const ValidatorScreen = () => {
 
   const handleImageUpload = async (event) => {
     const file = event.target.files?.[0];
-    if (!file) return;
-
-    if (!('BarcodeDetector' in window)) {
-      setError('Upload image non supporte sans BarcodeDetector. Collez le code manuellement.');
+    if (!file) {
+      event.target.value = '';
       return;
     }
 
@@ -177,24 +175,55 @@ const ValidatorScreen = () => {
     setResult(null);
 
     try {
-      detectorRef.current = new window.BarcodeDetector({
-        formats: ['qr_code', 'code_128', 'code_39', 'ean_13', 'ean_8'],
-      });
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
 
-      const imageBitmap = await createImageBitmap(file);
-      const barcodes = await detectorRef.current.detect(imageBitmap);
-      imageBitmap.close();
+      img.onload = async () => {
+        URL.revokeObjectURL(objectUrl);
+        
+        // jsQR struggles with extremely large images from phone cameras. 
+        // Downscaling to a max dimension of 800px drastically improves detection rate.
+        const MAX_DIMENSION = 800;
+        let width = img.width;
+        let height = img.height;
 
-      if (!barcodes.length || !barcodes[0]?.rawValue) {
-        setError('Aucun code detecte dans cette image.');
-        return;
-      }
+        if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+          const ratio = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
 
-      const raw = barcodes[0].rawValue;
-      setScanValue(raw);
-      await processValidation(raw);
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        
+        // Draw the image onto the scaled canvas
+        ctx.drawImage(img, 0, 0, width, height);
+        const imageData = ctx.getImageData(0, 0, width, height);
+
+        // Run jsQR with attemptBoth which is much better for camera shots with bad contrast
+        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+          inversionAttempts: "attemptBoth"
+        });
+
+        if (code && code.data) {
+          const raw = code.data;
+          setScanValue(raw);
+          await processValidation(raw);
+        } else {
+          setError('Aucun code QR detecte dans cette image. Assurez-vous que le code est lisible.');
+        }
+      };
+
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        setError("Format d'image non valide ou image corrompue.");
+      };
+
+      img.src = objectUrl;
     } catch (err) {
-      setError(err?.message || 'Impossible d analyser cette image.');
+      setError(err?.message || "Impossible d'analyser cette image.");
     } finally {
       event.target.value = '';
     }

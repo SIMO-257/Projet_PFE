@@ -37,6 +37,7 @@ const PaimentHistory = lazy(() => import("./Pages/PaimentHistory"));
 const Notifications = lazy(() => import("./Pages/Notifications"));
 const OfflineMode = lazy(() => import("./Pages/OfflineMode"));
 
+
 function RootRedirect() {
   const { isAuthenticated, isAuthChecked, isLoading } = useAuth();
 

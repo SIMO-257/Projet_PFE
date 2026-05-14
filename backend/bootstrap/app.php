@@ -16,13 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
     $middleware->append(HandleCors::class);
-    $middleware->statefulApi();
     $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
+    $middleware->redirectGuestsTo(fn (Request $request) => $request->is('api/*') ? null : route('login'));
     $middleware->validateCsrfTokens(except: [
-        'api/webhooks/stripe',
-        'api/login',
-        'api/tickets/purchase',
-        'api/wallet/recharge/*',
+        'api/*',
     ]);
     $middleware->web(append: [
         HandleInertiaRequests::class,

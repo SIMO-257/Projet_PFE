@@ -1,11 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { clearAuthData, fetchClientProfile, loginClient, logoutClient, fetchCsrfToken, setAuthPersistence } from '../../services/clientService';
+import { clearAuthData, fetchClientProfile, loginClient, logoutClient, setAuthToken } from '../../services/clientService';
 
 export const login = createAsyncThunk('auth/login', async (credentials, { rejectWithValue }) => {
   try {
-    await fetchCsrfToken();
-    await loginClient(credentials);
-    setAuthPersistence(Boolean(credentials?.remember_me));
+    const loginRes = await loginClient(credentials);
+    const token = loginRes.data?.data?.access_token;
+    if (token) {
+      setAuthToken(token, Boolean(credentials?.remember_me));
+    }
     const profileResponse = await fetchClientProfile();
     return profileResponse;
   } catch (err) {
@@ -16,22 +18,15 @@ export const login = createAsyncThunk('auth/login', async (credentials, { reject
 
 export const getProfile = createAsyncThunk('auth/getProfile', async (_, { rejectWithValue }) => {
   try {
-    console.log('[THUNK] getProfile: Starting...');
-    // Fetch CSRF first to ensure session is initialized
-    await fetchCsrfToken();
-    console.log('[THUNK] getProfile: CSRF fetched, now fetching profile...');
     const response = await fetchClientProfile();
-    console.log('[THUNK] getProfile: Received profile:', response);
     return response;
   } catch (err) {
-    console.error('[THUNK] getProfile: Error:', err.message);
     return rejectWithValue(err.response?.data || { message: 'Failed to load profile' });
   }
 });
 
 export const logout = createAsyncThunk('auth/logout', async (_, { rejectWithValue }) => {
   try {
-    await fetchCsrfToken();
     await logoutClient();
     clearAuthData();
     return true;

@@ -95,19 +95,10 @@ class ClientController extends Controller
             'remember_me' => 'nullable|boolean',
         ]);
 
-        $remember = (bool) ($credentials['remember_me'] ?? false);
+        $client = Client::where('email', $credentials['email'])->first();
 
-
-        if (Auth::guard('client')->attempt(['email' => $credentials['email'], 'password' => $credentials['password']], $remember)) {
-            if ($request->hasSession()) {
-                $request->session()->regenerate();
-            }
-
-            /** @var Client $client */
-            $client = Auth::guard('client')->user();
-
+        if ($client && Hash::check($credentials['password'], $client->password_hash)) {
             if ($client->is_active) {
-                Auth::guard('client')->logout();
                 AuditLog::log('login_failed_already_active', $client->id, ['email' => $credentials['email']]);
                 return $this->errorResponse('Account already used by someone else.', 403);
             }
@@ -128,8 +119,12 @@ class ClientController extends Controller
                 ['ip' => $request->ip(), 'agent' => $request->userAgent()]
             );
 
+            $token = $client->createToken('auth_token')->plainTextToken;
+
             return $this->successResponse([
-                'remember_me' => $client->remember_me,
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'remember_me' => $credentials['remember_me'] ?? false,
             ], 'Login successful.');
         }
 
@@ -165,19 +160,15 @@ class ClientController extends Controller
     public function logout(Request $request)
     {
         /** @var Client|null $client */
-        $client = Auth::guard('client')->user();
+        $client = $request->user();
         $userId = $client?->id;
 
         if ($client) {
             $client->is_active = false;
             $client->last_active_at = null;
             $client->save();
+            $client->currentAccessToken()->delete();
         }
-
-        Auth::guard('client')->logout();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
 
         AuditLog::log('logout', $userId);
 

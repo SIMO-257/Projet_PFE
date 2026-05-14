@@ -3,55 +3,37 @@ import axios from 'axios';
 const configuredApiBase = import.meta.env.VITE_API_URL;
 const apiBase = configuredApiBase.replace(/\/+$/, '');
 
-// Global axios defaults for CSRF support
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
-axios.defaults.xsrfCookieName = 'XSRF-TOKEN';
-axios.defaults.xsrfHeaderName = 'X-XSRF-TOKEN';
-
 const clientApi = axios.create({
   baseURL: `${apiBase}/api`,
-  withCredentials: true,
-  withXSRFToken: true,
   headers: {
     Accept: 'application/json',
-    'X-Requested-With': 'XMLHttpRequest',
   },
 });
 
-// CSRF cookie fetch (required for Sanctum SPA auth)
-export const fetchCsrfToken = () => axios.get(`${apiBase}/sanctum/csrf-cookie`, { withCredentials: true });
 
 const extractPayload = (response) => response?.data?.data ?? null;
 
-const AUTH_FLAG_KEY = 'is_authenticated';
-const AUTH_REMEMBER_KEY = 'auth_remember';
+const API_TOKEN_KEY = 'auth_token';
 
-// These are now legacy/placeholder as we use cookies
-export const getAuthToken = () => localStorage.getItem(AUTH_FLAG_KEY) === 'true';
+export const getAuthToken = () => localStorage.getItem(API_TOKEN_KEY) || sessionStorage.getItem(API_TOKEN_KEY);
 
-export const setAuthToken = () => {
-  localStorage.setItem(AUTH_FLAG_KEY, 'true');
-};
-
-export const setAuthPersistence = (rememberMe = false) => {
+export const setAuthToken = (token, rememberMe = false) => {
+  if (!token) return;
   if (rememberMe) {
-    localStorage.setItem(AUTH_REMEMBER_KEY, 'true');
-    localStorage.setItem(AUTH_FLAG_KEY, 'true');
-    sessionStorage.removeItem(AUTH_FLAG_KEY);
-    return;
+    localStorage.setItem(API_TOKEN_KEY, token);
+    sessionStorage.removeItem(API_TOKEN_KEY);
+  } else {
+    sessionStorage.setItem(API_TOKEN_KEY, token);
+    localStorage.removeItem(API_TOKEN_KEY);
   }
-
-  localStorage.removeItem(AUTH_REMEMBER_KEY);
-  localStorage.removeItem(AUTH_FLAG_KEY);
-  sessionStorage.setItem(AUTH_FLAG_KEY, 'true');
 };
 
-export const shouldRestoreAuthSession = () => {
-  const remembered = localStorage.getItem(AUTH_REMEMBER_KEY) === 'true';
-  const activeSession = sessionStorage.getItem(AUTH_FLAG_KEY) === 'true';
-  return remembered || activeSession;
+export const clearAuthData = () => {
+  localStorage.removeItem(API_TOKEN_KEY);
+  sessionStorage.removeItem(API_TOKEN_KEY);
 };
+
+export const shouldRestoreAuthSession = () => !!getAuthToken();
 
 export const setClientUuid = (uuid, rememberMe = false) => {
   if (!uuid) return;
@@ -65,14 +47,11 @@ export const setClientUuid = (uuid, rememberMe = false) => {
   }
 };
 
-export const clearAuthData = () => {
-  localStorage.removeItem(AUTH_FLAG_KEY);
-  localStorage.removeItem(AUTH_REMEMBER_KEY);
-  sessionStorage.removeItem(AUTH_FLAG_KEY);
-};
-
 clientApi.interceptors.request.use((config) => {
-  // No need to manually add Bearer token as withCredentials handles cookies
+  const token = getAuthToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
   return config;
 });
 
@@ -92,22 +71,18 @@ clientApi.interceptors.response.use(
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
 export const signupClient = async (payload) => {
-  await fetchCsrfToken();
   return clientApi.post('/signup', payload);
 };
 
 export const loginClient = async (payload) => {
-  await fetchCsrfToken();
   return clientApi.post('/login', payload);
 };
 
 export const forgotPasswordClient = async (payload) => {
-  await fetchCsrfToken();
   return clientApi.post('/forgot-password', payload);
 };
 
 export const resetPasswordClient = async (payload) => {
-  await fetchCsrfToken();
   return clientApi.post('/reset-password', payload);
 };
 
