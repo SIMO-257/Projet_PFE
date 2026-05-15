@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { fetchTicketTypes, purchaseTicket } from '../services/ticketService';
 import styles from '../Styles/TicketSelection.module.css';
 
@@ -244,7 +244,7 @@ export default function TicketSelection() {
                             />
 
                             <span className={styles.termsText}>
-                                J'accepte les conditions generales de vente
+                                J'accepte les <Link to="/terms-and-conditions" style={{ color: '#8b6f47', textDecoration: 'underline' }}>conditions generales de vente</Link>
                             </span>
 
                         </label>
