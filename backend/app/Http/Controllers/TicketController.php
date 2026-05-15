@@ -23,8 +23,11 @@ class TicketController extends Controller
 {
     private function normalizeTicketStatus(Ticket $ticket): void
     {
-        if ($ticket->status === 'active' && $this->shouldConsumeUse($ticket) && $ticket->remaining_uses <= 0) {
-            $ticket->status = 'used';
+        if (in_array($ticket->status, ['active', 'used']) && $this->shouldConsumeUse($ticket) && $ticket->remaining_uses <= 0) {
+            $ticket->status = 'expired';
+            $ticket->save();
+        } elseif (in_array($ticket->status, ['active', 'used']) && !empty($ticket->valid_until) && Carbon::parse($ticket->valid_until)->isPast()) {
+            $ticket->status = 'expired';
             $ticket->save();
         }
     }
@@ -511,11 +514,22 @@ class TicketController extends Controller
                     return $this->errorResponse("Le billet est deja {$ticket->status}.", 422);
                 }
 
+                if (!empty($ticket->valid_until) && Carbon::parse($ticket->valid_until)->isPast()) {
+                    $ticket->status = 'expired';
+                    $ticket->save();
+                    $this->logValidation($ticket->id, $client->id, 'DEV-NFC-CHALLENGE', 'nfc', 'failure', "Le billet est expire.");
+                    return $this->errorResponse("Le billet est expire.", 422);
+                }
+
+                if ($ticket->status === 'active') {
+                    $ticket->status = 'used';
+                }
+
                 if ($this->shouldConsumeUse($ticket)) {
                     $ticket->remaining_uses -= 1;
 
                     if ($ticket->remaining_uses <= 0) {
-                        $ticket->status = 'used';
+                        $ticket->status = 'expired';
                     }
                 }
 
@@ -574,9 +588,13 @@ class TicketController extends Controller
 
                 if (!$this->canValidateStatus((string) $ticket->status)) {
                     $failureReason = "Le billet est déjà {$ticket->status}.";
+                } elseif (!empty($ticket->valid_until) && Carbon::parse($ticket->valid_until)->isPast()) {
+                    $failureReason = "Le billet est expiré.";
+                    $ticket->status = 'expired';
+                    $ticket->save();
                 } elseif ($this->shouldConsumeUse($ticket) && $ticket->remaining_uses <= 0) {
                     $failureReason = "Plus d'utilisations restantes.";
-                    $ticket->status = 'used';
+                    $ticket->status = 'expired';
                     $ticket->save();
                 }
 
@@ -587,11 +605,15 @@ class TicketController extends Controller
                 }
 
                 // 3. Perform Validation (Decrement Use)
+                if ($ticket->status === 'active') {
+                    $ticket->status = 'used';
+                }
+
                 if ($this->shouldConsumeUse($ticket)) {
                     $ticket->remaining_uses -= 1;
                     
                     if ($ticket->remaining_uses <= 0) {
-                        $ticket->status = 'used';
+                        $ticket->status = 'expired';
                     }
                 }
                 

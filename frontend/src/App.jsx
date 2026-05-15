@@ -96,8 +96,10 @@ function App() {
             <Route path="/signup" element={<SignUp />} />
             <Route path="/forgot_password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
           </Route>
+
+          {/* SHARED ROUTES (Both Public & Protected) */}
+          <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
 
           {/* PROTECTED ROUTES */}
           <Route element={<ProtectedRoute />}>
