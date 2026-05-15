@@ -24,7 +24,8 @@ export default function Notifications() {
 
     useEffect(() => {
         dispatch(fetchNotifications(activeFilter));
-        dispatch(fetchUnreadCount());
+        // Automatically mark all as read on load, fulfilling user request to clear badge
+        dispatch(markAllNotificationsRead());
     }, [dispatch, activeFilter]);
 
     const handleRead = (id) => {

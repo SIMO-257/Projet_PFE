@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { fetchTicketTypes, purchaseTicket } from '../services/ticketService';
-import styles from '../Styles/TicketSelection.module.css';
 
 export default function TicketSelection() {
 
@@ -60,7 +59,7 @@ export default function TicketSelection() {
         if (!selectedType) return;
 
         if (!acceptedTerms) {
-            setErrors({ terms: 'Vous devez accepter les conditions generales.' });
+            setErrors({ terms: 'Vous devez accepter les conditions générales.' });
             return;
         }
 
@@ -91,7 +90,7 @@ export default function TicketSelection() {
                 setErrors(responseErrors);
             } else {
                 setErrors({
-                    form: err?.response?.data?.message || "Echec de l'achat. Reessayez."
+                    form: err?.response?.data?.message || "Échec de l'achat. Réessayez."
                 });
             }
 
@@ -102,8 +101,8 @@ export default function TicketSelection() {
 
     if (loading) {
         return (
-            <div className={styles.container}>
-                <p style={{ color: 'white', textAlign: 'center' }}>Chargement...</p>
+            <div className="app-shell flex items-center justify-center">
+                <p className="text-[#f5d579] font-bold text-lg animate-pulse">Chargement...</p>
             </div>
         );
     }
@@ -111,158 +110,142 @@ export default function TicketSelection() {
     const totalPrice = selectedType ? (selectedType.price * quantity).toFixed(2) : 0;
 
     return (
-        <div className={styles.container}>
-            <div className={styles.mainContent}>
-
-                <div className={styles.card}>
-
-                    <div className={styles.header}>
-                        <div className={styles.headerContent}>
-
-                            <h1 className={styles.headerTitle}>
-                                Selection du Billet
+        <div className="app-shell font-sora">
+            <div className="app-frame">
+                <div className="app-card bg-gradient-to-br from-[#400106] to-[#260101] relative flex flex-col h-[100dvh]">
+                    
+                    {/* Header */}
+                    <div className="p-6 md:p-8 border-b border-[#f5d579]/10 bg-black/20 flex-shrink-0 z-10 shadow-lg">
+                        <div className="flex items-center justify-between mb-2">
+                            <h1 className="text-2xl md:text-3xl font-bold text-[#f5d579]">
+                                Sélection du Billet
                             </h1>
+                            <button 
+                                onClick={() => navigate('/home')}
+                                className="text-white/60 hover:text-white transition-colors"
+                            >
+                                <span className="text-4xl font-light line-height-1">×</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Content Area */}
+                    <div className="app-content p-6 md:p-8 space-y-8 scroll-smooth relative">
+                        <style>{`
+                            div::-webkit-scrollbar { width: 4px; }
+                            div::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 10px; }
+                            div::-webkit-scrollbar-thumb { background-color: #f5d579; border-radius: 10px; }
+                        `}</style>
+                        <div className="max-w-3xl mx-auto space-y-8">
+
+                            <h3 className="text-white/80 text-lg font-medium mb-4">
+                                Choisissez votre type de billet
+                            </h3>
+                            
+                            <div className="grid gap-4">
+                                {ticketTypes.map((type) => (
+                                    <div
+                                        key={type.id}
+                                        className={`p-6 rounded-2xl border transition-all cursor-pointer ${
+                                            selectedType?.id === type.id 
+                                            ? 'bg-[#f5d579]/10 border-[#f5d579] shadow-[0_0_20px_rgba(245,213,121,0.15)] scale-[1.01]' 
+                                            : 'bg-black/20 border-[#f5d579]/20 hover:border-[#f5d579]/50 hover:bg-black/40'
+                                        }`}
+                                        onClick={() => setSelectedType(type)}
+                                    >
+                                        <div className="flex justify-between items-center mb-3">
+                                            <span className="text-white font-bold text-lg">{type.name_fr}</span>
+                                            <span className="text-[#f5d579] font-bold text-xl">{type.price} DH</span>
+                                        </div>
+                                        <p className="text-white/60 text-sm leading-relaxed">{type.description}</p>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {!selectedType?.is_reusable && (
+                                <div className="p-6 rounded-2xl bg-black/20 border border-[#f5d579]/20 flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <button 
+                                            onClick={decrementQuantity}
+                                            className="w-10 h-10 rounded-xl bg-white/5 border border-[#f5d579]/30 text-[#f5d579] font-bold flex items-center justify-center hover:bg-[#f5d579]/10 active:scale-95 transition-all text-xl"
+                                        >
+                                            -
+                                        </button>
+                                        <span className="text-white font-bold text-xl w-8 text-center">{quantity}</span>
+                                        <button 
+                                            onClick={incrementQuantity}
+                                            className="w-10 h-10 rounded-xl bg-white/5 border border-[#f5d579]/30 text-[#f5d579] font-bold flex items-center justify-center hover:bg-[#f5d579]/10 active:scale-95 transition-all text-xl"
+                                        >
+                                            +
+                                        </button>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="text-[#f5d579] font-bold text-2xl">{totalPrice} DH</div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {errors.balance && (
+                                <div className="bg-red-900/40 border border-red-500/50 rounded-2xl p-5 mb-4 shadow-[0_0_15px_rgba(239,68,68,0.15)]">
+                                    <p className="text-red-400 text-sm mb-3 font-medium">
+                                        {errors.balance[0]}
+                                    </p>
+                                    <button
+                                        onClick={() => navigate('/recharge-payment')}
+                                        className="text-[#f5d579] text-sm font-bold underline hover:text-white transition-colors"
+                                    >
+                                        Recharger mon compte maintenant
+                                    </button>
+                                </div>
+                            )}
+
+                            {errors.form && (
+                                <p className="text-red-400 text-sm font-medium bg-red-900/40 p-5 rounded-2xl border border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.15)]">
+                                    {errors.form}
+                                </p>
+                            )}
+                            
+                            {errors.terms && (
+                                <p className="text-red-400 text-sm font-medium bg-red-900/40 p-5 rounded-2xl border border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.15)]">
+                                    {errors.terms}
+                                </p>
+                            )}
+
+                        </div>
+                    </div>
+                    
+                    {/* Footer */}
+                    <div className="p-6 md:p-8 border-t border-[#f5d579]/10 bg-black/20 flex-shrink-0 z-10 shadow-[0_-10px_20px_rgba(0,0,0,0.2)]">
+                        <div className="max-w-3xl mx-auto">
+                            <label className="flex items-start gap-3 cursor-pointer select-none mb-6">
+                                <div className="relative flex items-center mt-0.5 z-0">
+                                    <input
+                                        type="checkbox"
+                                        checked={acceptedTerms}
+                                        onChange={() => setAcceptedTerms(!acceptedTerms)}
+                                        className={`w-5 h-5 rounded border-2 appearance-none cursor-pointer transition-all ${acceptedTerms ? 'bg-[#f5d579] border-[#f5d579]' : 'bg-transparent border-[#f5d579]/40'}`}
+                                    />
+                                    {acceptedTerms && (
+                                        <svg className="absolute left-0.5 top-0.5 w-4 h-4 text-[#260101] pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    )}
+                                </div>
+                                <span className={`text-sm leading-tight ${acceptedTerms ? 'text-white' : 'text-white/60'}`}>
+                                    J'accepte les <Link to="/terms-and-conditions" className="text-[#f5d579] underline hover:text-white transition-colors">conditions générales de vente</Link>
+                                </span>
+                            </label>
 
                             <button
-                                className={styles.closeButton}
-                                onClick={() => navigate('/home')}
+                                className={`w-full py-4 px-6 rounded-2xl font-bold text-sm transition-all ${processing || !selectedType ? 'bg-[#f5d579]/10 text-[#f5d579]/30 cursor-not-allowed' : 'bg-gradient-to-r from-[#f5d579] to-[#d4af37] text-[#260101] shadow-xl shadow-[#f5d579]/20 hover:scale-[1.02] active:scale-95'}`}
+                                onClick={handlePurchase}
+                                disabled={processing || !selectedType}
                             >
-                                x
+                                {processing ? 'Transaction en cours...' : `Confirmer et payer ${totalPrice} DH`}
                             </button>
-
                         </div>
                     </div>
 
-                    <div className={styles.content}>
-
-                        <h3 className={styles.sectionTitle}>
-                            Choisissez votre type de billet
-                        </h3>
-
-                        <div className="grid gap-4">
-
-                            {ticketTypes.map((type) => (
-
-                                <div
-                                    key={type.id}
-                                    className={styles.ticketSummary}
-                                    onClick={() => setSelectedType(type)}
-                                    style={{
-                                        cursor: 'pointer',
-                                        border: selectedType?.id === type.id
-                                            ? '2px solid #8b6f47'
-                                            : '1px solid #4a2a2a'
-                                    }}
-                                >
-
-                                    <div className={styles.ticketHeader}>
-
-                                        <span className={styles.ticketType}>
-                                            {type.name_fr}
-                                        </span>
-
-                                        <span className={styles.ticketPrice}>
-                                            {type.price} DH
-                                        </span>
-
-                                    </div>
-
-                                    <p className={styles.ticketDescription}>
-                                        {type.description}
-                                    </p>
-
-                                </div>
-
-                            ))}
-
-                        </div>
-
-                        {!selectedType?.is_reusable && (
-                            <div className={styles.quantityCard}>
-
-                                <div className={styles.quantityControls}>
-
-                                    <button
-                                        onClick={decrementQuantity}
-                                        className={styles.quantityButton}
-                                    >
-                                        -
-                                    </button>
-
-                                    <div className={styles.quantityDisplay}>
-                                        {quantity}
-                                    </div>
-
-                                    <button
-                                        onClick={incrementQuantity}
-                                        className={styles.quantityButton}
-                                    >
-                                        +
-                                    </button>
-
-                                </div>
-
-                                <div className={styles.totalPrice}>
-                                    {totalPrice} DH
-                                </div>
-
-                            </div>
-                        )}
-
-                        {errors.balance && (
-                            <div className="bg-red-900/20 border border-red-500/50 rounded-lg p-3 mb-4">
-                                <p className="text-red-400 text-sm mb-2">
-                                    {errors.balance[0]}
-                                </p>
-                                <button
-                                    onClick={() => navigate('/recharge-payment')}
-                                    className="text-yellow-500 text-xs font-bold underline"
-                                >
-                                    Recharger mon compte maintenant
-                                </button>
-                            </div>
-                        )}
-
-                        {errors.form && (
-                            <p className="text-red-500 text-sm">
-                                {errors.form}
-                            </p>
-                        )}
-
-                        {errors.terms && (
-                            <p className="text-red-500 text-sm">
-                                {errors.terms}
-                            </p>
-                        )}
-
-                        <label className={styles.termsContainer}>
-
-                            <input
-                                type="checkbox"
-                                checked={acceptedTerms}
-                                onChange={() => setAcceptedTerms(!acceptedTerms)}
-                            />
-
-                            <span className={styles.termsText}>
-                                J'accepte les <Link to="/terms-and-conditions" style={{ color: '#8b6f47', textDecoration: 'underline' }}>conditions generales de vente</Link>
-                            </span>
-
-                        </label>
-
-                        <button
-                            className={styles.continueButton}
-                            onClick={handlePurchase}
-                            disabled={processing || !selectedType}
-                        >
-
-                            {processing
-                                ? 'Transaction en cours...'
-                                : `Confirmer et payer ${totalPrice} DH`
-                            }
-
-                        </button>
-
-                    </div>
                 </div>
             </div>
         </div>

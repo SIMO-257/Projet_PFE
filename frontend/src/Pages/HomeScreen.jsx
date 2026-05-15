@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 import BottomNavigation from '../Components/Layout/BottomNavigation';
 import BalanceCard from '../Components/Cards/BalanceCard';
 import TicketHistoryCard from '../Components/Cards/TicketHistoryCard';
@@ -8,21 +9,26 @@ import { useAuth } from '../hooks/useAuth';
 import { useWallet } from '../hooks/useWallet';
 import { useTickets } from '../hooks/useTickets';
 import { fetchPurchasedCards } from '../services/ticketService';
+import { fetchUnreadCount } from '../Redux/Slices/notificationSlice';
 
 const HomeScreen = () => {
   const { user } = useAuth();
   const { refreshWallet } = useWallet();
   const { tickets, refreshTickets } = useTickets();
   const navigateHook = useNavigate();
+  const dispatch = useDispatch();
+  const unreadCount = useSelector(state => state.notifications?.unreadCount || 0);
+
   const [purchasedCards, setPurchasedCards] = useState([]);
 
   useEffect(() => {
     refreshWallet();
     refreshTickets();
+    dispatch(fetchUnreadCount());
     fetchPurchasedCards()
       .then((data) => setPurchasedCards(Array.isArray(data) ? data : []))
       .catch(() => setPurchasedCards([]));
-  }, [refreshWallet, refreshTickets]);
+  }, [refreshWallet, refreshTickets, dispatch]);
 
   const safeTickets = Array.isArray(tickets) ? tickets : [];
 
@@ -89,6 +95,9 @@ const HomeScreen = () => {
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                 </svg>
+                {unreadCount > 0 && (
+                  <span className="absolute top-[8px] right-[10px] w-2.5 h-2.5 bg-red-500 rounded-full border border-[#2a0b0f]"></span>
+                )}
               </button>
             </div>
 
