@@ -98,10 +98,8 @@ class ClientController extends Controller
         $client = Client::where('email', $credentials['email'])->first();
 
         if ($client && Hash::check($credentials['password'], $client->password_hash)) {
-            if ($client->is_active) {
-                AuditLog::log('login_failed_already_active', $client->id, ['email' => $credentials['email']]);
-                return $this->errorResponse('Account already used by someone else.', 403);
-            }
+            // Disconnect other active sessions to enforce single device usage
+            $client->tokens()->delete();
 
             $client->is_active = true;
             $client->last_active_at = now();

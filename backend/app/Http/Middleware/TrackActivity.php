@@ -21,6 +21,13 @@ class TrackActivity
             if ($client->last_active_at && $client->last_active_at->lt($threshold)) {
                 $client->is_active = false;
                 $client->last_active_at = null;
+                $client->save();
+
+                if ($client->currentAccessToken()) {
+                    $client->currentAccessToken()->delete();
+                }
+
+                return response()->json(['message' => 'Session expired due to inactivity.'], 401);
             } else {
                 $client->last_active_at = now();
             }
