@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useState } from 'react';
 import { signupClient } from '../services/clientService';
 
@@ -261,7 +261,7 @@ export default function SignUp() {
             />
 
             <FormOptions
-                leftContent={<CheckboxInput label={<>J'accepte les <a className={styles.authLink} href='#'>Conditions d'utilisation</a> et <a className={styles.authLink} href='#'>Politique de Confidentialite</a></>} id="remember" setCheck={toggleTerms} check={form.accept_terms} />}
+                leftContent={<CheckboxInput label={<>J'accepte les <Link className={styles.authLink} to='/terms-and-conditions'>Conditions d'utilisation</Link> et <Link className={styles.authLink} to='/terms-and-conditions'>Politique de Confidentialite</Link></>} id="remember" setCheck={toggleTerms} check={form.accept_terms} />}
                 rightContent=""
             />
 

@@ -36,6 +36,7 @@ const PaimentHistory = lazy(() => import("./Pages/PaimentHistory"));
 
 const Notifications = lazy(() => import("./Pages/Notifications"));
 const OfflineMode = lazy(() => import("./Pages/OfflineMode"));
+const TermsAndConditions = lazy(() => import("./Pages/TermsAndConditions"));
 
 
 function RootRedirect() {
@@ -95,6 +96,7 @@ function App() {
             <Route path="/signup" element={<SignUp />} />
             <Route path="/forgot_password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
           </Route>
 
           {/* PROTECTED ROUTES */}
