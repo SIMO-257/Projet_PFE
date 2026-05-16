@@ -4,6 +4,7 @@ import { useTickets } from '../hooks/useTickets';
 import Header from '../Components/Layout/Header';
 import BottomNavigation from '../Components/Layout/BottomNavigation';
 import TicketCard from '../Components/Cards/TicketCard';
+import TicketCardSkeleton from '../Components/Skeletons/TicketCardSkeleton';
 
 export default function MyTickets() {
   const navigateHook = useNavigate();
@@ -31,7 +32,11 @@ export default function MyTickets() {
             <p className="text-white/60 text-sm mb-6 mt-4">Sélectionnez ou achetez votre titre de transport</p>
             
             {isLoading && safeTickets.length === 0 ? (
-              <p className="text-white text-center py-10">Chargement...</p>
+              <div className="space-y-4 pt-4">
+                <TicketCardSkeleton />
+                <TicketCardSkeleton />
+                <TicketCardSkeleton />
+              </div>
             ) : (
               <div className="space-y-4">
                 {/* Active/Purchased Tickets Section */}

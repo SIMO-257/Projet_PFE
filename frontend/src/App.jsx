@@ -7,6 +7,8 @@ import { useAuth } from "./hooks/useAuth";
 import { markAuthCheckedUnauthenticated } from "./Redux/Slices/AuthSlice";
 import { shouldRestoreAuthSession } from "./services/clientService";
 
+import GlobalPageLoader from "./Components/UI/GlobalPageLoader";
+
 // Lazy pages
 const Login = lazy(() => import("./Pages/Login"));
 const SignUp = lazy(() => import("./Pages/SignUp"));
@@ -45,11 +47,7 @@ function RootRedirect() {
 
   // Wait until we have a definitive answer from the backend
   if (!isAuthChecked || isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#1a0507] text-white">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
-      </div>
-    );
+    return <GlobalPageLoader />;
   }
 
   // If we checked and user is NOT authenticated, they MUST see login
@@ -79,13 +77,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Suspense
-        fallback={
-          <div className="min-h-screen flex items-center justify-center bg-[#1a0507] text-white">
-            Loading...
-          </div>
-        }
-      >
+      <Suspense fallback={<GlobalPageLoader />}>
         <Routes>
 
           {/* Default route */}

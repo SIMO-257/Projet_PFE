@@ -4,6 +4,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import BottomNavigation from '../Components/Layout/BottomNavigation';
 import BalanceCard from '../Components/Cards/BalanceCard';
 import TicketHistoryCard from '../Components/Cards/TicketHistoryCard';
+import BalanceCardSkeleton from '../Components/Skeletons/BalanceCardSkeleton';
+import TicketHistorySkeleton from '../Components/Skeletons/TicketHistorySkeleton';
+import GoldenSpinner from '../Components/UI/GoldenSpinner';
 import styles from '../Styles/HomeScreen.module.css';
 import { useAuth } from '../hooks/useAuth';
 import { useWallet } from '../hooks/useWallet';
@@ -20,14 +23,22 @@ const HomeScreen = () => {
   const unreadCount = useSelector(state => state.notifications?.unreadCount || 0);
 
   const [purchasedCards, setPurchasedCards] = useState([]);
+  const [isDataLoading, setIsDataLoading] = useState(true);
+  const [isNavigatingToValidation, setIsNavigatingToValidation] = useState(false);
 
   useEffect(() => {
     refreshWallet();
     refreshTickets();
     dispatch(fetchUnreadCount());
     fetchPurchasedCards()
-      .then((data) => setPurchasedCards(Array.isArray(data) ? data : []))
-      .catch(() => setPurchasedCards([]));
+      .then((data) => {
+         setPurchasedCards(Array.isArray(data) ? data : []);
+         setIsDataLoading(false);
+      })
+      .catch(() => {
+         setPurchasedCards([]);
+         setIsDataLoading(false);
+      });
   }, [refreshWallet, refreshTickets, dispatch]);
 
   const safeTickets = Array.isArray(tickets) ? tickets : [];
@@ -67,17 +78,24 @@ const HomeScreen = () => {
   const handleNotifications = () => navigateHook('/notifications');
   const handleChangeCard = () => navigateHook('/change-card');
   const handleDefaultCardPress = () => {
-    if (!defaultCard?.uuid) {
+    if (!defaultCard?.uuid || isNavigatingToValidation) {
       return;
     }
 
-    navigateHook('/validation', {
-      state: {
-        source: 'home-card',
-        hideBottomNav: true,
-        ticketUuid: defaultCard.uuid,
-      },
-    });
+    setIsNavigatingToValidation(true);
+    
+    setTimeout(() => {
+        navigateHook('/validation', {
+          state: {
+            source: 'home-card',
+            hideBottomNav: true,
+            ticketUuid: defaultCard.uuid,
+          },
+        });
+        
+        // Reset after a delay in case user navigates back
+        setTimeout(() => setIsNavigatingToValidation(false), 1000);
+    }, 10);
   };
   const handleTicketPress = (ticket) => navigateHook(`/viewticket/${ticket.uuid}`);
   const handleAllTickets = () => navigateHook('/all-tickets');
@@ -105,12 +123,20 @@ const HomeScreen = () => {
 
             <div className={`app-content ${styles.hideScrollbar} no-scrollbar px-6 pb-24`}>
               <div className="mb-4 mt-2">
+                {isDataLoading ? (
+                  <BalanceCardSkeleton />
+                ) : (
                 <button
                   type="button"
                   onClick={handleDefaultCardPress}
-                  disabled={!defaultCard?.uuid}
-                  className="w-full text-left disabled:cursor-not-allowed"
+                  disabled={!defaultCard?.uuid || isNavigatingToValidation}
+                  className="w-full text-left disabled:cursor-not-allowed relative"
                 >
+                  {isNavigatingToValidation && (
+                      <div className="absolute inset-0 bg-[#400106]/50 backdrop-blur-sm z-20 flex items-center justify-center rounded-2xl">
+                          <GoldenSpinner size={48} />
+                      </div>
+                  )}
                   <BalanceCard
                     title="Ticket par defaut"
                     amount={`${activeTicketPrice.toFixed(2)} MAD`}
@@ -121,7 +147,9 @@ const HomeScreen = () => {
                     circlesPosition="right"
                   />
                 </button>
+                )}
 
+                {!isDataLoading && (
                 <div className="flex justify-end -mt-4 mb-4 pr-2">
                   <button onClick={handleChangeCard} className="text-yellow-500 text-[10px] font-bold uppercase tracking-wider hover:text-yellow-400 flex items-center space-x-1">
                     <span>Changer de carte</span>
@@ -130,6 +158,7 @@ const HomeScreen = () => {
                     </svg>
                   </button>
                 </div>
+                )}
 
               </div>
 
@@ -139,7 +168,13 @@ const HomeScreen = () => {
                   <button onClick={handleAllTickets} className="text-yellow-500 text-xs font-medium">Voir tout</button>
                 </div>
                 <div className="space-y-3">
-                  {lastSixTickets.length > 0 ? (
+                  {isDataLoading ? (
+                    <>
+                      <TicketHistorySkeleton />
+                      <TicketHistorySkeleton />
+                      <TicketHistorySkeleton />
+                    </>
+                  ) : lastSixTickets.length > 0 ? (
                     lastSixTickets.map((ticket) => (
                       <TicketHistoryCard
                         key={ticket.uuid}

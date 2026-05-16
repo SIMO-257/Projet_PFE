@@ -19,6 +19,7 @@ import NFCAnimation from '../Components/UI/NFCAnimation';
 import ProcessingIndicator from '../Components/UI/ProcessingIndicator';
 import QRCodeDisplay from '../Components/UI/QRCodeDisplay';
 import TimerDisplay from '../Components/UI/TimerDisplay';
+import GoldenSpinner from '../Components/UI/GoldenSpinner';
 import styles from '../Styles/ValidationScreen.module.css';
 
 export default function ValidationScreen() {
@@ -36,6 +37,8 @@ export default function ValidationScreen() {
   const [nfcTicketUuidInput, setNfcTicketUuidInput] = useState('');
   const [nfcSecondsRemaining, setNfcSecondsRemaining] = useState(0);
   const [isNfcSubmitting, setIsNfcSubmitting] = useState(false);
+  const [isGeneratingQR, setIsGeneratingQR] = useState(false);
+  const [isGeneratingNFC, setIsGeneratingNFC] = useState(false);
 
   useEffect(() => {
     if (tickets.length === 0) {
@@ -150,15 +153,18 @@ export default function ValidationScreen() {
   };
 
   const validateQR = async () => {
-    if (!activeTicket) {
-      setNotification({
-        type: 'error',
-        title: 'Aucun billet',
-        message: 'Vous n avez pas de billet actif a valider.',
-      });
+    if (!activeTicket || isGeneratingQR) {
+      if (!activeTicket) {
+        setNotification({
+          type: 'error',
+          title: 'Aucun billet',
+          message: 'Vous n avez pas de billet actif a valider.',
+        });
+      }
       return;
     }
 
+    setIsGeneratingQR(true);
     try {
       const tokenData = await createQrValidationToken({ ticket_uuid: activeTicket.uuid });
       const validationToken = tokenData?.validation_token || '';
@@ -182,19 +188,24 @@ export default function ValidationScreen() {
         title: 'Erreur',
         message: err?.response?.data?.message || 'Impossible de generer le token QR.',
       });
+    } finally {
+      setIsGeneratingQR(false);
     }
   };
 
   const startNfcChallenge = async () => {
-    if (!activeTicket) {
-      setNotification({
-        type: 'error',
-        title: 'Aucun billet',
-        message: 'Vous n avez pas de billet actif a valider.',
-      });
+    if (!activeTicket || isGeneratingNFC) {
+      if (!activeTicket) {
+        setNotification({
+          type: 'error',
+          title: 'Aucun billet',
+          message: 'Vous n avez pas de billet actif a valider.',
+        });
+      }
       return;
     }
 
+    setIsGeneratingNFC(true);
     try {
       const data = await createNfcChallenge();
       setNfcToken(data?.nfc_token || '');
@@ -208,6 +219,8 @@ export default function ValidationScreen() {
         title: 'Erreur',
         message: err?.response?.data?.message || 'Impossible de generer le token NFC.',
       });
+    } finally {
+      setIsGeneratingNFC(false);
     }
   };
 
@@ -298,41 +311,55 @@ export default function ValidationScreen() {
               </div>
 
               <div className="px-6 pb-6 space-y-4">
-                <ActionButtonCard
-                  variant="validation"
-                  icon={
-                    <svg className="w-7 h-7 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"
-                      />
-                    </svg>
-                  }
-                  label="Valider avec NFC"
-                  description={selectedTicketUuid ? 'Carte par defaut preselectionnee' : 'Generer un token NFC (60s)'}
-                  onClick={startNfcChallenge}
-                  showArrow={true}
-                />
+                <div className="relative rounded-2xl overflow-hidden">
+                  {isGeneratingNFC && (
+                      <div className="absolute inset-0 bg-[#400106]/50 backdrop-blur-sm z-20 flex items-center justify-center">
+                          <GoldenSpinner size={40} />
+                      </div>
+                  )}
+                  <ActionButtonCard
+                    variant="validation"
+                    icon={
+                      <svg className="w-7 h-7 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"
+                        />
+                      </svg>
+                    }
+                    label="Valider avec NFC"
+                    description={selectedTicketUuid ? 'Carte par defaut preselectionnee' : 'Generer un token NFC (60s)'}
+                    onClick={startNfcChallenge}
+                    showArrow={true}
+                  />
+                </div>
 
-                <ActionButtonCard
-                  variant="validation"
-                  icon={
-                    <svg className="w-7 h-7 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
-                      />
-                    </svg>
-                  }
-                  label="Valider avec QR Code"
-                  description="Scannez le code"
-                  onClick={validateQR}
-                  showArrow={true}
-                />
+                <div className="relative rounded-2xl overflow-hidden">
+                  {isGeneratingQR && (
+                      <div className="absolute inset-0 bg-[#400106]/50 backdrop-blur-sm z-20 flex items-center justify-center">
+                          <GoldenSpinner size={40} />
+                      </div>
+                  )}
+                  <ActionButtonCard
+                    variant="validation"
+                    icon={
+                      <svg className="w-7 h-7 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
+                        />
+                      </svg>
+                    }
+                    label="Valider avec QR Code"
+                    description="Scannez le code"
+                    onClick={validateQR}
+                    showArrow={true}
+                  />
+                </div>
               </div>
 
               <div className="px-6 pb-8">

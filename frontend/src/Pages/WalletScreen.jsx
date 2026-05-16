@@ -6,6 +6,8 @@ import ActionButtonCard from '../Components/Cards/ActionButtonCard';
 import BottomNavigation from '../Components/Layout/BottomNavigation';
 import TransactionItem from '../Components/Cards/TransactionItem';
 import SectionHeader from '../Components/Layout/SectionHeader';
+import BalanceCardSkeleton from '../Components/Skeletons/BalanceCardSkeleton';
+import TicketHistorySkeleton from '../Components/Skeletons/TicketHistorySkeleton';
 import styles from '../Styles/WalletScreen.module.css';
 import { useWallet } from '../hooks/useWallet';
 
@@ -57,15 +59,19 @@ const WalletScreen = () => {
 
             <div className="app-content no-scrollbar px-6 pb-24">
               
-              <BalanceCard 
-                title="Solde disponible"
-                amount={`${safeBalance.toFixed(2)} DH`}
-                cardType="Carte Virtuelle"
-                cardNumber={`**** **** **** ${safeCardLastFour}`}
-                gradientFrom="#7A3B47"
-                gradientTo="#5C2A36"
-                showCircles={false}
-              />
+              {isLoading && balance === undefined ? (
+                <BalanceCardSkeleton />
+              ) : (
+                <BalanceCard 
+                  title="Solde disponible"
+                  amount={`${safeBalance.toFixed(2)} DH`}
+                  cardType="Carte Virtuelle"
+                  cardNumber={`**** **** **** ${safeCardLastFour}`}
+                  gradientFrom="#7A3B47"
+                  gradientTo="#5C2A36"
+                  showCircles={false}
+                />
+              )}
 
               <ActionButtonCard
                 variant="validation"
@@ -89,7 +95,11 @@ const WalletScreen = () => {
 
                 <div className="space-y-3">
                   {isLoading && transactions.length === 0 ? (
-                    <div className="text-center text-white/50 py-4">Chargement...</div>
+                    <>
+                      <TicketHistorySkeleton />
+                      <TicketHistorySkeleton />
+                      <TicketHistorySkeleton />
+                    </>
                   ) : mappedTransactions.length > 0 ? (
                     mappedTransactions.map((transaction) => (
                       <TransactionItem
