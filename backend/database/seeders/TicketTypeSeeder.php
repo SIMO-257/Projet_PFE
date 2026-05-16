@@ -21,7 +21,7 @@ class TicketTypeSeeder extends Seeder
                 'price' => 8.00,
                 'duration_minutes' => 10080,
                 'is_reusable' => 0,
-                'max_uses' => 1,
+                'max_uses' => 2,
                 'is_active' => 1,
             ],
             [
@@ -32,7 +32,7 @@ class TicketTypeSeeder extends Seeder
                 'price' => 14.00,
                 'duration_minutes' => 10080,
                 'is_reusable' => 0,
-                'max_uses' => 2,
+                'max_uses' => 4,
                 'is_active' => 1,
             ],
             [
