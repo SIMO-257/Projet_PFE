@@ -1,5 +1,5 @@
 # Multi-stage build for Laravel backend
-FROM php:8.2-fpm as base
+FROM php:8.2-apache as base
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -37,10 +37,15 @@ RUN composer install --no-dev --optimize-autoloader
 
 # Create necessary directories and set permissions
 RUN mkdir -p storage/logs \
-    && chown -R www-data:www-data storage bootstrap/cache \
-    && chmod -R 755 storage bootstrap/cache
+    && chown -R www-data:www-data /var/www \
+    && chmod -R 755 /var/www/storage /var/www/bootstrap/cache
 
-# Expose port for PHP-FPM
-EXPOSE 9000
+# Configure Apache DocumentRoot
+RUN sed -ri -e 's!/var/www/html!/var/www/public!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!/var/www/public!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-CMD ["php-fpm"]
+# Enable Apache mod_rewrite for Laravel routing
+RUN a2enmod rewrite
+
+# Expose port 80 for HTTP
+EXPOSE 80
