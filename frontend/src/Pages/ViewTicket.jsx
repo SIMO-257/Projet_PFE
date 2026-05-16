@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchTicketDetails } from '../services/ticketService';
-import { CheckCircle, Ticket, Calendar, ShieldCheck } from 'lucide-react';
+import { CheckCircle, Ticket, Calendar, ShieldCheck, RefreshCcw } from 'lucide-react';
 import Header from '../Components/Layout/Header';
 
 export default function ViewTicket() {
@@ -78,11 +78,11 @@ export default function ViewTicket() {
 
                 <div className="app-content p-6 pb-12 custom-scrollbar">
 
-                    <div className={`flex items-center space-x-3 p-4 rounded-2xl mb-6 ${ticket.status === 'active' ? 'bg-green-500/10 border border-green-500/20' : 'bg-red-500/10 border border-red-500/20'}`}>
-                        <CheckCircle size={24} className={ticket.status === 'active' ? 'text-green-500' : 'text-red-500'} />
+                    <div className={`flex items-center space-x-3 p-4 rounded-2xl mb-6 ${ticket.status === 'active' ? 'bg-green-500/10 border border-green-500/20' : (ticket.status === 'used' ? 'bg-yellow-500/10 border border-yellow-500/20' : 'bg-red-500/10 border border-red-500/20')}`}>
+                        <CheckCircle size={24} className={ticket.status === 'active' ? 'text-green-500' : (ticket.status === 'used' ? 'text-yellow-500' : 'text-red-500')} />
                         <div>
-                            <p className={`font-bold ${ticket.status === 'active' ? 'text-green-500' : 'text-red-500'}`}>
-                                {ticket.status === 'active' ? 'BILLET VALIDE' : 'BILLET EXPIRE'}
+                            <p className={`font-bold ${ticket.status === 'active' ? 'text-green-500' : (ticket.status === 'used' ? 'text-yellow-500' : 'text-red-500')}`}>
+                                {ticket.status === 'active' ? 'BILLET VALIDE' : (ticket.status === 'used' ? 'BILLET UTILISÉ' : 'BILLET EXPIRE')}
                             </p>
                             <p className="text-white/60 text-xs">Jusqu'au {validUntil}</p>
                         </div>
@@ -92,6 +92,9 @@ export default function ViewTicket() {
                         <DetailRow icon={<Ticket size={18} />} label="Type de Billet" value={ticket.ticket_type?.name_fr} />
                         <DetailRow icon={<ShieldCheck size={18} />} label="ID Unique" value={ticket.uuid.substring(0, 18).toUpperCase() + '...'} />
                         <DetailRow icon={<Calendar size={18} />} label="Date d'Achat" value={purchaseDate} />
+                        {!ticket.ticket_type?.is_reusable && ticket.remaining_uses !== undefined && (
+                            <DetailRow icon={<RefreshCcw size={18} />} label="Utilisations restantes" value={ticket.remaining_uses} />
+                        )}
                         <div className="pt-2 border-t border-white/5 flex justify-between items-center">
                             <span className="text-white/40 text-sm">Prix paye</span>
                             <span className="text-yellow-500 font-bold text-lg">{ticket.price_paid} DH</span>

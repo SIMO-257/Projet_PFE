@@ -44,13 +44,13 @@ export default function MyTickets() {
                         variant="active"
                         item={{
                           title: t.ticket_type?.name_fr || "Billet",
-                          status: t.status === 'active' ? "Actif" : "Expiré",
+                          status: t.status === 'active' ? "Actif" : (t.status === 'used' ? "Utilisé" : "Expiré"),
                           description: t.ticket_type?.description || "Valable pour un trajet",
                           price: `${t.price_paid} DH`,
                           validInfo: "Valide jusqu'au",
                           validTime: new Date(t.valid_until).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }),
                           buttonText: "Voir le billet",
-                          isActive: t.status === 'active'
+                          isActive: t.status === 'active' || t.status === 'used'
                         }} 
                         onAction={() => navigateHook(`/viewticket/${t.uuid}`)} 
                       />

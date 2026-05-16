@@ -74,9 +74,6 @@ const Confirmation = () => {
     return (
         <div className={styles.appContainer}>
             <div className={styles.container}>
-                {/* Close button */}
-                <button className={styles.closeBtn} onClick={handleReturnHome}>×</button>
-
                 {/* Success Icon */}
                 <div className={styles.successIcon}>
                     <svg viewBox="0 0 100 100" className={styles.checkmark}>

@@ -106,6 +106,13 @@ class TicketController extends Controller
                 ->where('id', $client->default_ticket_id)
                 ->where('user_id', $client->id)
                 ->first();
+
+            if ($defaultTicket) {
+                $this->normalizeTicketStatus($defaultTicket);
+                if ($defaultTicket->status === 'expired') {
+                    $defaultTicket = null;
+                }
+            }
         }
 
         if ($defaultTicket) {
@@ -114,6 +121,7 @@ class TicketController extends Controller
 
         $fallback = Ticket::with('ticketType')
             ->where('user_id', $client->id)
+            ->where('status', '!=', 'expired')
             ->orderBy('created_at', 'desc')
             ->first();
 

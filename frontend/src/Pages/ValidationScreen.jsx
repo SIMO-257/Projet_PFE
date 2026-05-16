@@ -5,6 +5,7 @@ import {
   createNfcChallenge,
   consumeNfcChallenge,
   createQrValidationToken,
+  fetchTicketDetails,
 } from '../services/ticketService';
 import Header from '../Components/Layout/Header';
 import BottomNavigation from '../Components/Layout/BottomNavigation';
@@ -49,9 +50,9 @@ export default function ValidationScreen() {
     : null;
 
   const activeTicket =
-    selectedTicket && selectedTicket.status === 'active' && selectedTicket.remaining_uses > 0
+    selectedTicket && ['active', 'used'].includes(selectedTicket.status) && selectedTicket.remaining_uses > 0
       ? selectedTicket
-      : tickets.find((t) => t.status === 'active' && t.remaining_uses > 0);
+      : tickets.find((t) => ['active', 'used'].includes(t.status) && t.remaining_uses > 0);
 
   useEffect(() => {
     if (activeTicket && !nfcTicketUuidInput) {
@@ -93,6 +94,32 @@ export default function ValidationScreen() {
     }
     return () => clearInterval(timer);
   }, [showQRModal, qrTimeRemaining]);
+
+  useEffect(() => {
+    let pollingInterval;
+    if (showQRModal && activeTicket) {
+      pollingInterval = setInterval(async () => {
+        try {
+          const updatedTicket = await fetchTicketDetails(activeTicket.uuid);
+          if (updatedTicket) {
+            const hasStatusChanged = activeTicket.status === 'active' && updatedTicket.status === 'used';
+            const hasUsesDecreased = updatedTicket.remaining_uses < activeTicket.remaining_uses;
+            
+            if (hasStatusChanged || hasUsesDecreased) {
+              clearInterval(pollingInterval);
+              setShowQRModal(false);
+              setQRTimeRemaining(300);
+              setQrPayload('');
+              navigateHook('/validation-success', { state: { ticket: updatedTicket } });
+            }
+          }
+        } catch (error) {
+          console.error("Erreur lors de la vérification du billet:", error);
+        }
+      }, 3000); // Polling every 3 seconds
+    }
+    return () => clearInterval(pollingInterval);
+  }, [showQRModal, activeTicket, navigateHook]);
 
   useEffect(() => {
     let timer;
@@ -223,7 +250,7 @@ export default function ValidationScreen() {
 
       setTimeout(() => {
         closeNFCModal();
-        navigateHook('/home');
+        navigateHook('/validation-success', { state: { ticket: activeTicket } });
       }, 700);
     } catch (err) {
       setNotification({

@@ -45,8 +45,10 @@ const HomeScreen = () => {
     const safeCards = Array.isArray(purchasedCards) ? purchasedCards : [];
     const fromState = safeCards.find((card) => card.is_default === true);
     if (fromState) return fromState;
-    if (safeCards.length === 0) return null;
-    return [...safeCards].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
+    
+    const validCards = safeCards.filter(card => ['active', 'used'].includes(card.status));
+    if (validCards.length === 0) return null;
+    return [...validCards].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
   }, [purchasedCards]);
 
   const activeTicketType = defaultCard?.ticket_type || defaultCard?.ticketType || null;
