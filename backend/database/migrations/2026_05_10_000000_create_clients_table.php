@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('password_hash', 255);
             $table->string('first_name', 100)->nullable();
             $table->string('last_name', 100)->nullable();
-            $table->binary('profile_file')->nullable();
+            $table->string('avatar_path')->nullable();
             $table->boolean('is_active')->default(true);
             $table->boolean('remember_me')->default(false);
             $table->string('fcm_token')->nullable();

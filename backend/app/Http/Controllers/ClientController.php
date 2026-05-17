@@ -36,8 +36,8 @@ class ClientController extends Controller
             'email' => $client->email,
             'phone' => $client->phone,
             'created_at' => $client->created_at->toDateString(),
-            'has_profile_file' => !is_null($client->profile_file),
-            'avatar_url' => $this->avatarDataUrl($client->profile_file),
+            'has_profile_file' => !is_null($client->avatar_path),
+            'avatar_url' => $client->avatar_path ? asset('storage/' . $client->avatar_path) : null,
         ]);
     }
 
@@ -66,7 +66,7 @@ class ClientController extends Controller
             'client_id' => $client->id,
             'first_name' => $client->first_name,
             'last_name' => $client->last_name,
-            'has_blob' => !empty($client->profile_file)
+            'has_avatar' => !empty($client->avatar_path)
         ]);
 
         AuditLog::log('profile_update', $client->id);
@@ -81,8 +81,8 @@ class ClientController extends Controller
             'email' => $client->email,
             'phone' => $client->phone,
             'created_at' => $client->created_at->toDateString(),
-            'has_profile_file' => !is_null($client->profile_file),
-            'avatar_url' => $this->avatarDataUrl($client->profile_file),
+            'has_profile_file' => !is_null($client->avatar_path),
+            'avatar_url' => $client->avatar_path ? asset('storage/' . $client->avatar_path) : null,
         ], 'Profile updated successfully.');
     }
 
@@ -142,7 +142,7 @@ class ClientController extends Controller
             'email' => $data['email'],
             'phone' => $data['phone'] ?? null,
             'password_hash' => Hash::make($data['password']),
-            'profile_file' => $this->defaultAvatarBinary(),
+            'avatar_path' => null,
             'is_active' => false,
         ]);
         $this->applyName($client, $data);
@@ -331,40 +331,11 @@ class ClientController extends Controller
     private function applyProfileFile(Client $client, Request $request, string $key): void
     {
         if ($request->hasFile($key)) {
-            $client->profile_file = file_get_contents($request->file($key)->getRealPath());
+            if ($client->avatar_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($client->avatar_path)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($client->avatar_path);
+            }
+            $path = $request->file($key)->store('avatars', 'public');
+            $client->avatar_path = $path;
         }
-    }
-
-    private function avatarDataUrl(?string $binary): ?string
-    {
-        if (empty($binary)) {
-            return null;
-        }
-
-        $mime = (new \finfo(FILEINFO_MIME_TYPE))->buffer($binary) ?: 'image/jpeg';
-
-        return 'data:'.$mime.';base64,'.base64_encode($binary);
-    }
-
-    private function defaultAvatarBinary(): ?string
-    {
-        static $cached = null;
-        static $loaded = false;
-
-        if ($loaded) {
-            return $cached;
-        }
-
-        $loaded = true;
-        $path = resource_path('images/default-avatar.svg');
-
-        if (!is_file($path)) {
-            return null;
-        }
-
-        $data = file_get_contents($path);
-        $cached = $data === false ? null : $data;
-
-        return $cached;
     }
 }

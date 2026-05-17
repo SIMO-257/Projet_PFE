@@ -37,7 +37,7 @@ const HelpSupportScreen = () => {
   const handleCall = () => {};
   const handleEmail = () => {};
   const handleChat = () => {};
-  const handleGuideClick = (title) => {};
+
 
   // Filter FAQs based on search term
   const filteredFaqs = faqs.filter(faq =>
@@ -145,26 +145,6 @@ const HelpSupportScreen = () => {
               </div>
             </Section>
 
-            {/* Guides Section */}
-            <Section title="Guides d'utilisation">
-              <div className="space-y-2">
-                <GuideItem 
-                  title="Premiers pas avec l'application"
-                  time="3 min"
-                  onClick={() => handleGuideClick('Premiers pas avec l\'application')}
-                />
-                <GuideItem 
-                  title="Comment recharger votre solde"
-                  time="2 min"
-                  onClick={() => handleGuideClick('Comment recharger votre solde')}
-                />
-                <GuideItem 
-                  title="Utiliser les QR codes"
-                  time="1 min"
-                  onClick={() => handleGuideClick('Utiliser les QR codes')}
-                />
-              </div>
-            </Section>
 
             {/* Report Problem Section */}
             <Section title="Signaler un problème">
@@ -256,20 +236,7 @@ const ContactItem = ({ icon, title, subtitle, status, description, buttonText, o
   </div>
 );
 
-const GuideItem = ({ title, time, onClick }) => (
-  <button
-    onClick={onClick}
-    className="w-full bg-black/40 rounded-xl border border-white/10 hover:border-white/20 transition-all p-4 text-left flex items-center justify-between"
-  >
-    <div>
-      <p className="text-white font-medium text-sm">{title}</p>
-      <p className="text-white/40 text-xs mt-1">{time}</p>
-    </div>
-    <svg className="w-5 h-5 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/>
-    </svg>
-  </button>
-);
+
 
 const Icon = ({ name }) => {
   const icons = {

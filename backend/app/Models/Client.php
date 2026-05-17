@@ -29,7 +29,7 @@ class Client extends Authenticatable implements CanResetPasswordContract
         'password_hash',
         'first_name',
         'last_name',
-        'profile_file',
+        'avatar_path',
         'is_active',
         'last_active_at',
         'remember_me',

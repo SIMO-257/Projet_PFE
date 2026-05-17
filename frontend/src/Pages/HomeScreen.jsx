@@ -151,9 +151,9 @@ const HomeScreen = () => {
 
                 {!isDataLoading && (
                 <div className="flex justify-end -mt-4 mb-4 pr-2">
-                  <button onClick={handleChangeCard} className="text-yellow-500 text-[10px] font-bold uppercase tracking-wider hover:text-yellow-400 flex items-center space-x-1">
+                  <button onClick={handleChangeCard} className="text-yellow-500 text-xs font-bold uppercase tracking-wider hover:text-yellow-400 flex items-center space-x-1">
                     <span>Changer de carte</span>
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/>
                     </svg>
                   </button>
@@ -165,7 +165,7 @@ const HomeScreen = () => {
               <div className="mb-6">
                 <div className="flex justify-between items-center mb-3">
                   <h2 className="text-white/60 text-xs uppercase tracking-widest font-bold">Historique</h2>
-                  <button onClick={handleAllTickets} className="text-yellow-500 text-xs font-medium">Voir tout</button>
+                  <button onClick={handleAllTickets} className="text-yellow-500 text-sm font-semibold">Voir tout</button>
                 </div>
                 <div className="space-y-3">
                   {isDataLoading ? (
