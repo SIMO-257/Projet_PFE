@@ -28,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ]);
     $middleware->alias([
         'authMiddleware' => \App\Http\Middleware\AuthMiddleware::class,
+        'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
     ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

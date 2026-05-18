@@ -48,6 +48,7 @@ class Client extends Authenticatable implements CanResetPasswordContract, MustVe
      */
     protected $hidden = [
         'password_hash',
+        'profile_file',
     ];
 
     /**
@@ -112,6 +113,14 @@ class Client extends Authenticatable implements CanResetPasswordContract, MustVe
     public function transactions()
     {
         return $this->hasMany(Transaction::class, 'user_id');
+    }
+
+    /**
+     * Get the tickets for the client.
+     */
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class, 'user_id');
     }
 
     public function defaultTicket()

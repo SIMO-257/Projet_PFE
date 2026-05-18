@@ -1,27 +1,6 @@
-import axios from 'axios';
+import api from './api';
 
-const apiBase = import.meta.env.VITE_API_URL ?? '';
-
-// Global axios defaults for CSRF support
-axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
-axios.defaults.xsrfCookieName = 'XSRF-TOKEN';
-axios.defaults.xsrfHeaderName = 'X-XSRF-TOKEN';
-
-const clientApi = axios.create({
-  baseURL: `${apiBase}/api`,
-  withCredentials: true,
-  withXSRFToken: true,
-  headers: {
-    Accept: 'application/json',
-    'X-Requested-With': 'XMLHttpRequest',
-  },
-});
-
-// CSRF cookie fetch (required for Sanctum SPA auth)
-export const fetchCsrfToken = () => axios.get(`${apiBase}/sanctum/csrf-cookie`, { withCredentials: true });
-
-
+export const fetchCsrfToken = () => api.get('/sanctum/csrf-cookie', { baseURL: import.meta.env.VITE_API_URL });
 
 const extractPayload = (response) => response?.data?.data ?? null;
 
@@ -48,45 +27,34 @@ export const setClientUuid = (uuid, rememberMe = false) => {
 };
 
 export const clearAuthData = () => {
-
   localStorage.removeItem('is_authenticated');
-
 };
 
-clientApi.interceptors.request.use((config) => {
-  // No need to manually add Bearer token as withCredentials handles cookies
-  return config;
-});
-
-clientApi.interceptors.response.use(
+api.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error('[AXIOS] Response error:', error.message, 'Status:', error.response?.status);
-    if (error.response?.status === 401) {
-      console.log('[AXIOS] 401 detected, clearing auth data');
+    if (error.response?.status === 401 && !error.config.url.startsWith('/admin')) {
       clearAuthData();
-      // Don't redirect here - let the component/thunk handle it
-      // This prevents conflicts with React routing
     }
     return Promise.reject(error);
   }
 );
 
-export const signupClient = (payload) => clientApi.post('/signup', payload);
+export const signupClient = (payload) => api.post('/signup', payload);
 
-export const loginClient = (payload) => clientApi.post('/login', payload);
+export const loginClient = (payload) => api.post('/login', payload);
 
-export const resendVerificationEmail = (email) => clientApi.post('/email/resend', { email });
+export const resendVerificationEmail = (email) => api.post('/email/resend', { email });
 
-export const verifyEmailCode = (email, code) => clientApi.post('/email/verify-code', { email, code });
+export const verifyEmailCode = (email, code) => api.post('/email/verify-code', { email, code });
 
 export const forgotPasswordClient = (payload) =>
-  clientApi.post('/forgot-password', payload);
+  api.post('/forgot-password', payload);
 
 export const resetPasswordClient = (payload) =>
-  clientApi.post('/reset-password', payload);
+  api.post('/reset-password', payload);
 
-export const fetchClientProfile = () => clientApi.get('/profile').then(extractPayload);
+export const fetchClientProfile = () => api.get('/profile').then(extractPayload);
 
 export const updateClientProfile = ({ payload = {}, avatarFile = null }) => {
   if (avatarFile) {
@@ -99,44 +67,44 @@ export const updateClientProfile = ({ payload = {}, avatarFile = null }) => {
     });
     form.append('profile_file', avatarFile);
 
-    return clientApi.post('/profile', form);
+    return api.post('/profile', form);
   }
 
-  return clientApi.put('/profile', payload);
+  return api.put('/profile', payload);
 };
 
-export const logoutClient = () => clientApi.post('/logout');
+export const logoutClient = () => api.post('/logout');
 
-export const logoutAllClient = () => clientApi.post('/logout-all');
+export const logoutAllClient = () => api.post('/logout-all');
 
-export const fetchClientHome = () => clientApi.get('/home').then(extractPayload);
+export const fetchClientHome = () => api.get('/home').then(extractPayload);
 
-export const fetchWalletDetails = () => clientApi.get('/wallet').then(extractPayload);
+export const fetchWalletDetails = () => api.get('/wallet').then(extractPayload);
 
-export const fetchTransactionHistory = () => clientApi.get('/wallet/transactions').then(extractPayload);
+export const fetchTransactionHistory = () => api.get('/wallet/transactions').then(extractPayload);
 
-export const initRecharge = (payload) => clientApi.post('/wallet/recharge/init', payload);
+export const initRecharge = (payload) => api.post('/wallet/recharge/init', payload);
 
-export const confirmRecharge = (payload) => clientApi.post('/wallet/recharge/confirm', payload);
+export const confirmRecharge = (payload) => api.post('/wallet/recharge/confirm', payload);
 
-export const fetchTicketTypes = () => clientApi.get('/ticket-types').then(extractPayload);
+export const fetchTicketTypes = () => api.get('/ticket-types').then(extractPayload);
 
-export const purchaseTicket = (payload) => clientApi.post('/tickets/purchase', payload);
+export const purchaseTicket = (payload) => api.post('/tickets/purchase', payload);
 
-export const fetchMyTickets = () => clientApi.get('/tickets').then(extractPayload);
-export const fetchPurchasedCards = () => clientApi.get('/tickets/cards').then(extractPayload);
-export const setDefaultPurchasedCard = (ticketId) => clientApi.post('/tickets/cards/default', { ticket_id: ticketId }).then(extractPayload);
+export const fetchMyTickets = () => api.get('/tickets').then(extractPayload);
+export const fetchPurchasedCards = () => api.get('/tickets/cards').then(extractPayload);
+export const setDefaultPurchasedCard = (ticketId) => api.post('/tickets/cards/default', { ticket_id: ticketId }).then(extractPayload);
 
-export const fetchTicketDetails = (uuid) => clientApi.get(`/tickets/${uuid}`).then(extractPayload);
+export const fetchTicketDetails = (uuid) => api.get(`/tickets/${uuid}`).then(extractPayload);
 
-export const validateTicket = (uuid, payload) => clientApi.post(`/tickets/${uuid}/validate`, payload);
-export const createNfcChallenge = () => clientApi.post('/tickets/nfc/challenge').then(extractPayload);
-export const consumeNfcChallenge = (payload) => clientApi.post('/tickets/nfc/consume', payload).then(extractPayload);
-export const createQrValidationToken = (payload) => clientApi.post('/tickets/qr/token', payload).then(extractPayload);
-export const consumeQrValidationToken = (payload) => clientApi.post('/tickets/qr/consume', payload).then(extractPayload);
+export const validateTicket = (uuid, payload) => api.post(`/tickets/${uuid}/validate`, payload);
+export const createNfcChallenge = () => api.post('/tickets/nfc/challenge').then(extractPayload);
+export const consumeNfcChallenge = (payload) => api.post('/tickets/nfc/consume', payload).then(extractPayload);
+export const createQrValidationToken = (payload) => api.post('/tickets/qr/token', payload).then(extractPayload);
+export const consumeQrValidationToken = (payload) => api.post('/tickets/qr/consume', payload).then(extractPayload);
 
-export const createPaymentIntent = (payload) => clientApi.post('/payments/create-intent', payload);
+export const createPaymentIntent = (payload) => api.post('/payments/create-intent', payload);
 
-export const saveBillingDetails = (payload) => clientApi.post('/payments/billing-details', payload);
+export const saveBillingDetails = (payload) => api.post('/payments/billing-details', payload);
 
-export default clientApi;
+export default api;

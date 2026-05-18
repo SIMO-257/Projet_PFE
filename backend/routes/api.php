@@ -68,3 +68,43 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user/preferences', [ClientController::class, 'getPreferences'])->name('api.client.preferences.get');
     Route::patch('/user/preferences', [ClientController::class, 'updatePreferences'])->name('api.client.preferences.update');
 });
+
+// ─── ADMIN ROUTES ────────────────────────────────────────────
+use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminClientController;
+use App\Http\Controllers\Admin\AdminTicketController;
+use App\Http\Controllers\Admin\AdminTransactionController;
+use App\Http\Controllers\Admin\AdminNotificationController;
+use App\Http\Controllers\Admin\AdminProfileController;
+
+// Public admin route — no auth required
+Route::prefix('admin')->group(function () {
+    Route::post('/login',  [AdminAuthController::class, 'login']);
+});
+
+// Protected admin routes — requires sanctum token and admin check
+Route::prefix('admin')->middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::post('/logout',  [AdminAuthController::class, 'logout']);
+    Route::get('/me',       [AdminAuthController::class, 'me']);
+
+    // Dashboard
+    Route::get('/dashboard', [AdminDashboardController::class, 'index']);
+
+    // Clients
+    Route::get('/clients',                       [AdminClientController::class, 'index']);
+    Route::get('/clients/{client}',              [AdminClientController::class, 'show']);
+    Route::patch('/clients/{client}/toggle-status',  [AdminClientController::class, 'toggleStatus']);
+
+    // Tickets
+    Route::get('/tickets', [AdminTicketController::class, 'index']);
+
+    // Transactions
+    Route::get('/transactions', [AdminTransactionController::class, 'index']);
+
+    // Notifications
+    Route::post('/notifications/send', [AdminNotificationController::class, 'send']);
+
+    // Profile
+    Route::put('/profile', [AdminProfileController::class, 'update']);
+});
