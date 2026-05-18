@@ -16,10 +16,10 @@ class ScheduleTicketExpiration
     public function handle(TicketPurchasedEvent $event): void
     {
         $validUntil = Carbon::parse($event->validUntil);
-        $delay = now()->diffInSeconds($validUntil, false);
-
-        if ($delay > 0) {
-            ExpireTicketIfEligibleJob::dispatch($event->ticketId)->delay($delay);
+        
+        if ($validUntil->isFuture()) {
+            // Laravel automatically calculates the seconds between 'now' and $validUntil
+            ExpireTicketIfEligibleJob::dispatch($event->ticketId)->delay($validUntil);
         } else {
             ExpireTicketIfEligibleJob::dispatch($event->ticketId);
         }

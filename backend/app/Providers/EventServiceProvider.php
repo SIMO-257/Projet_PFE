@@ -3,7 +3,12 @@
 namespace App\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Event;
+use App\Events\TicketPurchasedEvent;
+use App\Events\TicketValidatedEvent;
+use App\Events\LowBalanceEvent;
+use App\Listeners\ScheduleTicketExpiration;
+use App\Listeners\SendTicketValidatedNotification;
+use App\Listeners\SendLowBalanceNotification;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -13,14 +18,14 @@ class EventServiceProvider extends ServiceProvider
      * @var array<class-string, array<int, class-string>>
      */
     protected $listen = [
-        \App\Events\TicketPurchasedEvent::class => [
-            \App\Listeners\ScheduleTicketExpiration::class,
+        TicketPurchasedEvent::class => [
+            ScheduleTicketExpiration::class,
         ],
-        \App\Events\TicketValidatedEvent::class => [
-            \App\Listeners\SendTicketValidatedNotification::class,
+        TicketValidatedEvent::class => [
+            SendTicketValidatedNotification::class,
         ],
-        \App\Events\LowBalanceEvent::class => [
-            \App\Listeners\SendLowBalanceNotification::class,
+        LowBalanceEvent::class => [
+            SendLowBalanceNotification::class,
         ],
     ];
 

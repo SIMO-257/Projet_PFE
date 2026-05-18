@@ -126,11 +126,17 @@ const HomeScreen = () => {
                 {isDataLoading ? (
                   <BalanceCardSkeleton />
                 ) : (
-                <button
-                  type="button"
+                <div
+                  role="button"
+                  tabIndex={(!defaultCard?.uuid || isNavigatingToValidation) ? -1 : 0}
                   onClick={handleDefaultCardPress}
-                  disabled={!defaultCard?.uuid || isNavigatingToValidation}
-                  className="w-full text-left disabled:cursor-not-allowed relative"
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' && !(!defaultCard?.uuid || isNavigatingToValidation)) {
+                      handleDefaultCardPress();
+                    }
+                  }}
+                  aria-disabled={!defaultCard?.uuid || isNavigatingToValidation}
+                  className={`w-full text-left relative ${!defaultCard?.uuid || isNavigatingToValidation ? 'cursor-not-allowed opacity-80' : 'cursor-pointer'}`}
                 >
                   {isNavigatingToValidation && (
                       <div className="absolute inset-0 bg-[#400106]/50 backdrop-blur-sm z-20 flex items-center justify-center rounded-2xl">
@@ -145,18 +151,9 @@ const HomeScreen = () => {
                     gradientFrom="#7A3B47"
                     gradientTo="#5C2A36"
                     circlesPosition="right"
+                    onAction={handleChangeCard}
+                    actionLabel="Changer de carte"
                   />
-                </button>
-                )}
-
-                {!isDataLoading && (
-                <div className="flex justify-end -mt-4 mb-4 pr-2">
-                  <button onClick={handleChangeCard} className="text-yellow-500 text-xs font-bold uppercase tracking-wider hover:text-yellow-400 flex items-center space-x-1">
-                    <span>Changer de carte</span>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/>
-                    </svg>
-                  </button>
                 </div>
                 )}
 
