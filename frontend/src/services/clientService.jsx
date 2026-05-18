@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import axios from 'axios';
 
 const configuredApiBase = import.meta.env.VITE_API_URL;
@@ -10,6 +11,11 @@ const clientApi = axios.create({
   },
 });
 
+=======
+import api from './api';
+
+export const fetchCsrfToken = () => api.get('/sanctum/csrf-cookie', { baseURL: import.meta.env.VITE_API_URL });
+>>>>>>> bce7596e (Add admin dashboard, authentication and management system)
 
 const extractPayload = (response) => response?.data?.data ?? null;
 
@@ -47,6 +53,7 @@ export const setClientUuid = (uuid, rememberMe = false) => {
   }
 };
 
+<<<<<<< HEAD
 clientApi.interceptors.request.use((config) => {
   const token = getAuthToken();
   if (token) {
@@ -56,18 +63,27 @@ clientApi.interceptors.request.use((config) => {
 });
 
 clientApi.interceptors.response.use(
+=======
+export const clearAuthData = () => {
+  localStorage.removeItem('is_authenticated');
+};
+
+api.interceptors.response.use(
+>>>>>>> bce7596e (Add admin dashboard, authentication and management system)
   (response) => response,
   (error) => {
-    console.error('[AXIOS] Response error:', error.message, 'Status:', error.response?.status);
-    if (error.response?.status === 401) {
-      console.log('[AXIOS] 401 detected, clearing auth data');
+    if (error.response?.status === 401 && !error.config.url.startsWith('/admin')) {
       clearAuthData();
+<<<<<<< HEAD
       // Don't redirect here - let the component/thunk handle it
+=======
+>>>>>>> bce7596e (Add admin dashboard, authentication and management system)
     }
     return Promise.reject(error);
   }
 );
 
+<<<<<<< HEAD
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
 export const signupClient = async (payload) => {
@@ -87,8 +103,23 @@ export const resetPasswordClient = async (payload) => {
 };
 
 // ── Profile ───────────────────────────────────────────────────────────────────
+=======
+export const signupClient = (payload) => api.post('/signup', payload);
 
-export const fetchClientProfile = () => clientApi.get('/profile').then(extractPayload);
+export const loginClient = (payload) => api.post('/login', payload);
+
+export const resendVerificationEmail = (email) => api.post('/email/resend', { email });
+
+export const verifyEmailCode = (email, code) => api.post('/email/verify-code', { email, code });
+
+export const forgotPasswordClient = (payload) =>
+  api.post('/forgot-password', payload);
+
+export const resetPasswordClient = (payload) =>
+  api.post('/reset-password', payload);
+>>>>>>> bce7596e (Add admin dashboard, authentication and management system)
+
+export const fetchClientProfile = () => api.get('/profile').then(extractPayload);
 
 export const updateClientProfile = ({ payload = {}, avatarFile = null }) => {
   if (avatarFile) {
@@ -100,13 +131,55 @@ export const updateClientProfile = ({ payload = {}, avatarFile = null }) => {
       }
     });
     form.append('profile_file', avatarFile);
+<<<<<<< HEAD
     return clientApi.post('/profile', form);
   }
   return clientApi.put('/profile', payload);
+=======
+
+    return api.post('/profile', form);
+  }
+
+  return api.put('/profile', payload);
+>>>>>>> bce7596e (Add admin dashboard, authentication and management system)
 };
 
-export const logoutClient = () => clientApi.post('/logout');
+export const logoutClient = () => api.post('/logout');
 
-export const logoutAllClient = () => clientApi.post('/logout-all');
+export const logoutAllClient = () => api.post('/logout-all');
 
+<<<<<<< HEAD
 export default clientApi;
+=======
+export const fetchClientHome = () => api.get('/home').then(extractPayload);
+
+export const fetchWalletDetails = () => api.get('/wallet').then(extractPayload);
+
+export const fetchTransactionHistory = () => api.get('/wallet/transactions').then(extractPayload);
+
+export const initRecharge = (payload) => api.post('/wallet/recharge/init', payload);
+
+export const confirmRecharge = (payload) => api.post('/wallet/recharge/confirm', payload);
+
+export const fetchTicketTypes = () => api.get('/ticket-types').then(extractPayload);
+
+export const purchaseTicket = (payload) => api.post('/tickets/purchase', payload);
+
+export const fetchMyTickets = () => api.get('/tickets').then(extractPayload);
+export const fetchPurchasedCards = () => api.get('/tickets/cards').then(extractPayload);
+export const setDefaultPurchasedCard = (ticketId) => api.post('/tickets/cards/default', { ticket_id: ticketId }).then(extractPayload);
+
+export const fetchTicketDetails = (uuid) => api.get(`/tickets/${uuid}`).then(extractPayload);
+
+export const validateTicket = (uuid, payload) => api.post(`/tickets/${uuid}/validate`, payload);
+export const createNfcChallenge = () => api.post('/tickets/nfc/challenge').then(extractPayload);
+export const consumeNfcChallenge = (payload) => api.post('/tickets/nfc/consume', payload).then(extractPayload);
+export const createQrValidationToken = (payload) => api.post('/tickets/qr/token', payload).then(extractPayload);
+export const consumeQrValidationToken = (payload) => api.post('/tickets/qr/consume', payload).then(extractPayload);
+
+export const createPaymentIntent = (payload) => api.post('/payments/create-intent', payload);
+
+export const saveBillingDetails = (payload) => api.post('/payments/billing-details', payload);
+
+export default api;
+>>>>>>> bce7596e (Add admin dashboard, authentication and management system)

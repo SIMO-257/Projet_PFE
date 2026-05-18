@@ -15,12 +15,12 @@ import { fetchPurchasedCards } from '../services/ticketService';
 import { fetchUnreadCount } from '../Redux/Slices/notificationSlice';
 
 const HomeScreen = () => {
+  const dispatch = useDispatch();
   const { user } = useAuth();
   const { refreshWallet } = useWallet();
   const { tickets, refreshTickets } = useTickets();
-  const navigateHook = useNavigate();
-  const dispatch = useDispatch();
   const unreadCount = useSelector(state => state.notifications?.unreadCount || 0);
+  const navigateHook = useNavigate();
 
   const [purchasedCards, setPurchasedCards] = useState([]);
   const [isDataLoading, setIsDataLoading] = useState(true);

@@ -15,7 +15,8 @@ class DatabaseSeeder extends Seeder
     {
         // Seed ticket types first
         $this->call([
-            TicketTypeSeeder::class
+            TicketTypeSeeder::class,
+            AdminSeeder::class
         ]);
 
         

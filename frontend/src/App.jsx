@@ -42,6 +42,19 @@ const OfflineMode = lazy(() => import("./Pages/OfflineMode"));
 const TermsAndConditions = lazy(() => import("./Pages/TermsAndConditions"));
 
 
+// Admin Pages
+const AdminLogin = lazy(() => import("./Pages/admin/AdminLogin"));
+const AdminDashboard = lazy(() => import("./Pages/admin/AdminDashboard"));
+const AdminClients = lazy(() => import("./Pages/admin/AdminClients"));
+const AdminTickets = lazy(() => import("./Pages/admin/AdminTickets"));
+const AdminTransactions = lazy(() => import("./Pages/admin/AdminTransactions"));
+const AdminNotifications = lazy(() => import("./Pages/admin/AdminNotifications"));
+const AdminProfile = lazy(() => import("./Pages/admin/AdminProfile"));
+
+// Admin Components
+import AdminGuard from './Components/guards/AdminGuard';
+import AdminLayout from './Components/admin/AdminLayout';
+
 function RootRedirect() {
   const { isAuthenticated, isAuthChecked, isLoading } = useAuth();
 
@@ -68,7 +81,10 @@ function App() {
       return;
     }
 
-    if (shouldRestoreAuthSession()) {
+    // Check if current path is an admin path
+    const isAdminPath = window.location.pathname.startsWith('/admin');
+
+    if (shouldRestoreAuthSession() && !isAdminPath) {
       refreshProfile();
     } else {
       dispatch(markAuthCheckedUnauthenticated());
@@ -120,6 +136,21 @@ function App() {
 
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/offline" element={<OfflineMode />} />
+          </Route>
+
+          {/* ADMIN ROUTES */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+
+          <Route path="/admin" element={<AdminGuard />}>
+            <Route element={<AdminLayout />}>
+              <Route index element={<Navigate to="/admin/dashboard" replace />} />
+              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="clients" element={<AdminClients />} />
+              <Route path="tickets" element={<AdminTickets />} />
+              <Route path="transactions" element={<AdminTransactions />} />
+              <Route path="notifications" element={<AdminNotifications />} />
+              <Route path="profil" element={<AdminProfile />} />
+            </Route>
           </Route>
 
         </Routes>

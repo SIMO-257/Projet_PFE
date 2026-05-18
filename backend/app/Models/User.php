@@ -6,11 +6,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     const UPDATED_AT = null;
 
@@ -20,12 +21,10 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'uuid',
-        'email',
-        'phone',
-        'password_hash',
         'first_name',
         'last_name',
+        'email',
+        'password',
         'is_active',
     ];
 
@@ -35,7 +34,8 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $hidden = [
-        'password_hash',
+        'password',
+        'remember_token',
     ];
 
     /**
@@ -47,7 +47,15 @@ class User extends Authenticatable
     {
         return [
             'is_active' => 'boolean',
-            'password_hash' => 'hashed',
+            'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Helper — full name accessor
+     */
+    public function getFullNameAttribute(): string
+    {
+        return $this->first_name . ' ' . $this->last_name;
     }
 }
