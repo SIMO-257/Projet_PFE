@@ -8,6 +8,9 @@ import { markAuthCheckedUnauthenticated } from "./Redux/Slices/AuthSlice";
 import { shouldRestoreAuthSession } from "./services/clientService";
 
 import GlobalPageLoader from "./Components/UI/GlobalPageLoader";
+import LoadingOverlay from "./Components/UI/LoadingOverlay";
+import { setRouteLoading } from "./Redux/Slices/uiSlice";
+import RechargePaymentScreen from "./Pages/RechargePaymentScreen";
 
 // Lazy pages
 
@@ -35,7 +38,6 @@ const ValidatorScreen = lazy(() => import("./Pages/Validator"));
 
 
 const Paiment = lazy(() => import("./Pages/Paiment"));
-const RechargePaymentScreen = lazy(() => import("./Pages/RechargePaymentScreen"));
 const PurchasedCards = lazy(() => import("./Pages/PurchasedCards"));
 const ConfirmationPaiment = lazy(() => import("./Pages/ConfirmationPaiment"));
 const PaimentHistory = lazy(() => import("./Pages/PaimentHistory"));
@@ -75,10 +77,28 @@ function RootRedirect() {
   return <Navigate to="/home" replace />;
 }
 
+import { useLocation } from "react-router-dom";
+
+function RouteWatcher() {
+  const location = useLocation();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(setRouteLoading(true));
+    const timer = setTimeout(() => {
+      dispatch(setRouteLoading(false));
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [location.pathname, dispatch]);
+
+  return null;
+}
+
 function App() {
   const dispatch = useDispatch();
   const { refreshProfile, isAuthChecked } = useAuth();
   const theme = useSelector((state) => state.settings.theme);
+  const { isGlobalLoading, isRouteLoading } = useSelector((state) => state.ui || { isGlobalLoading: false, isRouteLoading: false });
 
   useEffect(() => {
     if (isAuthChecked) {
@@ -106,6 +126,8 @@ function App() {
 
   return (
     <BrowserRouter>
+      <RouteWatcher />
+      <LoadingOverlay isVisible={isGlobalLoading || isRouteLoading} message={isGlobalLoading ? "Sécurisation de la transaction..." : "Chargement..."} />
       <Suspense fallback={<GlobalPageLoader />}>
         <Routes>
 

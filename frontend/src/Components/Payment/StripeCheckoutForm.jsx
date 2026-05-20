@@ -8,12 +8,15 @@ import {
   ExpressCheckoutElement,
 } from '@stripe/react-stripe-js';
 
+import { useDispatch } from 'react-redux';
+import { setGlobalLoading } from '../../Redux/Slices/uiSlice';
 import * as notificationService from '../../services/notificationService';
 import { confirmRecharge } from '../../services/walletService';
 
 const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel }) => {
   const stripe = useStripe();
   const elements = useElements();
+  const dispatch = useDispatch();
   const [message, setMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
@@ -35,6 +38,7 @@ const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel }) => {
     }
 
     setIsLoading(true);
+    dispatch(setGlobalLoading(true));
     setMessage(null);
 
     try {
@@ -43,6 +47,7 @@ const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel }) => {
         console.error('[Stripe] Submit error:', submitError);
         setMessage(submitError.message);
         setIsLoading(false);
+        dispatch(setGlobalLoading(false));
         return;
       }
 
@@ -74,6 +79,7 @@ const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel }) => {
         } else {
           setMessage('Une erreur est survenue lors de la validation du paiement.');
         }
+        dispatch(setGlobalLoading(false));
       } else {
         console.log('[Stripe] Payment successful:', result.paymentIntent);
 
@@ -81,6 +87,7 @@ const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel }) => {
         if (!paymentIntentId) {
           setMessage('Paiement confirme, mais identifiant de transaction introuvable.');
           setIsLoading(false);
+          dispatch(setGlobalLoading(false));
           return;
         }
 
@@ -92,11 +99,13 @@ const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel }) => {
             confirmErr?.response?.data?.message ||
               "Paiement reussi, mais l'enregistrement du rechargement a echoue."
           );
+          dispatch(setGlobalLoading(false));
         }
       }
     } catch (err) {
       console.error('[Stripe] Unexpected error:', err);
       setMessage('Une erreur inatendue est survenue.');
+      dispatch(setGlobalLoading(false));
     } finally {
       setIsLoading(false);
     }

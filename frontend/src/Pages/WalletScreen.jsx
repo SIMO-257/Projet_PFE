@@ -9,15 +9,24 @@ import SectionHeader from '../Components/Layout/SectionHeader';
 import BalanceCardSkeleton from '../Components/Skeletons/BalanceCardSkeleton';
 import TicketHistorySkeleton from '../Components/Skeletons/TicketHistorySkeleton';
 import styles from '../Styles/WalletScreen.module.css';
+import { useDispatch } from 'react-redux';
+import { setGlobalLoading } from '../Redux/Slices/uiSlice';
 import { useWallet } from '../hooks/useWallet';
 
 const WalletScreen = () => {
   const { balance, card_last_four, transactions, isLoading, refreshWallet } = useWallet();
   const navigateHook = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     refreshWallet();
   }, [refreshWallet]);
+
+  useEffect(() => {
+    if (!isLoading) {
+      dispatch(setGlobalLoading(false));
+    }
+  }, [isLoading, dispatch]);
 
   const handleRecharge = () => {
     navigateHook('/recharge-payment');

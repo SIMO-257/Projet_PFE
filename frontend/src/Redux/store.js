@@ -5,6 +5,7 @@ import TicketsReducer from "./Slices/TicketsSlice";
 import NotificationReducer from "./Slices/notificationSlice";
 import SettingsReducer from "./Slices/settingsSlice";
 import adminReducer from './Slices/adminSlice';
+import uiReducer from './Slices/uiSlice';
 
 const store = configureStore({
     reducer: {
@@ -14,6 +15,7 @@ const store = configureStore({
         notifications: NotificationReducer,
         settings: SettingsReducer,
         admin: adminReducer,
+        ui: uiReducer,
     }
 })
 
