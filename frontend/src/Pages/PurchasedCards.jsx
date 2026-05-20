@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../Components/Layout/Header';
-import BottomNavigation from '../Components/Layout/BottomNavigation';
 import PurchasedCardItem from '../Components/Cards/PurchasedCardItem';
 import { fetchPurchasedCards, setDefaultPurchasedCard } from '../services/ticketService';
 
@@ -69,8 +68,6 @@ const PurchasedCards = () => {
               </div>
             )}
           </div>
-
-          <BottomNavigation />
         </div>
       </div>
     </div>

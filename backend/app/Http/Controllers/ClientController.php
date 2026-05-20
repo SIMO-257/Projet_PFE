@@ -25,10 +25,7 @@ class ClientController extends Controller
     {
         $client = $request->user();
 
-        $name = trim(($client->first_name ?? '').' '.($client->last_name ?? ''));
-        if ($name === '') {
-            $name = $client->email;
-        }
+        $name = $client->full_name ?: $client->email;
 
         return $this->successResponse([
             'name' => $name,
@@ -56,7 +53,9 @@ class ClientController extends Controller
         if (array_key_exists('phone', $validated)) {
             $client->phone = $validated['phone'] ?: null;
         }
-        $this->applyName($client, $validated);
+        if (array_key_exists('full_name', $validated)) {
+            $client->full_name = $validated['full_name'];
+        }
         $this->applyProfileFile($client, $request, 'profile_file');
 
         $client->save();
@@ -64,17 +63,13 @@ class ClientController extends Controller
 
         \Illuminate\Support\Facades\Log::info('Profile Saved', [
             'client_id' => $client->id,
-            'first_name' => $client->first_name,
-            'last_name' => $client->last_name,
+            'full_name' => $client->full_name,
             'has_avatar' => !empty($client->avatar_path)
         ]);
 
         AuditLog::log('profile_update', $client->id);
 
-        $name = trim(($client->first_name ?? '').' '.($client->last_name ?? ''));
-        if ($name === '') {
-            $name = $client->email;
-        }
+        $name = $client->full_name ?: $client->email;
 
         return $this->successResponse([
             'name' => $name,
@@ -115,14 +110,19 @@ class ClientController extends Controller
                 return $this->errorResponse('Account is inactive.', 403);
             }
 
-            $client->is_active = true;
             $client->last_active_at = now();
             $client->save();
+
+            AuditLog::log(
                 'security',
-                'info',
-                'Nouvelle connexion',
-                "Une nouvelle connexion a été détectée sur votre compte le " . now()->format('d/m à H:i') . ".",
-                ['ip' => $request->ip(), 'agent' => $request->userAgent()]
+                $client->id,
+                [
+                    'type' => 'info',
+                    'message' => 'Nouvelle connexion',
+                    'details' => "Une nouvelle connexion a été détectée sur votre compte le " . now()->format('d/m à H:i') . ".",
+                    'ip' => $request->ip(),
+                    'agent' => $request->userAgent()
+                ]
             );
 
             $token = $client->createToken('auth_token')->plainTextToken;
@@ -146,24 +146,36 @@ class ClientController extends Controller
     {
         $data = $request->validated();
 
-        $client = Client::create([
+        // Prevent signups if email or phone already exist in clients or pending registrations
+        if (Client::where('email', $data['email'])->exists() || \App\Models\PendingRegistration::where('email', $data['email'])->exists()) {
+            return $this->errorResponse('This email is already used.', 422, ['email' => ['This email is already used.']]);
+        }
+        if (Client::where('phone', $data['phone'] ?? '')->exists() || \App\Models\PendingRegistration::where('phone', $data['phone'] ?? '')->exists()) {
+            return $this->errorResponse('This phone number is already used.', 422, ['phone' => ['This phone number is already used.']]);
+        }
+
+        // Create a pending registration — the real Client will be created after email verification
+        $pending = \App\Models\PendingRegistration::create([
             'email' => $data['email'],
             'phone' => $data['phone'] ?? null,
             'password_hash' => Hash::make($data['password']),
             'avatar_path' => null,
-            'is_active' => false,
+            'full_name' => $data['full_name'],
         ]);
-        $this->applyName($client, $data);
-        $this->applyProfileFile($client, $request, 'profile_file');
-        $client->save();
 
-        // Generate and send verification code
-        $code = $client->generateVerificationCode();
-        $client->notify(new \App\Notifications\VerifyEmailNotification($code));
+        // Handle optional profile file upload
+        if ($request->hasFile('profile_file')) {
+            $path = $request->file('profile_file')->store('avatars', 'public');
+            $pending->avatar_path = $path;
+            $pending->save();
+        }
 
-        AuditLog::log('signup', $client->id);
+        $code = $pending->generateVerificationCode();
+        $pending->notify(new \App\Notifications\VerifyEmailNotification($code));
 
-        return $this->successResponse(null, 'Account created successfully. Please check your email for verification code.', 201);
+        AuditLog::log('signup', null, ['email' => $pending->email]);
+
+        return $this->successResponse(null, 'Account pending verification. Check your email for the verification code.', 201);
     }
 
 
@@ -174,7 +186,6 @@ class ClientController extends Controller
         $userId = $client?->id;
 
         if ($client) {
-            $client->is_active = false;
             $client->last_active_at = null;
             $client->save();
             $client->currentAccessToken()->delete();
@@ -192,7 +203,6 @@ class ClientController extends Controller
         $userId = $client?->id;
 
         if ($client) {
-            $client->is_active = false;
             $client->last_active_at = null;
             $client->save();
         }
@@ -322,23 +332,7 @@ class ClientController extends Controller
         return $this->successResponse($updated, 'Préférences mises à jour');
     }
 
-    private function applyName(Client $client, array $data): void
-    {
-        if (!empty($data['full_name'])) {
-            $parts = preg_split('/[\s,]+/', trim((string) $data['full_name']), -1, PREG_SPLIT_NO_EMPTY);
-            $client->last_name = array_shift($parts) ?: null;
-            $client->first_name = count($parts) ? implode(' ', $parts) : null;
-            return;
-        }
 
-        if (array_key_exists('first_name', $data)) {
-            $client->first_name = $data['first_name'] ?: null;
-        }
-
-        if (array_key_exists('last_name', $data)) {
-            $client->last_name = $data['last_name'] ?: null;
-        }
-    }
 
     private function applyProfileFile(Client $client, Request $request, string $key): void
     {

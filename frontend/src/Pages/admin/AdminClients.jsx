@@ -82,7 +82,7 @@ const AdminClients = () => {
                 <tr key={client.id} className="hover:bg-white/[0.02] transition-colors">
                   <td className="px-6 py-4">
                     <div className="text-sm font-medium text-white">
-                      {client.first_name} {client.last_name}
+                      {client.full_name}
                     </div>
                   </td>
                   <td className="px-6 py-4 text-sm text-white/70">{client.email}</td>

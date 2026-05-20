@@ -28,8 +28,7 @@ class Client extends Authenticatable implements CanResetPasswordContract, MustVe
         'email',
         'phone',
         'password_hash',
-        'first_name',
-        'last_name',
+        'full_name',
         'avatar_path',
         'is_active',
         'last_active_at',
@@ -40,6 +39,7 @@ class Client extends Authenticatable implements CanResetPasswordContract, MustVe
         'email_verification_token',
         'email_verification_code',
         'email_verification_sent_at',
+        'email_verified_at',
     ];
 
     /**

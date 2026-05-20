@@ -99,6 +99,7 @@ const HomeScreen = () => {
   };
   const handleTicketPress = (ticket) => navigateHook(`/viewticket/${ticket.uuid}`);
   const handleAllTickets = () => navigateHook('/all-tickets');
+  const greeting = new Date().getHours() >= 18 ? 'Bonsoir' : 'Bonjour';
 
   return (
     <>
@@ -108,8 +109,8 @@ const HomeScreen = () => {
 
             <div className="flex items-center justify-between px-6 pt-8 pb-4">
               <div>
-                <p className="text-white/60 text-xs">Bonjour,</p>
-                <h1 className="text-white text-xl font-bold">{user?.name || user?.email}</h1>
+                <p className="text-white/80 text-sm font-medium">{greeting},</p>
+                <h1 className="text-white text-2xl font-bold mt-1">{user?.name || user?.email}</h1>
               </div>
               <button onClick={handleNotifications} className="relative w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -21,7 +21,7 @@ class VerifyEmailNotification extends Notification
     {
         return (new MailMessage)
             ->subject('Votre code de vérification — CasaWay')
-            ->greeting('Bonjour ' . $notifiable->first_name . ' !')
+            ->greeting('Bonjour ' . ($notifiable->full_name ?? '') . ' !')
             ->line('Merci de vous être inscrit sur CasaWay.')
             ->line('Voici votre code de vérification à 6 chiffres :')
             ->line('**' . $this->code . '**')

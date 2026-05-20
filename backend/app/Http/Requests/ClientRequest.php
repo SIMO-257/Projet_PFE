@@ -38,9 +38,7 @@ class ClientRequest extends FormRequest
                     ->numbers()
                     ->symbols(),
             ],
-            'full_name' => 'nullable|string|max:255',
-            'first_name' => 'nullable|string|max:100',
-            'last_name' => 'nullable|string|max:100',
+            'full_name' => 'required|string|max:255',
             'profile_file' => 'nullable|file|max:5120|mimes:jpg,jpeg,png,webp',
         ];
     }
@@ -57,24 +55,12 @@ class ClientRequest extends FormRequest
             'password.required' => 'Password is required.',
             'password.min' => 'Password must be at least 8 characters.',
             'password.confirmed' => 'Password confirmation does not match.',
+            'full_name.required' => 'Full name is required.',
             'full_name.max' => 'Full name is too long.',
             'profile_file.file' => 'Profile file is not valid.',
             'profile_file.max' => 'Profile file is too large (max 5MB).',
             'profile_file.mimes' => 'Profile file must be jpg, jpeg, png, or webp.',
         ];
-    }
-
-    protected function withValidator($validator): void
-    {
-        $validator->after(function ($validator) {
-            $fullName = trim((string) $this->input('full_name', ''));
-            if ($fullName !== '') {
-                $parts = preg_split('/[\s,]+/', $fullName, -1, PREG_SPLIT_NO_EMPTY);
-                if (count($parts) < 2) {
-                    $validator->errors()->add('full_name', 'Full name must contain last name then first name.');
-                }
-            }
-        });
     }
 
     protected function failedValidation(Validator $validator): void

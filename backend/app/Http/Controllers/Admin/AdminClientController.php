@@ -17,13 +17,12 @@ class AdminClientController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('email', 'like', "%{$search}%")
-                  ->orWhere('first_name', 'like', "%{$search}%")
-                  ->orWhere('last_name',  'like', "%{$search}%");
+                  ->orWhere('full_name', 'like', "%{$search}%");
             });
         }
 
         $clients = $query
-            ->select('id', 'first_name', 'last_name', 'email', 'is_active', 'created_at')
+            ->select('id', 'full_name', 'email', 'is_active', 'created_at')
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 

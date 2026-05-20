@@ -104,19 +104,12 @@ export default function SignUp() {
             return;
         }
 
-        const fullName = form.full_name || '';
-        const nameParts = fullName.trim().split(/\s+/);
-        const firstName = nameParts.shift() || null;
-        const lastName = nameParts.length ? nameParts.join(' ') : null;
-
         const payload = {
             email: form.email,
             phone: form.phone ? form.phone.replace(/\D/g, '') : null,
             password: form.password,
             password_confirmation: form.password_confirmation,
             full_name: form.full_name,
-            first_name: firstName,
-            last_name: lastName,
         };
 
         try {

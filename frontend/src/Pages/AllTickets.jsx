@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTickets } from '../hooks/useTickets';
 import Header from '../Components/Layout/Header';
-import BottomNavigation from '../Components/Layout/BottomNavigation';
 import TicketHistoryCard from '../Components/Cards/TicketHistoryCard';
 
 const AllTickets = () => {
@@ -163,8 +162,6 @@ const AllTickets = () => {
               <p className="text-white/50 text-center py-10">Aucun billet trouvé</p>
             )}
           </div>
-
-          <BottomNavigation />
         </div>
       </div>
     </div>

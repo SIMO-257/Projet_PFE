@@ -24,8 +24,7 @@ class ClientFactory extends Factory
             'email' => $this->faker->unique()->safeEmail(),
             'phone' => $this->faker->e164PhoneNumber(),
             'password_hash' => 'password',
-            'first_name' => $this->faker->firstName(),
-            'last_name' => $this->faker->lastName(),
+            'full_name' => $this->faker->name(),
             'is_active' => true,
             'created_at' => now(),
         ];

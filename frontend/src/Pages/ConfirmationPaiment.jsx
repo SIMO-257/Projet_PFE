@@ -75,14 +75,12 @@ const Confirmation = () => {
     return (
         <div className={styles.appContainer}>
             <div className={styles.container}>
-<<<<<<< HEAD:frontend/src/Pages/ConfirmationPaiment.jsx
-=======
+
                 {/* Close button */}
                 <button className={styles.closeBtn} onClick={handleReturnHome}>×</button>
 
                 <ProgressSteps currentStep={2} />
 
->>>>>>> c4f909ef (Add email verification and update authentication flow):frontend/src/Pages/ConfirmationPaiment/ConfirmationPaiment.jsx
                 {/* Success Icon */}
                 <div className={styles.successIcon}>
                     <svg viewBox="0 0 100 100" className={styles.checkmark}>
