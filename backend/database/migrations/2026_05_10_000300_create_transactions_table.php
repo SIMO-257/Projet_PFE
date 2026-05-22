@@ -18,11 +18,11 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('clients')->onDelete('cascade');
             $table->string('type', 20);
             $table->string('status', 20)->default('completed');
+            $table->string('payment_method', 20)->default('wallet');
             $table->decimal('amount', 10, 2);
             $table->string('currency', 3)->default('MAD');
             $table->decimal('balance_before', 10, 2);
             $table->decimal('balance_after', 10, 2);
-            $table->string('payment_method', 50)->default('wallet');
             $table->string('reference', 100)->nullable();
             $table->json('metadata')->nullable();
             $table->timestamp('created_at')->useCurrent();

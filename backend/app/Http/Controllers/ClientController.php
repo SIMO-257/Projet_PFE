@@ -6,11 +6,10 @@ use App\Http\Requests\ClientRequest;
 use App\Http\Requests\ProfileRequest;
 use App\Models\Client;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
-
+use Illuminate\Support\Facades\Storage;
 
 use App\Models\AuditLog;
 
@@ -24,17 +23,13 @@ class ClientController extends Controller
     public function fetch_profile(Request $request)
     {
         $client = $request->user();
-
-        $name = $client->full_name ?: $client->email;
-
         return $this->successResponse([
-            'name' => $name,
+            'name' => $client->full_name ?: 'Utilisateur',
             'client_uuid' => $client->uuid,
             'email' => $client->email,
             'phone' => $client->phone,
             'created_at' => $client->created_at->toDateString(),
-            'has_profile_file' => !is_null($client->avatar_path),
-            'avatar_url' => $client->avatar_path ? asset('storage/' . $client->avatar_path) : null,
+            'avatar_url' => $client->avatar_path ? Storage::disk('public')->url($client->avatar_path) : null,
         ]);
     }
 
@@ -44,18 +39,8 @@ class ClientController extends Controller
         $client = $request->user();
 
         $validated = $request->validated();
-        \Illuminate\Support\Facades\Log::info('Profile Update Request', [
-            'client_id' => $client->id,
-            'full_name' => $validated['full_name'] ?? 'not provided',
-            'has_file' => $request->hasFile('profile_file')
-        ]);
-
-        if (array_key_exists('phone', $validated)) {
-            $client->phone = $validated['phone'] ?: null;
-        }
-        if (array_key_exists('full_name', $validated)) {
-            $client->full_name = $validated['full_name'];
-        }
+        $client->fill($validated);
+        
         $this->applyProfileFile($client, $request, 'profile_file');
 
         $client->save();
@@ -69,15 +54,11 @@ class ClientController extends Controller
 
         AuditLog::log('profile_update', $client->id);
 
-        $name = $client->full_name ?: $client->email;
-
         return $this->successResponse([
-            'name' => $name,
+            'name' => $client->full_name,
             'email' => $client->email,
             'phone' => $client->phone,
-            'created_at' => $client->created_at->toDateString(),
-            'has_profile_file' => !is_null($client->avatar_path),
-            'avatar_url' => $client->avatar_path ? asset('storage/' . $client->avatar_path) : null,
+            'avatar_url' => $client->avatar_path ? Storage::disk('public')->url($client->avatar_path) : null,
         ], 'Profile updated successfully.');
     }
 
@@ -130,7 +111,7 @@ class ClientController extends Controller
             return $this->successResponse([
                 'access_token' => $token,
                 'token_type' => 'Bearer',
-                'remember_me' => $credentials['remember_me'] ?? false,
+                'remember_me' => $client->remember_me ?? false,
             ], 'Login successful.');
         }
 
@@ -165,8 +146,7 @@ class ClientController extends Controller
 
         // Handle optional profile file upload
         if ($request->hasFile('profile_file')) {
-            $path = $request->file('profile_file')->store('avatars', 'public');
-            $pending->avatar_path = $path;
+            $pending->avatar_path = $request->file('profile_file')->store('avatars', 'public');
             $pending->save();
         }
 
@@ -196,23 +176,7 @@ class ClientController extends Controller
         return $this->successResponse(null, 'Logout successful.');
     }
 
-    public function logoutAll(Request $request)
-    {
-        /** @var Client|null $client */
-        $client = $request->user();
-        $userId = $client?->id;
-
-        if ($client) {
-            $client->last_active_at = null;
-            $client->save();
-        }
-
-        $client?->tokens()->delete();
-
-        AuditLog::log('logout_all', $userId);
-
-        return $this->successResponse(null, 'Logged out from all devices.');
-    }
+    
 
     public function forgotPassword(Request $request)
     {
@@ -239,7 +203,16 @@ class ClientController extends Controller
         $data = $request->validate([
             'token' => 'required|string',
             'email' => 'required|email',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => [
+                'required',
+                'string',
+                'confirmed',
+                \Illuminate\Validation\Rules\Password::min(8)
+                    ->letters()
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols(),
+            ],
         ]);
 
         $status = Password::broker('clients')->reset(
@@ -337,11 +310,11 @@ class ClientController extends Controller
     private function applyProfileFile(Client $client, Request $request, string $key): void
     {
         if ($request->hasFile($key)) {
-            if ($client->avatar_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($client->avatar_path)) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($client->avatar_path);
+            // Delete old file if exists
+            if ($client->avatar_path) {
+                Storage::disk('public')->delete($client->avatar_path);
             }
-            $path = $request->file($key)->store('avatars', 'public');
-            $client->avatar_path = $path;
+            $client->avatar_path = $request->file($key)->store('avatars', 'public');
         }
     }
 }

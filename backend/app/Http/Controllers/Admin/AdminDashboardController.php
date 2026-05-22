@@ -17,7 +17,7 @@ class AdminDashboardController extends Controller
             'total_clients'      => Client::count(),
             'active_clients'     => Client::where('is_active', true)->count(),
             'total_tickets'      => Ticket::count(),
-            'validated_tickets'  => Ticket::where('status', 'validated')->count(),
+            'validated_tickets'  => Ticket::where('status', 'used')->count(),
             'total_revenue'      => Transaction::where('type', 'recharge')->where('status', 'completed')->sum('amount'),
             'transactions_today' => Transaction::whereDate('created_at', today())->count(),
             'new_clients_today'  => Client::whereDate('created_at', today())->count(),

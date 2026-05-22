@@ -26,7 +26,6 @@ class Ticket extends Model
         'valid_until',
         'remaining_uses',
         'price_paid',
-        'jws_signature',
     ];
 
     /**

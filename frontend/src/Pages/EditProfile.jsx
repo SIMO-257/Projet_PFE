@@ -18,7 +18,7 @@ const EditProfileScreen = () => {
   const [fullName, setFullName] = useState(initialProfile?.name ?? '');
   const [email, setEmail] = useState(initialProfile?.email ?? '');
   const [phone, setPhone] = useState(initialProfile?.phone ?? '');
-  const [profileImage, setProfileImage] = useState(null);
+  const [profileImage, setProfileImage] = useState(initialProfile?.avatar_url ?? null);
   const [avatarFile, setAvatarFile] = useState(null);
   const fileInputRef = useRef(null);
   const [errors, setErrors] = useState({});
@@ -42,6 +42,9 @@ const EditProfileScreen = () => {
         setFullName(data?.name ?? '');
         setEmail(data?.email ?? '');
         setPhone(data?.phone ?? '');
+        if (data?.avatar_url) {
+          setProfileImage(data.avatar_url);
+        }
       })
       .catch((err) => {
         if (err?.response?.status === 401) {

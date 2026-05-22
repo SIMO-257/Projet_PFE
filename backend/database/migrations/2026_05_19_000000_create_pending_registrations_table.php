@@ -12,8 +12,7 @@ return new class extends Migration {
             $table->string('email')->unique();
             $table->string('phone')->unique();
             $table->string('password_hash');
-            $table->string('first_name')->nullable();
-            $table->string('last_name')->nullable();
+            $table->string('full_name')->nullable();
             $table->string('avatar_path')->nullable();
             $table->string('email_verification_code', 6)->nullable();
             $table->string('email_verification_token')->nullable();

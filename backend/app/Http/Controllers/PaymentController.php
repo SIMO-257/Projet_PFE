@@ -7,7 +7,6 @@ use Stripe\Stripe;
 use Stripe\PaymentIntent;
 use Illuminate\Support\Facades\Auth;
 use App\Models\AuditLog;
-use App\Models\BillingDetail;
 
 class PaymentController extends Controller
 {
@@ -57,30 +56,5 @@ class PaymentController extends Controller
         } catch (\Exception $e) {
             return $this->errorResponse('Erreur lors de la création du paiement : ' . $e->getMessage(), 500);
         }
-    }
-
-    /**
-     * Save or update user billing details from the Address Element.
-     */
-    public function saveBillingDetails(Request $request)
-    {
-        $user = Auth::user();
-
-        $validated = $request->validate([
-            'address' => 'required|array',
-            'tax_id' => 'nullable|string|max:50',
-            'country' => 'required|string|size:2',
-        ]);
-
-        $billing = BillingDetail::updateOrCreate(
-            ['user_id' => $user->id],
-            [
-                'address' => $validated['address'],
-                'tax_id' => $validated['tax_id'],
-                'country' => $validated['country'],
-            ]
-        );
-
-        return $this->successResponse($billing, 'Détails de facturation enregistrés.');
     }
 }

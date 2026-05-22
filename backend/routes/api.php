@@ -54,7 +54,6 @@ Route::middleware(['auth:sanctum', 'track.activity'])->group(function () {
 
     // Checkout & Payment Routes
     Route::post('/payments/create-intent', [\App\Http\Controllers\PaymentController::class, 'createIntent'])->middleware('throttle:10,1')->name('api.payments.create_intent');
-    Route::post('/payments/billing-details', [\App\Http\Controllers\PaymentController::class, 'saveBillingDetails'])->name('api.payments.billing_details');
 
     // Notification Routes
     Route::prefix('notifications')->group(function () {

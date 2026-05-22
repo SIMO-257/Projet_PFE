@@ -3,21 +3,19 @@ import React from 'react';
 import styles from '../../Styles/Auth.module.css'
 
 export default function InputField(props) {
-    const inputClassName = `${styles.formInput} ${props.error ? styles.formInputError : ''}`.trim();
+    const { error, errorMessage, var: value, setVar: onChange, label, ...rest } = props;
+    const inputClassName = `${styles.formInput} ${error ? styles.formInputError : ''}`.trim();
     const normalizedError =
-        Array.isArray(props.errorMessage) ? props.errorMessage[0] : props.errorMessage;
+        Array.isArray(errorMessage) ? errorMessage[0] : errorMessage;
 
     return (
         <div className={styles.formGroup}>
-            <label htmlFor={props.id} className={styles.formLabel}>{props.label}</label>
+            <label htmlFor={props.id} className={styles.formLabel}>{label}</label>
             <input
-                type={props.type}
-                id={props.id}
-                placeholder={props.placeholder}
                 className={inputClassName}
-                value={props.var}
-                onChange={props.setVar}
-                required={props.required}
+                value={value}
+                onChange={onChange}
+                {...rest}
             />
             {normalizedError && <p className={styles.fieldError}>{normalizedError}</p>}
         </div>
