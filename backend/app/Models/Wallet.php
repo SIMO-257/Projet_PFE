@@ -16,7 +16,6 @@ class Wallet extends Model
     protected $fillable = [
         'user_id',
         'balance',
-        'card_last_four',
     ];
 
     /**

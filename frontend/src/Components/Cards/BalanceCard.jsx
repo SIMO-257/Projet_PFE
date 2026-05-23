@@ -4,8 +4,6 @@ import styles from '../../Styles/HomeScreen.module.css';
 const BalanceCard = ({ 
     title = "Solde disponible", 
     amount = "42,50 €", 
-    cardType = "Carte virtuelle", 
-    cardNumber = "**** 7842",
     gradientFrom = "#7A3B47",
     gradientTo = "#5C2A36",
     circlesPosition = "right", // 'right' or 'left'
@@ -35,8 +33,6 @@ const BalanceCard = ({
                 
                 <div className="flex items-center justify-between">
                     <div>
-                        <p className="text-white/60 text-xs mb-1">{cardType}</p>
-                        <p className="text-white/80 text-sm font-mono">{cardNumber}</p>
                     </div>
                     {onAction ? (
                       <button

@@ -32,7 +32,6 @@ class Client extends Authenticatable implements CanResetPasswordContract, MustVe
         'avatar_path',
         'is_active',
         'last_active_at',
-        'remember_me',
         'default_ticket_id',
         'notification_prefs',
         'client_preferences',
@@ -61,7 +60,6 @@ class Client extends Authenticatable implements CanResetPasswordContract, MustVe
     {
         return [
             'is_active' => 'boolean',
-            'remember_me' => 'boolean',
             'created_at' => 'datetime',
             'last_active_at' => 'datetime',
             'notification_prefs' => 'array',

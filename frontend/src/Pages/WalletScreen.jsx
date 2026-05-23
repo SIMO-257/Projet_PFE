@@ -14,7 +14,7 @@ import { setGlobalLoading } from '../Redux/Slices/uiSlice';
 import { useWallet } from '../hooks/useWallet';
 
 const WalletScreen = () => {
-  const { balance, card_last_four, transactions, isLoading, refreshWallet } = useWallet();
+  const { balance, transactions, isLoading, refreshWallet } = useWallet();
   const navigateHook = useNavigate();
   const dispatch = useDispatch();
 
@@ -37,7 +37,6 @@ const WalletScreen = () => {
   };
 
   const safeBalance = Number.isFinite(balance) ? balance : 0;
-  const safeCardLastFour = card_last_four || '****';
   const safeTransactions = Array.isArray(transactions) ? transactions : [];
   const latestSixTransactions = [...safeTransactions]
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
@@ -74,8 +73,6 @@ const WalletScreen = () => {
                 <BalanceCard 
                   title="Solde disponible"
                   amount={`${safeBalance.toFixed(2)} DH`}
-                  cardType="Carte Virtuelle"
-                  cardNumber={`**** **** **** ${safeCardLastFour}`}
                   gradientFrom="#7A3B47"
                   gradientTo="#5C2A36"
                   showCircles={false}

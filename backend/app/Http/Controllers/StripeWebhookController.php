@@ -120,7 +120,6 @@ class StripeWebhookController extends Controller
                     $wallet = Wallet::create([
                         'user_id' => $userId,
                         'balance' => 0.00,
-                        'card_last_four' => '****',
                     ]);
                     $wallet->refresh();
                 }
@@ -136,18 +135,6 @@ class StripeWebhookController extends Controller
 
                 $balanceBefore = (float) $wallet->balance;
                 $wallet->balance = $balanceBefore + $amountInDh;
-
-                $latestChargeId = $paymentIntent->latest_charge;
-                if ($latestChargeId) {
-                    try {
-                        $charge = \Stripe\Charge::retrieve($latestChargeId);
-                        if (isset($charge->payment_method_details->card)) {
-                            $wallet->card_last_four = $charge->payment_method_details->card->last4;
-                        }
-                    } catch (\Exception $e) {
-                        Log::warning('Stripe Webhook: Could not retrieve charge details for card_last_four: ' . $e->getMessage());
-                    }
-                }
 
                 $wallet->save();
 

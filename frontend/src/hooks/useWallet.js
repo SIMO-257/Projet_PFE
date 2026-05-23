@@ -4,7 +4,7 @@ import { getWalletData } from '../Redux/Slices/WalletSlice';
 
 export const useWallet = () => {
   const dispatch = useDispatch();
-  const { balance, card_last_four, transactions, status, error } = useSelector((state) => state.wallet);
+  const { balance, transactions, status, error } = useSelector((state) => state.wallet);
 
   const refreshWallet = useCallback(() => {
     dispatch(getWalletData());
@@ -12,7 +12,6 @@ export const useWallet = () => {
 
   return {
     balance,
-    card_last_four,
     transactions,
     isLoading: status === 'loading',
     error,

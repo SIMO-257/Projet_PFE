@@ -142,7 +142,6 @@ class WalletController extends Controller
                     $wallet = Wallet::create([
                         'user_id' => $user->id,
                         'balance' => 0.00,
-                        'card_last_four' => '****',
                     ]);
                     $wallet->refresh();
                 }
@@ -235,12 +234,11 @@ class WalletController extends Controller
         $user = Auth::user();
         $wallet = Wallet::firstOrCreate(
             ['user_id' => $user->id],
-            ['balance' => 0.00, 'card_last_four' => '****']
+            ['balance' => 0.00]
         );
 
         return $this->successResponse([
             'balance' => (float) $wallet->balance,
-            'card_last_four' => $wallet->card_last_four,
         ]);
     }
 

@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('clients')->onDelete('cascade');
             $table->decimal('balance', 10, 2)->default(0.00);
-            $table->string('card_last_four')->nullable();
             $table->timestamps();
 
             // Indexes

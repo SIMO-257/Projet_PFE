@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            $table->string('secure_token', 255)->nullable();
             $table->foreignId('user_id')->constrained('clients')->onDelete('cascade');
             $table->foreignId('ticket_type_id')->constrained('ticket_types')->onDelete('cascade');
             $table->foreignId('purchase_id')->nullable()->constrained('transactions')->onDelete('set null');
@@ -28,7 +27,6 @@ return new class extends Migration
             // Indexes
             $table->index('user_id');
             $table->index('uuid');
-            $table->index('secure_token');
             $table->index('ticket_type_id');
             $table->index('status');
             $table->index('valid_until');

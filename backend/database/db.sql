@@ -83,7 +83,6 @@ CREATE TABLE `wallets` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `user_id` BIGINT UNSIGNED NOT NULL,
     `balance` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
-    `card_last_four` VARCHAR(4) NULL ,
     `created_at` TIMESTAMP NULL,
     `updated_at` TIMESTAMP NULL,
     PRIMARY KEY (`id`),
@@ -125,7 +124,6 @@ CREATE TABLE `transactions` (
 CREATE TABLE `tickets` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `uuid` CHAR(36) NOT NULL,
-    `secure_token` VARCHAR(255) NULL,
     `user_id` BIGINT UNSIGNED NOT NULL,
     `ticket_type_id` BIGINT UNSIGNED NOT NULL,
     `purchase_id` BIGINT UNSIGNED NULL,
@@ -140,7 +138,6 @@ CREATE TABLE `tickets` (
     UNIQUE KEY `tickets_uuid_unique` (`uuid`),
     KEY `tickets_user_id_index` (`user_id`),
     KEY `tickets_uuid_index` (`uuid`),
-    KEY `tickets_secure_token_index` (`secure_token`),
     KEY `tickets_ticket_type_id_index` (`ticket_type_id`),
     KEY `tickets_status_index` (`status`),
     KEY `tickets_valid_until_index` (`valid_until`),
@@ -230,18 +227,6 @@ CREATE TABLE `processed_stripe_events` (
     KEY `processed_stripe_events_event_id_index` (`event_id`)
 ) ENGINE=InnoDB;
 
-CREATE TABLE `sessions` (
-    `id` VARCHAR(255) NOT NULL,
-    `user_id` BIGINT UNSIGNED NULL,
-    `ip_address` VARCHAR(45) NULL,
-    `user_agent` TEXT NULL,
-    `payload` LONGTEXT NOT NULL,
-    `last_activity` INT NOT NULL,
-    PRIMARY KEY (`id`),
-    KEY `sessions_user_id_index` (`user_id`),
-    KEY `sessions_last_activity_index` (`last_activity`)
-) ENGINE=InnoDB;
-
 CREATE TABLE `password_reset_tokens` (
     `email` VARCHAR(255) NOT NULL,
     `token` VARCHAR(255) NOT NULL,
@@ -326,7 +311,6 @@ CREATE TABLE IF NOT EXISTS `users` (
     `email` VARCHAR(255) NOT NULL,
     `password` VARCHAR(255) NOT NULL,
     `is_active` TINYINT(1) NOT NULL DEFAULT 1,
-    `remember_token` VARCHAR(100) NULL,
     `created_at` TIMESTAMP NULL,
     `updated_at` TIMESTAMP NULL,
     PRIMARY KEY (`id`),

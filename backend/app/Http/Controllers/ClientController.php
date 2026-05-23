@@ -111,7 +111,6 @@ class ClientController extends Controller
             return $this->successResponse([
                 'access_token' => $token,
                 'token_type' => 'Bearer',
-                'remember_me' => $client->remember_me ?? false,
             ], 'Login successful.');
         }
 

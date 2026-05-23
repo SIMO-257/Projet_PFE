@@ -71,12 +71,7 @@ export default function ForgotPassword() {
                     Notre équipe support est disponible 24h/7j pour vous assister.
                 </p>
                 <div className="flex justify-center space-x-6">
-                    <a href="#" className={styles.forgotPassword}>
-                        <strong>Appel</strong>
-                    </a>
-                    <a href="#" className={styles.forgotPassword}>
-                        <strong>Chat</strong>
-                    </a>
+                    <strong>05 55 55 55 55</strong>
                 </div>
             </div>
         </AuthLayout>
