@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import BottomNavigation from '../Components/Layout/BottomNavigation';
 import BalanceCard from '../Components/Cards/BalanceCard';
+import DefaultTicketCard from '../Components/Cards/DefaultTicketCard';
 import TicketHistoryCard from '../Components/Cards/TicketHistoryCard';
 import BalanceCardSkeleton from '../Components/Skeletons/BalanceCardSkeleton';
 import TicketHistorySkeleton from '../Components/Skeletons/TicketHistorySkeleton';
@@ -67,6 +68,17 @@ const HomeScreen = () => {
   const activeTicketCode = defaultCard?.uuid ? defaultCard.uuid.slice(0, 8).toUpperCase() : null;
   const activeTicketPrice = defaultCard?.price_paid ? Number(defaultCard.price_paid) : 0;
 
+  const defaultTicketProp = useMemo(() => {
+    if (!defaultCard) return null;
+    const activeTicketType = defaultCard?.ticket_type || defaultCard?.ticketType || null;
+    return {
+      name: activeTicketType?.name_fr || activeTicketType?.name || 'Ticket par défaut',
+      price: `${(defaultCard?.price_paid ? Number(defaultCard.price_paid) : 0).toFixed(2)} MAD`,
+      uuid: defaultCard.uuid || '',
+      isReusable: !!(activeTicketType?.is_reusable ?? activeTicketType?.isReusable ?? false),
+    };
+  }, [defaultCard]);
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#2a0b0f] to-[#1a0507] flex items-center justify-center">
@@ -127,35 +139,12 @@ const HomeScreen = () => {
                 {isDataLoading ? (
                   <BalanceCardSkeleton />
                 ) : (
-                <div
-                  role="button"
-                  tabIndex={(!defaultCard?.uuid || isNavigatingToValidation) ? -1 : 0}
-                  onClick={handleDefaultCardPress}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter' && !(!defaultCard?.uuid || isNavigatingToValidation)) {
-                      handleDefaultCardPress();
-                    }
-                  }}
-                  aria-disabled={!defaultCard?.uuid || isNavigatingToValidation}
-                  className={`w-full text-left relative ${!defaultCard?.uuid || isNavigatingToValidation ? 'cursor-not-allowed opacity-80' : 'cursor-pointer'}`}
-                >
-                  {isNavigatingToValidation && (
-                      <div className="absolute inset-0 bg-[#400106]/50 backdrop-blur-sm z-20 flex items-center justify-center rounded-2xl">
-                          <GoldenSpinner size={48} />
-                      </div>
-                  )}
-                  <BalanceCard
-                    title="Ticket par defaut"
-                    amount={`${activeTicketPrice.toFixed(2)} MAD`}
-                    cardType={activeTicketName}
-                    cardNumber={defaultCard ? `Code: ${activeTicketCode}` : 'Aucun ticket achete'}
-                    gradientFrom="#7A3B47"
-                    gradientTo="#5C2A36"
-                    circlesPosition="right"
+                  <DefaultTicketCard
+                    defaultTicket={defaultTicketProp}
+                    onClick={handleDefaultCardPress}
                     onAction={handleChangeCard}
-                    actionLabel="Changer de carte"
+                    isNavigatingToValidation={isNavigatingToValidation}
                   />
-                </div>
                 )}
 
               </div>

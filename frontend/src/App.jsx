@@ -43,7 +43,6 @@ const ConfirmationPaiment = lazy(() => import("./Pages/ConfirmationPaiment"));
 const PaimentHistory = lazy(() => import("./Pages/PaimentHistory"));
 
 const Notifications = lazy(() => import("./Pages/Notifications"));
-const OfflineMode = lazy(() => import("./Pages/OfflineMode"));
 const TermsAndConditions = lazy(() => import("./Pages/TermsAndConditions"));
 
 
@@ -170,7 +169,6 @@ function App() {
             <Route path="/payment-history" element={<PaimentHistory />} />
 
             <Route path="/notifications" element={<Notifications />} />
-            <Route path="/offline" element={<OfflineMode />} />
           </Route>
 
           {/* ADMIN ROUTES */}
