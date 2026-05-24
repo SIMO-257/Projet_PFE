@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
-import { createPaymentIntent } from "../services/walletService";
+import { createPaymentIntent, cancelPaymentIntent } from "../services/walletService";
 
 // Layout Components
 import Header from "../Components/Layout/Header";
@@ -23,14 +23,36 @@ export default function RechargePayment() {
   const [amount, setAmount] = useState("");
   const [error, setError] = useState("");
   const [clientSecret, setClientSecret] = useState("");
+  const [paymentIntentId, setPaymentIntentId] = useState("");
   const [isInitializing, setIsInitializing] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   const goBack = () => {
     if (step === 2) {
-      setStep(1);
-      setClientSecret("");
+      handleCancelPayment();
     } else {
       navigate(-1);
+    }
+  };
+
+  const handleCancelPayment = async () => {
+    if (!paymentIntentId) {
+      setStep(1);
+      setClientSecret("");
+      return;
+    }
+
+    setIsCancelling(true);
+    try {
+      await cancelPaymentIntent(paymentIntentId);
+    } catch (err) {
+      // Silently handle — the intent will expire on Stripe anyway
+      console.warn('Failed to cancel PaymentIntent:', err);
+    } finally {
+      setPaymentIntentId("");
+      setClientSecret("");
+      setStep(1);
+      setIsCancelling(false);
     }
   };
 
@@ -60,6 +82,7 @@ export default function RechargePayment() {
       const { clientSecret: secret } = response.data.data;
       
       setClientSecret(secret);
+      setPaymentIntentId(response.data.data.paymentIntentId);
       setStep(2);
     } catch (err) {
       setError(err.response?.data?.message || "Erreur lors de l'initialisation du paiement.");
@@ -188,7 +211,8 @@ export default function RechargePayment() {
                       amount={amount}
                       clientSecret={clientSecret}
                       onSuccess={onSuccess} 
-                      onCancel={() => setStep(1)} 
+                      onCancel={handleCancelPayment}
+                      isCancelling={isCancelling}
                     />
                   </div>
                 </Elements>

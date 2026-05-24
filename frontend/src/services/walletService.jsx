@@ -12,4 +12,6 @@ export const confirmRecharge = (payload) => clientApi.post('/wallet/recharge/con
 
 export const createPaymentIntent = (payload) => clientApi.post('/payments/create-intent', payload);
 
+export const cancelPaymentIntent = (paymentIntentId) => clientApi.post('/payments/cancel-intent', { payment_intent_id: paymentIntentId });
+
 export const saveBillingDetails = (payload) => clientApi.post('/payments/billing-details', payload);

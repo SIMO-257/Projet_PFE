@@ -4,14 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Client;
-use App\Models\Notification;
-use App\Services\NotificationService;
+use App\Jobs\SendAdminNotificationJob;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class AdminNotificationController extends Controller
 {
-    public function __construct(private NotificationService $notificationService) {}
-
     // POST /api/admin/notifications/send
     public function send(Request $request)
     {
@@ -24,7 +22,7 @@ class AdminNotificationController extends Controller
         ]);
 
         if ($validator->fails()) {
-            \Illuminate\Support\Facades\Log::warning('Notification Validation Failed', [
+            Log::warning('Notification Validation Failed', [
                 'errors' => $validator->errors()->toArray(),
                 'request' => $request->all()
             ]);
@@ -36,37 +34,37 @@ class AdminNotificationController extends Controller
         }
 
         if ($request->target === 'all') {
-            // Send to all clients in chunks to avoid memory issues
+            // Dispatch a queued job per client to avoid timeout with thousands of users
             Client::chunk(100, function ($clients) use ($request) {
                 foreach ($clients as $client) {
-                    $this->notificationService->send(
-                        $client,
+                    SendAdminNotificationJob::dispatch(
+                        $client->id,
                         $request->type,
-                        'info',
                         $request->title,
                         $request->body,
                     );
                 }
             });
+
             $count = Client::count();
             return response()->json([
                 'status' => 'success',
-                'message' => "Notification envoyée à {$count} clients.",
+                'message' => "Notification en cours d'envoi à {$count} clients (tâches en file d'attente).",
             ]);
         }
 
+        // Single client — dispatch job as well for consistency
         $client = Client::findOrFail($request->client_id);
-        $this->notificationService->send(
-            $client,
+        SendAdminNotificationJob::dispatch(
+            $client->id,
             $request->type,
-            'info',
             $request->title,
             $request->body,
         );
 
         return response()->json([
             'status' => 'success',
-            'message' => "Notification envoyée à {$client->email}.",
+            'message' => "Notification en cours d'envoi à {$client->email}.",
         ]);
     }
 }

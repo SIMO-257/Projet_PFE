@@ -78,3 +78,36 @@ remove the continue with google or apple buttons from the login and sign up page
 -- i want the green response like you see in the image text to be a little more bigger also it has to be in like a green container resembiling good response just like usual web pages.
 -- change these pages name [ChangeCardScreen,HelpSupportScreen,HomeScreen,ProfileScreen,RechargePaimentScreen,SecurityScreen,SettingsScreen,ValidationScreen,WalletScreen] by removing the screen word and keeping the page name as it (ex:homescreen->home) also check the name of the export function to be the same as the page file name (ex:home.jsx->export default function home).  
 -- check for major edits in other files for this change sand verify for mismatch errors.
+
+1. 🔴 Stripe Webhook Job
+Currently  StripeWebhookController::handle()  runs synchronously. Stripe expects a response within a few seconds. If processing fails mid-way (DB hiccup, network), the webhook is lost and Stripe will retry — but your code may end up double-processing. A queued job would make this bulletproof:
+- Accept webhook → return  200  immediately → queue job → process reliably
+- Retry on failure automatically (Laravel queue retries)
+2. 🔴 User Registration Event
+Signup currently happens inline in the controller. Adding a  UserRegisteredEvent  with listeners for:
+- Sending a welcome push notification
+- Creating the default wallet (if not done in controller)
+- Logging the registration to audit logs
+Medium priority (nice-to-have reliability):
+3. 🟡 Wallet Recharge Confirmed Event
+When  RechargePaymentScreen  confirms a recharge, there's no event. This would let you:
+- Notify the user "Your wallet has been recharged with X DH"
+- Send an email receipt
+- Update analytics
+4. 🟡 Scheduled Cleanup Job
+You have no periodic cleanup. A single scheduled job (daily) could clean:
+- Old audit logs (configurable retention)
+- Expired/used verification codes
+- Old notification records
+- Blacklisted tokens past expiry
+Lower priority (enhancements):
+5. 🟢 Ticket Expiry Reminder Notification
+When a ticket has 24h left, send the user a push: "Your pass expires tomorrow". This would need a scheduled command that checks daily.
+6. 🟢 Batch Admin Notification Job
+ AdminNotificationController::send  currently fires inline. If an admin sends a notification to thousands of users, that request will timeout. A queued job per user (or chunked job) would scale properly.
+────────────────────────────────────────────────────────────────────────────────
+Bottom line: Your current events/jobs system handles the immediate transaction flows. The biggest gaps are:
+1. Stripe webhook should be a job — most critical for production reliability
+2. A registration event — simple win for onboarding UX
+3. A cleanup cron — good hygiene for long-running systems
+Want me to implement any of these? I can start with the highest priority items.

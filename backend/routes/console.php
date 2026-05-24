@@ -22,3 +22,7 @@ Artisan::command('tickets:expire', function () {
 })->purpose('Mark active tickets as expired when valid_until is reached');
 
 Schedule::command('tickets:expire')->everyMinute();
+
+Schedule::command('cleanup:expired')->dailyAt('03:00');
+
+Schedule::command('tickets:remind-expiry')->dailyAt('08:00');

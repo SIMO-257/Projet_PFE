@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\UserRegisteredEvent;
 use App\Models\AuditLog;
 use App\Models\Client;
 use App\Notifications\VerifyEmailNotification;
@@ -52,6 +53,9 @@ class EmailVerificationController extends Controller
         ]);
 
         $pending->delete();
+
+        // Dispatch the registration event
+        UserRegisteredEvent::dispatch($newClient);
 
         return redirect(config('app.frontend_url') . '/verify-email?status=success');
     }
@@ -113,6 +117,9 @@ class EmailVerificationController extends Controller
         $pending->delete();
 
         AuditLog::log('signup_completed', $newClient->id);
+
+        // Dispatch the registration event
+        UserRegisteredEvent::dispatch($newClient);
 
         return $this->successResponse(null, 'Votre email a été vérifié et le compte est créé.');
     }

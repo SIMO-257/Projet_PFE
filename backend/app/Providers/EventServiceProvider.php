@@ -6,9 +6,13 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 use App\Events\TicketPurchasedEvent;
 use App\Events\TicketValidatedEvent;
 use App\Events\LowBalanceEvent;
+use App\Events\UserRegisteredEvent;
 use App\Listeners\ScheduleTicketExpiration;
 use App\Listeners\SendTicketValidatedNotification;
 use App\Listeners\SendLowBalanceNotification;
+use App\Listeners\SendWelcomeNotification;
+use App\Listeners\CreateDefaultWallet;
+use App\Listeners\LogRegistrationAudit;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -26,6 +30,11 @@ class EventServiceProvider extends ServiceProvider
         ],
         LowBalanceEvent::class => [
             SendLowBalanceNotification::class,
+        ],
+        UserRegisteredEvent::class => [
+            SendWelcomeNotification::class,
+            CreateDefaultWallet::class,
+            LogRegistrationAudit::class,
         ],
     ];
 
