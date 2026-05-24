@@ -4,7 +4,7 @@ import Header from '../Components/Layout/Header';
 import PurchasedCardItem from '../Components/Cards/PurchasedCardItem';
 import { fetchPurchasedCards, setDefaultPurchasedCard } from '../services/ticketService';
 
-const PurchasedCards = () => {
+export default function PurchasedCards  ()  {
   const navigate = useNavigate();
   const [cards, setCards] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -74,4 +74,4 @@ const PurchasedCards = () => {
   );
 };
 
-export default PurchasedCards;
+;

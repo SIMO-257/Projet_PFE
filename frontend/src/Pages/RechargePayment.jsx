@@ -17,7 +17,7 @@ import InputField from "../Components/Inputs/InputField";
 const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
 
-const RechargePaymentScreen = () => {
+export default function RechargePayment() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1); // 1: Amount Selection, 2: Card Details
   const [amount, setAmount] = useState("");
@@ -206,4 +206,4 @@ const RechargePaymentScreen = () => {
   );
 };
 
-export default RechargePaymentScreen;
+

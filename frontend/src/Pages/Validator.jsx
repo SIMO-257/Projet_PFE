@@ -4,7 +4,7 @@ import jsQR from 'jsqr';
 import Header from '../Components/Layout/Header';
 import { consumeQrValidationToken, validateTicket } from '../services/ticketService';
 
-const ValidatorScreen = () => {
+export default function ValidatorScreen ()  {
   const navigate = useNavigate();
   const videoRef = useRef(null);
   const streamRef = useRef(null);
@@ -330,4 +330,4 @@ const ValidatorScreen = () => {
   );
 };
 
-export default ValidatorScreen;
+

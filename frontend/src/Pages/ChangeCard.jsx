@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../Components/Layout/Header';
 import styles from '../Styles/ChangeCard.module.css';
 
-const ChangeCardScreen = () => {
+export default function ChangeCard () {
   const navigate = useNavigate();
 
   // Mock card data with various statuses
@@ -375,4 +375,4 @@ const ChangeCardScreen = () => {
   );
 };
 
-export default ChangeCardScreen;
+

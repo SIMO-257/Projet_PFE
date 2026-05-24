@@ -16,7 +16,7 @@ import { resetState as resetTickets } from "../Redux/Slices/TicketsSlice";
 import { resetState as resetNotifications } from "../Redux/Slices/notificationSlice";
 import { useTranslation } from "../hooks/useTranslation";
 
-const SettingsScreen = () => {
+const Settings = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { theme, language } = useSelector((state) => state.settings);
@@ -733,4 +733,4 @@ const Icon = ({ name }) => {
   );
 };
 
-export default SettingsScreen;
+export default Settings;

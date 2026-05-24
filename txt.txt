@@ -74,3 +74,7 @@ remove the continue with google or apple buttons from the login and sign up page
 -- each status for each card will have a specific color green for active red for expired and yellow for used.
 -- what is your plan.
 
+
+-- i want the green response like you see in the image text to be a little more bigger also it has to be in like a green container resembiling good response just like usual web pages.
+-- change these pages name [ChangeCardScreen,HelpSupportScreen,HomeScreen,ProfileScreen,RechargePaimentScreen,SecurityScreen,SettingsScreen,ValidationScreen,WalletScreen] by removing the screen word and keeping the page name as it (ex:homescreen->home) also check the name of the export function to be the same as the page file name (ex:home.jsx->export default function home).  
+-- check for major edits in other files for this change sand verify for mismatch errors.

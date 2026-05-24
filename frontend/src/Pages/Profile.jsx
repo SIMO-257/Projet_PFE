@@ -9,7 +9,7 @@ import { useAuth } from '../hooks/useAuth';
 import { fetchClientProfile } from '../services/clientService';
 import { useTranslation } from '../hooks/useTranslation';
 
-const ProfileScreen = () => {
+export default function Profile()  {
   const [profile, setProfile] = useState(null);
   const navigateHook = useNavigate();
   const { logout } = useAuth();
@@ -178,4 +178,4 @@ const ProfileScreen = () => {
   );
 };
 
-export default ProfileScreen;
+

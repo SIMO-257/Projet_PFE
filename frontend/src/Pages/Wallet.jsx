@@ -13,7 +13,7 @@ import { useDispatch } from 'react-redux';
 import { setGlobalLoading } from '../Redux/Slices/uiSlice';
 import { useWallet } from '../hooks/useWallet';
 
-const WalletScreen = () => {
+export default function Wallet() {
   const { balance, transactions, isLoading, refreshWallet } = useWallet();
   const navigateHook = useNavigate();
   const dispatch = useDispatch();
@@ -133,4 +133,4 @@ const WalletScreen = () => {
   );
 };
 
-export default WalletScreen;
+;

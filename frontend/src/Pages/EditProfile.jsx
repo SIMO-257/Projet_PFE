@@ -10,7 +10,7 @@ import {
   updateClientProfile,
 } from '../services/clientService';
 
-const EditProfileScreen = () => {
+export default function EditProfileScreen  ()  {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -328,4 +328,3 @@ const EditProfileScreen = () => {
   );
 };
 
-export default EditProfileScreen;

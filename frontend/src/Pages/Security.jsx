@@ -4,7 +4,7 @@ import Header from '../Components/Layout/Header';
 import styles from '../Styles/Security.module.css';
 import { getClientPreferences, updateClientPreferences } from '../services/notificationService';
 
-const SecurityScreen = () => {
+const Security = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
@@ -313,4 +313,4 @@ const Icon = ({ name }) => {
   return icons[name] || null;
 };
 
-export default SecurityScreen;
+export default Security;

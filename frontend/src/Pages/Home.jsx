@@ -15,7 +15,7 @@ import { useTickets } from '../hooks/useTickets';
 import { fetchPurchasedCards } from '../services/ticketService';
 import { fetchUnreadCount } from '../Redux/Slices/notificationSlice';
 
-const HomeScreen = () => {
+export default function Home() {
   const dispatch = useDispatch();
   const { user } = useAuth();
   const { refreshWallet } = useWallet();
@@ -189,4 +189,4 @@ const HomeScreen = () => {
   );
 };
 
-export default HomeScreen;
+

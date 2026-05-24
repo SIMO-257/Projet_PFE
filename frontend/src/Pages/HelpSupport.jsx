@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../Components/Layout/Header';
 import styles from '../Styles/HelpSupport.module.css';
 
-const HelpSupportScreen = () => {
+const HelpSupport = () => {
   const navigate = useNavigate();
   // State for FAQ expand/collapse
   const [openFaq, setOpenFaq] = useState(null);
@@ -247,4 +247,4 @@ const Icon = ({ name }) => {
   return icons[name] || null;
 };
 
-export default HelpSupportScreen;
+export default HelpSupport;

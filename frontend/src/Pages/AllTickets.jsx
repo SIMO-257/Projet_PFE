@@ -4,7 +4,7 @@ import { useTickets } from '../hooks/useTickets';
 import Header from '../Components/Layout/Header';
 import TicketHistoryCard from '../Components/Cards/TicketHistoryCard';
 
-const AllTickets = () => {
+export default function AllTickets ()  {
   const navigateHook = useNavigate();
   const { tickets, isLoading, refreshTickets } = useTickets();
   const [statusFilter, setStatusFilter] = useState('all');
@@ -168,4 +168,4 @@ const AllTickets = () => {
   );
 };
 
-export default AllTickets;
+;

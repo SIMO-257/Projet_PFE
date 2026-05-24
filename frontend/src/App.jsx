@@ -10,7 +10,7 @@ import { shouldRestoreAuthSession } from "./services/clientService";
 import GlobalPageLoader from "./Components/UI/GlobalPageLoader";
 import LoadingOverlay from "./Components/UI/LoadingOverlay";
 import { setRouteLoading } from "./Redux/Slices/uiSlice";
-import RechargePaymentScreen from "./Pages/RechargePaymentScreen";
+import RechargePayment from "./Pages/RechargePayment";
 
 // Lazy pages
 
@@ -20,19 +20,19 @@ const VerifyEmail = lazy(() => import("./Pages/auth/VerifyEmail"));
 const ForgotPassword = lazy(() => import("./Pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./Pages/ResetPassword"));
 
-const HomeScreen = lazy(() => import("./Pages/HomeScreen"));
-const WalletScreen = lazy(() => import("./Pages/WalletScreen"));
-const ProfileScreen = lazy(() => import("./Pages/ProfileScreen"));
+const Home = lazy(() => import("./Pages/Home"));
+const Wallet = lazy(() => import("./Pages/Wallet"));
+const Profile = lazy(() => import("./Pages/Profile"));
 const EditProfileScreen = lazy(() => import("./Pages/EditProfile"));
-const SettingsScreen = lazy(() => import("./Pages/SettingsScreen"));
-const HelpSupportScreen = lazy(() => import("./Pages/HelpSupportScreen"));
-const SecurityScreen = lazy(() => import("./Pages/SecurityScreen"));
+const Settings = lazy(() => import("./Pages/Settings"));
+const HelpSupport = lazy(() => import("./Pages/HelpSupport"));
+const Security = lazy(() => import("./Pages/Security"));
 
 const MyTickets = lazy(() => import("./Pages/MyTickets"));
 const AllTickets = lazy(() => import("./Pages/AllTickets"));
 const TicketSelection = lazy(() => import("./Pages/TicketSelection"));
 const ViewTicket = lazy(() => import("./Pages/ViewTicket"));
-const ValidationScreen = lazy(() => import("./Pages/ValidationScreen"));
+const Validation = lazy(() => import("./Pages/Validation"));
 const ValidationSuccess = lazy(() => import("./Pages/ValidationSuccess"));
 const ValidatorScreen = lazy(() => import("./Pages/Validator"));
 
@@ -147,23 +147,23 @@ function App() {
 
           {/* PROTECTED ROUTES */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/home" element={<HomeScreen />} />
-            <Route path="/wallet" element={<WalletScreen />} />
-            <Route path="/profile" element={<ProfileScreen />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/wallet" element={<Wallet />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/edit-profile" element={<EditProfileScreen />} />
-            <Route path="/settings" element={<SettingsScreen />} />
-            <Route path="/help-support" element={<HelpSupportScreen />} />
-            <Route path="/security" element={<SecurityScreen />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/help-support" element={<HelpSupport />} />
+            <Route path="/security" element={<Security />} />
 
             <Route path="/mytickets" element={<MyTickets />} />
             <Route path="/all-tickets" element={<AllTickets />} />
             <Route path="/ticket-selection" element={<TicketSelection />} />
             <Route path="/viewticket/:id" element={<ViewTicket />} />
-            <Route path="/validation" element={<ValidationScreen />} />
+            <Route path="/validation" element={<Validation />} />
             <Route path="/validation-success" element={<ValidationSuccess />} />
             <Route path="/validator" element={<ValidatorScreen />} />
 
-            <Route path="/recharge-payment" element={<RechargePaymentScreen />} />
+            <Route path="/recharge-payment" element={<RechargePayment />} />
             <Route path="/change-card" element={<PurchasedCards />} />
             <Route path="/payment-confirmation" element={<ConfirmationPaiment />} />
             <Route path="/payment-history" element={<PaimentHistory />} />

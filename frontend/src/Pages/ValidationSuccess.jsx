@@ -2,7 +2,7 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styles from '../Styles/ConfirmationPaiment.module.css';
 
-const ValidationSuccess = () => {
+export default function ValidationSuccess () {
     const location = useLocation();
     const navigate = useNavigate();
     const { ticket } = location.state || {};
@@ -102,4 +102,4 @@ const ValidationSuccess = () => {
     );
 };
 
-export default ValidationSuccess;
+;

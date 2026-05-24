@@ -22,7 +22,7 @@ import TimerDisplay from '../Components/UI/TimerDisplay';
 import GoldenSpinner from '../Components/UI/GoldenSpinner';
 import styles from '../Styles/ValidationScreen.module.css';
 
-export default function ValidationScreen() {
+export default function Validation() {
   const { tickets, refreshTickets } = useTickets();
   const navigateHook = useNavigate();
   const location = useLocation();

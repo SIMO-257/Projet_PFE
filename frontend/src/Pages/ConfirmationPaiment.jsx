@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import ProgressSteps from '../Components/NavBar/ProgressSteps';
 import styles from '../Styles/ConfirmationPaiment.module.css';
 
-const Confirmation = () => {
+export default function Confirmation () {
     const location = useLocation();
     const navigate = useNavigate();
     const { tickets, message } = location.state || {};
@@ -202,4 +202,4 @@ const Confirmation = () => {
     );
 };
 
-export default Confirmation;
+
