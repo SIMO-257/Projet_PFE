@@ -36,8 +36,8 @@ CREATE TABLE `clients` (
 CREATE TABLE `ticket_types` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `code` VARCHAR(50) NOT NULL,
-    `name_fr` VARCHAR(100) NOT NULL,
-    `description` TEXT NOT NULL,
+    `name` JSON NOT NULL,
+    `description` JSON NULL,
     `price` DECIMAL(10,2) NOT NULL,
     `duration_minutes` INT NULL,
     `is_reusable` TINYINT(1) NOT NULL DEFAULT 0,
@@ -51,11 +51,11 @@ CREATE TABLE `ticket_types` (
     KEY `ticket_types_is_active_index` (`is_active`)
 ) ENGINE=InnoDB;
 
-INSERT INTO `ticket_types` (`id`, `code`, `name_fr`, `description`, `price`, `duration_minutes`, `is_reusable`, `max_uses`, `is_active`) VALUES
-(1, 'BILLET_SIMPLE', 'Billet Normal', 'Valable pour un trajet avec 2 correspondances.', 8.00, 10080, 0, 1, 1),
-(2, 'BILLET_DOUBLE', 'Carte Aller/Retour (A/R)', 'Valable pour un trajet aller-retour.', 14.00, 10080, 0, 2, 1),
-(4, 'BILLET_SEMAINE', 'Billet de Semaine', 'Voyages illimités pendant 7 jours.', 70.00, 10080, 1, 999, 1),
-(5, 'BILLET_MOIS', 'Billet de Mois', 'Voyages illimités pendant 30 jours.', 250.00, 43200, 1, 999, 1);
+INSERT INTO `ticket_types` (`id`, `code`, `name`, `description`, `price`, `duration_minutes`, `is_reusable`, `max_uses`, `is_active`) VALUES
+(1, 'BILLET_SIMPLE', '{"fr":"Billet Normal","en":"Standard Ticket","ar":"تذكرة عادية"}', '{"fr":"Valable pour un trajet avec 2 correspondances.","en":"Valid for one trip with 2 connections.","ar":"صالحة لرحلة واحدة مع وصلتين"}', 8.00, 10080, 0, 1, 1),
+(2, 'BILLET_DOUBLE', '{"fr":"Carte Aller/Retour (A/R)","en":"Round Trip Card","ar":"بطاقة ذهاب وإياب"}', '{"fr":"Valable pour un trajet aller-retour.","en":"Valid for a round trip.","ar":"صالحة لرحلة ذهاب وإياب"}', 14.00, 10080, 0, 2, 1),
+(4, 'BILLET_SEMAINE', '{"fr":"Billet de Semaine","en":"Weekly Ticket","ar":"تذكرة أسبوعية"}', '{"fr":"Voyages illimités pendant 7 jours.","en":"Unlimited travel for 7 days.","ar":"سفر غير محدود لمدة 7 أيام"}', 70.00, 10080, 1, 999, 1),
+(5, 'BILLET_MOIS', '{"fr":"Billet de Mois","en":"Monthly Ticket","ar":"تذكرة شهرية"}', '{"fr":"Voyages illimités pendant 30 jours.","en":"Unlimited travel for 30 days.","ar":"سفر غير محدود لمدة 30 يوماً"}', 250.00, 43200, 1, 999, 1);
 
 
 CREATE TABLE `pending_registrations` (

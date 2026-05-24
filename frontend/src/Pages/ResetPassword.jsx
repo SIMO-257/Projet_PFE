@@ -1,12 +1,14 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useState } from 'react';
 import { resetPasswordClient } from '../services/clientService';
+import { useTranslation } from '../hooks/useTranslation';
 import InputField from '../Components/Inputs/InputField';
 import ConnexionButton from '../Components/Buttons/ConnexionButton';
 import AuthLayout from '../Components/Layout/AuthLayout';
 import styles from '../Styles/Auth.module.css';
 
 export default function ResetPassword() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -61,46 +63,48 @@ export default function ResetPassword() {
     setStatus('');
 
     if (!form.token || !form.email) {
-      setErrors({ form: 'Reset link is invalid. Please request a new link.' });
+      setErrors({ form: t('invalid_reset_link') });
       return;
     }
 
     if (passwordStrength === 'weak' || passwordStrength === null) {
-      setErrors(prev => ({ ...prev, password: 'Le mot de passe est trop faible.' }));
+      setErrors(prev => ({ ...prev, password: t('password_weak') }));
       return;
     }
 
     try {
       setProcessing(true);
       const res = await resetPasswordClient(form);
-      setStatus(res?.data?.message ?? 'Password reset successful.');
+      setStatus(res?.data?.message ?? t('password_reset_success'));
       setTimeout(() => navigate('/login'), 1200);
     } catch (err) {
       const responseErrors = err?.response?.data?.errors;
       if (responseErrors) {
         setErrors(responseErrors);
       } else {
-        setErrors({ form: 'Failed to reset password. Please try again.' });
+        setErrors({ form: t('failed_reset') });
       }
     } finally {
       setProcessing(false);
     }
   };
 
+  const strengthLabelClass = passwordStrength === 'weak' ? 'text-red-500' : (passwordStrength === 'medium' ? 'text-yellow-600' : 'text-green-600');
+
   return (
     <AuthLayout
-        subtitle="Reset Password"
-        description="Choose a new password for your account."
-        footerText="Back to"
-        footerLinkText="Login"
+        subtitle={t('reset_password_title')}
+        description={t('reset_password_desc')}
+        footerText={t('back_to_login')}
+        footerLinkText={t('sign_in_link')}
         footerLinkTo="/login"
         showSocial={false}
         onSubmit={onResetSubmit}
     >
       <InputField
-        label="Email"
+        label={t('email')}
         type="email"
-        placeholder="your@email.com"
+        placeholder={t('email_placeholder')}
         id="reset-email"
         var={form.email}
         setVar={setField('email')}
@@ -111,9 +115,9 @@ export default function ResetPassword() {
       />
 
       <InputField
-        label="New Password"
+        label={t('new_password_label')}
         type="password"
-        placeholder="At least 8 characters"
+        placeholder={t('new_password_placeholder')}
         id="reset-password"
         var={form.password}
         setVar={setField('password')}
@@ -130,8 +134,8 @@ export default function ResetPassword() {
                   <div className={`h-1 flex-1 rounded-full transition-colors ${passwordStrength === 'medium' || passwordStrength === 'strong' ? (passwordStrength === 'medium' ? 'bg-yellow-500' : 'bg-green-500') : 'bg-gray-200'}`} />
                   <div className={`h-1 flex-1 rounded-full transition-colors ${passwordStrength === 'strong' ? 'bg-green-500' : 'bg-gray-200'}`} />
               </div>
-              <p className={`text-[10px] font-medium uppercase tracking-wider ${passwordStrength === 'weak' ? 'text-red-500' : (passwordStrength === 'medium' ? 'text-yellow-600' : 'text-green-600')}`}>
-                  Force: {passwordStrength === 'weak' ? 'Faible' : (passwordStrength === 'medium' ? 'Moyenne' : 'Forte')}
+              <p className={`text-[10px] font-medium uppercase tracking-wider ${strengthLabelClass}`}>
+                  {t('password_strength')}: {passwordStrength === 'weak' ? t('weak') : (passwordStrength === 'medium' ? t('medium') : t('strong'))}
               </p>
           </div>
       )}
@@ -139,32 +143,32 @@ export default function ResetPassword() {
       {/* Password Rules */}
       {form.password && (
           <div className="mb-6 p-3 bg-gray-50 rounded-xl border border-gray-100">
-              <p className="text-[10px] text-gray-400 uppercase tracking-widest mb-2 font-bold">Exigences:</p>
+              <p className="text-[10px] text-gray-400 uppercase tracking-widest mb-2 font-bold">{t('password_requirements')}</p>
               <ul className="space-y-1">
                   <li className={`flex items-center gap-2 text-[11px] ${form.password.length >= 8 ? 'text-green-600' : 'text-gray-400'}`}>
                       <div className={`w-1 h-1 rounded-full ${form.password.length >= 8 ? 'bg-green-600' : 'bg-gray-300'}`} />
-                      Au moins 8 caractères
+                      {t('min_chars')}
                   </li>
                   <li className={`flex items-center gap-2 text-[11px] ${/[A-Z]/.test(form.password) && /[a-z]/.test(form.password) ? 'text-green-600' : 'text-gray-400'}`}>
                       <div className={`w-1 h-1 rounded-full ${/[A-Z]/.test(form.password) && /[a-z]/.test(form.password) ? 'bg-green-600' : 'bg-gray-300'}`} />
-                      Majuscules & minuscules
+                      {t('upper_lower_case')}
                   </li>
                   <li className={`flex items-center gap-2 text-[11px] ${/[0-9]/.test(form.password) ? 'text-green-600' : 'text-gray-400'}`}>
                       <div className={`w-1 h-1 rounded-full ${/[0-9]/.test(form.password) ? 'bg-green-600' : 'bg-gray-300'}`} />
-                      Au moins un chiffre
+                      {t('at_least_one_number')}
                   </li>
                   <li className={`flex items-center gap-2 text-[11px] ${/[^A-Za-z0-9]/.test(form.password) ? 'text-green-600' : 'text-gray-400'}`}>
                       <div className={`w-1 h-1 rounded-full ${/[^A-Za-z0-9]/.test(form.password) ? 'bg-green-600' : 'bg-gray-300'}`} />
-                      Un caractère spécial
+                      {t('special_char')}
                   </li>
               </ul>
           </div>
       )}
 
       <InputField
-        label="Confirm Password"
+        label={t('confirm_new_password')}
         type="password"
-        placeholder="Repeat your password"
+        placeholder={t('confirm_password_placeholder')}
         id="reset-password-confirmation"
         var={form.password_confirmation}
         setVar={setField('password_confirmation')}
@@ -177,7 +181,7 @@ export default function ResetPassword() {
       {status && <p className={styles.authDescription}>{status}</p>}
 
       <ConnexionButton type="submit" variant="primary" disabled={processing}>
-        {processing ? 'Resetting...' : 'Reset Password'}
+        {processing ? t('resetting') : t('reset_btn')}
       </ConnexionButton>
     </AuthLayout>
   );

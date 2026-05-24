@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from '../hooks/useTranslation';
 import { useTickets } from '../hooks/useTickets';
 import {
   createNfcChallenge,
@@ -23,6 +24,7 @@ import GoldenSpinner from '../Components/UI/GoldenSpinner';
 import styles from '../Styles/ValidationScreen.module.css';
 
 export default function Validation() {
+  const { t } = useTranslation();
   const { tickets, refreshTickets } = useTickets();
   const navigateHook = useNavigate();
   const location = useLocation();
@@ -86,8 +88,8 @@ export default function Validation() {
             setQrPayload('');
             setNotification({
               type: 'error',
-              title: 'QR Code expire',
-              message: 'Generez un nouveau code pour continuer',
+              title: t('qr_expired'),
+              message: t('generate_new_qr'),
             });
             return 300;
           }
@@ -171,11 +173,11 @@ export default function Validation() {
       const expiresIn = Number(tokenData?.expires_in || 300);
 
       if (!validationToken) {
-        setNotification({
-          type: 'error',
-          title: 'Erreur',
-          message: 'Token QR introuvable.',
-        });
+      setNotification({
+        type: 'error',
+        title: t('error'),
+        message: t('qr_unsupported'),
+      });
         return;
       }
 
@@ -186,7 +188,7 @@ export default function Validation() {
       setNotification({
         type: 'error',
         title: 'Erreur',
-        message: err?.response?.data?.message || 'Impossible de generer le token QR.',
+        message: err?.response?.data?.message || t('qr_unsupported'),
       });
     } finally {
       setIsGeneratingQR(false);
@@ -217,7 +219,7 @@ export default function Validation() {
       setNotification({
         type: 'error',
         title: 'Erreur',
-        message: err?.response?.data?.message || 'Impossible de generer le token NFC.',
+        message: err?.response?.data?.message || t('nfc_unsupported'),
       });
     } finally {
       setIsGeneratingNFC(false);
@@ -230,8 +232,8 @@ export default function Validation() {
     if (!nfcToken || nfcSecondsRemaining <= 0) {
       setNotification({
         type: 'error',
-        title: 'Token expire',
-        message: 'Le token NFC a expire. Relancez la validation NFC.',
+        title: t('qr_expired'),
+        message: t('token_expired_error'),
       });
       return;
     }
@@ -240,14 +242,14 @@ export default function Validation() {
     if (!ticketUuid) {
       setNotification({
         type: 'error',
-        title: 'UUID manquant',
-        message: 'Collez le UUID du ticket avant de valider.',
+        title: t('error'),
+        message: t('uuid_missing_error'),
       });
       return;
     }
 
     setIsNfcSubmitting(true);
-    setNfcStatusMessage('Validation en cours...');
+    setNfcStatusMessage(t('validating'));
 
     try {
       const result = await consumeNfcChallenge({
@@ -257,8 +259,8 @@ export default function Validation() {
 
       setNotification({
         type: 'success',
-        title: 'Validation NFC reussie',
-        message: result?.message || 'Le ticket actif a ete valide.',
+        title: t('nfc_success'),
+        message: result?.message || t('validating'),
       });
 
       setTimeout(() => {
@@ -268,8 +270,8 @@ export default function Validation() {
     } catch (err) {
       setNotification({
         type: 'error',
-        title: 'Echec NFC',
-        message: err?.response?.data?.message || 'Validation NFC echouee.',
+        title: t('nfc_failed'),
+        message: err?.response?.data?.message || t('nfc_failed'),
       });
     } finally {
       setIsNfcSubmitting(false);
@@ -277,9 +279,9 @@ export default function Validation() {
   };
 
   const infoItems = [
-    'Validez votre titre avant de monter a bord',
-    'NFC: token actif pendant 60 secondes',
-    'Le QR Code est valable 30 secondes',
+    t('info_validate_before_boarding'),
+    t('info_nfc_token_60s'),
+    t('info_qr_30s'),
   ];
 
   return (
@@ -298,7 +300,7 @@ export default function Validation() {
       <div className="app-shell">
         <div className="app-frame">
           <ValidationCard className="app-card">
-            <Header title="Validation" onBack={goBack} showBackButton={true} className="p-6 pb-4" />
+            <Header title={t('validation')} onBack={goBack} showBackButton={true} className="p-6 pb-4" />
 
             <div className="app-content no-scrollbar">
               <div className="flex justify-center py-8">
@@ -306,8 +308,8 @@ export default function Validation() {
               </div>
 
               <div className="text-center px-6 pb-6">
-                <h2 className="text-2xl font-bold text-white mb-2">Valider votre titre</h2>
-                <p className="text-white/60 text-sm">Choisissez votre methode de validation</p>
+                <h2 className="text-2xl font-bold text-white mb-2">{t('validate_your_ticket')}</h2>
+                <p className="text-white/60 text-sm">{t('choose_validation_method')}</p>
               </div>
 
               <div className="px-6 pb-6 space-y-4">
@@ -329,8 +331,8 @@ export default function Validation() {
                         />
                       </svg>
                     }
-                    label="Valider avec NFC"
-                    description={selectedTicketUuid ? 'Carte par defaut preselectionnee' : 'Generer un token NFC (60s)'}
+                    label={t('validate_with_nfc')}
+                    description={selectedTicketUuid ? t('default_card_selected') : t('generate_nfc_token')}
                     onClick={startNfcChallenge}
                     showArrow={true}
                   />
@@ -354,8 +356,8 @@ export default function Validation() {
                         />
                       </svg>
                     }
-                    label="Valider avec QR Code"
-                    description="Scannez le code"
+                    label={t('validate_with_qr')}
+                    description={t('scan_qr_code')}
                     onClick={validateQR}
                     showArrow={true}
                   />
@@ -363,7 +365,7 @@ export default function Validation() {
               </div>
 
               <div className="px-6 pb-8">
-                <InfoCard title="Informations importantes" items={infoItems} maxHeight={128} />
+                <InfoCard title={t('important_info')} items={infoItems} maxHeight={128} />
               </div>
             </div>
 
@@ -384,8 +386,8 @@ export default function Validation() {
               <NFCAnimation isActive={true} size={128} showWaves={true} pulseSpeed="normal" />
             </div>
 
-            <h3 className="text-2xl font-bold text-white mb-2">Token NFC</h3>
-            <p className="text-white/70 mb-2 text-xs">Expira dans {nfcSecondsRemaining}s</p>
+            <h3 className="text-2xl font-bold text-white mb-2">{t('nfc_token_title')}</h3>
+            <p className="text-white/70 mb-2 text-xs">{t('expires_in_seconds', { seconds: nfcSecondsRemaining })}</p>
             <p className="text-yellow-400 text-lg font-bold tracking-wider mb-4">{nfcToken || '---'}</p>
             <p className="text-white/60 mb-4 text-sm">{nfcStatusMessage}</p>
 
@@ -393,12 +395,12 @@ export default function Validation() {
               type="text"
               value={nfcTicketUuidInput}
               onChange={(e) => setNfcTicketUuidInput(e.target.value)}
-              placeholder="Coller UUID du ticket"
+              placeholder={t('paste_ticket_uuid')}
               className="w-full rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-white text-sm mb-4"
             />
 
             {isNfcSubmitting ? (
-              <ProcessingIndicator message="Validation..." dotCount={3} dotSize="sm" showMessage={true} />
+              <ProcessingIndicator message={t('validating')} dotCount={3} dotSize="sm" showMessage={true} />
             ) : (
               <button
                 type="button"
@@ -406,7 +408,7 @@ export default function Validation() {
                 disabled={nfcSecondsRemaining <= 0}
                 className="w-full rounded-lg bg-yellow-500/20 border border-yellow-500/30 text-yellow-300 py-2 text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                Valider le ticket actif
+                {t('validate_active_ticket')}
               </button>
             )}
 
@@ -418,7 +420,7 @@ export default function Validation() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 }
-                label="Annuler"
+                label={t('cancel')}
                 onClick={closeNFCModal}
                 showArrow={false}
                 className="w-full"
@@ -451,8 +453,8 @@ export default function Validation() {
               </div>
             </div>
 
-            <h3 className="text-xl font-bold text-white mb-2">Presentez ce QR Code</h3>
-            <p className="text-white/60 mb-4">au controleur pour valider votre titre</p>
+            <h3 className="text-xl font-bold text-white mb-2">{t('scan_qr_code')}</h3>
+            <p className="text-white/60 mb-4">{t('choose_validation_method')}</p>
             {activeTicket?.uuid && (
               <p className="text-white/50 text-xs mb-4">Ticket: {activeTicket.uuid.slice(0, 8).toUpperCase()}</p>
             )}
@@ -468,7 +470,7 @@ export default function Validation() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               }
-              label="Fermer"
+              label={t('close')}
               onClick={() => {
                 setShowQRModal(false);
                 setQRTimeRemaining(300);

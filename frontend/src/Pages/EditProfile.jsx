@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '../Components/Layout/Header';
 import styles from '../Styles/EditProfile.module.css';
+import { useTranslation } from '../hooks/useTranslation';
 import {
   clearAuthData,
   fetchClientProfile,
@@ -13,6 +14,7 @@ import {
 export default function EditProfileScreen  ()  {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
 
   const initialProfile = location.state?.profile ?? null;
   const [fullName, setFullName] = useState(initialProfile?.name ?? '');
@@ -74,20 +76,20 @@ export default function EditProfileScreen  ()  {
   const handleChangePassword = async () => {
     setResetStatus('');
     if (!email) {
-      setErrors((prev) => ({ ...prev, form: ['Email is missing for password reset.'] }));
+      setErrors((prev) => ({ ...prev, form: [t('edit_reset_email_missing')] }));
       return;
     }
 
     try {
       setSendingReset(true);
       const res = await forgotPasswordClient({ email });
-      setResetStatus(res?.data?.message ?? 'Reset link sent successfully.');
+      setResetStatus(res?.data?.message ?? t('reset_link_sent_success'));
     } catch (err) {
       const responseErrors = err?.response?.data?.errors;
       if (responseErrors) {
         setErrors((prev) => ({ ...prev, ...responseErrors }));
       } else {
-        setErrors((prev) => ({ ...prev, form: ['Failed to send reset link.'] }));
+        setErrors((prev) => ({ ...prev, form: [t('edit_failed_send_reset')] }));
       }
     } finally {
       setSendingReset(false);
@@ -115,7 +117,7 @@ export default function EditProfileScreen  ()  {
         if (responseErrors) {
           setErrors(responseErrors);
         } else {
-          setErrors({ form: ['Erreur lors de la mise à jour du profil.'] });
+          setErrors({ form: [t('profile_update_error')] });
         }
       })
       .finally(() => setProcessing(false));
@@ -133,7 +135,7 @@ export default function EditProfileScreen  ()  {
         <div className={`${styles.editProfileCard} app-card`}>
           
           <Header 
-            title="Modifier le profil" 
+            title={t('edit_profile_title')} 
             showBackButton={true} 
             onBack={goBack}
           />
@@ -176,17 +178,16 @@ export default function EditProfileScreen  ()  {
 
             {/* Section Title */}
             <h2 className="text-white/60 text-xs uppercase tracking-wide mb-4">
-              Informations personnelles
+              {t('personal_info')}
             </h2>
 
             {/* Form Fields */}
             <div className="space-y-4">
               
               {/* Full Name Field */}
-              <div>
-                <label className="text-white/50 text-xs uppercase tracking-wide mb-2 block">
-                  Nom complet
-                </label>
+              <div>                  <label className="text-white/50 text-xs uppercase tracking-wide mb-2 block">
+                    {t('full_name')}
+                  </label>
                 <div className="relative bg-black/40 rounded-xl border border-white/10 focus-within:border-yellow-500/30 transition-all">
                   <div className="flex items-center px-4 py-3">
                     <div className="w-5 h-5 flex items-center justify-center mr-3">
@@ -199,7 +200,7 @@ export default function EditProfileScreen  ()  {
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       className="flex-1 bg-transparent text-white text-sm outline-none placeholder-white/40"
-                      placeholder="Entrez votre nom complet"
+                      placeholder={t('full_name_placeholder')}
                     />
                     {fullName && (
                       <button
@@ -220,10 +221,9 @@ export default function EditProfileScreen  ()  {
               </div>
 
               {/* Email Field */}
-              <div>
-                <label className="text-white/50 text-xs uppercase tracking-wide mb-2 block">
-                  Email
-                </label>
+              <div>                  <label className="text-white/50 text-xs uppercase tracking-wide mb-2 block">
+                    {t('email')}
+                  </label>
                 <div className="relative bg-black/40 rounded-xl border border-white/10">
                   <div className="flex items-center px-4 py-3">
                     <div className="w-5 h-5 flex items-center justify-center mr-3">
@@ -237,7 +237,7 @@ export default function EditProfileScreen  ()  {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="flex-1 bg-transparent text-white text-sm outline-none placeholder-white/40"
-                      placeholder="votre @email.com"
+                      placeholder={t('email_edit_placeholder')}
                       disabled
                     />
                     {email && email.includes('@') && email.includes('.') && (
@@ -253,10 +253,9 @@ export default function EditProfileScreen  ()  {
               </div>
 
               {/* Phone Field */}
-              <div>
-                <label className="text-white/50 text-xs uppercase tracking-wide mb-2 block">
-                  Téléphone
-                </label>
+              <div>                  <label className="text-white/50 text-xs uppercase tracking-wide mb-2 block">
+                    {t('phone')}
+                  </label>
                 <div className="relative bg-black/40 rounded-xl border border-white/10">
                   <div className="flex items-center px-4 py-3">
                     <div className="w-5 h-5 flex items-center justify-center mr-3">
@@ -278,7 +277,7 @@ export default function EditProfileScreen  ()  {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       className="flex-1 bg-transparent text-white text-sm outline-none placeholder-white/40"
-                      placeholder="(07/06) XX XX XX XX"
+                      placeholder={t('phone_placeholder')}
                     />
                   </div>
                 </div>
@@ -299,7 +298,7 @@ export default function EditProfileScreen  ()  {
                       </svg>
                     </div>
                     <span className="text-white text-sm">
-                      {sendingReset ? 'Envoi du lien...' : 'Modifier le mot de passe'}
+                      {sendingReset ? t('edit_sending_link') : t('edit_change_password_btn')}
                     </span>
                   </div>
                   <svg className="w-5 h-5 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -318,7 +317,7 @@ export default function EditProfileScreen  ()  {
                 disabled={processing}
                 className="w-full bg-gradient-to-r from-[#D9B991] to-[#C9A961] text-[#400106] font-semibold py-4 rounded-2xl hover:from-[#E5C5A1] hover:to-[#D9B971] transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg"
               >
-                {processing ? 'Enregistrement...' : 'Enregistrer les modifications'}
+                {processing ? t('edit_saving') : t('edit_save_changes')}
               </button>
             </div>
           </div>

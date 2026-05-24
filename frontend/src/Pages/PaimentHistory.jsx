@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from '../hooks/useTranslation';
 import { fetchTransactionHistory } from '../services/walletService';
 import styles from '../Styles/PaimentHistory.module.css';
 import BottomNavigation from '../Components/Layout/BottomNavigation';
@@ -7,6 +8,7 @@ import TransactionItem from '../Components/Cards/TransactionItem';
 
 export default function PaimentHistory() {
     const navigate = useNavigate();
+    const { t, language } = useTranslation();
     const [activeDateFilter, setActiveDateFilter] = useState('all');
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -27,9 +29,9 @@ export default function PaimentHistory() {
     }, []);
 
     const dateFilters = [
-        { id: 'today', label: "Aujourd'hui" },
-        { id: 'week', label: 'Cette semaine' },
-        { id: 'all', label: 'Tout' },
+        { id: 'today', label: t('today_filter') },
+        { id: 'week', label: t('this_week_filter') },
+        { id: 'all', label: t('filter_all') },
     ];
 
     const safeTransactions = Array.isArray(transactions) ? transactions : [];
@@ -71,18 +73,19 @@ export default function PaimentHistory() {
     });
 
     const groupedTransactions = filteredTransactions.reduce((groups, tx) => {
+        const locale = language === 'ar' ? 'ar-MA' : language === 'en' ? 'en-US' : 'fr-FR';
         const txDate = parseTxDate(tx.created_at);
-        const date = (txDate || new Date()).toLocaleDateString('fr-FR', {
+        const date = (txDate || new Date()).toLocaleDateString(locale, {
             day: 'numeric',
             month: 'long',
             year: 'numeric',
         });
-        const today = new Date().toLocaleDateString('fr-FR', {
+        const today = new Date().toLocaleDateString(locale, {
             day: 'numeric',
             month: 'long',
             year: 'numeric',
         });
-        const groupTitle = date === today ? "Aujourd'hui" : date;
+        const groupTitle = date === today ? t('today_label') : date;
 
         if (!groups[groupTitle]) groups[groupTitle] = [];
         groups[groupTitle].push(tx);
@@ -97,19 +100,21 @@ export default function PaimentHistory() {
         count: filteredTransactions.length,
     };
 
+    const getLocale = () => language === 'ar' ? 'ar-MA' : language === 'en' ? 'en-US' : 'fr-FR';
+
     const mappedTransactions = (list) =>
         list.map((t) => {
             const isPositive = t.type === 'recharge';
             return {
                 id: t.id,
-                title: t.reference || (isPositive ? 'Rechargement portefeuille' : 'Achat de billet'),
-                date: (parseTxDate(t.created_at) || new Date()).toLocaleString('fr-FR', {
+                title: t.reference || (isPositive ? t('wallet_recharge_label') : t('ticket_purchase_label')),
+                date: (parseTxDate(t.created_at) || new Date()).toLocaleString(getLocale(), {
                     day: 'numeric',
                     month: 'long',
                     hour: '2-digit',
                     minute: '2-digit',
                 }),
-                amount: `${isPositive ? '+' : '-'}${parseFloat(t.amount || 0).toFixed(2)} DH`,
+                amount: `${isPositive ? '+' : '-'}${parseFloat(t.amount || 0).toFixed(2)} ${t('currency')}`,
                 isPositive,
                 icon: isPositive ? 'plus' : 'ticket',
             };
@@ -135,11 +140,11 @@ export default function PaimentHistory() {
                                     onClick={handleBack}
                                     className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors"
                                 >
-                                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg className="w-6 h-6 text-white rtl-flip" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
                                     </svg>
                                 </button>
-                                <h1 className={styles.mainTitle}>Historique</h1>
+                                <h1 className={styles.mainTitle}>{t('history')}</h1>
                                 <div className="w-10"></div>
                             </div>
 
@@ -157,17 +162,17 @@ export default function PaimentHistory() {
                         </header>
 
                         <section className={styles.statisticsSection}>
-                            <h2 className={styles.sectionTitle}>Résumé</h2>
+                            <h2 className={styles.sectionTitle}>{t('summary_title')}</h2>
                             <div className={styles.statsGrid}>
                                 <div className={styles.statCard}>
                                     <div className={styles.statContent}>
-                                        <div className={styles.statLabel}>Total dépensé</div>
-                                        <div className={styles.statValue}>{stats.spent} DH</div>
+                                        <div className={styles.statLabel}>{t('total_spent_label')}</div>
+                                        <div className={styles.statValue}>{stats.spent} {t('currency')}</div>
                                     </div>
                                 </div>
                                 <div className={styles.statCard}>
                                     <div className={styles.statContent}>
-                                        <div className={styles.statLabel}>Total transactions</div>
+                                        <div className={styles.statLabel}>{t('total_transactions_label')}</div>
                                         <div className={styles.statValue}>{stats.count}</div>
                                     </div>
                                 </div>
@@ -175,7 +180,7 @@ export default function PaimentHistory() {
                         </section>
 
                         {loading ? (
-                            <p className="text-white text-center py-10">Chargement...</p>
+                            <p className="text-white text-center py-10">{t('loading')}</p>
                         ) : (
                             Object.entries(groupedTransactions).map(([date, dayTransactions]) => (
                                 <section key={date} className={styles.daySection}>
@@ -196,7 +201,7 @@ export default function PaimentHistory() {
                             ))
                         )}
                         {!loading && filteredTransactions.length === 0 && (
-                            <p className="text-white/50 text-center py-10">Aucune transaction trouvée</p>
+                            <p className="text-white/50 text-center py-10">{t('no_transaction_found')}</p>
                         )}
                     </div>
                     <BottomNavigation />

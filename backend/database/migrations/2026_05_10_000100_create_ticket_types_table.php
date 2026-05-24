@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('ticket_types', function (Blueprint $table) {
             $table->id();
             $table->string('code', 50)->unique();
-            $table->string('name_fr', 100);
-            $table->text('description');
+            $table->json('name');
+            $table->json('description')->nullable();
             $table->decimal('price', 10, 2);
             $table->integer('duration_minutes')->nullable();
             $table->boolean('is_reusable')->default(false);

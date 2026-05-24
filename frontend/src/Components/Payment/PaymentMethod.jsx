@@ -1,8 +1,10 @@
 // components/PaymentMethod.jsx
 
+import { useTranslation } from '../../hooks/useTranslation';
 import styles from '../../Styles/Paiment.module.css';
 
 const PaymentMethod = ({ method, isSelected, onSelect }) => {
+  const { t } = useTranslation();
   if (!method) return null;
 
   const bgColor = method.bgColor || '';
@@ -82,7 +84,7 @@ const PaymentMethod = ({ method, isSelected, onSelect }) => {
       {method.id === 'portfolio' && (
         <div className={styles.portfolioWrapper}>
           <p className={styles.portfolioBalance}>{method.balance}</p>
-          <p className={styles.portfolioLabel}>Solde disponible</p>
+          <p className={styles.portfolioLabel}>{t('available_balance')}</p>
           {isSelected && (
             <div className={styles.portfolioStatus}>
               <svg className={styles.portfolioCheckIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">

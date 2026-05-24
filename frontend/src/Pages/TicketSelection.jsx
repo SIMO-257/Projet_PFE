@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useTranslation } from '../hooks/useTranslation';
 import { fetchTicketTypes, purchaseTicket } from '../services/ticketService';
 
 export default function TicketSelection() {
+    const { t } = useTranslation();
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -59,7 +61,7 @@ export default function TicketSelection() {
         if (!selectedType) return;
 
         if (!acceptedTerms) {
-            setErrors({ terms: 'Vous devez accepter les conditions générales.' });
+            setErrors({ terms: t('must_accept_terms_cgv') });
             return;
         }
 
@@ -90,7 +92,7 @@ export default function TicketSelection() {
                 setErrors(responseErrors);
             } else {
                 setErrors({
-                    form: err?.response?.data?.message || "Échec de l'achat. Réessayez."
+                    form: err?.response?.data?.message || t('purchase_failed')
                 });
             }
 
@@ -102,7 +104,7 @@ export default function TicketSelection() {
     if (loading) {
         return (
             <div className="app-shell flex items-center justify-center">
-                <p className="text-[#f5d579] font-bold text-lg animate-pulse">Chargement...</p>
+                <p className="text-[#f5d579] font-bold text-lg animate-pulse">{t('loading')}</p>
             </div>
         );
     }
@@ -118,7 +120,7 @@ export default function TicketSelection() {
                     <div className="p-6 md:p-8 border-b border-[#f5d579]/10 bg-black/20 flex-shrink-0 z-10 shadow-lg">
                         <div className="flex items-center justify-between mb-2">
                             <h1 className="text-2xl md:text-3xl font-bold text-[#f5d579]">
-                                Sélection du Billet
+                                {t('select_ticket_page')}
                             </h1>
                             <button 
                                 onClick={() => navigate('/home')}
@@ -139,7 +141,7 @@ export default function TicketSelection() {
                         <div className="max-w-3xl mx-auto space-y-8">
 
                             <h3 className="text-white/80 text-lg font-medium mb-4">
-                                Choisissez votre type de billet
+                                {t('choose_ticket_type')}
                             </h3>
                             
                             <div className="grid gap-4">
@@ -154,8 +156,8 @@ export default function TicketSelection() {
                                         onClick={() => setSelectedType(type)}
                                     >
                                         <div className="flex justify-between items-center mb-3">
-                                            <span className="text-white font-bold text-lg">{type.name_fr}</span>
-                                            <span className="text-[#f5d579] font-bold text-xl">{type.price} DH</span>
+                                            <span className="text-white font-bold text-lg">{type.name}</span>
+                                            <span className="text-[#f5d579] font-bold text-xl">{type.price} {t('currency')}</span>
                                         </div>
                                         <p className="text-white/60 text-sm leading-relaxed">{type.description}</p>
                                     </div>
@@ -180,7 +182,7 @@ export default function TicketSelection() {
                                         </button>
                                     </div>
                                     <div className="text-right">
-                                        <div className="text-[#f5d579] font-bold text-2xl">{totalPrice} DH</div>
+                                        <div className="text-[#f5d579] font-bold text-2xl">{totalPrice} {t('currency')}</div>
                                     </div>
                                 </div>
                             )}
@@ -194,7 +196,7 @@ export default function TicketSelection() {
                                         onClick={() => navigate('/recharge-payment')}
                                         className="text-[#f5d579] text-sm font-bold underline hover:text-white transition-colors"
                                     >
-                                        Recharger mon compte maintenant
+                                        {t('recharge_account_now')}
                                     </button>
                                 </div>
                             )}
@@ -232,7 +234,7 @@ export default function TicketSelection() {
                                     )}
                                 </div>
                                 <span className={`text-sm leading-tight ${acceptedTerms ? 'text-white' : 'text-white/60'}`}>
-                                    J'accepte les <Link to="/terms-and-conditions" className="text-[#f5d579] underline hover:text-white transition-colors">conditions générales de vente</Link>
+                                    {t('accept_terms_cgv')}
                                 </span>
                             </label>
 
@@ -241,7 +243,7 @@ export default function TicketSelection() {
                                 onClick={handlePurchase}
                                 disabled={processing || !selectedType}
                             >
-                                {processing ? 'Transaction en cours...' : `Confirmer et payer ${totalPrice} DH`}
+                                {processing ? t('transaction_in_progress') : t('confirm_pay_amount', { amount: `${totalPrice} ${t('currency')}` })}
                             </button>
                         </div>
                     </div>

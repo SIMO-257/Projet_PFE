@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const ContactCard = ({ 
   type = 'phone', // 'phone' | 'email' | 'chat'
@@ -7,9 +8,11 @@ const ContactCard = ({
   contactInfo,
   status = 'online', // 'online' | 'offline' | 'working-hours'
   onAction,
-  buttonText = 'Contacter',
+  buttonText: btnProp,
   className = ""
 }) => {
+    const { t } = useTranslation();
+    const buttonText = btnProp || t('contact_button_text');
   const getIcon = () => {
     switch(type) {
       case 'phone':
@@ -48,9 +51,9 @@ const ContactCard = ({
   const getStatusText = () => {
     if (type === 'chat') {
       return status === 'online' ? (
-        <p className="text-green-400 text-xs mb-1">En ligne</p>
+        <p className="text-green-400 text-xs mb-1">{t('online_status')}</p>
       ) : (
-        <p className="text-red-400 text-xs mb-1">Hors ligne</p>
+        <p className="text-red-400 text-xs mb-1">{t('offline_status')}</p>
       );
     }
     return null;

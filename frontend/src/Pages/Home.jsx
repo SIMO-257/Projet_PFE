@@ -12,6 +12,7 @@ import styles from '../Styles/HomeScreen.module.css';
 import { useAuth } from '../hooks/useAuth';
 import { useWallet } from '../hooks/useWallet';
 import { useTickets } from '../hooks/useTickets';
+import { useTranslation } from '../hooks/useTranslation';
 import { fetchPurchasedCards } from '../services/ticketService';
 import { fetchUnreadCount } from '../Redux/Slices/notificationSlice';
 
@@ -21,6 +22,7 @@ export default function Home() {
   const { refreshWallet } = useWallet();
   const { tickets, refreshTickets } = useTickets();
   const unreadCount = useSelector(state => state.notifications?.unreadCount || 0);
+  const { t, language } = useTranslation();
   const navigateHook = useNavigate();
 
   const [purchasedCards, setPurchasedCards] = useState([]);
@@ -64,7 +66,7 @@ export default function Home() {
   }, [purchasedCards]);
 
   const activeTicketType = defaultCard?.ticket_type || defaultCard?.ticketType || null;
-  const activeTicketName = activeTicketType?.name_fr || activeTicketType?.name || 'Aucun ticket achete';
+  const activeTicketName = activeTicketType?.name || t('no_ticket');
   const activeTicketCode = defaultCard?.uuid ? defaultCard.uuid.slice(0, 8).toUpperCase() : null;
   const activeTicketPrice = defaultCard?.price_paid ? Number(defaultCard.price_paid) : 0;
 
@@ -72,7 +74,7 @@ export default function Home() {
     if (!defaultCard) return null;
     const activeTicketType = defaultCard?.ticket_type || defaultCard?.ticketType || null;
     return {
-      name: activeTicketType?.name_fr || activeTicketType?.name || 'Ticket par défaut',
+      name: activeTicketType?.name || t('default_ticket'),
       price: `${(defaultCard?.price_paid ? Number(defaultCard.price_paid) : 0).toFixed(2)} MAD`,
       uuid: defaultCard.uuid || '',
       isReusable: !!(activeTicketType?.is_reusable ?? activeTicketType?.isReusable ?? false),
@@ -82,7 +84,7 @@ export default function Home() {
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#2a0b0f] to-[#1a0507] flex items-center justify-center">
-        <div className="text-white text-lg">Loading user data...</div>
+        <div className="text-white text-lg">{t('loading_user_data')}</div>
       </div>
     );
   }
@@ -111,7 +113,7 @@ export default function Home() {
   };
   const handleTicketPress = (ticket) => navigateHook(`/viewticket/${ticket.uuid}`);
   const handleAllTickets = () => navigateHook('/all-tickets');
-  const greeting = new Date().getHours() >= 18 ? 'Bonsoir' : 'Bonjour';
+  const greeting = new Date().getHours() >= 18 ? t('good_evening') : t('good_morning');
 
   return (
     <>
@@ -151,8 +153,8 @@ export default function Home() {
 
               <div className="mb-6">
                 <div className="flex justify-between items-center mb-3">
-                  <h2 className="text-white/60 text-xs uppercase tracking-widest font-bold">Historique</h2>
-                  <button onClick={handleAllTickets} className="text-yellow-500 text-sm font-semibold">Voir tout</button>
+                  <h2 className="text-white/60 text-xs uppercase tracking-widest font-bold">{t('history')}</h2>
+                  <button onClick={handleAllTickets} className="text-yellow-500 text-sm font-semibold">{t('view_all')}</button>
                 </div>
                 <div className="space-y-3">
                   {isDataLoading ? (
@@ -165,9 +167,9 @@ export default function Home() {
                     lastSixTickets.map((ticket) => (
                       <TicketHistoryCard
                         key={ticket.uuid}
-                        ticketName={ticket.ticket_type?.name_fr || 'Billet'}
+                        ticketName={ticket.ticket_type?.name || t('ticket_type')}
                         price={`${ticket.price_paid} DH`}
-                        date={new Date(ticket.updated_at || ticket.created_at).toLocaleString('fr-FR', { 
+                        date={new Date(ticket.updated_at || ticket.created_at).toLocaleString(language === 'ar' ? 'ar-MA' : language === 'en' ? 'en-US' : 'fr-FR', { 
                           day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' 
                         })}
                         status={ticket.status}
@@ -175,7 +177,7 @@ export default function Home() {
                       />
                     ))
                   ) : (
-                    <p className="text-white/40 text-sm italic py-4">Aucun ticket trouvé</p>
+                    <p className="text-white/40 text-sm italic py-4">{t('no_tickets_found')}</p>
                   )}
                 </div>
               </div>

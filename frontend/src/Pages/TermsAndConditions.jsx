@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Info, CheckCircle2 } from 'lucide-react';
+import { useTranslation } from '../hooks/useTranslation';
 
 export default function TermsAndConditions() {
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const [hasReadToBottom, setHasReadToBottom] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
     const scrollRef = useRef(null);
@@ -34,43 +36,43 @@ export default function TermsAndConditions() {
 
     const sections = [
         {
-            title: "Introduction",
-            content: "Les présentes conditions générales de vente régissent l'achat de titres de transport via notre application mobile. En accédant à nos services, vous reconnaissez avoir pris connaissance et accepté sans réserve l'intégralité de ces conditions. Ce document constitue un contrat entre vous et le prestataire de service."
+            title: t('section_intro'),
+            content: t('section_intro_text')
         },
         {
-            title: "Achat de billets",
-            content: "L'acquisition de billets s'effectue directement via l'interface sécurisée de l'application. Chaque billet est dématérialisé et lié de manière unique à votre compte utilisateur. Il est strictement personnel et non transférable à un tiers après activation."
+            title: t('section_purchase_tickets'),
+            content: t('section_purchase_text')
         },
         {
-            title: "Tarifs et paiement",
+            title: t('section_pricing'),
             content: (
                 <div className="space-y-4">
                     <ul className="list-disc pl-5 space-y-2 opacity-90 text-white/80">
-                        <li>Tous nos tarifs sont exprimés en <strong className="text-[#f5d579]">MAD TTC</strong>.</li>
-                        <li>Modes de recharge : Cartes bancaires, Portefeuille numérique, et points de vente partenaires.</li>
-                        <li><strong className="text-[#f5d579]">Aucun frais caché</strong> : le prix affiché est le prix final payé.</li>
-                        <li>Le prix en vigueur au moment de l'achat fait foi pour la transaction.</li>
+                        <li dangerouslySetInnerHTML={{ __html: t('pricing_currency') }} />
+                        <li>{t('pricing_methods')}</li>
+                        <li dangerouslySetInnerHTML={{ __html: t('pricing_no_hidden') }} />
+                        <li>{t('pricing_valid_at_time')}</li>
                     </ul>
                     <div className="flex items-start gap-3 p-4 bg-white/5 rounded-xl border border-[#f5d579]/20">
                         <Info size={18} className="text-[#f5d579] shrink-0 mt-0.5" />
                         <p className="text-xs italic leading-relaxed text-white/70">
-                            Note : Les tarifs sont susceptibles d'évoluer selon les décisions réglementaires de transport urbain.
+                            {t('pricing_note')}
                         </p>
                     </div>
                 </div>
             )
         },
         {
-            title: "Validité et utilisation",
-            content: "La validité d'un billet commence dès son achat ou son activation selon le type de titre choisi. Un billet doit être impérativement validé à chaque montée dans un véhicule via le scan du QR Code présent à bord. En cas de contrôle, vous devez présenter l'écran de validation actif sur votre appareil."
+            title: t('section_validity'),
+            content: t('section_validity_text')
         },
         {
-            title: "Remboursement",
-            content: "Compte tenu de la nature instantanée du service, aucun remboursement n'est accordé après l'achat, sauf en cas de défaut technique majeur imputable à la plateforme. Toute réclamation doit être formulée via le support client dans un délai maximum de 48h suivant l'incident."
+            title: t('section_refund'),
+            content: t('section_refund_text')
         },
         {
-            title: "Responsabilité",
-            content: "L'utilisateur est seul responsable de la sécurité de son compte et de son appareil mobile. Le prestataire décline toute responsabilité en cas de perte, vol de l'appareil ou épuisement de la batterie lors d'un contrôle de titre de transport. Veillez à maintenir votre appareil chargé et sécurisé."
+            title: t('section_liability'),
+            content: t('section_liability_text')
         }
     ];
 
@@ -83,13 +85,13 @@ export default function TermsAndConditions() {
                     <div className="p-6 md:p-8 border-b border-[#f5d579]/10 bg-black/20 flex-shrink-0 z-10 shadow-lg">
                         <div className="flex items-center justify-between mb-2">
                             <h1 className="text-2xl md:text-3xl font-bold text-[#f5d579]">
-                                Conditions Générales
+                                {t('terms_title')}
                             </h1>
                             <span className="px-3 py-1 bg-[#f5d579]/10 text-[#f5d579] text-xs font-bold rounded-full border border-[#f5d579]/30">
-                                6 sections
+                                {t('sections_count', { count: sections.length })}
                             </span>
                         </div>
-                        <p className="text-white/60 text-sm">Veuillez lire attentivement avant de continuer.</p>
+                        <p className="text-white/60 text-sm">{t('terms_intro')}</p>
                     </div>
 
                     {/* Content Area */}
@@ -151,13 +153,13 @@ export default function TermsAndConditions() {
                                         )}
                                     </div>
                                     <span className={`text-sm leading-tight ${isChecked ? 'text-white' : 'text-white/60'}`}>
-                                        J'ai lu et j'accepte l'intégralité des conditions générales d'utilisation.
+                                        {t('read_and_accept')}
                                     </span>
                                 </label>
                                 
                                 {!hasReadToBottom && (
                                     <p className="text-[#f5d579] text-[10px] mt-2 font-medium tracking-wide uppercase animate-pulse">
-                                        ⬇️ Faites défiler pour lire tout le contenu
+                                        {t('scroll_to_read')}
                                     </p>
                                 )}
                             </div>
@@ -167,7 +169,7 @@ export default function TermsAndConditions() {
                                     onClick={() => navigate(-1)}
                                     className="flex-1 py-4 px-6 rounded-2xl border border-[#f5d579]/30 text-[#f5d579] font-bold text-sm hover:bg-[#f5d579]/5 transition-all active:scale-95"
                                 >
-                                    Retour
+                                    {t('back')}
                                 </button>
                                 <button 
                                     onClick={() => navigate('/signup')}
@@ -179,7 +181,7 @@ export default function TermsAndConditions() {
                                             : 'bg-[#f5d579]/10 text-[#f5d579]/30 cursor-not-allowed'}
                                     `}
                                 >
-                                    Accepter et continuer
+                                    {t('accept_and_continue')}
                                 </button>
                             </div>
                         </div>

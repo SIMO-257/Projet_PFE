@@ -51,6 +51,12 @@ clientApi.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
+  // Send the user's language preference so the backend returns
+  // translated database content (ticket types, etc.) in the right locale
+  const lang = localStorage.getItem('app_lang') || 'fr';
+  config.headers['X-Locale'] = lang;
+
   return config;
 });
 

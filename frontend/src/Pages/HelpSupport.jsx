@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from '../hooks/useTranslation';
 import Header from '../Components/Layout/Header';
 import styles from '../Styles/HelpSupport.module.css';
 
 const HelpSupport = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   // State for FAQ expand/collapse
   const [openFaq, setOpenFaq] = useState(null);
   // State for search input
   const [searchTerm, setSearchTerm] = useState('');
   // State for report form
-  const [problemType, setProblemType] = useState('Problème de validation');
+  const [problemType, setProblemType] = useState('');
   const [description, setDescription] = useState('');
   const [attachScreenshot, setAttachScreenshot] = useState(false);
 
@@ -51,7 +53,7 @@ const HelpSupport = () => {
         <div className={`${styles.helpCard} app-card`}>
           
           <Header 
-            title="Aide & Support" 
+            title={t('help_support')} 
             showBackButton={true} 
             onBack={goBack} 
           />
@@ -68,7 +70,7 @@ const HelpSupport = () => {
                   </svg>
                   <input
                     type="text"
-                    placeholder="Rechercher de l'aide..."
+                    placeholder={t('search_help')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="flex-1 bg-transparent text-white text-sm outline-none placeholder-white/40"
@@ -78,10 +80,10 @@ const HelpSupport = () => {
             </div>
 
             {/* FAQ Section */}
-            <Section title="Questions Fréquentes">
+            <Section title={t('faq_section')}>
               <div className="space-y-3">
                 {filteredFaqs.length === 0 ? (
-                  <p className="text-white/40 text-sm text-center py-4">Aucun résultat trouvé</p>
+                  <p className="text-white/40 text-sm text-center py-4">{t('no_result_found')}</p>
                 ) : (
                   filteredFaqs.map((faq, index) => (
                     <div key={index} className="bg-black/40 rounded-xl border border-white/10 overflow-hidden">
@@ -103,9 +105,9 @@ const HelpSupport = () => {
                         <div className="px-4 pb-4 text-white/70 text-sm border-t border-white/10 pt-3">
                           <p>{faq.answer}</p>
                           <div className="flex items-center mt-3 space-x-4">
-                            <span className="text-white/40 text-xs">Cela a-t-il été utile ?</span>
-                            <button className="text-yellow-500 text-xs hover:text-yellow-400">Oui</button>
-                            <button className="text-yellow-500 text-xs hover:text-yellow-400">Non</button>
+                            <span className="text-white/40 text-xs">{t('was_helpful')}</span>
+                            <button className="text-yellow-500 text-xs hover:text-yellow-400">{t('yes')}</button>
+                            <button className="text-yellow-500 text-xs hover:text-yellow-400">{t('no')}</button>
                           </div>
                         </div>
                       )}
@@ -116,30 +118,30 @@ const HelpSupport = () => {
             </Section>
 
             {/* Contact Section */}
-            <Section title="Contactez-nous">
+            <Section title={t('contact_us')}>
               <div className="space-y-3">
                 <ContactItem 
                   icon="phone"
-                  title="Assistance téléphonique"
+                  title={t('contact_phone_title')}
                   subtitle="05-22-XX-XX-XX"
-                  description="Lun-Ven 8h-20h, Sam 9h-18h"
-                  buttonText="Appeler maintenant"
+                  description={t('contact_phone_hours')}
+                  buttonText={t('contact_call_now')}
                   onClick={handleCall}
                 />
                 <ContactItem 
                   icon="email"
-                  title="Support par email"
+                  title={t('contact_email_title')}
                   subtitle="support@transport.ma"
-                  description="Réponse sous 24h"
-                  buttonText="Envoyer un email"
+                  description={t('contact_email_response')}
+                  buttonText={t('contact_send_email')}
                   onClick={handleEmail}
                 />
                 <ContactItem 
                   icon="chat"
-                  title="Chat en direct"
-                  status="En ligne"
-                  description="Disponible 9h-18h"
-                  buttonText="Démarrer une conversation"
+                  title={t('contact_chat_title')}
+                  status={t('contact_online')}
+                  description={t('contact_chat_hours')}
+                  buttonText={t('contact_start_chat')}
                   onClick={handleChat}
                 />
               </div>
@@ -147,26 +149,26 @@ const HelpSupport = () => {
 
 
             {/* Report Problem Section */}
-            <Section title="Signaler un problème">
+            <Section title={t('report_problem_section')}>
               <div className="bg-black/40 rounded-xl border border-white/10 p-4 space-y-4">
                 <div>
-                  <label className="text-white/50 text-xs uppercase tracking-wide mb-2 block">Type de problème</label>
+                  <label className="text-white/50 text-xs uppercase tracking-wide mb-2 block">{t('problem_type')}</label>
                   <select
                     value={problemType}
                     onChange={(e) => setProblemType(e.target.value)}
                     className="w-full bg-[#1a0507] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-yellow-500/30 outline-none"
                   >
-                    <option>Problème de validation</option>
-                    <option>Problème de paiement</option>
-                    <option>Problème technique</option>
-                    <option>Autre</option>
+                    <option>{t('report_validation_issue')}</option>
+                    <option>{t('report_payment_issue')}</option>
+                    <option>{t('report_tech_bug')}</option>
+                    <option>{t('report_other')}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="text-white/50 text-xs uppercase tracking-wide mb-2 block">Description</label>
+                  <label className="text-white/50 text-xs uppercase tracking-wide mb-2 block">{t('problem_description')}</label>
                   <textarea
                     rows={4}
-                    placeholder="Décrivez le problème en détail..."
+                    placeholder={t('describe_problem')}
                     value={description}
                     onChange={(e) => setDescription(e.target.value.slice(0, 500))}
                     className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/40 resize-none focus:border-yellow-500/30 outline-none"
@@ -181,22 +183,22 @@ const HelpSupport = () => {
                     onChange={(e) => setAttachScreenshot(e.target.checked)}
                     className="w-4 h-4 rounded border-white/20 bg-black/40 text-yellow-500 focus:ring-yellow-500"
                   />
-                  <label htmlFor="screenshot" className="text-white/70 text-sm">Joindre une capture d'écran</label>
+                  <label htmlFor="screenshot" className="text-white/70 text-sm">{t('attach_screenshot')}</label>
                 </div>
                 <button
                   onClick={handleSendReport}
                   className="w-full bg-gradient-to-r from-[#D9B991] to-[#C9A961] text-[#400106] font-semibold py-3 rounded-xl hover:from-[#E5C5A1] hover:to-[#D9B971] transition-all"
                 >
-                  Envoyer le rapport
+                  {t('send_report')}
                 </button>
               </div>
             </Section>
 
             {/* Footer */}
             <div className="text-center text-white/30 text-xs mt-6 pb-4">
-              <p>© 2026 Casablanca Transport</p>
-              <p className="mt-1">Version 2.4.1</p>
-              <p className="mt-2">Fait avec 🐾 à Casablanca</p>
+              <p>{t('footer_copyright')}</p>
+              <p className="mt-1">{t('app_version', { version: '2.4.1' })}</p>
+              <p className="mt-2">{t('footer_made_with')}</p>
             </div>
           </div>
         </div>

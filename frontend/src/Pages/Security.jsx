@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from '../hooks/useTranslation';
 import Header from '../Components/Layout/Header';
 import styles from '../Styles/Security.module.css';
 import { getClientPreferences, updateClientPreferences } from '../services/notificationService';
 
 const Security = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
@@ -80,7 +82,7 @@ const Security = () => {
         <div className={`${styles.securityCard} app-card`}>
           
           <Header 
-            title="Sécurité" 
+            title={t('security_title')} 
             showBackButton={true} 
             onBack={goBack} 
           />
@@ -89,32 +91,32 @@ const Security = () => {
           <div className={`app-content ${styles.scrollContainer}`}>
             
             {/* Authentication Section */}
-            <Section title="Authentification de l'application">
+            <Section title={t('app_auth_section')}>
               <ToggleItem
                 icon="lock"
-                label="Code PIN"
-                description="Verrouiller l'application avec un code"
+                label={t('pin_label')}
+                description={t('pin_desc')}
                 value={pinEnabled}
                 onChange={(v) => handlePreferenceChange('pin_enabled', v)}
               />
               <ToggleItem
                 icon="faceid"
-                label="Authentification biométrique"
-                description="Face ID / Touch ID"
+                label={t('biometric_label')}
+                description={t('biometric_desc')}
                 value={biometricEnabled}
                 onChange={(v) => handlePreferenceChange('biometric_enabled', v)}
               />
               <ToggleItem
                 icon="shield"
-                label="Authentification pour actions sensibles"
-                description="Paiements, changement de carte, etc."
+                label={t('sensitive_actions_label')}
+                description={t('sensitive_actions_desc')}
                 value={requireAuthSensitive}
                 onChange={(v) => handlePreferenceChange('auth_purchase', v)}
               />
             </Section>
 
             {/* Session Management */}
-            <Section title="Sessions actives">
+            <Section title={t('sessions')}>
               <div className="space-y-2">
                 {sessions.map(session => (
                   <div key={session.id} className="bg-black/40 rounded-xl border border-white/10 p-3">
@@ -123,18 +125,18 @@ const Security = () => {
                         <div className="flex items-center space-x-2">
                           <p className="text-white font-medium text-sm">{session.device}</p>
                           {session.current && (
-                            <span className="bg-green-500/20 text-green-400 text-xs px-2 py-0.5 rounded-full">En cours</span>
+                            <span className="bg-green-500/20 text-green-400 text-xs px-2 py-0.5 rounded-full">{t('current_session_badge')}</span>
                           )}
                         </div>
                         <p className="text-white/40 text-xs mt-1">{session.location}</p>
-                        <p className="text-white/40 text-xs">Dernière activité: {session.lastActive}</p>
+                        <p className="text-white/40 text-xs">{t('last_activity')}: {session.lastActive}</p>
                       </div>
                       {!session.current && (
                         <button
                           onClick={() => handleRevokeSession(session.id)}
                           className="text-red-400 text-xs hover:text-red-300"
                         >
-                          Révoquer
+                          {t('revoke_session')}
                         </button>
                       )}
                     </div>
@@ -145,53 +147,53 @@ const Security = () => {
                     onClick={handleLogoutAll}
                     className="w-full bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 p-3 text-center text-white/70 text-sm mt-2 transition-all"
                   >
-                    Se déconnecter de tous les autres appareils
+                    {t('disconnect_other_devices')}
                   </button>
                 )}
               </div>
             </Section>
 
             {/* Fraud Prevention */}
-            <Section title="Prévention des fraudes">
+            <Section title={t('fraud_prevention')}>
               <ToggleItem
                 icon="alert"
-                label="Alertes anti‑rejeu"
-                description="Notifier si un ticket est utilisé deux fois"
+                label={t('anti_replay_label')}
+                description={t('anti_replay_desc')}
                 value={antiReplayAlerts}
                 onChange={(v) => handlePreferenceChange('anti_replay_alerts', v)}
               />
               <ToggleItem
                 icon="suspicious"
-                label="Alertes d'activité suspecte"
-                description="Connexions multiples, échecs répétés"
+                label={t('suspicious_activity_label')}
+                description={t('suspicious_activity_desc')}
                 value={suspiciousActivityAlerts}
                 onChange={(v) => handlePreferenceChange('suspicious_activity_alerts', v)}
               />
             </Section>
 
             {/* Encryption & Security Info */}
-            <Section title="Chiffrement & Sécurité">
+            <Section title={t('encryption_section')}>
               <div className="bg-black/40 rounded-xl border border-white/10 p-4 space-y-2">
                 <div className="flex items-center space-x-2">
                   <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
                   </svg>
-                  <p className="text-white/70 text-xs">Vos données personnelles sont chiffrées avec AES-256</p>
+                  <p className="text-white/70 text-xs">{t('aes_encryption')}</p>
                 </div>
                 <div className="flex items-center space-x-2">
                   <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
                   </svg>
-                  <p className="text-white/70 text-xs">Les QR tickets sont signés avec RSA-256</p>
+                  <p className="text-white/70 text-xs">{t('rsa_signing')}</p>
                 </div>
                 <div className="border-t border-white/10 pt-2 mt-2">
-                  <p className="text-white/40 text-xs">Dernier audit de sécurité: 15 janvier 2026</p>
+                  <p className="text-white/40 text-xs">{t('last_security_audit')}</p>
                 </div>
               </div>
             </Section>
 
             {/* Card Security */}
-            <Section title="Sécurité de la carte">
+            <Section title={t('card_security_section')}>
               <div className="bg-black/40 rounded-xl border border-white/10 p-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
@@ -201,8 +203,8 @@ const Security = () => {
                       </svg>
                     </div>
                     <div>
-                      <p className="text-white font-medium text-sm">Geler la carte virtuelle</p>
-                      <p className="text-white/40 text-xs">Empêche toute utilisation en cas de perte</p>
+                      <p className="text-white font-medium text-sm">{t('freeze_virtual_card')}</p>
+                      <p className="text-white/40 text-xs">{t('prevent_use_loss')}</p>
                     </div>
                   </div>
                   <button
@@ -219,22 +221,22 @@ const Security = () => {
                   </button>
                 </div>
                 {cardFrozen && (
-                  <p className="text-yellow-500 text-xs mt-3">Carte actuellement gelée. Les validations sont bloquées.</p>
+                  <p className="text-yellow-500 text-xs mt-3">{t('card_frozen_alert')}</p>
                 )}
               </div>
             </Section>
 
             {/* Password & Recovery */}
-            <Section title="Mot de passe & Récupération">
+            <Section title={t('password_recovery_section')}>
               <div className="space-y-2">
                 <ArrowItem
                   icon="key"
-                  label="Changer le mot de passe"
+                  label={t('change_password')}
                   onClick={handleChangePassword}
                 />
                 <ArrowItem
                   icon="recovery"
-                  label="Définir email / téléphone de récupération"
+                  label={t('set_recovery')}
                   onClick={handleSetRecovery}
                 />
               </div>
@@ -294,7 +296,7 @@ const ArrowItem = ({ icon, label, onClick }) => (
       </div>
       <span className="text-white text-sm font-medium">{label}</span>
     </div>
-    <svg className="w-5 h-5 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="w-5 h-5 text-white/40 rtl-flip" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/>
     </svg>
   </button>

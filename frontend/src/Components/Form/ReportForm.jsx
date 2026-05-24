@@ -7,14 +7,15 @@ const ReportForm = ({
   onProblemDescriptionChange,
   onAttachScreenshot,
   onSubmit,
-  className = ""
+  className = "",
+  t
 }) => {
   const problemTypes = [
-    'Problème de validation',
-    'Problème de paiement',
-    'Bug technique',
-    'Problème de compte',
-    'Autre'
+    t('report_validation_issue'),
+    t('report_payment_issue'),
+    t('report_tech_bug'),
+    t('report_account_issue'),
+    t('report_other')
   ];
 
   return (
@@ -22,7 +23,7 @@ const ReportForm = ({
       {/* Problem Type Dropdown */}
       <div>
         <label className="text-white/60 text-xs uppercase tracking-wide mb-2 block">
-          Type de problème
+          {t('report_problem_type')}
         </label>
         <div className="relative">
           <select
@@ -43,12 +44,12 @@ const ReportForm = ({
       {/* Description */}
       <div>
         <label className="text-white/60 text-xs uppercase tracking-wide mb-2 block">
-          Description
+          {t('report_description')}
         </label>
         <textarea
           value={problemDescription}
           onChange={(e) => onProblemDescriptionChange(e.target.value)}
-          placeholder="Décrivez le problème en détail..."
+          placeholder={t('report_description_placeholder')}
           rows="4"
           maxLength={500}
           className="w-full bg-black/50 border border-white/10 rounded-xl py-3 px-4 text-white text-sm outline-none focus:border-yellow-500/50 transition-all resize-none placeholder-white/40"
@@ -64,7 +65,7 @@ const ReportForm = ({
         <svg className="w-5 h-5 text-white/60" fill="currentColor" viewBox="0 0 20 20">
           <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd"/>
         </svg>
-        <span className="text-white/60 text-sm">Joindre une capture d'écran</span>
+        <span className="text-white/60 text-sm">{t('report_attach_screenshot')}</span>
       </button>
 
       {/* Submit Button */}
@@ -72,7 +73,7 @@ const ReportForm = ({
         onClick={onSubmit}
         className="w-full bg-gradient-to-r from-[#D9B991] to-[#C9A961] text-[#400106] font-semibold py-3 rounded-xl hover:from-[#E5C5A1] hover:to-[#D9B971] transition-all"
       >
-        Envoyer le rapport
+        {t('report_submit')}
       </button>
     </div>
   );

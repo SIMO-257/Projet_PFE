@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
+import { useTranslation } from "../hooks/useTranslation";
 import { createPaymentIntent, cancelPaymentIntent } from "../services/walletService";
 
 // Layout Components
@@ -18,6 +19,7 @@ const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
 
 export default function RechargePayment() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [step, setStep] = useState(1); // 1: Amount Selection, 2: Card Details
   const [amount, setAmount] = useState("");
@@ -65,7 +67,7 @@ export default function RechargePayment() {
     const val = parseFloat(cleanAmount);
     
     if (isNaN(val) || val < 5 || val > 500) {
-      setError("Le montant doit être compris entre 5 DH et 500 DH.");
+      setError(t('amount_error_range'));
       return;
     }
     
@@ -85,7 +87,7 @@ export default function RechargePayment() {
       setPaymentIntentId(response.data.data.paymentIntentId);
       setStep(2);
     } catch (err) {
-      setError(err.response?.data?.message || "Erreur lors de l'initialisation du paiement.");
+      setError(err.response?.data?.message || t('payment_init_error'));
     } finally {
       setIsInitializing(false);
     }
@@ -94,7 +96,7 @@ export default function RechargePayment() {
   const onSuccess = (paymentIntentId) => {
     navigate("/wallet", { 
       state: { 
-        successMessage: "Paiement réussi !",
+        successMessage: t('payment_success_message'),
         paymentIntentId: paymentIntentId
       } 
     });
@@ -123,7 +125,7 @@ export default function RechargePayment() {
       <div className="app-frame">
         <ValidationCard className="app-card shadow-2xl">
           <Header
-            title={step === 1 ? "Rechargement" : "Paiement sécurisé"}
+            title={step === 1 ? t('recharge_title') : t('secure_payment')}
             onBack={goBack}
             showBackButton={true}
             onClose={closeModal}
@@ -139,12 +141,12 @@ export default function RechargePayment() {
             {step === 1 ? (
               <div className="space-y-8 mt-4">
                 <div className="space-y-2">
-                  <h3 className="text-white text-lg font-bold">Combien souhaitez-vous recharger ?</h3>
-                  <p className="text-white/40 text-xs">Le solde sera disponible après validation du paiement.</p>
+                  <h3 className="text-white text-lg font-bold">{t('how_much_recharge')}</h3>
+                  <p className="text-white/40 text-xs">{t('balance_after_payment')}</p>
                 </div>
 
                 <AmountDisplay
-                  label="Montant à ajouter"
+                  label={t('amount_to_add')}
                   amount={amount ? `${parseFloat(amount || 0).toFixed(2)} DH` : "0,00 DH"}
                   icon="wallet"
                   className="shadow-xl"
@@ -154,8 +156,8 @@ export default function RechargePayment() {
                   <InputField
                     type="number"
                     id="recharge-amount"
-                    label="Entrez le montant (DH)"
-                    placeholder="Ex: 50"
+                    label={t('enter_amount')}
+                    placeholder={t('amount_placeholder')}
                     var={amount}
                     setVar={onAmountChange}
                     error={!!error}
@@ -164,7 +166,7 @@ export default function RechargePayment() {
                 </div>
 
                 <div className="space-y-3">
-                  <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest px-1">Montants rapides</p>
+                  <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest px-1">{t('quick_amounts')}</p>
                   <div className="grid grid-cols-3 gap-3">
                     {["10", "20", "50", "100", "200", "500"].map((preset) => (
                       <button
@@ -196,10 +198,10 @@ export default function RechargePayment() {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      <span>Initialisation...</span>
+                      <span>{t('initializing')}</span>
                     </>
                   ) : (
-                    <span>Continuer vers le paiement</span>
+                    <span>{t('proceed_to_payment')}</span>
                   )}
                 </button>
               </div>
@@ -219,7 +221,7 @@ export default function RechargePayment() {
               ) : (
                 <div className="mt-8 flex flex-col items-center justify-center space-y-4">
                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500"></div>
-                   <p className="text-white/60 text-sm">Chargement du module de paiement...</p>
+                   <p className="text-white/60 text-sm">{t('load_payment')}</p>
                 </div>
               )
             )}

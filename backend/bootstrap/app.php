@@ -27,6 +27,11 @@ return Application::configure(basePath: dirname(__DIR__))
     $middleware->alias([
         'authMiddleware' => \App\Http\Middleware\AuthMiddleware::class,
         'track.activity' => \App\Http\Middleware\TrackActivity::class,
+        'set.locale' => \App\Http\Middleware\SetLocale::class,
+    ]);
+
+    $middleware->api(prepend: [
+        \App\Http\Middleware\SetLocale::class,
     ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -51,6 +51,15 @@ input[type="number"] {
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
   }
+
+  /* RTL flip: rotates directional icons/chevrons 180deg in RTL mode */
+  .rtl-flip {
+    transition: transform 0.2s ease;
+  }
+
+  [dir="rtl"] .rtl-flip {
+    transform: rotate(180deg);
+  }
 }
 
 :root {

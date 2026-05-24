@@ -1,15 +1,19 @@
 import React from 'react';
 import styles from '../../Styles/HomeScreen.module.css';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const BalanceCard = ({ 
-    title = "Solde disponible", 
+    title: titleProp, 
     amount = "42,50 €", 
     gradientFrom = "#7A3B47",
     gradientTo = "#5C2A36",
     circlesPosition = "right", // 'right' or 'left'
     onAction = null,
-    actionLabel = "Action"
+    actionLabel: actionLabelProp
 }) => {
+    const { t } = useTranslation();
+    const title = titleProp || t('balance_card_label');
+    const actionLabel = actionLabelProp || t('section_action_default');
     return (
         <div className={`${styles.balanceCard} relative rounded-3xl p-6 mb-6 overflow-hidden shadow-xl hover:-translate-y-1 transition-all duration-300`}
             style={{ background: `linear-gradient(to bottom right, ${gradientFrom}, ${gradientTo})` }}>

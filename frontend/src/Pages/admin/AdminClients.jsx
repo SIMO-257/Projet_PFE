@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from '../../hooks/useTranslation';
 import { getClients, toggleClientStatus } from '../../services/adminService';
 
 const AdminClients = () => {
+  const { t } = useTranslation();
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -15,7 +17,7 @@ const AdminClients = () => {
       setClients(response.data.data.data);
       setPagination(response.data.data);
     } catch (err) {
-      console.error('Erreur lors du chargement des clients');
+      console.error(t('purchase_error'));
     } finally {
       setLoading(false);
     }
@@ -43,13 +45,13 @@ const AdminClients = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-white">Gestion des Clients</h2>
-          <p className="text-white/50">Liste des utilisateurs de l'application CasaWay.</p>
+          <h2 className="text-2xl font-bold text-white">{t('admin_client_management')}</h2>
+          <p className="text-white/50">{t('admin_client_subtitle')}</p>
         </div>
         <div className="relative">
           <input
             type="text"
-            placeholder="Rechercher (Nom, Email)..."
+            placeholder={t('search_name_email')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white w-64 focus:outline-none focus:border-yellow-500/50 transition-all"
@@ -61,21 +63,21 @@ const AdminClients = () => {
         <table className="w-full text-left">
           <thead className="bg-white/5 text-white/60 text-xs uppercase">
             <tr>
-              <th className="px-6 py-4 font-medium">Nom</th>
-              <th className="px-6 py-4 font-medium">Email</th>
-              <th className="px-6 py-4 font-medium">Statut</th>
-              <th className="px-6 py-4 font-medium">Inscription</th>
-              <th className="px-6 py-4 font-medium">Actions</th>
+              <th className="px-6 py-4 font-medium">{t('table_name')}</th>
+              <th className="px-6 py-4 font-medium">{t('table_email')}</th>
+              <th className="px-6 py-4 font-medium">{t('table_status')}</th>
+              <th className="px-6 py-4 font-medium">{t('table_registration')}</th>
+              <th className="px-6 py-4 font-medium">{t('table_actions')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
             {loading && clients.length === 0 ? (
               <tr>
-                <td colSpan="5" className="px-6 py-12 text-center text-white/40">Chargement des clients...</td>
+                <td colSpan="5" className="px-6 py-12 text-center text-white/40">{t('loading_clients')}</td>
               </tr>
             ) : clients.length === 0 ? (
               <tr>
-                <td colSpan="5" className="px-6 py-12 text-center text-white/40">Aucun client trouvé.</td>
+                <td colSpan="5" className="px-6 py-12 text-center text-white/40">{t('no_client_found')}</td>
               </tr>
             ) : (
               clients.map((client) => (
@@ -92,7 +94,7 @@ const AdminClients = () => {
                         ? 'bg-green-500/10 text-green-400 border border-green-500/20' 
                         : 'bg-red-500/10 text-red-400 border border-red-500/20'
                     }`}>
-                      {client.is_active ? 'Actif' : 'Bloqué'}
+                      {client.is_active ? t('status_active_admin') : t('status_blocked_admin')}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-white/50">
@@ -107,7 +109,7 @@ const AdminClients = () => {
                           : 'text-green-400 hover:bg-green-500/10'
                       }`}
                     >
-                      {client.is_active ? 'Bloquer' : 'Débloquer'}
+                      {client.is_active ? t('action_block') : t('action_unblock')}
                     </button>
                   </td>
                 </tr>

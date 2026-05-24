@@ -75,7 +75,7 @@ export default function ValidatorScreen ()  {
         });
       } else {
         if (!ticketUuid) {
-          setError('Code invalide. Aucun ticket UUID detecte.');
+          setError('Invalid code. No ticket UUID detected.');
           return;
         }
         response = await validateTicket(ticketUuid, {
@@ -88,14 +88,14 @@ export default function ValidatorScreen ()  {
       setResult({
         ok: true,
         ticketUuid: ticketUuid || '(token)',
-        message: response?.message || 'Validation reussie.',
+        message: response?.message || 'Validation successful.',
         payload: response || null,
       });
     } catch (err) {
       setResult({
         ok: false,
         ticketUuid: ticketUuid || '(token)',
-        message: err?.response?.data?.message || 'Validation echouee.',
+        message: err?.response?.data?.message || 'Validation failed.',
         payload: err?.response?.data?.data || null,
       });
     } finally {
@@ -169,7 +169,7 @@ export default function ValidatorScreen ()  {
       setIsScanning(true);
       frameRequestRef.current = requestAnimationFrame(scanFrame);
     } catch (err) {
-      setError(err?.message || 'Impossible de demarrer la camera. Verifiez les permissions.');
+      setError(err?.message || 'Could not start camera. Check permissions.');
       stopCamera();
     }
   };
@@ -226,18 +226,18 @@ export default function ValidatorScreen ()  {
           setScanValue(raw);
           await processValidation(raw);
         } else {
-          setError('Aucun code QR detecte dans cette image. Assurez-vous que le code est lisible.');
+          setError('No QR code detected in this image. Make sure the code is readable.');
         }
       };
 
       img.onerror = () => {
         URL.revokeObjectURL(objectUrl);
-        setError("Format d'image non valide ou image corrompue.");
+        setError('Invalid image format or corrupted image.');
       };
 
       img.src = objectUrl;
     } catch (err) {
-      setError(err?.message || "Impossible d'analyser cette image.");
+      setError(err?.message || 'Could not analyze this image.');
     } finally {
       event.target.value = '';
     }

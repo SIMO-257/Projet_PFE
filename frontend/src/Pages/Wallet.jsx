@@ -11,9 +11,11 @@ import TicketHistorySkeleton from '../Components/Skeletons/TicketHistorySkeleton
 import styles from '../Styles/WalletScreen.module.css';
 import { useDispatch } from 'react-redux';
 import { setGlobalLoading } from '../Redux/Slices/uiSlice';
+import { useTranslation } from '../hooks/useTranslation';
 import { useWallet } from '../hooks/useWallet';
 
 export default function Wallet() {
+  const { t, language } = useTranslation();
   const { balance, transactions, isLoading, refreshWallet } = useWallet();
   const navigateHook = useNavigate();
   const dispatch = useDispatch();
@@ -42,16 +44,18 @@ export default function Wallet() {
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
     .slice(0, 6);
 
-  const mappedTransactions = latestSixTransactions.map(t => ({
-    id: t.id,
-    type: t.type,
-    title: t.reference || (t.type === 'recharge' ? 'Rechargement' : 'Achat'),
-    date: new Date(t.created_at).toLocaleString('fr-FR', { 
+  const dateLocale = language === 'ar' ? 'ar-MA' : language === 'en' ? 'en-US' : 'fr-FR';
+
+  const mappedTransactions = latestSixTransactions.map(trx => ({
+    id: trx.id,
+    type: trx.type,
+    title: trx.reference || (trx.type === 'recharge' ? t('recharge') : t('purchase')),
+    date: new Date(trx.created_at).toLocaleString(dateLocale, { 
       day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' 
     }),
-    amount: `${t.type === 'recharge' ? '+' : '-'}${parseFloat(t.amount).toFixed(2)} DH`,
-    isPositive: t.type === 'recharge',
-    icon: t.type === 'recharge' ? 'plus' : 'ticket'
+    amount: `${trx.type === 'recharge' ? '+' : '-'}${parseFloat(trx.amount).toFixed(2)} ${t('currency')}`,
+    isPositive: trx.type === 'recharge',
+    icon: trx.type === 'recharge' ? 'plus' : 'ticket'
   }));
 
   return (
@@ -62,7 +66,7 @@ export default function Wallet() {
             bg-gradient-to-br from-[#400106]/90 to-[#260101]/90 backdrop-blur-sm`}>
             
             <Header 
-              title="Portefeuille" 
+              title={t('wallet')} 
             />
 
             <div className="app-content no-scrollbar px-6 pb-24">
@@ -71,8 +75,8 @@ export default function Wallet() {
                 <BalanceCardSkeleton />
               ) : (
                 <BalanceCard 
-                  title="Solde disponible"
-                  amount={`${safeBalance.toFixed(2)} DH`}
+                  title={t('available_balance')}
+                  amount={`${safeBalance.toFixed(2)} ${t('currency')}`}
                   gradientFrom="#7A3B47"
                   gradientTo="#5C2A36"
                   showCircles={false}
@@ -86,7 +90,7 @@ export default function Wallet() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"/>
                   </svg>
                 }
-                label="Recharger le portefeuille"
+                label={t('recharge_wallet')}
                 onClick={handleRecharge}
                 className="mb-6 shadow-lg"
                 showArrow={false}
@@ -94,8 +98,8 @@ export default function Wallet() {
 
               <div className="mb-6">
                 <SectionHeader 
-                  title="Transactions récentes"
-                  buttonText="Tout voir"
+                  title={t('recent_transactions')}
+                  buttonText={t('view_all')}
                   onButtonClick={viewAllTransactions}
                 />
 
@@ -119,7 +123,7 @@ export default function Wallet() {
                       />
                     ))
                   ) : (
-                    <div className="text-center text-white/50 py-4">Aucune transaction récente</div>
+                    <div className="text-center text-white/50 py-4">{t('no_recent_transactions')}</div>
                   )}
                 </div>
               </div>

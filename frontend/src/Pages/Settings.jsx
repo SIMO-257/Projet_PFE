@@ -72,7 +72,7 @@ const Settings = () => {
   const handleClearCache = () => {
     if (
       window.confirm(
-        "Vider le cache supprimera les données temporaires. Continuer ?",
+        t("clear_cache_confirm"),
       )
     ) {
       // 1. Clear localStorage EXCEPT 'app_lang' and 'app_theme'
@@ -98,7 +98,7 @@ const Settings = () => {
       dispatch(resetTickets());
       dispatch(resetNotifications());
 
-      alert("Cache vidé avec succès");
+      alert(t("cache_cleared_success"));
     }
   };
 
@@ -107,14 +107,14 @@ const Settings = () => {
   };
 
   const handleDeleteOfflineData = () => {
-    if (window.confirm("Supprimer les données hors ligne ?")) {
+    if (window.confirm(t("delete_offline_confirm"))) {
       // Clear offline/ticket related keys
       const offlineKeys = ["tickets_cache", "last_sync"];
       offlineKeys.forEach((key) => localStorage.removeItem(key));
 
       dispatch(resetTickets());
       setShowOfflineModal(false);
-      alert("Données hors ligne supprimées");
+      alert(t("offline_data_deleted"));
     }
   };
 
@@ -212,7 +212,7 @@ const Settings = () => {
               <ToggleItem
                 icon="validation"
                 label={t("validation")}
-                description="Notifications de validation de tickets"
+                description={t("validation_notifications_desc")}
                 value={notificationPrefs.validation}
                 onChange={(value) =>
                   handleNotificationPrefChange("validation", value)
@@ -221,7 +221,7 @@ const Settings = () => {
               <ToggleItem
                 icon="payment"
                 label={t("payment")}
-                description="Recharges, débits, solde faible"
+                description={t("payment_notifications_desc")}
                 value={notificationPrefs.payment}
                 onChange={(value) =>
                   handleNotificationPrefChange("payment", value)
@@ -230,7 +230,7 @@ const Settings = () => {
               <ToggleItem
                 icon="security"
                 label={t("security")}
-                description="Connexions suspectes, changements"
+                description={t("security_notifications_desc")}
                 value={notificationPrefs.security}
                 onChange={(value) =>
                   handleNotificationPrefChange("security", value)
@@ -239,7 +239,7 @@ const Settings = () => {
               <ToggleItem
                 icon="promo"
                 label={t("promo")}
-                description="Offres spéciales, alertes trafic"
+                description={t("promo_notifications_desc")}
                 value={notificationPrefs.promo}
                 onChange={(value) =>
                   handleNotificationPrefChange("promo", value)
@@ -263,71 +263,71 @@ const Settings = () => {
             </Section>
 
             {/* ========== APPARENCE ========== */}
-            <Section title="Apparence">
+            <Section title={t("appearance")}>
               <ToggleItem
                 icon="darkmode"
                 label={t("dark_mode")}
-                description="Thème sombre / clair"
+                description={t("appearance_description")}
                 value={theme === "dark"}
                 onChange={handleThemeChange}
               />
             </Section>
 
             {/* ========== DONNÉES & STOCKAGE ========== */}
-            <Section title="Données & Stockage">
+            <Section title={t("data_storage")}>
               <ArrowItem
                 icon="trash"
-                label="Vider le cache"
+                label={t("clear_cache")}
                 onClick={handleClearCache}
               />
               <ArrowItem
                 icon="data"
-                label="Gérer les données hors ligne"
+                label={t("manage_offline_data")}
                 onClick={handleManageOffline}
               />
             </Section>
 
             {/* ========== CONFIDENTIALITÉ ========== */}
-            <Section title="Confidentialité">
+            <Section title={t("privacy")}>
               <ToggleItem
                 icon="analytics"
-                label="Partage des données d'analyse"
-                description="Aider à améliorer l'application"
+                label={t("share_analytics_data")}
+                description={t("share_analytics_desc")}
                 value={analyticsEnabled}
                 onChange={handleAnalyticsToggle}
               />
               <ToggleItem
                 icon="lock"
-                label="Authentification pour achats"
-                description="Demander le code PIN/biométrie"
+                label={t("auth_purchase")}
+                description={t("auth_purchase_desc")}
                 value={authPurchase}
                 onChange={handleAuthPurchaseToggle}
               />
             </Section>
 
             {/* ========== SUPPORT & LÉGAL ========== */}
-            <Section title="Support & Légal">
+            <Section title={t("support_legal")}>
               <ArrowItem
                 icon="help"
-                label="Aide & Support"
+                label={t("help_support")}
                 onClick={handleHelpSupport}
               />
               <ArrowItem
                 icon="info"
-                label="À propos"
-                value="Version 2.4.1"
+                label={t("about")}
+                value={`${t("version")} 2.4.1`}
                 onClick={handleAbout}
               />
               <ArrowItem
                 icon="privacy"
-                label="Politique de confidentialité"
+                label={t("privacy_policy")}
                 onClick={handlePrivacyPolicy}
               />
             </Section>
 
             {/* Footer */}
             <div className="text-center text-white/30 text-xs mt-6 pb-4">
-              <p>© 2026 CasaWay • Tous droits réservés</p>
+              <p>{t("all_rights_reserved")}</p>
             </div>
           </div>
         </div>
@@ -350,17 +350,16 @@ const Settings = () => {
           </div>
           <h3 className="text-white text-xl font-bold mb-1">CasaWay</h3>
           <p className="text-yellow-500 text-sm font-medium mb-4">
-            Version 2.4.1
+            {t("version")} 2.4.1
           </p>
 
           <div className="space-y-3 text-white/60 text-sm mb-6">
             <p>
-              Application de billetterie pour le réseau de transport urbain de
-              Casablanca.
+              {t("about_description")}
             </p>
-            <p>Tramway & Busway — Rechargez, validez, voyagez.</p>
+            <p>{t("about_tagline")}</p>
             <p className="pt-2 border-t border-white/5">
-              Développé dans le cadre d'un Projet de Fin d'Études (PFE).
+              {t("about_pfe")}
             </p>
           </div>
 
@@ -368,7 +367,7 @@ const Settings = () => {
             onClick={() => setShowAboutModal(false)}
             className="w-full py-3 bg-yellow-500 hover:bg-yellow-600 text-black font-bold rounded-xl transition-colors"
           >
-            Fermer
+            {t("close")}
           </button>
         </div>
       </ModalOverlay>
@@ -380,31 +379,31 @@ const Settings = () => {
       >
         <div className="bg-[#1a0507] border border-yellow-500/20 rounded-2xl p-6 max-w-sm w-full">
           <h3 className="text-white text-xl font-bold mb-4">
-            Données hors ligne
+            {t("offline_data")}
           </h3>
 
           <div className="space-y-4 mb-6">
             <div className="flex justify-between items-center text-sm">
-              <span className="text-white/60">Espace utilisé</span>
+              <span className="text-white/60">{t("storage_used")}</span>
               <span className="text-white font-medium">{getStorageSize()}</span>
             </div>
 
             <div className="space-y-2">
               <p className="text-white/40 text-xs uppercase tracking-wider">
-                Éléments mis en cache
+                {t("cached_items")}
               </p>
               <ul className="space-y-1 text-white/80 text-sm">
                 <li className="flex items-center space-x-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-yellow-500"></div>
-                  <span>Tickets & Titres de transport</span>
+                  <span>{t("cached_tickets")}</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-yellow-500"></div>
-                  <span>Historique des validations</span>
+                  <span>{t("cached_validations")}</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-yellow-500"></div>
-                  <span>Solde du portefeuille</span>
+                  <span>{t("cached_wallet_balance")}</span>
                 </li>
               </ul>
             </div>
@@ -415,13 +414,13 @@ const Settings = () => {
               onClick={handleDeleteOfflineData}
               className="w-full py-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 font-bold rounded-xl transition-colors border border-red-500/20"
             >
-              Supprimer les données
+              {t("delete_offline_data")}
             </button>
             <button
               onClick={() => setShowOfflineModal(false)}
               className="w-full py-3 bg-white/5 hover:bg-white/10 text-white font-bold rounded-xl transition-colors"
             >
-              Fermer
+              {t("close")}
             </button>
           </div>
         </div>
@@ -501,7 +500,7 @@ const ArrowItem = ({ icon, label, value, onClick }) => (
     <div className="flex items-center space-x-2">
       {value && <span className="text-white/60 text-xs">{value}</span>}
       <svg
-        className="w-5 h-5 text-white/40"
+        className="w-5 h-5 text-white/40 rtl-flip"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"

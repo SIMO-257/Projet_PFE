@@ -1,7 +1,9 @@
 import React from 'react';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const NotificationItem = ({ item, onRead, onDelete }) => {
     const { id, type, title, body, time_ago, is_read, severity } = item;
+    const { t } = useTranslation();
     const isDanger = severity === 'danger';
 
     const getIcon = () => {
@@ -76,11 +78,11 @@ const NotificationItem = ({ item, onRead, onDelete }) => {
             system: 'bg-gray-500/10 text-gray-400 border-gray-500/20',
         };
         const labels = {
-            validation: 'Validation',
-            payment: 'Paiement',
-            security: 'Sécurité',
-            promo: 'Promo',
-            system: 'Système',
+            validation: t('validation'),
+            payment: t('payment'),
+            security: t('security'),
+            promo: t('promo'),
+            system: t('system'),
         };
         return (
             <span className={`text-[10px] px-2 py-0.5 rounded-full border ${colors[type] || colors.system}`}>

@@ -1,6 +1,7 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { useState } from 'react';
 import { signupClient } from '../services/clientService';
+import { useTranslation } from '../hooks/useTranslation';
 
 import InputField from '../Components/Inputs/InputField';
 import CheckboxInput from '../Components/Inputs/CheckboxInput';
@@ -20,6 +21,7 @@ const DISPOSABLE_DOMAINS = [
 export default function SignUp() {
 
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     const [form, setForm] = useState({
         full_name: '',
@@ -72,13 +74,13 @@ export default function SignUp() {
         if (!form.email) return;
 
         if (!emailRegex.test(form.email)) {
-            setErrors(prev => ({ ...prev, email: 'Adresse email invalide.' }));
+            setErrors(prev => ({ ...prev, email: t('email_invalid') }));
             return;
         }
 
         const domain = form.email.split('@')[1]?.toLowerCase();
         if (DISPOSABLE_DOMAINS.includes(domain)) {
-            setErrors(prev => ({ ...prev, email: 'Adresse email temporaire non autorisée.' }));
+            setErrors(prev => ({ ...prev, email: t('email_temporary_not_allowed') }));
             return;
         }
     };
@@ -93,14 +95,14 @@ export default function SignUp() {
         // Final frontend check
         if (errors.email) return;
         if (passwordStrength === 'weak' || passwordStrength === null) {
-            setErrors(prev => ({ ...prev, password: 'Le mot de passe est trop faible.' }));
+            setErrors(prev => ({ ...prev, password: t('password_weak') }));
             return;
         }
 
         setErrors({});
 
         if (!form.accept_terms) {
-            setErrors({ accept_terms: 'Vous devez accepter les conditions.' });
+            setErrors({ accept_terms: t('must_accept_terms') });
             return;
         }
 
@@ -137,26 +139,28 @@ export default function SignUp() {
 
                 setErrors(nextErrors);
             } else {
-                setErrors({ form: "Inscription echouee. Reessayez." });
+                setErrors({ form: t('signup_failed') });
             }
         } finally {
             setProcessing(false);
         }
     };
 
+    const strengthLabelClass = passwordStrength === 'weak' ? 'text-red-500' : (passwordStrength === 'medium' ? 'text-yellow-600' : 'text-green-600');
+
     return (
         <AuthLayout
-            subtitle="Creer un Compte"
-            description="Rejoignez l'experience premium du mobile intelligent"
-            footerText="Deja un compte?"
-            footerLinkText="Se connecter"
+            subtitle={t('signup_title')}
+            description={t('signup_description')}
+            footerText={t('already_account')}
+            footerLinkText={t('sign_in_link')}
             footerLinkTo="/login"
             onSubmit={Sign_up}
         >
              <InputField
-                label="Nom Complet"
+                label={t('full_name')}
                 type="text"
-                placeholder="Entrez votre nom complet"
+                placeholder={t('full_name_placeholder')}
                 id="signup-name"
                 var={form.full_name}
                 setVar={setField('full_name')}
@@ -166,9 +170,9 @@ export default function SignUp() {
             />
 
             <InputField
-                label="Email"
+                label={t('email')}
                 type="email"
-                placeholder="votre@email.com"
+                placeholder={t('email_placeholder')}
                 id="signup-email"
                 var={form.email}
                 setVar={setField('email')}
@@ -179,9 +183,9 @@ export default function SignUp() {
             />
 
             <InputField
-                label="Telephone"
+                label={t('phone_number')}
                 type="tel"
-                placeholder="06 12 34 56 78"
+                placeholder={t('phone_placeholder')}
                 id="signup-number"
                 var={form.phone}
                 setVar={setField('phone')}
@@ -191,9 +195,9 @@ export default function SignUp() {
             />
 
             <InputField
-                label="Mot de passe"
+                label={t('password')}
                 type="password"
-                placeholder="********"
+                placeholder={t('password_placeholder')}
                 id="signup-password"
                 var={form.password}
                 setVar={setField('password')}
@@ -210,8 +214,8 @@ export default function SignUp() {
                         <div className={`h-1 flex-1 rounded-full transition-colors ${passwordStrength === 'medium' || passwordStrength === 'strong' ? (passwordStrength === 'medium' ? 'bg-yellow-500' : 'bg-green-500') : 'bg-gray-200'}`} />
                         <div className={`h-1 flex-1 rounded-full transition-colors ${passwordStrength === 'strong' ? 'bg-green-500' : 'bg-gray-200'}`} />
                     </div>
-                    <p className={`text-[10px] font-medium uppercase tracking-wider ${passwordStrength === 'weak' ? 'text-red-500' : (passwordStrength === 'medium' ? 'text-yellow-600' : 'text-green-600')}`}>
-                        Force: {passwordStrength === 'weak' ? 'Faible' : (passwordStrength === 'medium' ? 'Moyenne' : 'Forte')}
+                    <p className={`text-[10px] font-medium uppercase tracking-wider ${strengthLabelClass}`}>
+                        {t('password_strength')}: {passwordStrength === 'weak' ? t('weak') : (passwordStrength === 'medium' ? t('medium') : t('strong'))}
                     </p>
                 </div>
             )}
@@ -219,32 +223,32 @@ export default function SignUp() {
             {/* Password Rules */}
             {form.password && (
                 <div className="mb-6 p-3 bg-gray-50 rounded-xl border border-gray-100">
-                    <p className="text-[10px] text-gray-400 uppercase tracking-widest mb-2 font-bold">Exigences:</p>
+                    <p className="text-[10px] text-gray-400 uppercase tracking-widest mb-2 font-bold">{t('password_requirements')}</p>
                     <ul className="space-y-1">
                         <li className={`flex items-center gap-2 text-[11px] ${form.password.length >= 8 ? 'text-green-600' : 'text-gray-400'}`}>
                             <div className={`w-1 h-1 rounded-full ${form.password.length >= 8 ? 'bg-green-600' : 'bg-gray-300'}`} />
-                            Au moins 8 caractères
+                            {t('min_chars')}
                         </li>
                         <li className={`flex items-center gap-2 text-[11px] ${/[A-Z]/.test(form.password) && /[a-z]/.test(form.password) ? 'text-green-600' : 'text-gray-400'}`}>
                             <div className={`w-1 h-1 rounded-full ${/[A-Z]/.test(form.password) && /[a-z]/.test(form.password) ? 'bg-green-600' : 'bg-gray-300'}`} />
-                            Majuscules & minuscules
+                            {t('upper_lower_case')}
                         </li>
                         <li className={`flex items-center gap-2 text-[11px] ${/[0-9]/.test(form.password) ? 'text-green-600' : 'text-gray-400'}`}>
                             <div className={`w-1 h-1 rounded-full ${/[0-9]/.test(form.password) ? 'bg-green-600' : 'bg-gray-300'}`} />
-                            Au moins un chiffre
+                            {t('at_least_one_number')}
                         </li>
                         <li className={`flex items-center gap-2 text-[11px] ${/[^A-Za-z0-9]/.test(form.password) ? 'text-green-600' : 'text-gray-400'}`}>
                             <div className={`w-1 h-1 rounded-full ${/[^A-Za-z0-9]/.test(form.password) ? 'bg-green-600' : 'bg-gray-300'}`} />
-                            Un caractère spécial
+                            {t('special_char')}
                         </li>
                     </ul>
                 </div>
             )}
 
             <InputField
-                label="Confirmer le mot de passe"
+                label={t('confirm_password')}
                 type="password"
-                placeholder="********"
+                placeholder={t('confirm_password_placeholder')}
                 id="signup-password-confirmation"
                 var={form.password_confirmation}
                 setVar={setField('password_confirmation')}
@@ -254,7 +258,7 @@ export default function SignUp() {
             />
 
             <FormOptions
-                leftContent={<CheckboxInput label={<>J'accepte les <Link className={styles.authLink} to='/terms-and-conditions'>Conditions d'utilisation</Link> et <Link className={styles.authLink} to='/terms-and-conditions'>Politique de Confidentialite</Link></>} id="remember" setCheck={toggleTerms} check={form.accept_terms} />}
+                leftContent={<CheckboxInput label={<>{t('accept_terms')} <Link className={styles.authLink} to='/terms-and-conditions'>{t('terms_conditions')}</Link> {t('and')} <Link className={styles.authLink} to='/terms-and-conditions'>{t('privacy_policy')}</Link></>} id="remember" setCheck={toggleTerms} check={form.accept_terms} />}
                 rightContent=""
             />
 
@@ -262,7 +266,7 @@ export default function SignUp() {
             {errors.form && <p className={styles.fieldError}>{errors.form}</p>}
 
             <ConnexionButton type="submit" variant="primary" disabled={processing || !form.accept_terms}>
-                {processing ? 'Inscription...' : 'Inscription'}
+                {processing ? t('signing_up') : t('sign_up_btn')}
             </ConnexionButton>
         </AuthLayout>
     );

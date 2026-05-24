@@ -1,8 +1,10 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from '../hooks/useTranslation';
 import styles from '../Styles/ConfirmationPaiment.module.css';
 
 export default function ValidationSuccess () {
+    const { t, language } = useTranslation();
     const location = useLocation();
     const navigate = useNavigate();
     const { ticket } = location.state || {};
@@ -21,7 +23,8 @@ export default function ValidationSuccess () {
 
     const formatDate = (dateString) => {
         if (!dateString) return new Date().toLocaleString();
-        return new Date(dateString).toLocaleString('fr-FR', {
+        const locale = language === 'ar' ? 'ar-MA' : language === 'en' ? 'en-US' : 'fr-FR';
+        return new Date(dateString).toLocaleString(locale, {
             day: '2-digit', month: 'short', year: 'numeric',
             hour: '2-digit', minute: '2-digit'
         });
@@ -41,9 +44,9 @@ export default function ValidationSuccess () {
 
                 {/* Header */}
                 <header className={styles.header}>
-                    <h2 className={styles.subTitle}>Validation Réussie !</h2>
+                    <h2 className={styles.subTitle}>{t('validation_success_title')}</h2>
                     <p className={styles.description}>
-                        Votre billet a été validé avec succès. Bon voyage !
+                        {t('validation_success_desc')}
                     </p>
                 </header>
 
@@ -56,17 +59,17 @@ export default function ValidationSuccess () {
                             <path d="M7 8V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2" strokeWidth="2"/>
                         </svg>
                         <span className={styles.ticketType}>
-                            {ticket.ticket_type?.name_fr || "Billet"}
+                            {ticket.ticket_type?.name || t('bill_ticket_label')}
                         </span>
                     </div>
                     
                     <div className={styles.ticketDetails}>
                         <div className={styles.detailRow}>
-                            <span className={styles.label}>ID Billet</span>
+                            <span className={styles.label}>{t('ticket_id_label')}</span>
                             <span className={styles.value}>{ticket.uuid.substring(0, 8).toUpperCase()}</span>
                         </div>
                         <div className={styles.detailRow}>
-                            <span className={styles.label}>Date de validation</span>
+                            <span className={styles.label}>{t('validation_date_label')}</span>
                             <span className={styles.value}>{formatDate(new Date())}</span>
                         </div>
                     </div>
@@ -77,7 +80,7 @@ export default function ValidationSuccess () {
                             <line x1="12" y1="8" x2="12" y2="12" strokeWidth="2"/>
                             <circle cx="12" cy="16" r="0.5" fill="currentColor" strokeWidth="0"/>
                         </svg>
-                        Billet Utilisé
+                        {t('ticket_used_badge')}
                     </div>
                 </section>
                 )}
@@ -88,13 +91,13 @@ export default function ValidationSuccess () {
                         <svg className={styles.btnIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" strokeWidth="2"/>
                         </svg>
-                        Retour à l'accueil
+                        {t('return_home')}
                     </button>
                     <button className={styles.btnSecondary} onClick={handleViewTicket}>
                         <svg className={styles.btnIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <rect x="3" y="8" width="18" height="12" rx="2" strokeWidth="2"/>
                         </svg>
-                        Voir les détails du billet
+                        {t('show_my_ticket_btn')}
                     </button>
                 </div>
             </div>

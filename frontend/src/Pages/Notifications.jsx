@@ -132,10 +132,7 @@ export default function Notifications() {
                                     <button 
                                         onClick={loadMore}
                                         disabled={loadingMore}
-                                        className="w-full py-4 text-[10px] text-yellow-500 font-bold uppercase tracking-[0.2em] rounded-2xl border border-yellow-500/10 hover:bg-yellow-500/5 transition-colors disabled:opacity-50"
-                                    >
-                                        Loading...
-                                    </button>
+                                        className="w-full py-4 text-[10px] text-yellow-500 font-bold uppercase tracking-[0.2em] rounded-2xl border border-yellow-500/10 hover:bg-yellow-500/5 transition-colors disabled:opacity-50"                                    >{t('loading')}</button>
                                 )}
                             </>
                         )}

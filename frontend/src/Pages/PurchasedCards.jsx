@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from '../hooks/useTranslation';
 import Header from '../Components/Layout/Header';
 import PurchasedCardItem from '../Components/Cards/PurchasedCardItem';
 import { fetchPurchasedCards, setDefaultPurchasedCard } from '../services/ticketService';
 
 export default function PurchasedCards  ()  {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [cards, setCards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState(null);
@@ -20,7 +22,7 @@ export default function PurchasedCards  ()  {
       const data = await fetchPurchasedCards();
       setCards(Array.isArray(data) ? data : []);
     } catch (err) {
-      setError(err?.response?.data?.message || 'Erreur lors du chargement des tickets.');
+      setError(err?.response?.data?.message || t('purchase_error'));
     } finally {
       setLoading(false);
     }
@@ -37,7 +39,7 @@ export default function PurchasedCards  ()  {
       await setDefaultPurchasedCard(ticketId);
       await loadCards();
     } catch (err) {
-      setError(err?.response?.data?.message || 'Impossible de definir ce ticket par defaut.');
+      setError(err?.response?.data?.message || t('activation_error'));
     } finally {
       setSavingId(null);
     }
@@ -47,14 +49,14 @@ export default function PurchasedCards  ()  {
     <div className="app-shell">
       <div className="app-frame">
         <div className="app-card relative rounded-3xl shadow-2xl border border-yellow-500/20 overflow-hidden bg-gradient-to-br from-[#400106]/90 to-[#260101]/90 backdrop-blur-sm">
-          <Header title="Mes cartes achetees" showBackButton={true} onBack={() => navigate(-1)} />
+          <Header title={t('purchased_cards')} showBackButton={true} onBack={() => navigate(-1)} />
 
           <div className="app-content no-scrollbar px-6 pb-24">
             {error && <p className="text-red-300 text-xs mb-3">{error}</p>}
             {loading ? (
-              <p className="text-white/60 text-sm py-4">Chargement...</p>
+              <p className="text-white/60 text-sm py-4">{t('loading')}</p>
             ) : visibleCards.length === 0 ? (
-              <p className="text-white/60 text-sm py-4 italic">Aucun ticket achete.</p>
+              <p className="text-white/60 text-sm py-4 italic">{t('no_purchased_ticket')}</p>
             ) : (
               <div className="space-y-3 py-2">
                 {visibleCards.map((card) => (

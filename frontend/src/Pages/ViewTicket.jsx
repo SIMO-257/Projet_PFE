@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from '../hooks/useTranslation';
 import { fetchTicketDetails } from '../services/ticketService';
 import { CheckCircle, Ticket, Calendar, ShieldCheck, RefreshCcw } from 'lucide-react';
 import Header from '../Components/Layout/Header';
 
 export default function ViewTicket() {
+    const { t, language } = useTranslation();
     const { id: uuid } = useParams();
     const navigate = useNavigate();
 
@@ -19,11 +21,11 @@ export default function ViewTicket() {
                 if (data) {
                     setTicket(data);
                 } else {
-                    setError('Billet non trouve.');
+                    setError(t('no_ticket_found'));
                 }
             } catch (err) {
                 console.error('Failed to fetch ticket details', err);
-                setError('Billet non trouve ou erreur de connexion.');
+                setError(t('ticket_not_found_error'));
             } finally {
                 setLoading(false);
             }
@@ -41,7 +43,7 @@ export default function ViewTicket() {
             <div className="app-shell">
                 <div className="app-frame">
                     <div className="app-card items-center justify-center">
-                        <p className="text-white text-center">Chargement des details...</p>
+                        <p className="text-white text-center">{t('loading_details')}</p>
                     </div>
                 </div>
             </div>
@@ -53,19 +55,20 @@ export default function ViewTicket() {
             <div className="app-shell">
                 <div className="app-frame">
                     <div className="app-card bg-[#400106]/90 p-8 text-center justify-center">
-                        <p className="text-red-400 mb-6">{error || 'Erreur inconnue.'}</p>
-                        <button onClick={goBack} className="text-yellow-500 font-medium">Retour a mes billets</button>
+                        <p className="text-red-400 mb-6">{error || t('unknown_error')}</p>
+                        <button onClick={goBack} className="text-yellow-500 font-medium">{t('back_to_my_tickets')}</button>
                     </div>
                 </div>
             </div>
         );
     }
 
-    const validUntil = new Date(ticket.valid_until).toLocaleString('fr-FR', {
+    const locale = language === 'ar' ? 'ar-MA' : language === 'en' ? 'en-US' : 'fr-FR';
+    const validUntil = new Date(ticket.valid_until).toLocaleString(locale, {
         day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
     });
 
-    const purchaseDate = new Date(ticket.created_at).toLocaleString('fr-FR', {
+    const purchaseDate = new Date(ticket.created_at).toLocaleString(locale, {
         day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
     });
 
@@ -74,7 +77,7 @@ export default function ViewTicket() {
             <div className="app-frame">
                 <div className="app-card relative rounded-3xl shadow-2xl border border-yellow-500/20 overflow-hidden bg-gradient-to-br from-[#400106]/90 to-[#260101]/90 backdrop-blur-sm">
 
-                <Header title="Details du Billet" showBackButton={true} onBack={goBack} />
+                <Header title={t('ticket_details')} showBackButton={true} onBack={goBack} />
 
                 <div className="app-content p-6 pb-12 custom-scrollbar">
 
@@ -82,27 +85,27 @@ export default function ViewTicket() {
                         <CheckCircle size={24} className={ticket.status === 'active' ? 'text-green-500' : (ticket.status === 'used' ? 'text-yellow-500' : 'text-red-500')} />
                         <div>
                             <p className={`font-bold ${ticket.status === 'active' ? 'text-green-500' : (ticket.status === 'used' ? 'text-yellow-500' : 'text-red-500')}`}>
-                                {ticket.status === 'active' ? 'BILLET VALIDE' : (ticket.status === 'used' ? 'BILLET UTILISÉ' : 'BILLET EXPIRE')}
+                                {ticket.status === 'active' ? t('ticket_valid_status') : (ticket.status === 'used' ? t('ticket_used_status') : t('ticket_expired_status'))}
                             </p>
-                            <p className="text-white/60 text-xs">Jusqu'au {validUntil}</p>
+                            <p className="text-white/60 text-xs">{t('valid_until_label', { date: validUntil })}</p>
                         </div>
                     </div>
 
                     <div className="space-y-4 bg-black/20 rounded-2xl p-4 border border-white/5">
-                        <DetailRow icon={<Ticket size={18} />} label="Type de Billet" value={ticket.ticket_type?.name_fr} />
-                        <DetailRow icon={<ShieldCheck size={18} />} label="ID Unique" value={ticket.uuid.substring(0, 18).toUpperCase() + '...'} />
-                        <DetailRow icon={<Calendar size={18} />} label="Date d'Achat" value={purchaseDate} />
+                        <DetailRow icon={<Ticket size={18} />} label={t('ticket_type')} value={ticket.ticket_type?.name} />
+                        <DetailRow icon={<ShieldCheck size={18} />} label={t('ticket_unique_id_label')} value={ticket.uuid.substring(0, 18).toUpperCase() + '...'} />
+                        <DetailRow icon={<Calendar size={18} />} label={t('purchase_date')} value={purchaseDate} />
                         {!ticket.ticket_type?.is_reusable && ticket.remaining_uses !== undefined && (
-                            <DetailRow icon={<RefreshCcw size={18} />} label="Utilisations restantes" value={ticket.remaining_uses} />
+                            <DetailRow icon={<RefreshCcw size={18} />} label={t('remaining_uses_label')} value={ticket.remaining_uses} />
                         )}
                         <div className="pt-2 border-t border-white/5 flex justify-between items-center">
-                            <span className="text-white/40 text-sm">Prix paye</span>
-                            <span className="text-yellow-500 font-bold text-lg">{ticket.price_paid} DH</span>
+                            <span className="text-white/40 text-sm">{t('price_paid_label')}</span>
+                            <span className="text-yellow-500 font-bold text-lg">{ticket.price_paid} {t('currency')}</span>
                         </div>
                     </div>
 
                     <p className="text-white/30 text-[10px] text-center mt-8 px-6">
-                        Ce billet est personnel et non transmissible. En cas de controle, presentez votre QR Code ainsi qu'une piece d'identite si necessaire.
+                        {t('ticket_disclaimer')}
                     </p>
                 </div>
               </div>

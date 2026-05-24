@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { useTranslation } from '../hooks/useTranslation';
 
 
 import InputField from '../Components/Inputs/InputField';
@@ -13,6 +14,7 @@ import styles from '../Styles/Auth.module.css';
 export default function Login() {
     const navigate = useNavigate();
     const { login, isAuthenticated, error: authError, isLoading } = useAuth();
+    const { t } = useTranslation();
 
     const [form, setForm] = useState({
         email: '',
@@ -54,36 +56,36 @@ export default function Login() {
                 const responseErrors = response?.errors || response?.data;
                 if (responseErrors) {
                     if (responseErrors.email || responseErrors.password) {
-                        const generic = 'Password or Email are not valid';
+                        const generic = t('login_error');
                         setErrors({ email: generic, password: generic });
                     } else {
                         setErrors(responseErrors);
                     }
                 } else {
-                    const message = resultAction.payload?.message || 'Password or Email are not valid';
+                    const message = resultAction.payload?.message || t('login_error');
                     if (String(message).toLowerCase() !== 'unauthenticated.') {
                         setErrors({ form: message });
                     }
                 }
             }
         } catch (err) {
-            setErrors({ form: 'An unexpected error occurred' });
+            setErrors({ form: t('unexpected_error') });
         }
     };
 
     return (
         <AuthLayout
-            subtitle="Bon retour"
-            description="Connectez-vous pour accéder à votre expérience préférée."
-            footerText="Pas encore membre?"
-            footerLinkText="Créer un compte"
+            subtitle={t('welcome_back')}
+            description={t('login_description')}
+            footerText={t('no_account')}
+            footerLinkText={t('create_account')}
             footerLinkTo="/signup"
             onSubmit={Log_in}
         >
             <InputField
-                label="Email"
+                label={t('email')}
                 type="email"
-                placeholder="votre@email.com"
+                placeholder={t('email_placeholder')}
                 id="login-email"
                 var={form.email}
                 setVar={setField('email')}
@@ -93,9 +95,9 @@ export default function Login() {
             />
 
             <InputField
-                label="Mot de passe"
+                label={t('password')}
                 type="password"
-                placeholder="********"
+                placeholder={t('password_placeholder')}
                 id="login-password"
                 var={form.password}
                 setVar={setField('password')}
@@ -105,12 +107,12 @@ export default function Login() {
             />
           
             <FormOptions
-                leftContent={<CheckboxInput label="Se souvenir" id="remember" setCheck={toggleRemember} check={form.remember_me} />}
-                rightContent={<Link to="/forgot_password" className={styles.forgotPassword} >Mot de passe oublié?</Link>}
+                leftContent={<CheckboxInput label={t('remember_me')} id="remember" setCheck={toggleRemember} check={form.remember_me} />}
+                rightContent={<Link to="/forgot_password" className={styles.forgotPassword} >{t('forgot_password')}</Link>}
             />
 
             <ConnexionButton type="submit" variant="primary" disabled={isLoading}>
-                {isLoading ? 'Connexion...' : 'Connexion'}
+                {isLoading ? t('signing_in') : t('sign_in_btn')}
             </ConnexionButton>
         </AuthLayout>
 

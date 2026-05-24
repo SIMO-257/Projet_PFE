@@ -74,7 +74,7 @@ export default function Profile()  {
 
               <div className="space-y-3">
                 <ProfilInfo
-                  label="Email"
+                  label={t('email')}
                   value={profile?.email ?? '—'}
                   truncate={true}
                   icon={

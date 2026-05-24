@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { forgotPasswordClient } from '../services/clientService';
+import { useTranslation } from '../hooks/useTranslation';
 
 import InputField from '../Components/Inputs/InputField';
 import ConnexionButton from '../Components/Buttons/ConnexionButton';
@@ -8,6 +9,7 @@ import AuthLayout from '../Components/Layout/AuthLayout';
 import styles from '../Styles/Auth.module.css';
 
 export default function ForgotPassword() {
+    const { t } = useTranslation();
     const [form, setForm] = useState({ email: '' });
     const [errors, setErrors] = useState({});
     const [processing, setProcessing] = useState(false);
@@ -25,13 +27,13 @@ export default function ForgotPassword() {
         try {
             setProcessing(true);
             const res = await forgotPasswordClient({ email: form.email });
-            setStatus(res?.data?.message || 'Si le compte existe, un lien de réinitialisation a été envoyé.');
+            setStatus(res?.data?.message || t('reset_link_sent'));
         } catch (err) {
             const responseErrors = err?.response?.data?.errors;
             if (responseErrors) {
                 setErrors(responseErrors);
             } else {
-                setErrors({ form: 'Échec de l\'envoi. Veuillez réessayer.' });
+                setErrors({ form: t('failed_reset') });
             }
         } finally {
             setProcessing(false);
@@ -40,18 +42,18 @@ export default function ForgotPassword() {
 
     return (
         <AuthLayout
-            subtitle="Mot de passe oublié"
-            description="Entrez votre adresse e-mail et nous vous enverrons un lien pour réinitialiser votre mot de passe."
-            footerText="Vous vous souvenez de votre mot de passe ?"
-            footerLinkText="Se connecter"
+            subtitle={t('forgot_password_title')}
+            description={t('forgot_password_desc')}
+            footerText={t('remember_password')}
+            footerLinkText={t('sign_in_link')}
             footerLinkTo="/login"
             showSocial={false}
             onSubmit={Send_Password}
         >
             <InputField
-                label="Email"
+                label={t('email')}
                 type="email"
-                placeholder="votre@email.com"
+                placeholder={t('email_placeholder')}
                 id="login-email"
                 var={form.email}
                 setVar={setField('email')}
@@ -69,16 +71,16 @@ export default function ForgotPassword() {
             )}
 
             <ConnexionButton type="submit" variant="primary" disabled={processing}>
-                {processing ? 'Envoi...' : 'Réinitialiser'}
+                {processing ? t('sending') : t('send_reset_btn')}
             </ConnexionButton>
 
             <div className="mt-10 pt-6 border-t border-white/10">
-                <h3 className={`${styles.authSubtitle} !text-lg !mb-2 text-center`}>Besoin d'aide ?</h3>
+                <h3 className={`${styles.authSubtitle} !text-lg !mb-2 text-center`}>{t('need_help')}</h3>
                 <p className={`${styles.authDescription} text-center mb-4`}>
-                    Notre équipe support est disponible 24h/7j pour vous assister.
+                    {t('support_247')}
                 </p>
                 <div className="text-yellow-400 flex justify-center space-x-6">
-                    <strong>05 55 55 55 55</strong>
+                    <strong>{t('support_phone')}</strong>
                 </div>
             </div>
         </AuthLayout>

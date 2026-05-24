@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const RechargeSummaryCard = ({ 
     amount = "0,00 DH",
@@ -7,11 +8,12 @@ const RechargeSummaryCard = ({
     currency = "DH",
     className = ""
 }) => {
+  const { t } = useTranslation();
     return (
         <div className={`bg-gradient-to-br from-[#5C2A36] to-[#3D1A24] rounded-2xl p-6 border border-white/10 ${className}`}>
             {/* New Balance */}
             <div className="mb-4">
-                <p className="text-white/60 text-xs uppercase tracking-wide mb-2">Nouveau solde</p>
+                <p className="text-white/60 text-xs uppercase tracking-wide mb-2">{t('new_balance')}</p>
                 <h2 className="text-white text-4xl font-bold mb-1">{amount}</h2>
             </div>
 

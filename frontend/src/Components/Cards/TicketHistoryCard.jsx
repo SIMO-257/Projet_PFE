@@ -1,12 +1,16 @@
 import React from 'react';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const TicketHistoryCard = ({
-    ticketName = 'Ticket',
+    ticketName: nameProp,
     price = '0.00 DH',
-    date = 'Date',
+    date: dateProp,
     status = 'active', // 'active' | 'expired' | 'used'
     onClick = null
 }) => {
+    const { t } = useTranslation();
+    const ticketName = nameProp || t('ticket_name_default');
+    const date = dateProp || t('date_default');
     const normalizedStatus = String(status || '').toLowerCase();
 
     const getStatusColor = () => {
@@ -38,13 +42,13 @@ const TicketHistoryCard = ({
     const getStatusLabel = () => {
         switch (normalizedStatus) {
             case 'active':
-                return 'Actif';
+                return t('status_active');
             case 'expired':
-                return 'Expiré';
+                return t('status_expired');
             case 'used':
-                return 'Utilisé';
+                return t('used');
             default:
-                return status || 'Inconnu';
+                return status || t('status_unknown');
         }
     };
 

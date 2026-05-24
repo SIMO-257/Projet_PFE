@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from '../hooks/useTranslation';
 import Header from '../Components/Layout/Header';
 import styles from '../Styles/ChangeCard.module.css';
 
 export default function ChangeCard () {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // Mock card data with various statuses
   const initialCards = [
@@ -64,11 +66,11 @@ export default function ChangeCard () {
   // Helper: get status badge color and label
   const getStatusInfo = (status) => {
     switch (status) {
-      case 'active': return { color: 'bg-green-500/20 text-green-400', label: 'Active' };
-      case 'inactive': return { color: 'bg-gray-500/20 text-gray-400', label: 'Inactive' };
-      case 'blocked': return { color: 'bg-red-500/20 text-red-400', label: 'Bloquée' };
-      case 'expired': return { color: 'bg-orange-500/20 text-orange-400', label: 'Expirée' };
-      default: return { color: 'bg-white/10 text-white/40', label: 'Inconnu' };
+      case 'active': return { color: 'bg-green-500/20 text-green-400', label: t('active') };
+      case 'inactive': return { color: 'bg-gray-500/20 text-gray-400', label: t('inactive_card_label') };
+      case 'blocked': return { color: 'bg-red-500/20 text-red-400', label: t('blocked_card_label') };
+      case 'expired': return { color: 'bg-orange-500/20 text-orange-400', label: t('expired_card_label') };
+      default: return { color: 'bg-white/10 text-white/40', label: t('unknown_status') };
     }
   };
 
@@ -163,7 +165,7 @@ export default function ChangeCard () {
             
             {/* Header */}
             <Header 
-              title="Changer de carte" 
+              title={t('change_card_title')} 
               showBackButton={true} 
               onBack={goBack} 
             />
@@ -173,7 +175,7 @@ export default function ChangeCard () {
               
               {/* Current active card */}
               <div className="mb-6">
-                <h2 className="text-white/60 text-xs uppercase tracking-wide mb-3">Carte active</h2>
+                <h2 className="text-white/60 text-xs uppercase tracking-wide mb-3">{t('active_card')}</h2>
                 <div className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/10 rounded-xl border border-yellow-500/20 p-4">
                   <div className="flex items-start justify-between">
                     <div>
@@ -181,11 +183,11 @@ export default function ChangeCard () {
                       <p className="text-white text-lg font-mono font-bold mb-2">{activeCard?.cardNumber}</p>
                       <div className="flex items-center space-x-4 text-sm">
                         <div>
-                          <p className="text-white/40 text-xs">Solde</p>
+                          <p className="text-white/40 text-xs">{t('available_balance')}</p>
                           <p className="text-white font-semibold">{activeCard?.balance.toFixed(2)} MAD</p>
                         </div>
                         <div>
-                          <p className="text-white/40 text-xs">Valide jusqu'au</p>
+                          <p className="text-white/40 text-xs">{t('valid_until')}</p>
                           <p className="text-white">{activeCard?.validUntil}</p>
                         </div>
                       </div>
@@ -201,7 +203,7 @@ export default function ChangeCard () {
 
               {/* Other cards */}
               <div className="mb-6">
-                <h2 className="text-white/60 text-xs uppercase tracking-wide mb-3">Vos autres cartes</h2>
+                <h2 className="text-white/60 text-xs uppercase tracking-wide mb-3">{t('your_other_cards')}</h2>
                 <div className="space-y-3">
                   {(Array.isArray(cards) ? cards : []).filter(c => c.id !== activeCardId).map(card => {
                     const statusInfo = getStatusInfo(card.status);
@@ -212,7 +214,7 @@ export default function ChangeCard () {
                             <p className="text-white/60 text-xs">{card.type}</p>
                             <p className="text-white font-mono text-sm mb-1">{card.cardNumber}</p>
                             <div className="flex items-center space-x-3 text-xs">
-                              <span className="text-white/40">Solde: {card.balance.toFixed(2)} MAD</span>
+                              <span className="text-white/40">{t('available_balance')}: {card.balance.toFixed(2)} MAD</span>
                               <span className="text-white/40">Exp: {card.validUntil}</span>
                             </div>
                           </div>
@@ -223,22 +225,22 @@ export default function ChangeCard () {
                         <div className="flex items-center justify-end space-x-4 mt-2">
                           {/* Disable switch button if card is blocked or expired */}
                           {card.status === 'blocked' || card.status === 'expired' ? (
-                            <span className="text-white/30 text-xs" title={card.status === 'blocked' ? 'Carte bloquée' : 'Carte expirée'}>
-                              Utilisation impossible
+                            <span className="text-white/30 text-xs" title={card.status === 'blocked' ? t('blocked_card_label') : t('expired_card_label')}>
+                              {t('usage_impossible')}
                             </span>
                           ) : (
                             <button
                               onClick={() => handleSelectCard(card.id)}
                               className="text-yellow-500 text-xs font-medium hover:text-yellow-400"
                             >
-                              Utiliser cette carte
+                              {t('use_this_card')}
                             </button>
                           )}
                           <button
                             onClick={() => handleRemoveCard(card.id)}
                             className="text-red-400 text-xs hover:text-red-300"
                           >
-                            Supprimer
+                            {t('remove_card')}
                           </button>
                         </div>
                       </div>
@@ -246,7 +248,7 @@ export default function ChangeCard () {
                   })}
                   {(Array.isArray(cards) ? cards : []).filter(c => c.id !== activeCardId).length === 0 && (
                     <p className="text-white/40 text-sm text-center py-4">
-                      Aucune autre carte. Ajoutez-en une ci-dessous.
+                      {t('no_other_cards')}
                     </p>
                   )}
                 </div>
@@ -260,7 +262,7 @@ export default function ChangeCard () {
                 <svg className="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"/>
                 </svg>
-                <span className="text-white font-medium">Ajouter une nouvelle carte</span>
+                <span className="text-white font-medium">{t('add_new_card')}</span>
               </button>
 
               {/* Help / Support link */}
@@ -269,7 +271,7 @@ export default function ChangeCard () {
                   onClick={handleSupport}
                   className="text-white/40 text-xs hover:text-white/60 transition-colors"
                 >
-                  Besoin d'aide ? Contactez le support
+                  {t('need_help')} {t('contact_us').toLowerCase()}
                 </button>
               </div>
             </div>
@@ -368,7 +370,7 @@ export default function ChangeCard () {
       {/* Success Toast */}
       {showSwitchConfirmation && switchSuccessCard && (
         <div className="toast-confirm">
-          Carte changée avec succès !
+          {t('card_changed')}
         </div>
       )}
     </>

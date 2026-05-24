@@ -236,7 +236,7 @@ class TicketController extends Controller
                     'payment',
                     'success',
                     'Confirmation d\'achat',
-                    "Vous avez acheté {$validated['quantity']} " . ($validated['quantity'] > 1 ? 'billets' : 'billet') . " ({$ticketType->name_fr}). {$totalPrice} DH débités.",
+                    "Vous avez acheté {$validated['quantity']} " . ($validated['quantity'] > 1 ? 'billets' : 'billet') . " ({$ticketType->name}). {$totalPrice} DH débités.",
                     ['ticket_type' => $ticketType->name, 'quantity' => $validated['quantity'], 'amount' => $totalPrice]
                 );
 

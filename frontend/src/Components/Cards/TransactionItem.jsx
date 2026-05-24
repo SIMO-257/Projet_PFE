@@ -1,10 +1,11 @@
 import React from 'react';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const TransactionItem = ({ 
     type = 'recharge',
-    title = 'Transaction',
+    title: titleProp,
     subtitle = '',
-    date = 'Date',
+    date: dateProp,
     time = '',
     amount = '+0,00 €',
     isPositive = true,
@@ -12,6 +13,9 @@ const TransactionItem = ({
     showTime = false,
     variant = 'default' // 'default' | 'detailed'
 }) => {
+    const { t } = useTranslation();
+    const title = titleProp || t('transaction_title_default');
+    const date = dateProp || t('date_default');
     const getIcon = () => {
         if (icon === 'plus') {
             return (

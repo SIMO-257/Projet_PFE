@@ -97,6 +97,7 @@ function App() {
   const dispatch = useDispatch();
   const { refreshProfile, isAuthChecked } = useAuth();
   const theme = useSelector((state) => state.settings.theme);
+  const language = useSelector((state) => state.settings.language);
   const { isGlobalLoading, isRouteLoading } = useSelector((state) => state.ui || { isGlobalLoading: false, isRouteLoading: false });
 
   useEffect(() => {
@@ -122,6 +123,11 @@ function App() {
       document.documentElement.classList.remove('dark');
     }
   }, [theme]);
+
+  // Set document direction based on language (RTL for Arabic, LTR for others)
+  useEffect(() => {
+    document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+  }, [language]);
 
   return (
     <BrowserRouter>
