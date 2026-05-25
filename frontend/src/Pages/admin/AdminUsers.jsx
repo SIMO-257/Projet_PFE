@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from '../../hooks/useTranslation';
-import { getClients, toggleClientStatus } from '../../services/adminService';
+import { getUsers, toggleUserStatus } from '../../services/adminService';
 
-const AdminClients = () => {
+const AdminUsers = () => {
   const { t } = useTranslation();
-  const [clients, setClients] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [pagination, setPagination] = useState(null);
   const [page, setPage] = useState(1);
 
-  const fetchClients = async () => {
+  const fetchUsers = async () => {
     try {
       setLoading(true);
-      const response = await getClients({ search, page });
-      setClients(response.data.data.data);
+      const response = await getUsers({ search, page });
+      setUsers(response.data.data.data);
       setPagination(response.data.data);
     } catch (err) {
       console.error(t('purchase_error'));
@@ -25,7 +25,7 @@ const AdminClients = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      fetchClients();
+      fetchUsers();
     }, 400);
     return () => clearTimeout(timer);
   }, [search, page]);
@@ -33,11 +33,11 @@ const AdminClients = () => {
   const handleToggleStatus = async (id) => {
     try {
       // Optimistic update
-      setClients(clients.map(c => c.id === id ? { ...c, is_active: !c.is_active } : c));
-      await toggleClientStatus(id);
+      setUsers(users.map(u => u.id === id ? { ...u, is_active: !u.is_active } : u));
+      await toggleUserStatus(id);
     } catch (err) {
       // Revert on error
-      fetchClients();
+      fetchUsers();
     }
   };
 
@@ -71,45 +71,45 @@ const AdminClients = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
-            {loading && clients.length === 0 ? (
+            {loading && users.length === 0 ? (
               <tr>
                 <td colSpan="5" className="px-6 py-12 text-center text-white/40">{t('loading_clients')}</td>
               </tr>
-            ) : clients.length === 0 ? (
+            ) : users.length === 0 ? (
               <tr>
                 <td colSpan="5" className="px-6 py-12 text-center text-white/40">{t('no_client_found')}</td>
               </tr>
             ) : (
-              clients.map((client) => (
-                <tr key={client.id} className="hover:bg-white/[0.02] transition-colors">
+              users.map((user) => (
+                <tr key={user.id} className="hover:bg-white/[0.02] transition-colors">
                   <td className="px-6 py-4">
                     <div className="text-sm font-medium text-white">
-                      {client.full_name}
+                      {user.full_name}
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-white/70">{client.email}</td>
+                  <td className="px-6 py-4 text-sm text-white/70">{user.email}</td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${
-                      client.is_active 
+                      user.is_active 
                         ? 'bg-green-500/10 text-green-400 border border-green-500/20' 
                         : 'bg-red-500/10 text-red-400 border border-red-500/20'
                     }`}>
-                      {client.is_active ? t('status_active_admin') : t('status_blocked_admin')}
+                      {user.is_active ? t('status_active_admin') : t('status_blocked_admin')}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-white/50">
-                    {new Date(client.created_at).toLocaleDateString()}
+                    {new Date(user.created_at).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4">
                     <button
-                      onClick={() => handleToggleStatus(client.id)}
+                      onClick={() => handleToggleStatus(user.id)}
                       className={`text-xs font-semibold px-3 py-1 rounded-lg transition-all ${
-                        client.is_active
+                        user.is_active
                           ? 'text-red-400 hover:bg-red-500/10'
                           : 'text-green-400 hover:bg-green-500/10'
                       }`}
                     >
-                      {client.is_active ? t('action_block') : t('action_unblock')}
+                      {user.is_active ? t('action_block') : t('action_unblock')}
                     </button>
                   </td>
                 </tr>
@@ -140,4 +140,4 @@ const AdminClients = () => {
   );
 };
 
-export default AdminClients;
+export default AdminUsers;

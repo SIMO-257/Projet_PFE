@@ -31,11 +31,11 @@ class Transaction extends Model
     ];
 
     /**
-     * Get the client that owns the transaction.
+     * Get the user that owns the transaction.
      */
-    public function client()
+    public function user()
     {
-        return $this->belongsTo(Client::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     /**

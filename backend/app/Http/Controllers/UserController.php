@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ClientRequest;
+use App\Http\Requests\UserRequest;
 use App\Http\Requests\ProfileRequest;
-use App\Models\Client;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Storage;
-
 use App\Models\AuditLog;
 
-class ClientController extends Controller
+class UserController extends Controller
 {
     public function home()
     {
@@ -22,43 +21,43 @@ class ClientController extends Controller
 
     public function fetch_profile(Request $request)
     {
-        $client = $request->user();
+        $user = $request->user();
         return $this->successResponse([
-            'name' => $client->full_name ?: 'Utilisateur',
-            'client_uuid' => $client->uuid,
-            'email' => $client->email,
-            'phone' => $client->phone,
-            'created_at' => $client->created_at->toDateString(),
-            'avatar_url' => $client->avatar_path ? Storage::disk('public')->url($client->avatar_path) : null,
+            'name' => $user->full_name ?: 'Utilisateur',
+            'client_uuid' => $user->uuid,
+            'email' => $user->email,
+            'phone' => $user->phone,
+            'created_at' => $user->created_at->toDateString(),
+            'avatar_url' => $user->avatar_path ? Storage::disk('public')->url($user->avatar_path) : null,
         ]);
     }
 
     public function update_profile(ProfileRequest $request)
     {
-        /** @var Client $client */
-        $client = $request->user();
+        /** @var User $user */
+        $user = $request->user();
 
         $validated = $request->validated();
-        $client->fill($validated);
+        $user->fill($validated);
         
-        $this->applyProfileFile($client, $request, 'profile_file');
+        $this->applyProfileFile($user, $request, 'profile_file');
 
-        $client->save();
-        $client->refresh();
+        $user->save();
+        $user->refresh();
 
         \Illuminate\Support\Facades\Log::info('Profile Saved', [
-            'client_id' => $client->id,
-            'full_name' => $client->full_name,
-            'has_avatar' => !empty($client->avatar_path)
+            'user_id' => $user->id,
+            'full_name' => $user->full_name,
+            'has_avatar' => !empty($user->avatar_path)
         ]);
 
-        AuditLog::log('profile_update', $client->id);
+        AuditLog::log('profile_update', $user->id);
 
         return $this->successResponse([
-            'name' => $client->full_name,
-            'email' => $client->email,
-            'phone' => $client->phone,
-            'avatar_url' => $client->avatar_path ? Storage::disk('public')->url($client->avatar_path) : null,
+            'name' => $user->full_name,
+            'email' => $user->email,
+            'phone' => $user->phone,
+            'avatar_url' => $user->avatar_path ? Storage::disk('public')->url($user->avatar_path) : null,
         ], 'Profile updated successfully.');
     }
 
@@ -71,32 +70,32 @@ class ClientController extends Controller
             'remember_me' => 'nullable|boolean',
         ]);
 
-        $client = Client::where('email', $credentials['email'])->first();
+        $user = User::where('email', $credentials['email'])->first();
 
-        if ($client && Hash::check($credentials['password'], $client->password_hash)) {
+        if ($user && Hash::check($credentials['password'], $user->password_hash)) {
             // Disconnect other active sessions to enforce single device usage
-            $client->tokens()->delete();
+            $user->tokens()->delete();
 
-            if (!$client->hasVerifiedEmail()) {
+            if (!$user->hasVerifiedEmail()) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Votre email n\'est pas vérifié. Vérifiez votre boîte mail ou demandez un nouvel email.',
                     'error'   => 'email_not_verified',
-                    'email'   => $client->email,
+                    'email'   => $user->email,
                 ], 403);
             }
 
-            if (!$client->is_active) {
-                AuditLog::log('login_failed_inactive', $client->id, ['email' => $credentials['email']]);
+            if (!$user->is_active) {
+                AuditLog::log('login_failed_inactive', $user->id, ['email' => $credentials['email']]);
                 return $this->errorResponse('Account is inactive.', 403);
             }
 
-            $client->last_active_at = now();
-            $client->save();
+            $user->last_active_at = now();
+            $user->save();
 
             AuditLog::log(
                 'security',
-                $client->id,
+                $user->id,
                 [
                     'type' => 'info',
                     'message' => 'Nouvelle connexion',
@@ -106,7 +105,7 @@ class ClientController extends Controller
                 ]
             );
 
-            $token = $client->createToken('auth_token')->plainTextToken;
+            $token = $user->createToken('auth_token')->plainTextToken;
 
             return $this->successResponse([
                 'access_token' => $token,
@@ -122,19 +121,19 @@ class ClientController extends Controller
     }
 
  
-    public function signup(ClientRequest $request)
+    public function signup(UserRequest $request)
     {
         $data = $request->validated();
 
-        // Prevent signups if email or phone already exist in clients or pending registrations
-        if (Client::where('email', $data['email'])->exists() || \App\Models\PendingRegistration::where('email', $data['email'])->exists()) {
+        // Prevent signups if email or phone already exist in users or pending registrations
+        if (User::where('email', $data['email'])->exists() || \App\Models\PendingRegistration::where('email', $data['email'])->exists()) {
             return $this->errorResponse('This email is already used.', 422, ['email' => ['This email is already used.']]);
         }
-        if (Client::where('phone', $data['phone'] ?? '')->exists() || \App\Models\PendingRegistration::where('phone', $data['phone'] ?? '')->exists()) {
+        if (User::where('phone', $data['phone'] ?? '')->exists() || \App\Models\PendingRegistration::where('phone', $data['phone'] ?? '')->exists()) {
             return $this->errorResponse('This phone number is already used.', 422, ['phone' => ['This phone number is already used.']]);
         }
 
-        // Create a pending registration — the real Client will be created after email verification
+        // Create a pending registration — the real User will be created after email verification
         $pending = \App\Models\PendingRegistration::create([
             'email' => $data['email'],
             'phone' => $data['phone'] ?? null,
@@ -160,14 +159,14 @@ class ClientController extends Controller
 
     public function logout(Request $request)
     {
-        /** @var Client|null $client */
-        $client = $request->user();
-        $userId = $client?->id;
+        /** @var User|null $user */
+        $user = $request->user();
+        $userId = $user?->id;
 
-        if ($client) {
-            $client->last_active_at = null;
-            $client->save();
-            $client->currentAccessToken()->delete();
+        if ($user) {
+            $user->last_active_at = null;
+            $user->save();
+            $user->currentAccessToken()->delete();
         }
 
         AuditLog::log('logout', $userId);
@@ -183,13 +182,13 @@ class ClientController extends Controller
             'email' => 'required|email',
         ]);
 
-        $client = Client::where('email', $data['email'])
+        $user = User::where('email', $data['email'])
             ->where('is_active', true)
             ->first();
 
-        if ($client) {
-            AuditLog::log('forgot_password_request', $client->id, ['email' => $data['email']]);
-            Password::broker('clients')->sendResetLink([
+        if ($user) {
+            AuditLog::log('forgot_password_request', $user->id, ['email' => $data['email']]);
+            Password::broker('users')->sendResetLink([
                 'email' => $data['email'],
             ]);
         }
@@ -214,12 +213,12 @@ class ClientController extends Controller
             ],
         ]);
 
-        $status = Password::broker('clients')->reset(
+        $status = Password::broker('users')->reset(
             $data,
-            function (Client $client, string $password): void {
-                $client->password_hash = Hash::make($password);
-                $client->save();
-                AuditLog::log('password_reset_success', $client->id);
+            function (User $user, string $password): void {
+                $user->password_hash = Hash::make($password);
+                $user->save();
+                AuditLog::log('password_reset_success', $user->id);
             }
         );
 
@@ -279,9 +278,9 @@ class ClientController extends Controller
             'card_frozen'              => false,
         ];
 
-        $prefs = array_merge($defaults, $request->user()->client_preferences ?? []);
+        $prefs = array_merge($defaults, $request->user()->user_preferences ?? []);
 
-        return $this->successResponse($prefs, 'Client preferences fetched successfully');
+        return $this->successResponse($prefs, 'User preferences fetched successfully');
     }
 
     public function updatePreferences(Request $request)
@@ -296,24 +295,24 @@ class ClientController extends Controller
             'card_frozen'                => 'sometimes|boolean',
         ]);
 
-        $current = $request->user()->client_preferences ?? [];
+        $current = $request->user()->user_preferences ?? [];
         $updated = array_merge($current, $validated);
 
-        $request->user()->update(['client_preferences' => $updated]);
+        $request->user()->update(['user_preferences' => $updated]);
 
         return $this->successResponse($updated, 'Préférences mises à jour');
     }
 
 
 
-    private function applyProfileFile(Client $client, Request $request, string $key): void
+    private function applyProfileFile(User $user, Request $request, string $key): void
     {
         if ($request->hasFile($key)) {
             // Delete old file if exists
-            if ($client->avatar_path) {
-                Storage::disk('public')->delete($client->avatar_path);
+            if ($user->avatar_path) {
+                Storage::disk('public')->delete($user->avatar_path);
             }
-            $client->avatar_path = $request->file($key)->store('avatars', 'public');
+            $user->avatar_path = $request->file($key)->store('avatars', 'public');
         }
     }
 }

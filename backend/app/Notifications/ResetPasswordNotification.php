@@ -5,7 +5,7 @@ namespace App\Notifications;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ClientResetPasswordNotification extends Notification
+class ResetPasswordNotification extends Notification
 {
     public function __construct(
         private readonly string $token

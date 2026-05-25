@@ -7,7 +7,7 @@ use App\Models\Ticket;
 use App\Models\TicketType;
 use App\Models\Wallet;
 use App\Models\Transaction;
-use App\Models\Client;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -97,14 +97,14 @@ class TicketController extends Controller
         return is_array($payload) ? $payload : null;
     }
 
-    private function resolveDefaultTicketForClient(Client $client, bool $persistFallback = true): ?Ticket
+    private function resolveDefaultTicketForUser(User $user, bool $persistFallback = true): ?Ticket
     {
         $defaultTicket = null;
 
-        if (!empty($client->default_ticket_id)) {
+        if (!empty($user->default_ticket_id)) {
             $defaultTicket = Ticket::with('ticketType')
-                ->where('id', $client->default_ticket_id)
-                ->where('user_id', $client->id)
+                ->where('id', $user->default_ticket_id)
+                ->where('user_id', $user->id)
                 ->first();
 
             if ($defaultTicket) {
@@ -120,14 +120,14 @@ class TicketController extends Controller
         }
 
         $fallback = Ticket::with('ticketType')
-            ->where('user_id', $client->id)
+            ->where('user_id', $user->id)
             ->where('status', '!=', 'expired')
             ->orderBy('created_at', 'desc')
             ->first();
 
         if ($persistFallback) {
-            $client->default_ticket_id = $fallback ? $fallback->id : null;
-            $client->save();
+            $user->default_ticket_id = $fallback ? $fallback->id : null;
+            $user->save();
         }
 
         return $fallback;
@@ -148,19 +148,19 @@ class TicketController extends Controller
     public function purchase(TicketPurchaseRequest $request)
     {
         $validated = $request->validated();
-        $client = Auth::user();
+        $user = Auth::user();
         $ticketType = TicketType::find($validated['ticket_type_id']);
         
         $totalPrice = $ticketType->price * $validated['quantity'];
 
         try {
-            return DB::transaction(function () use ($totalPrice, $ticketType, $validated, $client) {
+            return DB::transaction(function () use ($totalPrice, $ticketType, $validated, $user) {
                 // Get or create wallet inside transaction with lock
-                $wallet = Wallet::where('user_id', $client->id)->lockForUpdate()->first();
+                $wallet = Wallet::where('user_id', $user->id)->lockForUpdate()->first();
                 
                 if (!$wallet) {
                     $wallet = Wallet::create([
-                        'user_id' => $client->id,
+                        'user_id' => $user->id,
                         'balance' => 0.00 // Default if missing
                     ]);
                 }
@@ -178,7 +178,7 @@ class TicketController extends Controller
                 // 2. Create Transaction Log
                 $transaction = Transaction::create([
                     'uuid' => (string) Str::uuid(),
-                    'user_id' => $client->id,
+                    'user_id' => $user->id,
                     'type' => 'purchase',
                     'status' => 'completed',
                     'amount' => $totalPrice,
@@ -193,7 +193,7 @@ class TicketController extends Controller
                 $nextReusableStartAt = $baseStartAt->copy();
 
                 if ($ticketType->is_reusable) {
-                    $lastReusableTicket = Ticket::where('user_id', $client->id)
+                    $lastReusableTicket = Ticket::where('user_id', $user->id)
                         ->where('ticket_type_id', $ticketType->id)
                         ->whereNotNull('valid_until')
                         ->where('valid_until', '>', $baseStartAt)
@@ -212,7 +212,7 @@ class TicketController extends Controller
 
                     $ticket = Ticket::create([
                         'uuid' => (string) Str::uuid(),
-                        'user_id' => $client->id,
+                        'user_id' => $user->id,
                         'ticket_type_id' => $ticketType->id,
                         'status' => 'active',
                         'valid_from' => $validFrom,
@@ -228,11 +228,11 @@ class TicketController extends Controller
                     }
                 }
 
-                AuditLog::log('ticket_purchase', $client->id, ['ticket_type' => $ticketType->name, 'quantity' => $validated['quantity']]);
+                AuditLog::log('ticket_purchase', $user->id, ['ticket_type' => $ticketType->name, 'quantity' => $validated['quantity']]);
 
                 // 4. Send Notification
                 app(\App\Services\NotificationService::class)->send(
-                    $client,
+                    $user,
                     'payment',
                     'success',
                     'Confirmation d\'achat',
@@ -241,7 +241,7 @@ class TicketController extends Controller
                 );
 
                 // Dispatch Low Balance Event
-                event(new \App\Events\LowBalanceEvent($client, $wallet->balance));
+                event(new \App\Events\LowBalanceEvent($user, $wallet->balance));
 
                 return $this->successResponse([
                     'tickets' => $tickets,
@@ -250,7 +250,7 @@ class TicketController extends Controller
             });
         } catch (\Throwable $e) {
             Log::error('Ticket purchase failed', [
-                'client_id' => $client ? $client->id : null,
+                'user_id' => $user ? $user->id : null,
                 'ticket_type_id' => $validated['ticket_type_id'] ?? null,
                 'quantity' => $validated['quantity'] ?? null,
                 'error' => $e->getMessage(),
@@ -264,11 +264,11 @@ class TicketController extends Controller
      */
     public function show($identifier)
     {
-        $client = Auth::user();
+        $user = Auth::user();
 
         // Find by UUID or ID, restricted to the authenticated user
         $ticket = Ticket::with('ticketType')
-            ->where('user_id', $client->id)
+            ->where('user_id', $user->id)
             ->where(function ($query) use ($identifier) {
                 $query->where('uuid', $identifier)
                       ->orWhere('id', $identifier);
@@ -283,17 +283,17 @@ class TicketController extends Controller
     }
 
     /**
-     * Get all tickets for a client.
+     * Get all tickets for a user.
      */
     public function index(Request $request)
     {
-        $client = Auth::user();
+        $user = Auth::user();
 
-        if (!$client) {
+        if (!$user) {
             return $this->errorResponse('Unauthenticated.', 401);
         }
 
-        $tickets = Ticket::where('user_id', $client->id)
+        $tickets = Ticket::where('user_id', $user->id)
             ->with('ticketType')
             ->orderBy('created_at', 'desc')
             ->get();
@@ -303,10 +303,10 @@ class TicketController extends Controller
 
     public function cards(Request $request)
     {
-        $client = Auth::user();
+        $user = Auth::user();
 
-        $activeDefault = $this->resolveDefaultTicketForClient($client, true);
-        $tickets = Ticket::where('user_id', $client->id)
+        $activeDefault = $this->resolveDefaultTicketForUser($user, true);
+        $tickets = Ticket::where('user_id', $user->id)
             ->with('ticketType')
             ->orderBy('created_at', 'desc')
             ->get()
@@ -331,25 +331,26 @@ class TicketController extends Controller
 
         return $this->successResponse($tickets);
     }
+
     public function setDefaultCard(Request $request)
     {
         $validated = $request->validate([
             'ticket_id' => 'required|integer',
         ]);
 
-        /** @var Client $client */
-        $client = Auth::user();
+        /** @var User $user */
+        $user = Auth::user();
         $ticket = Ticket::with('ticketType')
             ->where('id', $validated['ticket_id'])
-            ->where('user_id', $client->id)
+            ->where('user_id', $user->id)
             ->first();
 
         if (!$ticket) {
             return $this->errorResponse('Ticket non trouve ou non autorise.', 404);
         }
 
-        $client->default_ticket_id = $ticket->id;
-        $client->save();
+        $user->default_ticket_id = $ticket->id;
+        $user->save();
 
         $ticket = Ticket::with('ticketType')->find($ticket->id);
 
@@ -364,15 +365,15 @@ class TicketController extends Controller
      */
     public function createNfcChallenge(Request $request)
     {
-        /** @var Client $client */
-        $client = Auth::user();
+        /** @var User $user */
+        $user = Auth::user();
         $token = strtoupper(Str::random(12));
         $expiresIn = 60;
         $expiresAt = now()->addSeconds($expiresIn);
-        $cacheKey = "nfc_challenge:{$client->id}:{$token}";
+        $cacheKey = "nfc_challenge:{$user->id}:{$token}";
 
         Cache::put($cacheKey, [
-            'user_id' => $client->id,
+            'user_id' => $user->id,
             'expires_at' => $expiresAt->toIso8601String(),
         ], $expiresAt);
 
@@ -392,12 +393,12 @@ class TicketController extends Controller
             'ticket_uuid' => 'required|string',
         ]);
 
-        /** @var Client $client */
-        $client = Auth::user();
+        /** @var User $user */
+        $user = Auth::user();
         $ticketUuid = trim($validated['ticket_uuid']);
 
         $ticket = Ticket::where('uuid', $ticketUuid)
-            ->where('user_id', $client->id)
+            ->where('user_id', $user->id)
             ->first();
 
         if (!$ticket) {
@@ -411,7 +412,7 @@ class TicketController extends Controller
         $payload = [
             'sub' => 'ticket_validation',
             'ticket_uuid' => $ticket->uuid,
-            'user_id' => $client->id,
+            'user_id' => $user->id,
             'iat' => $issuedAt,
             'exp' => $expiresAt,
             'jti' => $jti,
@@ -439,15 +440,15 @@ class TicketController extends Controller
             'location' => 'nullable|string',
         ]);
 
-        /** @var Client $client */
-        $client = Auth::user();
+        /** @var User $user */
+        $user = Auth::user();
         $token = trim($validated['validation_token']);
         $validatorId = $validated['validator_id'] ?? 'PC-VALIDATOR-01';
         $location = $validated['location'] ?? null;
 
         $payload = $this->parseValidationToken($token);
         if (!$payload) {
-            $this->logValidation(null, $client->id, $validatorId, 'qr', 'failure', 'Token QR invalide.', $location);
+            $this->logValidation(null, $user->id, $validatorId, 'qr', 'failure', 'Token QR invalide.', $location);
             return $this->errorResponse('Token QR invalide.', 422);
         }
 
@@ -457,29 +458,29 @@ class TicketController extends Controller
         $tokenUserId = (int) ($payload['user_id'] ?? 0);
 
         if ($ticketUuid === '' || $exp <= 0 || $jti === '') {
-            $this->logValidation(null, $client->id, $validatorId, 'qr', 'failure', 'Token QR mal forme.', $location);
+            $this->logValidation(null, $user->id, $validatorId, 'qr', 'failure', 'Token QR mal forme.', $location);
             return $this->errorResponse('Token QR mal forme.', 422);
         }
 
-        if ($tokenUserId !== (int) $client->id) {
-            $this->logValidation(null, $client->id, $validatorId, 'qr', 'failure', 'Token QR non autorise.', $location);
+        if ($tokenUserId !== (int) $user->id) {
+            $this->logValidation(null, $user->id, $validatorId, 'qr', 'failure', 'Token QR non autorise.', $location);
             return $this->errorResponse('Token QR non autorise.', 403);
         }
 
         if (now()->timestamp > $exp) {
-            $this->logValidation(null, $client->id, $validatorId, 'qr', 'failure', 'Token QR expire.', $location);
+            $this->logValidation(null, $user->id, $validatorId, 'qr', 'failure', 'Token QR expire.', $location);
             return $this->errorResponse('Token QR expire.', 422);
         }
 
         $usedJtiKey = "qr_validation_token_used:{$jti}";
         if (Cache::has($usedJtiKey)) {
-            $this->logValidation(null, $client->id, $validatorId, 'qr', 'failure', 'Token QR deja utilise.', $location);
+            $this->logValidation(null, $user->id, $validatorId, 'qr', 'failure', 'Token QR deja utilise.', $location);
             return $this->errorResponse('Token QR deja utilise.', 422);
         }
 
         Cache::put($usedJtiKey, true, now()->addSeconds(max(1, $exp - now()->timestamp)));
 
-        return $this->validateTicketByUuid($ticketUuid, $client, 'qr', $validatorId, $location);
+        return $this->validateTicketByUuid($ticketUuid, $user, 'qr', $validatorId, $location);
     }
 
     /**
@@ -492,11 +493,11 @@ class TicketController extends Controller
             'nfc_token' => 'required|string',
         ]);
 
-        /** @var Client $client */
-        $client = Auth::user();
+        /** @var User $user */
+        $user = Auth::user();
         $token = strtoupper(trim($validated['nfc_token']));
         $ticketUuid = trim($validated['ticket_uuid']);
-        $cacheKey = "nfc_challenge:{$client->id}:{$token}";
+        $cacheKey = "nfc_challenge:{$user->id}:{$token}";
         $challenge = Cache::get($cacheKey);
 
         if (!$challenge) {
@@ -506,26 +507,26 @@ class TicketController extends Controller
         Cache::forget($cacheKey);
 
         try {
-            return DB::transaction(function () use ($client, $ticketUuid) {
+            return DB::transaction(function () use ($user, $ticketUuid) {
                 $ticket = Ticket::where('uuid', $ticketUuid)
-                    ->where('user_id', $client->id)
+                    ->where('user_id', $user->id)
                     ->lockForUpdate()
                     ->first();
 
                 if (!$ticket) {
-                    $this->logValidation(null, $client->id, 'DEV-NFC-CHALLENGE', 'nfc', 'failure', 'Ticket non trouve.');
+                    $this->logValidation(null, $user->id, 'DEV-NFC-CHALLENGE', 'nfc', 'failure', 'Ticket non trouve.');
                     return $this->errorResponse('Ticket non trouve ou non autorise.', 404);
                 }
 
                 if (!$this->canValidateStatus((string) $ticket->status)) {
-                    $this->logValidation($ticket->id, $client->id, 'DEV-NFC-CHALLENGE', 'nfc', 'failure', "Ticket deja {$ticket->status}.");
+                    $this->logValidation($ticket->id, $user->id, 'DEV-NFC-CHALLENGE', 'nfc', 'failure', "Ticket deja {$ticket->status}.");
                     return $this->errorResponse("Le billet est deja {$ticket->status}.", 422);
                 }
 
                 if (!empty($ticket->valid_until) && Carbon::parse($ticket->valid_until)->isPast()) {
                     $ticket->status = 'expired';
                     $ticket->save();
-                    $this->logValidation($ticket->id, $client->id, 'DEV-NFC-CHALLENGE', 'nfc', 'failure', "Le billet est expire.");
+                    $this->logValidation($ticket->id, $user->id, 'DEV-NFC-CHALLENGE', 'nfc', 'failure', "Le billet est expire.");
                     return $this->errorResponse("Le billet est expire.", 422);
                 }
 
@@ -543,8 +544,8 @@ class TicketController extends Controller
 
                 $ticket->save();
 
-                $this->logValidation($ticket->id, $client->id, 'DEV-NFC-CHALLENGE', 'nfc', 'success', null);
-                AuditLog::log('ticket_validation_nfc_challenge_success', $client->id, ['uuid' => $ticket->uuid]);
+                $this->logValidation($ticket->id, $user->id, 'DEV-NFC-CHALLENGE', 'nfc', 'success', null);
+                AuditLog::log('ticket_validation_nfc_challenge_success', $user->id, ['uuid' => $ticket->uuid]);
 
                 return $this->successResponse([
                     'uuid' => $ticket->uuid,
@@ -554,7 +555,7 @@ class TicketController extends Controller
             });
         } catch (\Throwable $e) {
             Log::error('NFC challenge consume failed', [
-                'client_id' => $client ? $client->id : null,
+                'user_id' => $user ? $user->id : null,
                 'ticket_uuid' => $ticketUuid,
                 'error' => $e->getMessage(),
             ]);
@@ -567,27 +568,27 @@ class TicketController extends Controller
      */
     public function validateTicket(Request $request, $uuid)
     {
-        $client = Auth::user();
+        $user = Auth::user();
         $validationType = $request->input('validation_type', 'qr');
         $validatorId = $request->input('validator_id', 'DEV-001'); // Mock validator ID
         $location = $request->input('location');
 
-        return $this->validateTicketByUuid($uuid, $client, $validationType, $validatorId, $location);
+        return $this->validateTicketByUuid($uuid, $user, $validationType, $validatorId, $location);
     }
 
-    private function validateTicketByUuid(string $uuid, Client $client, string $validationType, string $validatorId, ?string $location = null)
+    private function validateTicketByUuid(string $uuid, User $user, string $validationType, string $validatorId, ?string $location = null)
     {
         try {
-            return DB::transaction(function () use ($uuid, $client, $validationType, $validatorId, $location) {
+            return DB::transaction(function () use ($uuid, $user, $validationType, $validatorId, $location) {
                 // 1. Fetch ticket with lock to prevent race conditions
                 $ticket = Ticket::where('uuid', $uuid)
-                    ->where('user_id', $client->id)
+                    ->where('user_id', $user->id)
                     ->lockForUpdate()
                     ->first();
 
                 if (!$ticket) {
-                    $this->logValidation(null, $client->id, $validatorId, $validationType, 'failure', 'Ticket non trouvé ou non autorisé.');
-                    AuditLog::log('ticket_validation_failed_not_found', $client->id, ['uuid' => $uuid]);
+                    $this->logValidation(null, $user->id, $validatorId, $validationType, 'failure', 'Ticket non trouvé ou non autorisé.');
+                    AuditLog::log('ticket_validation_failed_not_found', $user->id, ['uuid' => $uuid]);
                     return $this->errorResponse('Ticket non trouvé ou non autorisé.', 404);
                 }
 
@@ -607,8 +608,8 @@ class TicketController extends Controller
                 }
 
                 if ($failureReason) {
-                    $this->logValidation($ticket->id, $client->id, $validatorId, $validationType, 'failure', $failureReason, $location);
-                    AuditLog::log('ticket_validation_failed', $client->id, ['uuid' => $uuid, 'reason' => $failureReason]);
+                    $this->logValidation($ticket->id, $user->id, $validatorId, $validationType, 'failure', $failureReason, $location);
+                    AuditLog::log('ticket_validation_failed', $user->id, ['uuid' => $uuid, 'reason' => $failureReason]);
                     return $this->errorResponse($failureReason, 422);
                 }
 
@@ -628,12 +629,12 @@ class TicketController extends Controller
                 $ticket->save();
 
                 // 4. Log Success
-                $this->logValidation($ticket->id, $client->id, $validatorId, $validationType, 'success', null, $location);
-                AuditLog::log('ticket_validation_success', $client->id, ['uuid' => $uuid]);
+                $this->logValidation($ticket->id, $user->id, $validatorId, $validationType, 'success', null, $location);
+                AuditLog::log('ticket_validation_success', $user->id, ['uuid' => $uuid]);
 
                 // Dispatch Notification Event
                 event(new \App\Events\TicketValidatedEvent(
-                    $client,
+                    $user,
                     $ticket->id,
                     6.00, // Fixed price for a ride in Casablanca (example)
                     'Tramway T1',
@@ -647,7 +648,7 @@ class TicketController extends Controller
             });
         } catch (\Throwable $e) {
             Log::error('Ticket validation failed', [
-                'client_id' => $client ? $client->id : null,
+                'user_id' => $user ? $user->id : null,
                 'ticket_uuid' => $uuid,
                 'validation_type' => $validationType,
                 'validator_id' => $validatorId,
@@ -677,4 +678,3 @@ class TicketController extends Controller
         ]);
     }
 }
-

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Client;
+use App\Models\User;
 use App\Jobs\SendAdminNotificationJob;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -18,7 +18,7 @@ class AdminNotificationController extends Controller
             'body'      => 'required|string|max:255',
             'type'      => 'required|in:validation,payment,security,promo,system',
             'target'    => 'required|in:all,single',
-            'client_id' => 'required_if:target,single|nullable|exists:clients,id',
+            'user_id' => 'required_if:target,single|nullable|exists:users,id',
         ]);
 
         if ($validator->fails()) {
@@ -34,11 +34,11 @@ class AdminNotificationController extends Controller
         }
 
         if ($request->target === 'all') {
-            // Dispatch a queued job per client to avoid timeout with thousands of users
-            Client::chunk(100, function ($clients) use ($request) {
-                foreach ($clients as $client) {
+            // Dispatch a queued job per user to avoid timeout with thousands of users
+            User::chunk(100, function ($users) use ($request) {
+                foreach ($users as $user) {
                     SendAdminNotificationJob::dispatch(
-                        $client->id,
+                        $user->id,
                         $request->type,
                         $request->title,
                         $request->body,
@@ -46,17 +46,17 @@ class AdminNotificationController extends Controller
                 }
             });
 
-            $count = Client::count();
+            $count = User::count();
             return response()->json([
                 'status' => 'success',
-                'message' => "Notification en cours d'envoi à {$count} clients (tâches en file d'attente).",
+                'message' => "Notification en cours d'envoi à {$count} utilisateurs (tâches en file d'attente).",
             ]);
         }
 
-        // Single client — dispatch job as well for consistency
-        $client = Client::findOrFail($request->client_id);
+        // Single user — dispatch job as well for consistency
+        $user = User::findOrFail($request->user_id);
         SendAdminNotificationJob::dispatch(
-            $client->id,
+            $user->id,
             $request->type,
             $request->title,
             $request->body,
@@ -64,7 +64,7 @@ class AdminNotificationController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => "Notification en cours d'envoi à {$client->email}.",
+            'message' => "Notification en cours d'envoi à {$user->email}.",
         ]);
     }
 }

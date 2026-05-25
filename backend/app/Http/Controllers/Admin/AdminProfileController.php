@@ -14,29 +14,29 @@ class AdminProfileController extends Controller
      */
     public function update(Request $request)
     {
-        $user = $request->user();
+        $admin = $request->user();
 
         $request->validate([
             'first_name' => 'required|string|max:50',
             'last_name'  => 'required|string|max:50',
-            'email'      => 'required|email|unique:users,email,' . $user->id,
+            'email'      => 'required|email|unique:admins,email,' . $admin->id,
             'password'   => ['nullable', 'confirmed', Password::min(8)],
         ]);
 
-        $user->first_name = $request->first_name;
-        $user->last_name = $request->last_name;
-        $user->email = $request->email;
+        $admin->first_name = $request->first_name;
+        $admin->last_name = $request->last_name;
+        $admin->email = $request->email;
 
         if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
+            $admin->password = Hash::make($request->password);
         }
 
-        $user->save();
+        $admin->save();
 
         return response()->json([
             'status' => 'success',
             'message' => 'Profil mis à jour avec succès.',
-            'admin' => $user
+            'admin' => $admin
         ]);
     }
 }

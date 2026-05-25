@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -18,16 +18,16 @@ class AdminAuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $admin = Admin::where('email', $request->email)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (!$admin || !Hash::check($request->password, $admin->password)) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Identifiants incorrects.',
             ], 401);
         }
 
-        if (!$user->is_active) {
+        if (!$admin->is_active) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Ce compte administrateur est désactivé.',
@@ -35,18 +35,18 @@ class AdminAuthController extends Controller
         }
 
         // Revoke old tokens, issue new one
-        $user->tokens()->delete();
-        $token = $user->createToken('admin-token', ['role:admin'])->plainTextToken;
+        $admin->tokens()->delete();
+        $token = $admin->createToken('admin-token', ['role:admin'])->plainTextToken;
 
         return response()->json([
             'status' => 'success',
             'message' => 'Connexion réussie.',
             'token'   => $token,
             'admin'   => [
-                'id'         => $user->id,
-                'first_name' => $user->first_name,
-                'last_name'  => $user->last_name,
-                'email'      => $user->email,
+                'id'         => $admin->id,
+                'first_name' => $admin->first_name,
+                'last_name'  => $admin->last_name,
+                'email'      => $admin->email,
             ],
         ]);
     }

@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Models\Client;
+use App\Models\User;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -15,7 +15,7 @@ class LowBalanceEvent
      * Create a new event instance.
      */
     public function __construct(
-        public Client $user,
+        public User $user,
         public $balance
     ) {}
 }

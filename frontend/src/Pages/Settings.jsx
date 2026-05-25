@@ -7,8 +7,8 @@ import styles from "../Styles/Settings.module.css";
 import {
   getNotificationPreferences,
   updateNotificationPreferences,
-  getClientPreferences,
-  updateClientPreferences,
+  getUserPreferences,
+  updateUserPreferences,
 } from "../services/notificationService";
 import { setTheme, setLanguage } from "../Redux/Slices/settingsSlice";
 import { resetState as resetWallet } from "../Redux/Slices/WalletSlice";
@@ -46,7 +46,7 @@ const Settings = () => {
       try {
         const [notifPrefs, clientPrefs] = await Promise.all([
           getNotificationPreferences(),
-          getClientPreferences(),
+          getUserPreferences(),
         ]);
 
         if (notifPrefs) {
@@ -80,7 +80,7 @@ const Settings = () => {
         "app_lang",
         "app_theme",
         "is_authenticated",
-        "client_uuid",
+        "user_uuid",
       ];
       const keysToRemove = [];
 
@@ -149,7 +149,7 @@ const Settings = () => {
   const handleAnalyticsToggle = async (value) => {
     setAnalyticsEnabled(value); // optimistic
     try {
-      await updateClientPreferences({
+      await updateUserPreferences({
         analytics_enabled: value,
         auth_purchase: authPurchase,
       });
@@ -162,7 +162,7 @@ const Settings = () => {
   const handleAuthPurchaseToggle = async (value) => {
     setAuthPurchase(value); // optimistic
     try {
-      await updateClientPreferences({
+      await updateUserPreferences({
         analytics_enabled: analyticsEnabled,
         auth_purchase: value,
       });

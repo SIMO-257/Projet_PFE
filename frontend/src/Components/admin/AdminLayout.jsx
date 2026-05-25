@@ -17,7 +17,7 @@ const AdminLayout = () => {
 
   const navItems = [
     { path: '/admin/dashboard', label: t('admin_dashboard'), icon: 'grid' },
-    { path: '/admin/clients', label: t('admin_nav_clients'), icon: 'users' },
+    { path: '/admin/users', label: t('admin_nav_clients'), icon: 'users' },
     { path: '/admin/tickets', label: t('admin_nav_tickets'), icon: 'ticket' },
     { path: '/admin/transactions', label: t('admin_nav_transactions'), icon: 'credit-card' },
     { path: '/admin/notifications', label: t('admin_nav_notifications'), icon: 'bell' },

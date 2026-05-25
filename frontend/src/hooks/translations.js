@@ -123,6 +123,8 @@ const translations = {
         purchase_tickets_count: "Achat de {count} {ticketLabel}",
         ticket_label_singular: "billet",
         ticket_label_plural: "billets",
+        purchase_success: "Achat réussi !",
+
 
 
 
@@ -900,6 +902,8 @@ const translations = {
         purchase_tickets_count: "شراء {count} {ticketLabel}",
         ticket_label_singular: "تذكرة",
         ticket_label_plural: "تذاكر",
+        purchase_success: "تم الشراء بنجاح !",
+
 
 
 
@@ -1677,6 +1681,8 @@ const translations = {
         purchase_tickets_count: "Purchase of {count} {ticketLabel}",
         ticket_label_singular: "ticket",
         ticket_label_plural: "tickets",
+        purchase_success: "Purchase successful !",
+
 
 
 

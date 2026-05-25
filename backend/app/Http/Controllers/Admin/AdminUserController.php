@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Client;
+use App\Models\User;
 use Illuminate\Http\Request;
 
-class AdminClientController extends Controller
+class AdminUserController extends Controller
 {
-    // GET /api/admin/clients?search=&page=1
+    // GET /api/admin/users?search=&page=1
     public function index(Request $request)
     {
-        $query = Client::query();
+        $query = User::query();
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -21,46 +21,45 @@ class AdminClientController extends Controller
             });
         }
 
-        $clients = $query
+        $users = $query
             ->select('id', 'full_name', 'email', 'is_active', 'created_at')
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
         return response()->json([
             'status' => 'success',
-            'data' => $clients
+            'data' => $users
         ]);
     }
 
-    // PATCH /api/admin/clients/{id}/toggle-status
-    public function toggleStatus(Client $client)
+    // PATCH /api/admin/users/{user}/toggle-status
+    public function toggleStatus(User $user)
     {
-        $client->update(['is_active' => !$client->is_active]);
-        $status = $client->is_active ? 'activé' : 'bloqué';
+        $user->update(['is_active' => !$user->is_active]);
+        $status = $user->is_active ? 'activé' : 'bloqué';
         return response()->json([
             'status' => 'success',
-            'message' => "Client {$status} avec succès.",
-            'data'    => ['is_active' => $client->is_active],
+            'message' => "Utilisateur {$status} avec succès.",
+            'data'    => ['is_active' => $user->is_active],
         ]);
     }
 
-    // GET /api/admin/clients/{id}
-    public function show(Client $client)
+    // GET /api/admin/users/{user}
+    public function show(User $user)
     {
         // Load relevant relations
-        $client->load(['transactions']); 
-        
-        // Custom relation for tickets if needed, but 'tickets' usually maps to tickets table
-        // We'll try to load 'tickets' as well
+        $user->load(['transactions']); 
+
+        // Load tickets as well
         try {
-            $client->load(['tickets']);
+            $user->load(['tickets']);
         } catch (\Exception $e) {
-            // Relation might not be defined on Client model yet
+            // Relation might not be defined
         }
 
         return response()->json([
             'status' => 'success',
-            'data' => $client
+            'data' => $user
         ]);
     }
 }

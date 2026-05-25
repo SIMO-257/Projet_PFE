@@ -11,7 +11,7 @@ class AdminTicketController extends Controller
     // GET /api/admin/tickets?search=&status=&page=1
     public function index(Request $request)
     {
-        $query = Ticket::with(['client', 'ticketType']);
+        $query = Ticket::with(['user', 'ticketType']);
 
         if ($request->filled('search')) {
             $query->where('uuid', 'like', "%{$request->search}%");

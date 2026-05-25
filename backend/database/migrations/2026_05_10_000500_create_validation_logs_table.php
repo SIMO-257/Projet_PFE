@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('validation_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('ticket_id')->nullable()->constrained('tickets')->onDelete('set null');
-            $table->foreignId('user_id')->constrained('clients')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('validator_id', 100);
             $table->enum('validation_type', ['nfc', 'qr']);
             $table->enum('status', ['success', 'failure', 'offline_accepted']);

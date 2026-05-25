@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ClientController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\EmailVerificationController;
 
@@ -10,10 +10,10 @@ Route::get('/health', function () {
 });
 
 // Public Routes
-Route::post('/signup', [ClientController::class, 'signup'])->middleware('throttle:6,1')->name('api.client.signup');
-Route::post('/login', [ClientController::class, 'login'])->middleware('throttle:login')->name('api.client.login');
-Route::post('/forgot-password', [ClientController::class, 'forgotPassword'])->middleware('throttle:3,1')->name('api.client.forgot_password');
-Route::post('/reset-password', [ClientController::class, 'resetPassword'])->middleware('throttle:3,1')->name('api.client.reset_password');
+Route::post('/users/signup', [UserController::class, 'signup'])->middleware('throttle:6,1')->name('api.users.signup');
+Route::post('/users/login', [UserController::class, 'login'])->middleware('throttle:login')->name('api.users.login');
+Route::post('/users/forgot-password', [UserController::class, 'forgotPassword'])->middleware('throttle:3,1')->name('api.users.forgot_password');
+Route::post('/users/reset-password', [UserController::class, 'resetPassword'])->middleware('throttle:3,1')->name('api.users.reset_password');
 
 // Email verification resend — no auth required (user is not logged in yet)
 Route::post('/email/resend', [EmailVerificationController::class, 'resend'])
@@ -26,12 +26,12 @@ Route::post('/webhooks/stripe', [\App\Http\Controllers\StripeWebhookController::
 
 // Protected Routes
 Route::middleware(['auth:sanctum', 'track.activity'])->group(function () {
-    Route::get('/profile', [ClientController::class, 'fetch_profile'])->name('api.client.profile');
-    Route::post('/profile/avatar', [ClientController::class, 'upload_avatar'])->name('api.client.profile.avatar');
-    Route::put('/profile', [ClientController::class, 'update_profile'])->name('api.client.profile.update');
-    Route::post('/logout', [ClientController::class, 'logout'])->name('api.client.logout');
-    Route::post('/logout-all', [ClientController::class, 'logoutAll'])->name('api.client.logout_all');
-    Route::get('/home', [ClientController::class, 'home'])->name('api.client.home');
+    Route::get('/users/profile', [UserController::class, 'fetch_profile'])->name('api.users.profile');
+    Route::post('/users/profile/avatar', [UserController::class, 'upload_avatar'])->name('api.users.profile.avatar');
+    Route::put('/users/profile', [UserController::class, 'update_profile'])->name('api.users.profile.update');
+    Route::post('/users/logout', [UserController::class, 'logout'])->name('api.users.logout');
+    Route::post('/users/logout-all', [UserController::class, 'logoutAll'])->name('api.users.logout_all');
+    Route::get('/users/home', [UserController::class, 'home'])->name('api.users.home');
 
     // Ticket Routes
     Route::get('/ticket-types', [TicketController::class, 'getTicketTypes'])->name('api.tickets.types');
@@ -66,17 +66,17 @@ Route::middleware(['auth:sanctum', 'track.activity'])->group(function () {
         Route::delete('/{id}', [\App\Http\Controllers\NotificationController::class, 'destroy'])->name('api.notifications.destroy');
     });
 
-    Route::put('/user/fcm-token', [ClientController::class, 'updateFcmToken'])->name('api.client.fcm_token.update');
-    Route::get('/user/notification-preferences', [ClientController::class, 'getNotificationPreferences'])->name('api.client.notification_preferences.get');
-    Route::patch('/user/notification-preferences', [ClientController::class, 'updateNotificationPreferences'])->name('api.client.notification_preferences.update');
-    Route::get('/user/preferences', [ClientController::class, 'getPreferences'])->name('api.client.preferences.get');
-    Route::patch('/user/preferences', [ClientController::class, 'updatePreferences'])->name('api.client.preferences.update');
+    Route::put('/users/fcm-token', [UserController::class, 'updateFcmToken'])->name('api.users.fcm_token.update');
+    Route::get('/users/notification-preferences', [UserController::class, 'getNotificationPreferences'])->name('api.users.notification_preferences.get');
+    Route::patch('/users/notification-preferences', [UserController::class, 'updateNotificationPreferences'])->name('api.users.notification_preferences.update');
+    Route::get('/users/preferences', [UserController::class, 'getPreferences'])->name('api.users.preferences.get');
+    Route::patch('/users/preferences', [UserController::class, 'updatePreferences'])->name('api.users.preferences.update');
 });
 
 // ─── ADMIN ROUTES ────────────────────────────────────────────
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\AdminDashboardController;
-use App\Http\Controllers\Admin\AdminClientController;
+use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminTicketController;
 use App\Http\Controllers\Admin\AdminTransactionController;
 use App\Http\Controllers\Admin\AdminNotificationController;
@@ -95,10 +95,10 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'admin'])->group(function ()
     // Dashboard
     Route::get('/dashboard', [AdminDashboardController::class, 'index']);
 
-    // Clients
-    Route::get('/clients',                       [AdminClientController::class, 'index']);
-    Route::get('/clients/{client}',              [AdminClientController::class, 'show']);
-    Route::patch('/clients/{client}/toggle-status',  [AdminClientController::class, 'toggleStatus']);
+    // Users (formerly Clients)
+    Route::get('/users',                       [AdminUserController::class, 'index']);
+    Route::get('/users/{user}',              [AdminUserController::class, 'show']);
+    Route::patch('/users/{user}/toggle-status',  [AdminUserController::class, 'toggleStatus']);
 
     // Tickets
     Route::get('/tickets', [AdminTicketController::class, 'index']);

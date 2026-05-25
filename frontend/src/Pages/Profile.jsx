@@ -6,7 +6,7 @@ import ProfilInfo from '../Components/Cards/ProfilInfo';
 import ProfileOpt from '../Components/Cards/ProfileOpt';
 import styles from '../Styles/ProfileScreen.module.css';
 import { useAuth } from '../hooks/useAuth';
-import { fetchClientProfile } from '../services/clientService';
+import { fetchUserProfile } from '../services/clientService';
 import { useTranslation } from '../hooks/useTranslation';
 
 export default function Profile()  {
@@ -16,7 +16,7 @@ export default function Profile()  {
   const { t } = useTranslation();
 
   useEffect(() => {
-    fetchClientProfile()
+    fetchUserProfile()
       .then((res) => setProfile(res ?? null))
       .catch(() => {
         setProfile(null);

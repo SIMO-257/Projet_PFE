@@ -5,7 +5,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- 1. Core tables (no foreign keys)
 -- =============================================
 
-CREATE TABLE `clients` (
+CREATE TABLE `users` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `uuid` CHAR(36) NOT NULL,
     `full_name` VARCHAR(100) NULL,
@@ -21,16 +21,17 @@ CREATE TABLE `clients` (
     `last_active_at` TIMESTAMP NULL,
     `fcm_token` VARCHAR(255) NULL,
     `notification_prefs` JSON NULL,
-    `client_preferences` JSON NULL,
+    `user_preferences` JSON NULL,
+    `default_ticket_id` BIGINT UNSIGNED NULL,
     `created_at` TIMESTAMP NULL,
     `updated_at` TIMESTAMP NULL,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `clients_uuid_unique` (`uuid`),
-    UNIQUE KEY `clients_phone_unique` (`phone`),
-    UNIQUE KEY `clients_email_unique` (`email`),
-    KEY `clients_email_index` (`email`),
-    KEY `clients_uuid_index` (`uuid`),
-    KEY `clients_is_active_index` (`is_active`)
+    UNIQUE KEY `users_uuid_unique` (`uuid`),
+    UNIQUE KEY `users_phone_unique` (`phone`),
+    UNIQUE KEY `users_email_unique` (`email`),
+    KEY `users_email_index` (`email`),
+    KEY `users_uuid_index` (`uuid`),
+    KEY `users_is_active_index` (`is_active`)
 ) ENGINE=InnoDB;
 
 CREATE TABLE `ticket_types` (
@@ -76,7 +77,7 @@ CREATE TABLE `pending_registrations` (
 ) ENGINE=InnoDB;
 
 -- =============================================
--- 2. Tables with simple foreign keys (to clients only)
+-- 2. Tables with simple foreign keys (to users only)
 -- =============================================
 
 CREATE TABLE `wallets` (
@@ -87,7 +88,7 @@ CREATE TABLE `wallets` (
     `updated_at` TIMESTAMP NULL,
     PRIMARY KEY (`id`),
     KEY `wallets_user_id_index` (`user_id`),
-    CONSTRAINT `wallets_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE
+    CONSTRAINT `wallets_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE `transactions` (
@@ -114,7 +115,7 @@ CREATE TABLE `transactions` (
     KEY `transactions_type_index` (`type`),
     KEY `transactions_status_index` (`status`),
     KEY `transactions_created_at_index` (`created_at`),
-    CONSTRAINT `transactions_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE
+    CONSTRAINT `transactions_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- =============================================
@@ -142,17 +143,16 @@ CREATE TABLE `tickets` (
     KEY `tickets_status_index` (`status`),
     KEY `tickets_valid_until_index` (`valid_until`),
     KEY `tickets_user_id_status_index` (`user_id`, `status`),
-    CONSTRAINT `tickets_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `tickets_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
     CONSTRAINT `tickets_ticket_type_id_foreign` FOREIGN KEY (`ticket_type_id`) REFERENCES `ticket_types` (`id`) ON DELETE CASCADE,
     CONSTRAINT `tickets_purchase_id_foreign` FOREIGN KEY (`purchase_id`) REFERENCES `transactions` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- =============================================
--- 4. Add default_ticket_id to clients (circular reference fix)
+-- 4. Add default_ticket_id to users (circular reference fix)
 -- =============================================
 
-ALTER TABLE `clients` ADD COLUMN `default_ticket_id` BIGINT UNSIGNED NULL AFTER `client_preferences`;
-ALTER TABLE `clients` ADD CONSTRAINT `clients_default_ticket_id_foreign` 
+ALTER TABLE `users` ADD CONSTRAINT `users_default_ticket_id_foreign` 
     FOREIGN KEY (`default_ticket_id`) REFERENCES `tickets` (`id`) ON DELETE SET NULL;
 
 -- =============================================
@@ -179,7 +179,7 @@ CREATE TABLE `validation_logs` (
     KEY `validation_logs_created_at_index` (`created_at`),
     KEY `validation_logs_user_id_status_index` (`user_id`, `status`),
     CONSTRAINT `validation_logs_ticket_id_foreign` FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`id`) ON DELETE SET NULL,
-    CONSTRAINT `validation_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE
+    CONSTRAINT `validation_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE `audit_logs` (
@@ -195,7 +195,7 @@ CREATE TABLE `audit_logs` (
     KEY `audit_logs_action_index` (`action`),
     KEY `audit_logs_created_at_index` (`created_at`),
     KEY `audit_logs_user_id_action_index` (`user_id`, `action`),
-    CONSTRAINT `audit_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE
+    CONSTRAINT `audit_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE `notifications` (
@@ -215,7 +215,7 @@ CREATE TABLE `notifications` (
     KEY `notifications_user_id_is_read_index` (`user_id`, `is_read`),
     KEY `notifications_user_id_created_at_index` (`user_id`, `created_at`),
     KEY `notifications_type_index` (`type`),
-    CONSTRAINT `notifications_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE
+    CONSTRAINT `notifications_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE `processed_stripe_events` (
@@ -304,7 +304,7 @@ CREATE TABLE `personal_access_tokens` (
     KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`, `tokenable_id`)
 ) ENGINE=InnoDB;
 
-CREATE TABLE IF NOT EXISTS `users` (
+CREATE TABLE `admins` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `first_name` VARCHAR(255) NOT NULL,
     `last_name` VARCHAR(255) NOT NULL,
@@ -314,7 +314,7 @@ CREATE TABLE IF NOT EXISTS `users` (
     `created_at` TIMESTAMP NULL,
     `updated_at` TIMESTAMP NULL,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `users_email_unique` (`email`)
+    UNIQUE KEY `admins_email_unique` (`email`)
 ) ENGINE=InnoDB;
 
 -- =============================================

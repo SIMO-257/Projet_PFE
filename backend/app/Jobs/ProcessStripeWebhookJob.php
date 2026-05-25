@@ -4,7 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Wallet;
 use App\Models\Transaction;
-use App\Models\Client;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -44,11 +44,6 @@ class ProcessStripeWebhookJob implements ShouldQueue
      */
     public function handle(): void
     {
-        // The controller already guarantees idempotency via pre-insert
-        // into processed_stripe_events, so we skip that check here.
-        // The transaction-level duplicate check (existing transaction lookup)
-        // provides additional safety within the succeed handler.
-
         match ($this->eventType) {
             'payment_intent.succeeded'    => $this->handlePaymentIntentSucceeded(),
             'payment_intent.payment_failed' => $this->handlePaymentIntentFailed(),
@@ -58,7 +53,6 @@ class ProcessStripeWebhookJob implements ShouldQueue
             ]),
         };
 
-        // Record as processed (only on success — let retries re-attempt on failure)
         DB::table('processed_stripe_events')
             ->upsert(
                 ['event_id' => $this->eventId, 'created_at' => now()],
@@ -84,9 +78,9 @@ class ProcessStripeWebhookJob implements ShouldQueue
             return;
         }
 
-        $client = Client::find($userId);
-        if (!$client) {
-            Log::warning('StripeWebhookJob: payment_intent.payment_failed — client not found', [
+        $user = User::find($userId);
+        if (!$user) {
+            Log::warning('StripeWebhookJob: payment_intent.payment_failed — user not found', [
                 'user_id' => $userId,
             ]);
             return;
@@ -94,7 +88,7 @@ class ProcessStripeWebhookJob implements ShouldQueue
 
         try {
             app(NotificationService::class)->send(
-                $client,
+                $user,
                 'payment',
                 'danger',
                 'Échec de paiement',
@@ -148,7 +142,6 @@ class ProcessStripeWebhookJob implements ShouldQueue
                     $wallet->refresh();
                 }
 
-                // Double-check idempotency within the transaction
                 $existingTransaction = Transaction::where('payment_intent_id', $paymentIntentId)->first();
                 if ($existingTransaction) {
                     Log::info('StripeWebhookJob: Payment already processed (duplicate)', [
@@ -189,12 +182,11 @@ class ProcessStripeWebhookJob implements ShouldQueue
                     'balance_after'     => $wallet->balance,
                 ]);
 
-                // Send success notification
-                $client = Client::find($userId);
-                if ($client) {
+                $user = User::find($userId);
+                if ($user) {
                     try {
                         app(NotificationService::class)->send(
-                            $client,
+                            $user,
                             'payment',
                             'success',
                             'Recharge réussie',
@@ -208,16 +200,15 @@ class ProcessStripeWebhookJob implements ShouldQueue
                         ]);
                     }
 
-                    // Clear low-balance throttle and re-evaluate
                     try {
-                        Redis::del("low_balance_notif:{$client->id}");
+                        Redis::del("low_balance_notif:{$user->id}");
                     } catch (\Throwable $e) {
                         // Redis unavailable — non-blocking
                     }
 
-                    event(new LowBalanceEvent($client, $wallet->balance));
+                    event(new LowBalanceEvent($user, $wallet->balance));
                 }
-            }, 5); // 5 max retries on deadlock
+            }, 5);
         } catch (\Exception $e) {
             Log::error('StripeWebhookJob: Error processing payment', [
                 'payment_intent_id' => $paymentIntentId,
@@ -225,7 +216,6 @@ class ProcessStripeWebhookJob implements ShouldQueue
                 'error'             => $e->getMessage(),
             ]);
 
-            // Re-throw so the job is retried by the queue worker
             throw $e;
         }
     }

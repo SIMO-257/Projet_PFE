@@ -9,17 +9,17 @@ return new class extends Migration
     /**
      * Run the migrations.
      * 
-     * This migration adds the default_ticket_id foreign key to clients table
+     * This migration adds the default_ticket_id foreign key to users table
      * AFTER the tickets table has been created to avoid circular dependency issues.
      */
     public function up(): void
     {
-        Schema::table('clients', function (Blueprint $table) {
+        Schema::table('users', function (Blueprint $table) {
             // Add the column if it doesn't exist
-            if (!Schema::hasColumn('clients', 'default_ticket_id')) {
+            if (!Schema::hasColumn('users', 'default_ticket_id')) {
                 $table->foreignId('default_ticket_id')
                     ->nullable()
-                    ->after('client_preferences')
+                    ->after('user_preferences')
                     ->constrained('tickets')
                     ->nullOnDelete();
             }
@@ -31,7 +31,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('clients', function (Blueprint $table) {
+        Schema::table('users', function (Blueprint $table) {
             $table->dropConstrainedForeignId('default_ticket_id');
         });
     }

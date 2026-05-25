@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->uuid('uuid')->unique();
             $table->string('payment_intent_id', 100)->nullable()->unique();
-            $table->foreignId('user_id')->constrained('clients')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('type', 20);
             $table->string('status', 20)->default('completed');
             $table->string('payment_method', 20)->default('wallet');

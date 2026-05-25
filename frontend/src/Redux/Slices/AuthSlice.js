@@ -1,14 +1,14 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { clearAuthData, fetchClientProfile, loginClient, logoutClient, setAuthToken } from '../../services/clientService';
+import { clearAuthData, fetchUserProfile, loginUser, logoutUser, setAuthToken } from '../../services/clientService';
 
 export const login = createAsyncThunk('auth/login', async (credentials, { rejectWithValue }) => {
   try {
-    const loginRes = await loginClient(credentials);
+    const loginRes = await loginUser(credentials);
     const token = loginRes.data?.data?.access_token;
     if (token) {
       setAuthToken(token, Boolean(credentials?.remember_me));
     }
-    const profileResponse = await fetchClientProfile();
+    const profileResponse = await fetchUserProfile();
     return profileResponse;
   } catch (err) {
     clearAuthData();
@@ -18,7 +18,7 @@ export const login = createAsyncThunk('auth/login', async (credentials, { reject
 
 export const getProfile = createAsyncThunk('auth/getProfile', async (_, { rejectWithValue }) => {
   try {
-    const response = await fetchClientProfile();
+    const response = await fetchUserProfile();
     return response;
   } catch (err) {
     return rejectWithValue(err.response?.data || { message: 'Failed to load profile' });
@@ -27,7 +27,7 @@ export const getProfile = createAsyncThunk('auth/getProfile', async (_, { reject
 
 export const logout = createAsyncThunk('auth/logout', async (_, { rejectWithValue }) => {
   try {
-    await logoutClient();
+    await logoutUser();
     clearAuthData();
     return true;
   } catch (err) {

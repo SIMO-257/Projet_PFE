@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Client;
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -28,8 +28,8 @@ class AuthMiddleware
             ], 422);
         }
 
-        $client = Client::where('email', $request->input('email'))->first();
-        $valid = $client && Hash::check($request->input('password'), $client->password_hash);
+        $user = User::where('email', $request->input('email'))->first();
+        $valid = $user && Hash::check($request->input('password'), $user->password_hash);
 
         if (!$valid) {
             return response()->json([
@@ -40,7 +40,7 @@ class AuthMiddleware
             ], 422);
         }
 
-        $request->attributes->set('client', $client);
+        $request->attributes->set('user', $user);
 
         return $next($request);
     }

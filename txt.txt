@@ -150,3 +150,7 @@ Estimated total effort: ~4 hours
 -- detail ticket still hardcoded so does my tickets.
 -- rechargement + paiment pages are still in french.
 -- help and support + validation page.
+
+
+-- change the client model + migrationes + controller to be called "user" + all the nesessary edits.
+-- and change the user model to be called admin + all the nsessary modificationes.  

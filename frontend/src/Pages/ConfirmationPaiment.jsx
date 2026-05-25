@@ -94,7 +94,7 @@ export default function Confirmation () {
 
                 {/* Header */}
                 <header className={styles.header}>
-                    <h2 className={styles.subTitle}>{message || t('purchase_confirmed')}</h2>
+                    <h2 className={styles.subTitle}>{message === 'Achat réussi !' ? t('purchase_success') : (message || t('purchase_confirmed'))}</h2>
                     <p className={styles.description}>
                         {quantity > 1 
                             ? t('tickets_added').replace('{count}', quantity)

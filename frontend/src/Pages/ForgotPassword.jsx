@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { forgotPasswordClient } from '../services/clientService';
+import { forgotPasswordUser } from '../services/clientService';
 import { useTranslation } from '../hooks/useTranslation';
 
 import InputField from '../Components/Inputs/InputField';
@@ -26,7 +26,7 @@ export default function ForgotPassword() {
 
         try {
             setProcessing(true);
-            const res = await forgotPasswordClient({ email: form.email });
+            const res = await forgotPasswordUser({ email: form.email });
             setStatus(res?.data?.message || t('reset_link_sent'));
         } catch (err) {
             const responseErrors = err?.response?.data?.errors;

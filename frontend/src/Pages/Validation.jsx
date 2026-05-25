@@ -456,7 +456,7 @@ export default function Validation() {
             <h3 className="text-xl font-bold text-white mb-2">{t('scan_qr_code')}</h3>
             <p className="text-white/60 mb-4">{t('choose_validation_method')}</p>
             {activeTicket?.uuid && (
-              <p className="text-white/50 text-xs mb-4">Ticket: {activeTicket.uuid.slice(0, 8).toUpperCase()}</p>
+              <p className="text-white/50 text-xs mb-4">{t('ticket_nav')}: {activeTicket.uuid.slice(0, 8).toUpperCase()}</p>
             )}
 
             <div className="bg-yellow-500/20 rounded-xl p-3 mb-6">

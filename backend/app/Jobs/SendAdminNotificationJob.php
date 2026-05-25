@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\Client;
+use App\Models\User;
 use App\Services\NotificationService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -35,17 +35,17 @@ class SendAdminNotificationJob implements ShouldQueue
      */
     public function handle(NotificationService $notificationService): void
     {
-        $client = Client::find($this->clientId);
+        $user = User::find($this->clientId);
 
-        if (!$client) {
-            Log::warning('SendAdminNotificationJob: Client not found', [
+        if (!$user) {
+            Log::warning('SendAdminNotificationJob: User not found', [
                 'client_id' => $this->clientId,
             ]);
             return;
         }
 
         $notificationService->send(
-            $client,
+            $user,
             $this->type,
             'info',
             $this->title,

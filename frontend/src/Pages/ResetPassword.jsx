@@ -1,6 +1,6 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useState } from 'react';
-import { resetPasswordClient } from '../services/clientService';
+import { resetPasswordUser } from '../services/clientService';
 import { useTranslation } from '../hooks/useTranslation';
 import InputField from '../Components/Inputs/InputField';
 import ConnexionButton from '../Components/Buttons/ConnexionButton';
@@ -74,7 +74,7 @@ export default function ResetPassword() {
 
     try {
       setProcessing(true);
-      const res = await resetPasswordClient(form);
+      const res = await resetPasswordUser(form);
       setStatus(res?.data?.message ?? t('password_reset_success'));
       setTimeout(() => navigate('/login'), 1200);
     } catch (err) {

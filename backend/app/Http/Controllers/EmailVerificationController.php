@@ -4,27 +4,27 @@ namespace App\Http\Controllers;
 
 use App\Events\UserRegisteredEvent;
 use App\Models\AuditLog;
-use App\Models\Client;
+use App\Models\User;
 use App\Notifications\VerifyEmailNotification;
 use Illuminate\Http\Request;
 
 class EmailVerificationController extends Controller
 {
     // GET /email/verify/{token}
-    // Called when the client clicks the link in the email
+    // Called when the user clicks the link in the email
     // This is a WEB route (not API) — it redirects to the frontend
     public function verify(string $token)
     {
-        // First try existing clients
-        $client = Client::where('email_verification_token', $token)->first();
-        if ($client) {
-            if ($client->hasVerifiedEmail()) {
+        // First try existing users
+        $user = User::where('email_verification_token', $token)->first();
+        if ($user) {
+            if ($user->hasVerifiedEmail()) {
                 return redirect(config('app.frontend_url') . '/verify-email?status=already_verified');
             }
-            if ($client->email_verification_sent_at->lt(now()->subMinutes(60))) {
-                return redirect(config('app.frontend_url') . '/verify-email?status=expired&email=' . urlencode($client->email));
+            if ($user->email_verification_sent_at->lt(now()->subMinutes(60))) {
+                return redirect(config('app.frontend_url') . '/verify-email?status=expired&email=' . urlencode($user->email));
             }
-            $client->update([
+            $user->update([
                 'email_verified_at' => now(),
                 'email_verification_token' => null,
                 'email_verification_sent_at' => null,
@@ -41,8 +41,8 @@ class EmailVerificationController extends Controller
             return redirect(config('app.frontend_url') . '/verify-email?status=expired&email=' . urlencode($pending->email));
         }
 
-        // Create the real client
-        $newClient = Client::create([
+        // Create the real user
+        $newUser = User::create([
             'email' => $pending->email,
             'phone' => $pending->phone,
             'password_hash' => $pending->password_hash,
@@ -55,7 +55,7 @@ class EmailVerificationController extends Controller
         $pending->delete();
 
         // Dispatch the registration event
-        UserRegisteredEvent::dispatch($newClient);
+        UserRegisteredEvent::dispatch($newUser);
 
         return redirect(config('app.frontend_url') . '/verify-email?status=success');
     }
@@ -69,19 +69,19 @@ class EmailVerificationController extends Controller
             'code'  => 'required|string|size:6',
         ]);
 
-        // First try existing clients (legacy flow)
-        $client = Client::where('email', $request->email)
+        // First try existing users (legacy flow)
+        $user = User::where('email', $request->email)
             ->where('email_verification_code', $request->code)
             ->first();
 
-        if ($client) {
-            if ($client->hasVerifiedEmail()) {
+        if ($user) {
+            if ($user->hasVerifiedEmail()) {
                 return $this->errorResponse('Cet email est déjà vérifié.', 400);
             }
-            if ($client->email_verification_sent_at->lt(now()->subMinutes(60))) {
+            if ($user->email_verification_sent_at->lt(now()->subMinutes(60))) {
                 return $this->errorResponse('Le code de vérification a expiré.', 400);
             }
-            $client->update([
+            $user->update([
                 'email_verified_at' => now(),
                 'email_verification_code' => null,
                 'email_verification_sent_at' => null,
@@ -102,8 +102,8 @@ class EmailVerificationController extends Controller
             return $this->errorResponse('Le code de vérification a expiré.', 400);
         }
 
-        // Create the real client account now that email is verified
-        $newClient = Client::create([
+        // Create the real user account now that email is verified
+        $newUser = User::create([
             'email' => $pending->email,
             'phone' => $pending->phone,
             'password_hash' => $pending->password_hash,
@@ -116,10 +116,10 @@ class EmailVerificationController extends Controller
         // Delete pending registration
         $pending->delete();
 
-        AuditLog::log('signup_completed', $newClient->id);
+        AuditLog::log('signup_completed', $newUser->id);
 
         // Dispatch the registration event
-        UserRegisteredEvent::dispatch($newClient);
+        UserRegisteredEvent::dispatch($newUser);
 
         return $this->successResponse(null, 'Votre email a été vérifié et le compte est créé.');
     }
@@ -131,9 +131,9 @@ class EmailVerificationController extends Controller
             'email' => 'required|email',
         ]);
 
-        $client = Client::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)->first();
 
-        if (!$client) {
+        if (!$user) {
             // If a pending registration exists, resend to it; otherwise return success to avoid enumeration
             $pending = \App\Models\PendingRegistration::where('email', $request->email)->first();
             if (!$pending) {
@@ -151,18 +151,18 @@ class EmailVerificationController extends Controller
             return $this->successResponse(null, 'Code de vérification envoyé.');
         }
 
-        if ($client->hasVerifiedEmail()) {
+        if ($user->hasVerifiedEmail()) {
             return $this->errorResponse('Cet email est déjà vérifié.', 400);
         }
 
         // Throttle: do not resend if last email was sent less than 2 minutes ago
-        if ($client->email_verification_sent_at
-            && $client->email_verification_sent_at->gt(now()->subMinutes(2))) {
+        if ($user->email_verification_sent_at
+            && $user->email_verification_sent_at->gt(now()->subMinutes(2))) {
             return $this->errorResponse('Veuillez attendre avant de redemander un code de vérification.', 429);
         }
 
-        $code = $client->generateVerificationCode();
-        $client->notify(new VerifyEmailNotification($code));
+        $code = $user->generateVerificationCode();
+        $user->notify(new VerifyEmailNotification($code));
 
         return $this->successResponse(null, 'Code de vérification envoyé.');
     }

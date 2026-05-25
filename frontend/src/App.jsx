@@ -49,7 +49,7 @@ const TermsAndConditions = lazy(() => import("./Pages/TermsAndConditions"));
 // Admin Pages
 const AdminLogin = lazy(() => import("./Pages/admin/AdminLogin"));
 const AdminDashboard = lazy(() => import("./Pages/admin/AdminDashboard"));
-const AdminClients = lazy(() => import("./Pages/admin/AdminClients"));
+const AdminUsers = lazy(() => import("./Pages/admin/AdminUsers"));
 const AdminTickets = lazy(() => import("./Pages/admin/AdminTickets"));
 const AdminTransactions = lazy(() => import("./Pages/admin/AdminTransactions"));
 const AdminNotifications = lazy(() => import("./Pages/admin/AdminNotifications"));
@@ -184,7 +184,7 @@ function App() {
             <Route element={<AdminLayout />}>
               <Route index element={<Navigate to="/admin/dashboard" replace />} />
               <Route path="dashboard" element={<AdminDashboard />} />
-              <Route path="clients" element={<AdminClients />} />
+              <Route path="users" element={<AdminUsers />} />
               <Route path="tickets" element={<AdminTickets />} />
               <Route path="transactions" element={<AdminTransactions />} />
               <Route path="notifications" element={<AdminNotifications />} />

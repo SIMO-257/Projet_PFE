@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../hooks/useTranslation';
 import Header from '../Components/Layout/Header';
 import styles from '../Styles/Security.module.css';
-import { getClientPreferences, updateClientPreferences } from '../services/notificationService';
+import { getUserPreferences, updateUserPreferences } from '../services/notificationService';
 
 const Security = () => {
   const { t } = useTranslation();
@@ -21,7 +21,7 @@ const Security = () => {
   useEffect(() => {
     const loadPrefs = async () => {
       try {
-        const prefs = await getClientPreferences();
+        const prefs = await getUserPreferences();
         if (prefs) {
           setPinEnabled(prefs.pin_enabled ?? true);
           setBiometricEnabled(prefs.biometric_enabled ?? false);
@@ -58,7 +58,7 @@ const Security = () => {
     if (setters[key]) setters[key](value);
 
     try {
-      await updateClientPreferences({ [key]: value });
+      await updateUserPreferences({ [key]: value });
     } catch (err) {
       console.error(`Failed to update ${key}:`, err);
       // Revert on failure

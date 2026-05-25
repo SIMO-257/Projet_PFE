@@ -5,10 +5,10 @@ import styles from '../Styles/EditProfile.module.css';
 import { useTranslation } from '../hooks/useTranslation';
 import {
   clearAuthData,
-  fetchClientProfile,
-  forgotPasswordClient,
+  fetchUserProfile,
+  forgotPasswordUser,
   getAuthToken,
-  updateClientProfile,
+  updateUserProfile,
 } from '../services/clientService';
 
 export default function EditProfileScreen  ()  {
@@ -37,7 +37,7 @@ export default function EditProfileScreen  ()  {
       return;
     }
 
-    fetchClientProfile()
+    fetchUserProfile()
       .then((res) => {
         const data = res ?? null;
         if (!data) return;
@@ -82,7 +82,7 @@ export default function EditProfileScreen  ()  {
 
     try {
       setSendingReset(true);
-      const res = await forgotPasswordClient({ email });
+      const res = await forgotPasswordUser({ email });
       setResetStatus(res?.data?.message ?? t('reset_link_sent_success'));
     } catch (err) {
       const responseErrors = err?.response?.data?.errors;
@@ -101,7 +101,7 @@ export default function EditProfileScreen  ()  {
 
     setProcessing(true);
 
-    updateClientProfile({
+    updateUserProfile({
       payload: { full_name: fullName, phone },
       avatarFile,
     })

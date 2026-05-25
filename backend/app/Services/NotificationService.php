@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\Notification;
-use App\Models\Client;
+use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Log;
@@ -14,7 +14,7 @@ class NotificationService
      * Create a notification record + fire FCM push
      */
     public function send(
-        Client $user,
+        User $user,
         string $type,
         string $severity,
         string $title,
@@ -65,7 +65,7 @@ class NotificationService
     /**
      * FCM v1 HTTP push — silently fails if no token
      */
-    private function sendFcmPush(Client $user, string $title, string $body, array $data = []): void
+    private function sendFcmPush(User $user, string $title, string $body, array $data = []): void
     {
         if (!$user->fcm_token) return;
 

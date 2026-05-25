@@ -17,8 +17,8 @@ class EnsureUserIsAdmin
             'url' => $request->fullUrl()
         ]);
 
-        // Check that the authenticated model is a User (admin), not a Client
-        if (!($user instanceof \App\Models\User)) {
+        // Check that the authenticated model is an Admin, not a regular User
+        if (!($user instanceof \App\Models\Admin)) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Accès refusé. Espace réservé aux administrateurs.'

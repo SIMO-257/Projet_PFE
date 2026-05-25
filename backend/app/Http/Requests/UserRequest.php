@@ -7,7 +7,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rules\Password;
 
-class ClientRequest extends FormRequest
+class UserRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -26,8 +26,8 @@ class ClientRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'required|email:rfc,dns|max:255|unique:clients,email',
-            'phone' => ['required', 'string', 'regex:/^(06|07)\d{8}$/', 'unique:clients,phone'],
+            'email' => 'required|email:rfc,dns|max:255|unique:users,email',
+            'phone' => ['required', 'string', 'regex:/^(06|07)\d{8}$/', 'unique:users,phone'],
             'password' => [
                 'required',
                 'string',

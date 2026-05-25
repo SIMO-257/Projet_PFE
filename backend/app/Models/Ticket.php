@@ -45,9 +45,9 @@ class Ticket extends Model
         return $this->belongsTo(TicketType::class, 'ticket_type_id');
     }
 
-    public function client()
+    public function user()
     {
-        return $this->belongsTo(Client::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     protected static function booted(): void

@@ -1,6 +1,6 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { useState } from 'react';
-import { signupClient } from '../services/clientService';
+import { signupUser } from '../services/clientService';
 import { useTranslation } from '../hooks/useTranslation';
 
 import InputField from '../Components/Inputs/InputField';
@@ -116,7 +116,7 @@ export default function SignUp() {
 
         try {
             setProcessing(true);
-            await signupClient(payload);
+            await signupUser(payload);
             navigate('/verify-email?status=pending&email=' + encodeURIComponent(form.email));
         } catch (err) {
             const responseErrors = err?.response?.data?.errors;

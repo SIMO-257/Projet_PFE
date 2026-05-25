@@ -6,12 +6,23 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /** Track whether we actually created the table (safe rollback guard). */
+    private bool $created = false;
+
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('clients', function (Blueprint $table) {
+        // Guard: on existing databases the table already exists
+        // (renamed from `clients` by the rename migration)
+        if (Schema::hasTable('users')) {
+            return;
+        }
+
+        $this->created = true;
+
+        Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
             $table->string('full_name', 100)->nullable();
@@ -27,7 +38,7 @@ return new class extends Migration
             $table->timestamp('last_active_at')->nullable();
             $table->string('fcm_token')->nullable();
             $table->json('notification_prefs')->nullable();
-            $table->json('client_preferences')->nullable();
+            $table->json('user_preferences')->nullable();
             $table->timestamps();
 
             // Indexes
@@ -42,7 +53,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('clients');
+        if (!$this->created) {
+            return;
+        }
+
+        Schema::dropIfExists('users');
     }
 
 };
