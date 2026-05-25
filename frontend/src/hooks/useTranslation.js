@@ -15,5 +15,25 @@ export const useTranslation = () => {
         );
     };
 
-    return { t, language };
+    const formatReference = (reference) => {
+        if (!reference) return '';
+        
+        // 1. Check for Stripe recharge reference
+        if (reference === 'Rechargement via Stripe') {
+            return t('recharge_stripe');
+        }
+        
+        // 2. Check for ticket purchase reference (e.g. "Achat de 1 billet", "Achat de 5 billets")
+        const match = reference.match(/^Achat de (\d+) (billets|billet)$/i);
+        if (match) {
+            const count = parseInt(match[1], 10);
+            const label = count > 1 ? t('ticket_label_plural') : t('ticket_label_singular');
+            return t('purchase_tickets_count', { count, ticketLabel: label });
+        }
+        
+        return reference;
+    };
+
+    return { t, language, formatReference };
 };
+

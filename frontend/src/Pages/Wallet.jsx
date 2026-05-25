@@ -15,7 +15,7 @@ import { useTranslation } from '../hooks/useTranslation';
 import { useWallet } from '../hooks/useWallet';
 
 export default function Wallet() {
-  const { t, language } = useTranslation();
+  const { t, language, formatReference } = useTranslation();
   const { balance, transactions, isLoading, refreshWallet } = useWallet();
   const navigateHook = useNavigate();
   const dispatch = useDispatch();
@@ -49,7 +49,7 @@ export default function Wallet() {
   const mappedTransactions = latestSixTransactions.map(trx => ({
     id: trx.id,
     type: trx.type,
-    title: trx.reference || (trx.type === 'recharge' ? t('recharge') : t('purchase')),
+    title: formatReference(trx.reference) || (trx.type === 'recharge' ? t('recharge') : t('purchase')),
     date: new Date(trx.created_at).toLocaleString(dateLocale, { 
       day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' 
     }),

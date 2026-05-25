@@ -12,11 +12,13 @@ import { useDispatch } from 'react-redux';
 import { setGlobalLoading } from '../../Redux/Slices/uiSlice';
 import * as notificationService from '../../services/notificationService';
 import { confirmRecharge } from '../../services/walletService';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel, isCancelling = false }) => {
   const stripe = useStripe();
   const elements = useElements();
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const [message, setMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
@@ -61,7 +63,7 @@ const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel, isCance
 
       if (result.error) {
         console.error('[Stripe] Confirm error:', result.error);
-        const errorMsg = result.error.message || 'Une erreur est survenue.';
+        const errorMsg = result.error.message || t('unexpected_error');
 
         notificationService
           .logFailure({
@@ -77,7 +79,7 @@ const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel, isCance
         if (result.error.type === 'card_error' || result.error.type === 'validation_error') {
           setMessage(errorMsg);
         } else {
-          setMessage('Une erreur est survenue lors de la validation du paiement.');
+          setMessage(t('payment_failed_desc'));
         }
         dispatch(setGlobalLoading(false));
       } else {
@@ -85,7 +87,7 @@ const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel, isCance
 
         const paymentIntentId = result.paymentIntent?.id || extractPaymentIntentId(clientSecret);
         if (!paymentIntentId) {
-          setMessage('Paiement confirme, mais identifiant de transaction introuvable.');
+          setMessage(t('payment_failed_desc'));
           setIsLoading(false);
           dispatch(setGlobalLoading(false));
           return;
@@ -97,14 +99,14 @@ const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel, isCance
         } catch (confirmErr) {
           setMessage(
             confirmErr?.response?.data?.message ||
-              "Paiement reussi, mais l'enregistrement du rechargement a echoue."
+              t('payment_failed_desc')
           );
           dispatch(setGlobalLoading(false));
         }
       }
     } catch (err) {
       console.error('[Stripe] Unexpected error:', err);
-      setMessage('Une erreur inatendue est survenue.');
+      setMessage(t('unexpected_error'));
       dispatch(setGlobalLoading(false));
     } finally {
       setIsLoading(false);
@@ -118,7 +120,7 @@ const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel, isCance
   return (
     <form id="payment-form" onSubmit={handleSubmit} className="space-y-6">
       <div className="mb-8">
-        <h3 className="text-white/40 text-[10px] uppercase font-bold mb-4 tracking-widest">Paiement Rapide</h3>
+        <h3 className="text-white/40 text-[10px] uppercase font-bold mb-4 tracking-widest">{t('express_checkout')}</h3>
         <ExpressCheckoutElement onConfirm={handleSubmit} />
       </div>
 
@@ -127,22 +129,22 @@ const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel, isCance
           <div className="w-full border-t border-white/10"></div>
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="px-2 bg-transparent text-white/30 text-xs uppercase font-medium">Ou payer par carte</span>
+          <span className="px-2 bg-transparent text-white/30 text-xs uppercase font-medium">{t('or_pay_by_card')}</span>
         </div>
       </div>
 
       <div className="space-y-2">
-        <label className="text-white/40 text-[10px] uppercase font-bold mb-2 block">Contact</label>
+        <label className="text-white/40 text-[10px] uppercase font-bold mb-2 block">{t('contact')}</label>
         <LinkAuthenticationElement id="link-authentication-element" onChange={(e) => setEmail(e.value.email)} />
       </div>
 
       <div className="space-y-2">
-        <label className="text-white/40 text-[10px] uppercase font-bold mb-2 block">Details de paiement</label>
+        <label className="text-white/40 text-[10px] uppercase font-bold mb-2 block">{t('payment_details')}</label>
         <PaymentElement id="payment-element" options={paymentElementOptions} />
       </div>
 
       <div className="space-y-2">
-        <label className="text-white/40 text-[10px] uppercase font-bold mb-2 block">Adresse de facturation</label>
+        <label className="text-white/40 text-[10px] uppercase font-bold mb-2 block">{t('billing_address')}</label>
         <AddressElement options={{ mode: 'billing' }} />
       </div>
 
@@ -168,7 +170,7 @@ const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel, isCance
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              <span>Securisation...</span>
+              <span>{t('securing')}</span>
             </div>
           ) : isCancelling ? (
             <div className="flex items-center space-x-2">
@@ -176,7 +178,7 @@ const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel, isCance
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              <span>Annulation...</span>
+              <span>{t('cancelling')}</span>
             </div>
           ) : !stripe || !elements ? (
             <div className="flex items-center space-x-2">
@@ -184,10 +186,10 @@ const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel, isCance
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              <span>Chargement du paiement sécurisé...</span>
+              <span>{t('payment_processing')}</span>
             </div>
           ) : (
-            <span>Payer {amount} DH</span>
+            <span>{t('pay_amount', { amount })}</span>
           )}
         </button>
 
@@ -197,7 +199,7 @@ const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel, isCance
           disabled={isLoading || isCancelling}
           className="w-full py-2 text-white/40 text-xs font-medium hover:text-white/60 transition-colors"
         >
-          Annuler
+          {t('cancel')}
         </button>
       </div>
 

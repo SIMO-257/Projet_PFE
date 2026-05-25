@@ -19,16 +19,16 @@ const HelpSupport = () => {
   // FAQ data
   const faqs = [
     {
-      question: 'Comment acheter un ticket ?',
-      answer: 'Pour acheter un ticket, ouvrez l\'application, sélectionnez "Acheter un ticket", choisissez le type de trajet et validez le paiement.',
+      question: t('faq_question_1'),
+      answer: t('faq_answer_1'),
     },
     {
-      question: 'Mon paiement a échoué, que faire ?',
-      answer: 'Vérifiez votre solde bancaire et votre compte. Si le problème persiste, contactez notre support via email ou chat.',
+      question: t('faq_question_2'),
+      answer: t('faq_answer_2'),
     },
     {
-      question: 'Comment valider mon billet par NFC ?',
-      answer: 'Activez le NFC sur votre téléphone, ouvrez le ticket et approchez votre téléphone du lecteur NFC.',
+      question: t('faq_question_3'),
+      answer: t('faq_answer_3'),
     },
   ];
 
@@ -217,23 +217,25 @@ const Section = ({ title, children }) => (
 );
 
 const ContactItem = ({ icon, title, subtitle, status, description, buttonText, onClick }) => (
-  <div className="bg-black/40 rounded-xl border border-white/10 p-4">
-    <div className="flex items-start space-x-3">
-      <div className="w-10 h-10 rounded-xl bg-yellow-500/20 flex items-center justify-center flex-shrink-0">
+  <div className="bg-black/40 rounded-xl border border-white/10 p-5 space-y-3">
+    <div className="flex items-start space-x-4">
+      <div className="w-10 h-10 rounded-xl bg-yellow-500/20 flex items-center justify-center flex-shrink-0 mt-1">
         <Icon name={icon} />
       </div>
-      <div className="flex-1">
-        <p className="text-white font-medium text-sm">{title}</p>
-        {subtitle && <p className="text-white/60 text-sm mt-1">{subtitle}</p>}
-        {status && <p className="text-green-400 text-xs">{status}</p>}
-        <p className="text-white/40 text-xs mt-1">{description}</p>
-        <button
-          onClick={onClick}
-          className="mt-3 bg-white/5 hover:bg-white/10 rounded-lg px-4 py-2 text-yellow-500 text-sm font-medium"
-        >
-          {buttonText}
-        </button>
+      <div className="flex-1 min-w-0">
+        <p className="text-white font-medium text-sm leading-tight">{title}</p>
+        {subtitle && <p className="text-white/60 text-sm mt-2 break-all">{subtitle}</p>}
+        {status && <p className="text-green-400 text-xs mt-1 font-semibold">{status}</p>}
+        <p className="text-white/40 text-xs mt-2 leading-relaxed">{description}</p>
       </div>
+    </div>
+    <div className="pl-14 -mt-2">
+      <button
+        onClick={onClick}
+        className="bg-white/5 hover:bg-white/10 rounded-lg px-4 py-2 text-yellow-500 text-sm font-medium transition-colors"
+      >
+        {buttonText}
+      </button>
     </div>
   </div>
 );

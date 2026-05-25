@@ -44,7 +44,7 @@
 
 .formLabel {
   @apply block text-white/70 font-semibold mb-2 uppercase tracking-wider;
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .formInput {
@@ -53,6 +53,7 @@
   border: 1.5px solid rgba(212, 175, 55, 0.18);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.06);
+  text-align: right;
 }
 
 .formInput::placeholder {

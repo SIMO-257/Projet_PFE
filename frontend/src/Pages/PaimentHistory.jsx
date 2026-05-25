@@ -8,7 +8,7 @@ import TransactionItem from '../Components/Cards/TransactionItem';
 
 export default function PaimentHistory() {
     const navigate = useNavigate();
-    const { t, language } = useTranslation();
+    const { t, language, formatReference } = useTranslation();
     const [activeDateFilter, setActiveDateFilter] = useState('all');
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -103,18 +103,18 @@ export default function PaimentHistory() {
     const getLocale = () => language === 'ar' ? 'ar-MA' : language === 'en' ? 'en-US' : 'fr-FR';
 
     const mappedTransactions = (list) =>
-        list.map((t) => {
-            const isPositive = t.type === 'recharge';
+        list.map((tx) => {
+            const isPositive = tx.type === 'recharge';
             return {
-                id: t.id,
-                title: t.reference || (isPositive ? t('wallet_recharge_label') : t('ticket_purchase_label')),
-                date: (parseTxDate(t.created_at) || new Date()).toLocaleString(getLocale(), {
+                id: tx.id,
+                title: formatReference(tx.reference) || (isPositive ? t('wallet_recharge_label') : t('ticket_purchase_label')),
+                date: (parseTxDate(tx.created_at) || new Date()).toLocaleString(getLocale(), {
                     day: 'numeric',
                     month: 'long',
                     hour: '2-digit',
                     minute: '2-digit',
                 }),
-                amount: `${isPositive ? '+' : '-'}${parseFloat(t.amount || 0).toFixed(2)} ${t('currency')}`,
+                amount: `${isPositive ? '+' : '-'}${parseFloat(tx.amount || 0).toFixed(2)} ${t('currency')}`,
                 isPositive,
                 icon: isPositive ? 'plus' : 'ticket',
             };

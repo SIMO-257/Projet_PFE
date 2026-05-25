@@ -19,7 +19,7 @@ const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
 
 export default function RechargePayment() {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const navigate = useNavigate();
   const [step, setStep] = useState(1); // 1: Amount Selection, 2: Card Details
   const [amount, setAmount] = useState("");
@@ -207,7 +207,7 @@ export default function RechargePayment() {
               </div>
             ) : (
               stripePromise && clientSecret ? (
-                <Elements stripe={stripePromise} options={{ clientSecret, appearance }}>
+                <Elements stripe={stripePromise} options={{ clientSecret, appearance, locale: language }}>
                   <div className="mt-4">
                     <StripeCheckoutForm 
                       amount={amount}
