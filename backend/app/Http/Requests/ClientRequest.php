@@ -26,7 +26,7 @@ class ClientRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'required|email:rfc,dns|max:255|unique:clients,email',
+            'email' => 'required|email:rfc|max:255|unique:clients,email',
             'phone' => ['required', 'string', 'regex:/^(06|07)\d{8}$/', 'unique:clients,phone'],
             'password' => [
                 'required',

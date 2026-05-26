@@ -71,6 +71,10 @@ Route::middleware(['auth:sanctum', 'track.activity'])->group(function () {
     Route::patch('/user/notification-preferences', [ClientController::class, 'updateNotificationPreferences'])->name('api.client.notification_preferences.update');
     Route::get('/user/preferences', [ClientController::class, 'getPreferences'])->name('api.client.preferences.get');
     Route::patch('/user/preferences', [ClientController::class, 'updatePreferences'])->name('api.client.preferences.update');
+
+    // Help & Support Routes
+    Route::get('/help', [\App\Http\Controllers\RapportController::class, 'index'])->name('api.help.index');
+    Route::post('/rapports', [\App\Http\Controllers\RapportController::class, 'store'])->name('api.rapports.store');
 });
 
 // ─── ADMIN ROUTES ────────────────────────────────────────────
@@ -111,4 +115,8 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'admin'])->group(function ()
 
     // Profile
     Route::put('/profile', [AdminProfileController::class, 'update']);
+
+    // Help & Support — Admin Rapports
+    Route::get('/rapports', [\App\Http\Controllers\Admin\AdminRapportController::class, 'index']);
+    Route::patch('/rapports/{id}/statut', [\App\Http\Controllers\Admin\AdminRapportController::class, 'updateStatut']);
 });

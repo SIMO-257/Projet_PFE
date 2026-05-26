@@ -54,6 +54,7 @@ const AdminTickets = lazy(() => import("./Pages/admin/AdminTickets"));
 const AdminTransactions = lazy(() => import("./Pages/admin/AdminTransactions"));
 const AdminNotifications = lazy(() => import("./Pages/admin/AdminNotifications"));
 const AdminProfile = lazy(() => import("./Pages/admin/AdminProfile"));
+const AdminRapports = lazy(() => import("./Pages/admin/AdminRapports"));
 
 // Admin Components
 import AdminGuard from './Components/guards/AdminGuard';
@@ -182,6 +183,7 @@ function App() {
               <Route path="tickets" element={<AdminTickets />} />
               <Route path="transactions" element={<AdminTransactions />} />
               <Route path="notifications" element={<AdminNotifications />} />
+              <Route path="rapports" element={<AdminRapports />} />
               <Route path="profil" element={<AdminProfile />} />
             </Route>
           </Route>
