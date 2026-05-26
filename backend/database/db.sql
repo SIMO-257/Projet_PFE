@@ -18,6 +18,7 @@ CREATE TABLE `users` (
     `password_hash` VARCHAR(255) NOT NULL,
     `avatar_path` VARCHAR(255) NULL,
     `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+    `is_student` TINYINT(1) NOT NULL DEFAULT 0,
     `last_active_at` TIMESTAMP NULL,
     `fcm_token` VARCHAR(255) NULL,
     `notification_prefs` JSON NULL,
@@ -89,6 +90,23 @@ CREATE TABLE `wallets` (
     PRIMARY KEY (`id`),
     KEY `wallets_user_id_index` (`user_id`),
     CONSTRAINT `wallets_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE `student_verifications` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `user_id` BIGINT UNSIGNED NOT NULL,
+    `cin_doc_path` VARCHAR(255) NOT NULL,
+    `school_doc_path` VARCHAR(255) NOT NULL,
+    `status` ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
+    `admin_id` BIGINT UNSIGNED NULL,
+    `rejected_reason` TEXT NULL,
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    KEY `student_verifications_user_id_index` (`user_id`),
+    KEY `student_verifications_status_index` (`status`),
+    CONSTRAINT `student_verifications_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `student_verifications_admin_id_foreign` FOREIGN KEY (`admin_id`) REFERENCES `admins` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE `transactions` (

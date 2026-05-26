@@ -42,6 +42,7 @@ class User extends Authenticatable implements CanResetPasswordContract, MustVeri
         'email_verification_sent_at',
         'email_verified_at',
         'fcm_token',
+        'is_student',
     ];
 
     /**
@@ -63,6 +64,7 @@ class User extends Authenticatable implements CanResetPasswordContract, MustVeri
     {
         return [
             'is_active' => 'boolean',
+            'is_student' => 'boolean',
             'created_at' => 'datetime',
             'last_active_at' => 'datetime',
             'notification_prefs' => 'array',
@@ -128,6 +130,14 @@ class User extends Authenticatable implements CanResetPasswordContract, MustVeri
     public function defaultTicket()
     {
         return $this->belongsTo(Ticket::class, 'default_ticket_id');
+    }
+
+    /**
+     * Get the student verification record.
+     */
+    public function studentVerification()
+    {
+        return $this->hasOne(StudentVerification::class, 'user_id');
     }
 
     // Check if email is verified

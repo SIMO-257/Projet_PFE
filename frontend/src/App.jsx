@@ -28,6 +28,7 @@ const EditProfilePage = lazy(() => import("./Pages/profile/EditProfilePage"));
 const SettingsPage = lazy(() => import("./Pages/profile/SettingsPage"));
 const HelpSupportPage = lazy(() => import("./Pages/profile/HelpSupportPage"));
 const SecurityPage = lazy(() => import("./Pages/profile/SecurityPage"));
+const StudentVerificationPage = lazy(() => import("./Pages/profile/StudentVerificationPage"));
 
 // Lazy pages - Tickets
 const MyTicketsPage = lazy(() => import("./Pages/tickets/MyTicketsPage"));
@@ -165,6 +166,7 @@ function App() {
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/help-support" element={<HelpSupportPage />} />
             <Route path="/security" element={<SecurityPage />} />
+            <Route path="/student-verification" element={<StudentVerificationPage />} />
 
             <Route path="/my-tickets" element={<MyTicketsPage />} />
             <Route path="/tickets-history" element={<TicketsHistoryPage />} />

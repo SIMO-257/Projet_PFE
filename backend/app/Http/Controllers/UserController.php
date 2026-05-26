@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Storage;
 use App\Models\AuditLog;
+use App\Models\StudentVerification;
 
 class UserController extends Controller
 {
@@ -29,6 +30,7 @@ class UserController extends Controller
             'phone' => $user->phone,
             'created_at' => $user->created_at->toDateString(),
             'avatar_url' => $user->avatar_path ? Storage::disk('public')->url($user->avatar_path) : null,
+            'is_student' => (bool) $user->is_student,
         ]);
     }
 
@@ -58,6 +60,7 @@ class UserController extends Controller
             'email' => $user->email,
             'phone' => $user->phone,
             'avatar_url' => $user->avatar_path ? Storage::disk('public')->url($user->avatar_path) : null,
+            'is_student' => (bool) $user->is_student,
         ], 'Profile updated successfully.');
     }
 
@@ -304,6 +307,83 @@ class UserController extends Controller
     }
 
 
+
+    /**
+     * Get the student verification status for the authenticated user.
+     */
+    public function studentStatus(Request $request)
+    {
+        $user = $request->user();
+        $verification = StudentVerification::where('user_id', $user->id)->first();
+
+        return $this->successResponse([
+            'is_student' => (bool) $user->is_student,
+            'verification' => $verification ? [
+                'id' => $verification->id,
+                'status' => $verification->status,
+                'created_at' => $verification->created_at->toDateTimeString(),
+            ] : null,
+        ]);
+    }
+
+    /**
+     * Submit student verification documents.
+     */
+    public function submitStudentVerification(Request $request)
+    {
+        $user = $request->user();
+
+        // If already a student, reject
+        if ($user->is_student) {
+            return $this->errorResponse('You are already verified as a student.', 422);
+        }
+
+        // Check if there's already a pending/approved verification
+        $existing = StudentVerification::where('user_id', $user->id)->first();
+        if ($existing && $existing->status !== 'rejected') {
+            return $this->errorResponse('A verification request already exists with status: ' . $existing->status, 422);
+        }
+
+        $validated = $request->validate([
+            'cin_doc' => 'required|file|mimes:pdf,doc,docx|max:10240',
+            'school_doc' => 'required|file|mimes:pdf,doc,docx|max:10240',
+        ]);
+
+        // Store files
+        $cinPath = $request->file('cin_doc')->store('student_cin', 'public');
+        $schoolPath = $request->file('school_doc')->store('student_school', 'public');
+
+        // If there was a previous rejected verification, update it instead of creating new
+        if ($existing) {
+            // Delete old files
+            Storage::disk('public')->delete($existing->cin_doc_path);
+            Storage::disk('public')->delete($existing->school_doc_path);
+
+            $existing->update([
+                'cin_doc_path' => $cinPath,
+                'school_doc_path' => $schoolPath,
+                'status' => 'pending',
+                'admin_id' => null,
+                'rejected_reason' => null,
+            ]);
+
+            $verification = $existing;
+        } else {
+            $verification = StudentVerification::create([
+                'user_id' => $user->id,
+                'cin_doc_path' => $cinPath,
+                'school_doc_path' => $schoolPath,
+                'status' => 'pending',
+            ]);
+        }
+
+        AuditLog::log('student_verification_submitted', $user->id);
+
+        return $this->successResponse([
+            'id' => $verification->id,
+            'status' => $verification->status,
+        ], 'Documents submitted successfully. Awaiting verification.', 201);
+    }
 
     private function applyProfileFile(User $user, Request $request, string $key): void
     {

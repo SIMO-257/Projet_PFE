@@ -27,6 +27,7 @@ return new class extends Migration
             $table->uuid('uuid')->unique();
             $table->string('full_name', 100)->nullable();
             $table->string('phone', 20)->unique()->nullable();
+            $table->boolean('is_student')->default(false);
             $table->string('email', 255)->unique();
             $table->string('email_verification_code', 6)->nullable();
             $table->string('email_verification_token')->nullable();

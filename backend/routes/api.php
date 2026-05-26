@@ -71,6 +71,10 @@ Route::middleware(['auth:sanctum', 'track.activity'])->group(function () {
     Route::patch('/users/notification-preferences', [UserController::class, 'updateNotificationPreferences'])->name('api.users.notification_preferences.update');
     Route::get('/users/preferences', [UserController::class, 'getPreferences'])->name('api.users.preferences.get');
     Route::patch('/users/preferences', [UserController::class, 'updatePreferences'])->name('api.users.preferences.update');
+
+    // Student Verification
+    Route::get('/users/student-status', [UserController::class, 'studentStatus'])->name('api.users.student.status');
+    Route::post('/users/student-verification', [UserController::class, 'submitStudentVerification'])->middleware('throttle:3,60')->name('api.users.student.verification');
 });
 
 // ─── ADMIN ROUTES ────────────────────────────────────────────

@@ -115,4 +115,13 @@ export const logoutUser = () => clientApi.post('/users/logout');
 
 export const logoutAllUser = () => clientApi.post('/users/logout-all');
 
+// ── Student Verification ───────────────────────────────────────────────────────
+
+export const fetchStudentStatus = () => clientApi.get('/users/student-status').then(extractPayload);
+
+export const submitStudentVerification = (formData) =>
+  clientApi.post('/users/student-verification', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }).then(extractPayload);
+
 export default clientApi;
