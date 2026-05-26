@@ -11,9 +11,6 @@ import {
   updateUserPreferences,
 } from "../services/notificationService";
 import { setTheme, setLanguage } from "../Redux/Slices/settingsSlice";
-import { resetState as resetWallet } from "../Redux/Slices/WalletSlice";
-import { resetState as resetTickets } from "../Redux/Slices/TicketsSlice";
-import { resetState as resetNotifications } from "../Redux/Slices/notificationSlice";
 import { useTranslation } from "../hooks/useTranslation";
 
 const Settings = () => {
@@ -29,7 +26,6 @@ const Settings = () => {
 
   // Modals state
   const [showAboutModal, setShowAboutModal] = useState(false);
-  const [showOfflineModal, setShowOfflineModal] = useState(false);
 
   // Notification preferences
   const [notificationPrefs, setNotificationPrefs] = useState({
@@ -68,66 +64,6 @@ const Settings = () => {
 
   // --- Handlers ---
   const goBack = () => navigate(-1);
-
-  const handleClearCache = () => {
-    if (
-      window.confirm(
-        t("clear_cache_confirm"),
-      )
-    ) {
-      // 1. Clear localStorage EXCEPT 'app_lang' and 'app_theme'
-      const keysToKeep = [
-        "app_lang",
-        "app_theme",
-        "is_authenticated",
-        "user_uuid",
-      ];
-      const keysToRemove = [];
-
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (!keysToKeep.includes(key)) {
-          keysToRemove.push(key);
-        }
-      }
-
-      keysToRemove.forEach((key) => localStorage.removeItem(key));
-
-      // 2. Dispatch Redux reset actions
-      dispatch(resetWallet());
-      dispatch(resetTickets());
-      dispatch(resetNotifications());
-
-      alert(t("cache_cleared_success"));
-    }
-  };
-
-  const handleManageOffline = () => {
-    setShowOfflineModal(true);
-  };
-
-  const handleDeleteOfflineData = () => {
-    if (window.confirm(t("delete_offline_confirm"))) {
-      // Clear offline/ticket related keys
-      const offlineKeys = ["tickets_cache", "last_sync"];
-      offlineKeys.forEach((key) => localStorage.removeItem(key));
-
-      dispatch(resetTickets());
-      setShowOfflineModal(false);
-      alert(t("offline_data_deleted"));
-    }
-  };
-
-  const handleHelpSupport = () => {
-    const subject = encodeURIComponent("Support CasaWay");
-    const body = encodeURIComponent(
-      "Bonjour,\n\nJ'ai besoin d'aide avec :\n\n[Décrivez votre problème ici]\n\nVersion : 2.4.1",
-    );
-    window.open(
-      `mailto:support@casaway.ma?subject=${subject}&body=${body}`,
-      "_blank",
-    );
-  };
 
   const handleAbout = () => {
     setShowAboutModal(true);
@@ -178,16 +114,6 @@ const Settings = () => {
 
   const handleLanguageChange = (e) => {
     dispatch(setLanguage(e.target.value));
-  };
-
-  // Calculate storage size
-  const getStorageSize = () => {
-    try {
-      const size = JSON.stringify(localStorage).length;
-      return Math.round(size / 1024) + " KB";
-    } catch (e) {
-      return "0 KB";
-    }
   };
 
   if (loading) {
@@ -273,19 +199,6 @@ const Settings = () => {
               />
             </Section>
 
-            {/* ========== DONNÉES & STOCKAGE ========== */}
-            <Section title={t("data_storage")}>
-              <ArrowItem
-                icon="trash"
-                label={t("clear_cache")}
-                onClick={handleClearCache}
-              />
-              <ArrowItem
-                icon="data"
-                label={t("manage_offline_data")}
-                onClick={handleManageOffline}
-              />
-            </Section>
 
             {/* ========== CONFIDENTIALITÉ ========== */}
             <Section title={t("privacy")}>
@@ -307,11 +220,6 @@ const Settings = () => {
 
             {/* ========== SUPPORT & LÉGAL ========== */}
             <Section title={t("support_legal")}>
-              <ArrowItem
-                icon="help"
-                label={t("help_support")}
-                onClick={handleHelpSupport}
-              />
               <ArrowItem
                 icon="info"
                 label={t("about")}
@@ -369,60 +277,6 @@ const Settings = () => {
           >
             {t("close")}
           </button>
-        </div>
-      </ModalOverlay>
-
-      {/* Offline Management Modal */}
-      <ModalOverlay
-        show={showOfflineModal}
-        onClose={() => setShowOfflineModal(false)}
-      >
-        <div className="bg-[#1a0507] border border-yellow-500/20 rounded-2xl p-6 max-w-sm w-full">
-          <h3 className="text-white text-xl font-bold mb-4">
-            {t("offline_data")}
-          </h3>
-
-          <div className="space-y-4 mb-6">
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-white/60">{t("storage_used")}</span>
-              <span className="text-white font-medium">{getStorageSize()}</span>
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-white/40 text-xs uppercase tracking-wider">
-                {t("cached_items")}
-              </p>
-              <ul className="space-y-1 text-white/80 text-sm">
-                <li className="flex items-center space-x-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-yellow-500"></div>
-                  <span>{t("cached_tickets")}</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-yellow-500"></div>
-                  <span>{t("cached_validations")}</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-yellow-500"></div>
-                  <span>{t("cached_wallet_balance")}</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <button
-              onClick={handleDeleteOfflineData}
-              className="w-full py-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 font-bold rounded-xl transition-colors border border-red-500/20"
-            >
-              {t("delete_offline_data")}
-            </button>
-            <button
-              onClick={() => setShowOfflineModal(false)}
-              className="w-full py-3 bg-white/5 hover:bg-white/10 text-white font-bold rounded-xl transition-colors"
-            >
-              {t("close")}
-            </button>
-          </div>
         </div>
       </ModalOverlay>
     </div>

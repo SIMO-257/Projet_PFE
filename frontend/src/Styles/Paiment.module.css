@@ -9,6 +9,10 @@
     background: linear-gradient(to bottom, #3D1515, #2D0F0F, #1D0808);
   }
 
+  :global([data-theme='light']) .container {
+    background: linear-gradient(to bottom, #f5f7fa, #e8ecf2, #dce0e8);
+  }
+
   .content {
     @apply max-w-md mx-auto;
   }
@@ -30,6 +34,10 @@
     @apply text-white text-lg font-semibold;
   }
 
+  :global([data-theme='light']) .headerTitle {
+    color: #1f1718;
+  }
+
   /* Navigation Tabs */
   .navTabs {
     @apply flex items-center gap-6 mb-6 text-sm;
@@ -40,6 +48,11 @@
     border-top: none;
     border-left: none;
     border-right: none;
+  }
+
+  :global([data-theme='light']) .navTabActive {
+    color: #1f1718;
+    border-bottom-color: #1f1718;
   }
 
   .navTabInactive {
@@ -53,6 +66,11 @@
     border-color: #2F5D2F;
   }
 
+  :global([data-theme='light']) .billetCard {
+    background: linear-gradient(to bottom right, #e8f0e8, #d8e8d8);
+    border-color: rgba(92, 42, 46, 0.14);
+  }
+
   .billetContent {
     @apply flex justify-between items-center;
   }
@@ -61,12 +79,24 @@
     @apply text-white font-semibold text-base;
   }
 
+  :global([data-theme='light']) .billetTitle {
+    color: #1f1718;
+  }
+
   .billetSubtitle {
     @apply text-green-300 text-sm;
   }
 
+  :global([data-theme='light']) .billetSubtitle {
+    color: #2d7a2d;
+  }
+
   .billetPrice {
     @apply text-white font-bold text-2xl;
+  }
+
+  :global([data-theme='light']) .billetPrice {
+    color: #1f1718;
   }
 
   /* Payment Methods Section */
@@ -76,6 +106,10 @@
 
   .paymentMethodsTitle {
     @apply text-white text-base font-medium mb-4;
+  }
+
+  :global([data-theme='light']) .paymentMethodsTitle {
+    color: #1f1718;
   }
 
   .paymentMethodsList {
@@ -91,6 +125,11 @@
     @apply bg-[#1A0F0F] border-[#2A1A1A];
   }
 
+  :global([data-theme='light']) .methodCardUnselected {
+    background-color: rgba(255, 255, 255, 0.5);
+    border-color: rgba(92, 42, 46, 0.14);
+  }
+
   .methodCardSelected {
     @apply border-2 border-solid;
   }
@@ -101,9 +140,19 @@
     background: linear-gradient(to bottom right, #6B2020, #4A1515);
   }
 
+  :global([data-theme='light']) .methodCardCard {
+    background: linear-gradient(to bottom right, #f0e6e0, #e8dcd4);
+    border-color: rgba(139, 48, 48, 0.3);
+  }
+
   .methodCardBank {
     @apply border-[#2F4A2F];
     background: linear-gradient(to bottom right, #1F3A1F, #152615);
+  }
+
+  :global([data-theme='light']) .methodCardBank {
+    background: linear-gradient(to bottom right, #e8f0e8, #d8e8d8);
+    border-color: rgba(47, 74, 47, 0.3);
   }
 
   .methodCardPortfolio {
@@ -111,9 +160,19 @@
     background: linear-gradient(to bottom right, #3A3A1F, #262615);
   }
 
+  :global([data-theme='light']) .methodCardPortfolio {
+    background: linear-gradient(to bottom right, #f0ede0, #e8e4d4);
+    border-color: rgba(74, 74, 47, 0.3);
+  }
+
   .methodCardApple {
     @apply border-[#2A2A2A];
     background: linear-gradient(to bottom right, #1A1A1A, #0F0F0F);
+  }
+
+  :global([data-theme='light']) .methodCardApple {
+    background: linear-gradient(to bottom right, #f5f5f5, #e8e8e8);
+    border-color: rgba(42, 42, 42, 0.2);
   }
 
   .methodHeader {
@@ -130,6 +189,10 @@
 
   .methodTitle {
     @apply text-white font-medium text-sm;
+  }
+
+  :global([data-theme='light']) .methodTitle {
+    color: #1f1718;
   }
 
   .methodInfoIcon {
@@ -171,6 +234,10 @@
     @apply text-white text-3xl font-bold mb-0.5;
   }
 
+  :global([data-theme='light']) .cardBalance {
+    color: #1f1718;
+  }
+
   .cardType {
     @apply text-gray-400 text-xs mb-3;
   }
@@ -203,6 +270,10 @@
 
   .portfolioBalance {
     @apply text-white text-3xl font-bold mb-0.5;
+  }
+
+  :global([data-theme='light']) .portfolioBalance {
+    color: #1f1718;
   }
 
   .portfolioLabel {
@@ -252,6 +323,11 @@
     border-color: #2A1A1A;
   }
 
+  :global([data-theme='light']) .ticketInfoCard {
+    background-color: rgba(255, 255, 255, 0.7);
+    border-color: rgba(92, 42, 46, 0.14);
+  }
+
   .ticketInfoGrid {
     @apply grid grid-cols-2 gap-4 mb-4;
   }
@@ -264,9 +340,17 @@
     @apply text-white font-medium text-sm;
   }
 
+  :global([data-theme='light']) .ticketInfoValue {
+    color: #1f1718;
+  }
+
   .ticketInfoDivider {
     @apply border-t pt-3;
     border-color: #2A1A1A;
+  }
+
+  :global([data-theme='light']) .ticketInfoDivider {
+    border-color: rgba(92, 42, 46, 0.14);
   }
 
   .ticketTotal {
@@ -279,6 +363,10 @@
 
   .ticketTotalValue {
     @apply text-white font-bold text-xl;
+  }
+
+  :global([data-theme='light']) .ticketTotalValue {
+    color: #1f1718;
   }
 
   /* Terms and Conditions */
@@ -329,6 +417,10 @@
   .securitySection {
     @apply mt-6 pt-4 border-t;
     border-color: #3A2A2A;
+  }
+
+  :global([data-theme='light']) .securitySection {
+    border-color: rgba(92, 42, 46, 0.14);
   }
 
   .securityBadges {

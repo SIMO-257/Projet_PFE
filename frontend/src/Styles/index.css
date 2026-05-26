@@ -98,8 +98,138 @@ input[type="number"] {
 [data-theme='light'] {
   --app-bg: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   --card-bg: #ffffff;
-  --text-main: #1a0507;
+  --text-main: #1f1718;
 }
+
+/* ===================================================================
+   LIGHT MODE — SCALED TO MATCH SETTINGS PAGE AESTHETIC
+   
+   Palette reference (from Settings.module.css):
+     - Card surface: warm cream #fff9f0 – #f8f1e0
+     - Text primary: #1f1718 (dark brown)
+     - Text secondary: rgba(31,23,24, .82 / .64 / .52 / .38)
+     - Item bg:      rgba(255,255,255,0.7)
+     - Accent bg:    rgba(92,42,46, 0.2)
+     - Borders:      rgba(92,42,46, 0.14 / 0.24)
+     - Gold accent:  rgba(212,175,55, 0.24)
+   =================================================================== */
+
+/* ── 1. Global text colour overrides ── */
+[data-theme='light'] .text-white { color: #1f1718; }
+[data-theme='light'] .text-white\/90 { color: rgba(31, 23, 24, 0.92); }
+[data-theme='light'] .text-white\/80 { color: rgba(31, 23, 24, 0.82); }
+[data-theme='light'] .text-white\/70 { color: rgba(31, 23, 24, 0.74); }
+[data-theme='light'] .text-white\/60 { color: rgba(31, 23, 24, 0.64); }
+[data-theme='light'] .text-white\/50 { color: rgba(31, 23, 24, 0.54); }
+[data-theme='light'] .text-white\/45 { color: rgba(31, 23, 24, 0.48); }
+[data-theme='light'] .text-white\/40 { color: rgba(31, 23, 24, 0.44); }
+[data-theme='light'] .text-white\/30 { color: rgba(31, 23, 24, 0.34); }
+[data-theme='light'] .text-white\/20 { color: rgba(31, 23, 24, 0.24); }
+[data-theme='light'] .text-white\/10 { color: rgba(31, 23, 24, 0.14); }
+
+/* ── 2. Hover text ── */
+[data-theme='light'] .hover\:text-white:hover { color: #1f1718; }
+
+/* ── 3. Solid dark backgrounds → light surfaces ── */
+[data-theme='light'] .bg-\[\#1a0507\] { background-color: #ffffff; }
+[data-theme='light'] .bg-\[\#0a0e27\] { background-color: #f5f7fa; }
+[data-theme='light'] .bg-\[\#0a0a0a\] { background-color: #f5f7fa; }
+[data-theme='light'] .bg-\[\#1a1a1a\]\/50 { background-color: rgba(92, 42, 46, 0.05); }
+[data-theme='light'] .bg-\[\#1a1a1a\] { background-color: #ffffff; }
+[data-theme='light'] .bg-\[\#2a0b0f\] { background-color: #f8f3ee; }
+[data-theme='light'] .bg-\[\#2a2a2a\] { background-color: #f5f7fa; }
+[data-theme='light'] .bg-\[\#333333\] { background-color: #eaecf2; }
+[data-theme='light'] .bg-\[\#400106\]\/90 { background-color: rgba(255, 255, 255, 0.9); }
+[data-theme='light'] .bg-\[\#400106\]\/55 { background-color: rgba(255, 255, 255, 0.55); }
+[data-theme='light'] .bg-\[\#400106\]\/50 { background-color: rgba(255, 255, 255, 0.5); }
+[data-theme='light'] .bg-\[\#2a0b0f\]\/80 { background-color: rgba(255, 255, 255, 0.8); }
+
+/* ── 4. Burgundy palette → light tones ── */
+[data-theme='light'] .bg-burgundy-900 { background-color: #f5f7fa; }
+[data-theme='light'] .bg-burgundy-800 { background-color: #f8f9fb; }
+[data-theme='light'] .bg-burgundy-700 { background-color: #ffffff; }
+[data-theme='light'] .bg-burgundy-600 { background-color: #f5f7fa; }
+[data-theme='light'] .bg-burgundy-500 { background-color: #f1f3f6; }
+[data-theme='light'] .bg-burgundy-light { background-color: #f1f3f6; }
+[data-theme='light'] .bg-burgundy-dark { background-color: #eaecf2; }
+
+/* ── 5. Black-opacity overlays become light overlays ── */
+[data-theme='light'] .bg-black\/60 { background-color: rgba(230, 230, 235, 0.6); }
+[data-theme='light'] .bg-black\/50 { background-color: rgba(235, 235, 240, 0.5); }
+[data-theme='light'] .bg-black\/40 { background-color: rgba(255, 255, 255, 0.7); }
+[data-theme='light'] .bg-black\/30 { background-color: rgba(255, 255, 255, 0.65); }
+[data-theme='light'] .bg-black\/25 { background-color: rgba(255, 255, 255, 0.6); }
+[data-theme='light'] .bg-black\/20 { background-color: rgba(255, 255, 255, 0.55); }
+
+/* ── 6. White-opacity (light-on-dark) become subtle burgundy tint on light ── */
+[data-theme='light'] .bg-white\/\[0\.02\] { background-color: rgba(92, 42, 46, 0.03); }
+[data-theme='light'] .bg-white\/5 { background-color: rgba(92, 42, 46, 0.07); }
+[data-theme='light'] .bg-white\/10 { background-color: rgba(92, 42, 46, 0.11); }
+[data-theme='light'] .bg-white\/15 { background-color: rgba(92, 42, 46, 0.15); }
+[data-theme='light'] .bg-white\/20 { background-color: rgba(92, 42, 46, 0.19); }
+[data-theme='light'] .bg-white\/\[\] { background-color: rgba(92, 42, 46, 0.07); }
+
+/* ── 7. Border colours ── */
+[data-theme='light'] .border-white\/5 { border-color: rgba(92, 42, 46, 0.08); }
+[data-theme='light'] .border-white\/10 { border-color: rgba(92, 42, 46, 0.14); }
+[data-theme='light'] .border-white\/15 { border-color: rgba(92, 42, 46, 0.18); }
+[data-theme='light'] .border-white\/20 { border-color: rgba(92, 42, 46, 0.22); }
+[data-theme='light'] .border-white\/30 { border-color: rgba(92, 42, 46, 0.32); }
+
+/* ── 8. Hover states ── */
+[data-theme='light'] .hover\:bg-white\/5:hover { background-color: rgba(92, 42, 46, 0.09); }
+[data-theme='light'] .hover\:bg-white\/10:hover { background-color: rgba(92, 42, 46, 0.14); }
+[data-theme='light'] .hover\:bg-white\/20:hover { background-color: rgba(92, 42, 46, 0.22); }
+[data-theme='light'] .hover\:border-white\/10:hover { border-color: rgba(92, 42, 46, 0.14); }
+[data-theme='light'] .hover\:border-white\/20:hover { border-color: rgba(92, 42, 46, 0.24); }
+
+/* ── 9. GRADIENT OVERRIDES ── */
+/* Main card gradient: from-[#400106]/95 to-[#260101]/95 and variants */
+[data-theme='light'] .from-\[\#400106\] { --tw-gradient-from: #ffffff var(--tw-gradient-from-position); }
+[data-theme='light'] .from-\[\#400106\]\/90 { --tw-gradient-from: rgba(255, 255, 255, 0.95) var(--tw-gradient-from-position); }
+[data-theme='light'] .from-\[\#400106\]\/95 { --tw-gradient-from: rgba(255, 255, 255, 0.97) var(--tw-gradient-from-position); }
+[data-theme='light'] .to-\[\#260101\] { --tw-gradient-to: #f8f3ee var(--tw-gradient-to-position); }
+[data-theme='light'] .to-\[\#260101\]\/90 { --tw-gradient-to: rgba(248, 243, 238, 0.95) var(--tw-gradient-to-position); }
+[data-theme='light'] .to-\[\#260101\]\/95 { --tw-gradient-to: rgba(248, 243, 238, 0.97) var(--tw-gradient-to-position); }
+
+/* App background gradient: from-[#2a0b0f] to-[#1a0507] */
+[data-theme='light'] .from-\[\#2a0b0f\] { --tw-gradient-from: #f5f7fa var(--tw-gradient-from-position); }
+[data-theme='light'] .from-\[\#2a0b0f\]\/95 { --tw-gradient-from: rgba(245, 247, 250, 0.95) var(--tw-gradient-from-position); }
+[data-theme='light'] .to-\[\#1a0507\] { --tw-gradient-to: #e8ecf2 var(--tw-gradient-to-position); }
+[data-theme='light'] .to-\[\#1a0507\]\/95 { --tw-gradient-to: rgba(232, 236, 242, 0.95) var(--tw-gradient-to-position); }
+
+/* Profile/inner card gradient: from-[#5C2A36] to-[#3D1A24] */
+[data-theme='light'] .from-\[\#5C2A36\] { --tw-gradient-from: rgba(248, 243, 238, 0.85) var(--tw-gradient-from-position); }
+[data-theme='light'] .to-\[\#3D1A24\] { --tw-gradient-to: rgba(240, 235, 228, 0.85) var(--tw-gradient-to-position); }
+
+/* Action button gradient: from-[#8B4049] to-[#5C2A2E] */
+[data-theme='light'] .from-\[\#8B4049\] { --tw-gradient-from: #8B4049 var(--tw-gradient-from-position); }
+[data-theme='light'] .to-\[\#5C2A2E\] { --tw-gradient-to: #5C2A2E var(--tw-gradient-to-position); }
+
+/* Gold button gradient: from-[#D9B991] to-[#C9A961] */
+[data-theme='light'] .from-\[\#D9B991\] { --tw-gradient-from: #D9B991 var(--tw-gradient-from-position); }
+[data-theme='light'] .to-\[\#C9A961\] { --tw-gradient-to: #C9A961 var(--tw-gradient-to-position); }
+
+/* Gold gradient: from-[#f5d579] to-[#d4af37] */
+[data-theme='light'] .from-\[\#f5d579\] { --tw-gradient-from: #f5d579 var(--tw-gradient-from-position); }
+[data-theme='light'] .to-\[\#d4af37\] { --tw-gradient-to: #d4af37 var(--tw-gradient-to-position); }
+
+/* ── 10. Text color overrides for dark-on-light text ── */
+[data-theme='light'] .text-\[\#260101\] { color: #400106; }
+[data-theme='light'] .text-\[\#400106\] { color: #400106; }
+[data-theme='light'] .text-\[\#f5d579\] { color: #d4af37; }
+[data-theme='light'] .text-\[\#f5d579\]\/30 { color: rgba(212, 175, 55, 0.3); }
+
+/* ── 11. Settings/About modal overrides ── */
+[data-theme='light'] .bg-\[\#1a0507\].border-yellow-500\/20 { background-color: #ffffff; border-color: rgba(212, 175, 55, 0.24); }
+[data-theme='light'] select option.bg-\[\#1a0507\] { background-color: #ffffff; }
+
+/* ── 12. Admin layout overrides ── */
+[data-theme='light'] .bg-\[\#1a0507\].text-white { background-color: #f5f7fa; color: #1f1718; }
+
+/* ── 13. Loading overlay / PublicRoute ── */
+[data-theme='light'] .bg-\[\#1a0507\].text-white.h-screen { background-color: #f5f7fa; color: #1f1718; }
+
 
 .app-shell {
   height: 100dvh;
@@ -134,17 +264,22 @@ input[type="number"] {
 
 /* 3D Sphere Loader Styles */
 .sphere-container {
-  width: 80px;
-  height: 80px;
-  perspective: 800px;
+  position: relative;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.sphere {
+/* Rings wrapper rotates in 3D */
+.sphere-rings-wrapper {
+  position: absolute;
   width: 100%;
   height: 100%;
-  position: relative;
+  perspective: 800px;
   transform-style: preserve-3d;
-  animation: rotateSphere 6s infinite linear;
+  animation: rotateSphere 8s infinite linear;
 }
 
 .sphere-ring {
@@ -155,41 +290,18 @@ input[type="number"] {
   height: 100%;
   border: 2px solid transparent;
   border-radius: 50%;
-  box-shadow: 0 0 15px rgba(234, 179, 8, 0.2);
+  box-shadow: 0 0 15px rgba(234, 179, 8, 0.15);
 }
 
-.ring-1 {
-  transform: rotateY(0deg);
-  border-color: rgba(234, 179, 8, 0.9);
-}
-.ring-2 {
-  transform: rotateY(36deg);
-  border-color: rgba(212, 163, 89, 0.7);
-}
-.ring-3 {
-  transform: rotateY(72deg);
-  border-color: rgba(184, 134, 11, 0.8);
-}
-.ring-4 {
-  transform: rotateY(108deg);
-  border-color: rgba(234, 179, 8, 0.7);
-}
-.ring-5 {
-  transform: rotateY(144deg);
-  border-color: rgba(212, 163, 89, 0.8);
-}
-.ring-6 {
-  transform: rotateX(90deg) rotateY(0deg);
-  border-color: rgba(234, 179, 8, 0.9);
-}
-.ring-7 {
-  transform: rotateX(90deg) rotateY(36deg);
-  border-color: rgba(184, 134, 11, 0.7);
-}
-.ring-8 {
-  transform: rotateX(90deg) rotateY(72deg);
-  border-color: rgba(234, 179, 8, 0.8);
-}
+/* Individual ring transforms */
+.ring-1 { transform: rotateY(0deg); border-color: rgba(234, 179, 8, 0.9); }
+.ring-2 { transform: rotateY(36deg); border-color: rgba(212, 163, 89, 0.7); }
+.ring-3 { transform: rotateY(72deg); border-color: rgba(184, 134, 11, 0.8); }
+.ring-4 { transform: rotateY(108deg); border-color: rgba(234, 179, 8, 0.7); }
+.ring-5 { transform: rotateY(144deg); border-color: rgba(212, 163, 89, 0.8); }
+.ring-6 { transform: rotateX(90deg) rotateY(0deg); border-color: rgba(234, 179, 8, 0.9); }
+.ring-7 { transform: rotateX(90deg) rotateY(36deg); border-color: rgba(184, 134, 11, 0.7); }
+.ring-8 { transform: rotateX(90deg) rotateY(72deg); border-color: rgba(234, 179, 8, 0.8); }
 
 @keyframes rotateSphere {
   0% {
@@ -197,5 +309,60 @@ input[type="number"] {
   }
   100% {
     transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg);
+  }
+}
+
+/* Logo container in the absolute center, with high contrast & soft gold glow */
+.sphere-logo-container {
+  position: absolute;
+  width: 54px;
+  height: 54px;
+  background: #ffffff; /* pure white circle so the logo is ALWAYS 100% visible */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px rgba(234, 179, 8, 0.4), inset 0 0 8px rgba(0, 0, 0, 0.1);
+  padding: 6px;
+  z-index: 10;
+  animation: logoPulse 2s infinite ease-in-out;
+}
+
+[data-theme='light'] .sphere-logo-container {
+  background: #ffffff;
+  box-shadow: 0 0 20px rgba(212, 163, 89, 0.35), inset 0 0 8px rgba(0, 0, 0, 0.05);
+}
+
+.sphere-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  animation: logoSpin2D 4s infinite linear; /* slow, premium 2D rotation */
+}
+
+.sphere-logo-fallback {
+  font-size: 22px;
+  font-weight: 800;
+  color: #2a0b0f;
+  font-family: 'Outfit', sans-serif;
+}
+
+@keyframes logoPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 15px rgba(234, 179, 8, 0.3);
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 0 25px rgba(234, 179, 8, 0.6);
+  }
+}
+
+@keyframes logoSpin2D {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }

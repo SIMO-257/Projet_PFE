@@ -126,3 +126,28 @@
     backdrop-filter: blur(8px);
   }
 }
+
+:global([data-theme='light']) .bottomNav {
+  background: linear-gradient(to top, rgba(245, 247, 250, 0.98), rgba(220, 225, 235, 0.95));
+  border-top-color: rgba(92, 42, 46, 0.14);
+}
+
+:global([data-theme='light']) .notificationButton {
+  background: linear-gradient(to bottom right, #e8d5c0, #d4bfb0);
+}
+
+:global([data-theme='light']) .centerNavButton:not(.active) {
+  background: linear-gradient(to bottom right, #e8d5c0, #d4bfb0);
+}
+
+:global([data-theme='light']) .welcomeText {
+  color: rgba(31, 23, 24, 0.64);
+}
+
+:global([data-theme='light']) .userName {
+  color: #1f1718;
+}
+
+:global([data-theme='light']) .balanceCard:hover {
+  box-shadow: 0 20px 40px rgba(92, 42, 46, 0.15);
+}

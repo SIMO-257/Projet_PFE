@@ -47,6 +47,13 @@
     border-color: rgba(212, 175, 55, 0.2);
   }
 
+  :global([data-theme='light']) .modalCard {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(248, 241, 224, 0.98));
+    border-color: rgba(212, 175, 55, 0.24);
+    box-shadow: 0 20px 45px -22px rgba(92, 42, 46, 0.28);
+    color: #1f1718;
+  }
+
   .modalCard::before {
     content: '';
     @apply absolute top-0 left-0 right-0 h-1 z-20;

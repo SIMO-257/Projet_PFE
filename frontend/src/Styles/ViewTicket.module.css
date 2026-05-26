@@ -8,8 +8,17 @@
     font-family: system-ui, -apple-system, sans-serif;
   }
 
+  :global([data-theme='light']) .pageContainer {
+    background: #f5f7fa;
+  }
+
   .container {
     @apply w-full max-w-md bg-[#0a0e27] text-white;
+  }
+
+  :global([data-theme='light']) .container {
+    background: transparent;
+    color: #1f1718;
   }
 
   .header {
@@ -22,6 +31,10 @@
 
   .headerTitle {
     @apply text-lg font-medium m-0 flex-1 text-center;
+  }
+
+  :global([data-theme='light']) .headerTitle {
+    color: #1f1718;
   }
 
   .statusCard {
@@ -40,6 +53,11 @@
   .detailsCard {
     @apply rounded-3xl p-6 mb-8;
     background-color: #1a1f3a;
+  }
+
+  :global([data-theme='light']) .detailsCard {
+    background-color: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(92, 42, 46, 0.14);
   }
 
   .detailItem {
@@ -63,8 +81,16 @@
     @apply text-xs uppercase tracking-wide text-[#8b92b0];
   }
 
+  :global([data-theme='light']) .detailLabel {
+    color: rgba(31, 23, 24, 0.64);
+  }
+
   .detailValue {
     @apply text-lg font-medium pl-11;
+  }
+
+  :global([data-theme='light']) .detailValue {
+    color: #1f1718;
   }
 
   .footer {

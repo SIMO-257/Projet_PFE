@@ -9,6 +9,7 @@ import CheckboxInput from '../Components/Inputs/CheckboxInput';
 import ConnexionButton from '../Components/Buttons/ConnexionButton';
 import FormOptions from '../Components/Form/FormOptions';
 import AuthLayout from '../Components/Layout/AuthLayout';
+import LoadingOverlay from '../Components/UI/LoadingOverlay';
 import styles from '../Styles/Auth.module.css';
 
 export default function Login() {
@@ -74,47 +75,49 @@ export default function Login() {
     };
 
     return (
-        <AuthLayout
-            subtitle={t('welcome_back')}
-            description={t('login_description')}
-            footerText={t('no_account')}
-            footerLinkText={t('create_account')}
-            footerLinkTo="/signup"
-            onSubmit={Log_in}
-        >
-            <InputField
-                label={t('email')}
-                type="email"
-                placeholder={t('email_placeholder')}
-                id="login-email"
-                var={form.email}
-                setVar={setField('email')}
-                error={Boolean(errors.email)}
-                errorMessage={errors.email}
-                required
-            />
+        <>
+            <LoadingOverlay isVisible={isLoading} message={t('signing_in')} />
+            <AuthLayout
+                subtitle={t('welcome_back')}
+                description={t('login_description')}
+                footerText={t('no_account')}
+                footerLinkText={t('create_account')}
+                footerLinkTo="/signup"
+                onSubmit={Log_in}
+            >
+                <InputField
+                    label={t('email')}
+                    type="email"
+                    placeholder={t('email_placeholder')}
+                    id="login-email"
+                    var={form.email}
+                    setVar={setField('email')}
+                    error={Boolean(errors.email)}
+                    errorMessage={errors.email}
+                    required
+                />
 
-            <InputField
-                label={t('password')}
-                type="password"
-                placeholder={t('password_placeholder')}
-                id="login-password"
-                var={form.password}
-                setVar={setField('password')}
-                error={Boolean(errors.password)}
-                errorMessage={errors.password}
-                required
-            />
-          
-            <FormOptions
-                leftContent={<CheckboxInput label={t('remember_me')} id="remember" setCheck={toggleRemember} check={form.remember_me} />}
-                rightContent={<Link to="/forgot_password" className={styles.forgotPassword} >{t('forgot_password')}</Link>}
-            />
+                <InputField
+                    label={t('password')}
+                    type="password"
+                    placeholder={t('password_placeholder')}
+                    id="login-password"
+                    var={form.password}
+                    setVar={setField('password')}
+                    error={Boolean(errors.password)}
+                    errorMessage={errors.password}
+                    required
+                />
+              
+                <FormOptions
+                    leftContent={<CheckboxInput label={t('remember_me')} id="remember" setCheck={toggleRemember} check={form.remember_me} />}
+                    rightContent={<Link to="/forgot_password" className={styles.forgotPassword} >{t('forgot_password')}</Link>}
+                />
 
-            <ConnexionButton type="submit" variant="primary" disabled={isLoading}>
-                {isLoading ? t('signing_in') : t('sign_in_btn')}
-            </ConnexionButton>
-        </AuthLayout>
-
+                <ConnexionButton type="submit" variant="primary" disabled={isLoading}>
+                    {isLoading ? t('signing_in') : t('sign_in_btn')}
+                </ConnexionButton>
+            </AuthLayout>
+        </>
     );
 }
