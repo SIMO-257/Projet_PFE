@@ -1,10 +1,13 @@
 import React from 'react';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const SectionHeader = ({ 
     title = "Section Title", 
-    buttonText = "Action",
+    buttonText: btnProp,
     onButtonClick 
 }) => {
+    const { t } = useTranslation();
+    const buttonText = btnProp || t('section_action_default');
     return (
         <div className="flex items-center justify-between mb-4">
             <h3 className="text-white text-base font-light">{title}</h3>

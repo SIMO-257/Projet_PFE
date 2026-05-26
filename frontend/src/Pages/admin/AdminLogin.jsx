@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginAdmin, clearAdminError } from '../../Redux/Slices/adminSlice';
+import { useTranslation } from '../../hooks/useTranslation';
 
 import InputField from '../../Components/Inputs/InputField';
 import ConnexionButton from '../../Components/Buttons/ConnexionButton';
@@ -9,6 +10,7 @@ import AuthLayout from '../../Components/Layout/AuthLayout';
 import styles from '../../Styles/Auth.module.css';
 
 export default function AdminLogin() {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { isAuthenticated, error: adminError, loading } = useSelector((state) => state.admin);
@@ -43,19 +45,19 @@ export default function AdminLogin() {
             if (payload?.errors) {
                 setErrors(payload.errors);
             } else {
-                setErrors({ form: payload?.message || 'Identifiants incorrects.' });
+                setErrors({ form: payload?.message || t('admin_login_failed') });
             }
         }
     };
 
     return (
         <AuthLayout
-            subtitle="Administration CasaWay"
-            description="Espace réservé aux administrateurs."
+            subtitle={t('admin_login_subtitle')}
+            description={t('admin_login_description')}
             onSubmit={handleLogin}
         >
             <InputField
-                label="Email"
+                label={t('email')}
                 type="email"
                 placeholder="admin@casaway.ma"
                 id="admin-email"
@@ -67,7 +69,7 @@ export default function AdminLogin() {
             />
 
             <InputField
-                label="Mot de passe"
+                label={t('password')}
                 type="password"
                 placeholder="********"
                 id="admin-password"
@@ -79,10 +81,10 @@ export default function AdminLogin() {
             />
 
             {errors.form && <p className={styles.fieldError}>{errors.form}</p>}
-            {adminError && !errors.form && <p className={styles.fieldError}>{adminError.message || 'Authentication failed'}</p>}
+            {adminError && !errors.form && <p className={styles.fieldError}>{adminError.message || t('admin_auth_failed')}</p>}
 
             <ConnexionButton type="submit" variant="primary" disabled={loading}>
-                {loading ? 'Connexion...' : 'Connexion'}
+                {loading ? t('signing_in') : t('sign_in_btn')}
             </ConnexionButton>
         </AuthLayout>
     );

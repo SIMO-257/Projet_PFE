@@ -111,3 +111,62 @@ Bottom line: Your current events/jobs system handles the immediate transaction f
 2. A registration event — simple win for onboarding UX
 3. A cleanup cron — good hygiene for long-running systems
 Want me to implement any of these? I can start with the highest priority items.
+
+
+
+
+Phase 1 — Expand translations.js (~1hr)
+Add all missing keys (~120+) to  translations.js  for all 3 languages. Group keys by feature area (auth, wallet, tickets, validation, settings, help, security, etc.).
+Phase 2 — Add  useTranslation  to all pages (~2hr)
+Go through all 20+ pages and:
+1. Import  useTranslation  and destructure  { t } 
+2. Replace all hardcoded strings with  t('key')  calls
+3. Fix date formatting to use the current language's locale instead of hardcoded  'fr-FR' 
+4. Fix dynamic strings (greetings, amounts, plurals)
+Phase 3 — Add RTL direction support (~30min)
+1. In  App.jsx , add a  dir  attribute to  <html>  based on language:
+// js
+document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+2. For icons/chevrons pointing right, use  transform: rotate(180deg)  in RTL mode
+3. Test  text-right  /  space-x-*  classes — they should work with Tailwind's  rtl:  modifier
+Phase 4 — Fix Settings.jsx remaining hardcoded text (~15min)
+Replace section titles ("Apparence", "Données & Stockage", "Confidentialité", etc.) and descriptions with  t()  calls.
+Phase 5 — Fix reset password page (~5min)
+Standardize language to French (matching the rest of the app).
+────────────────────────────────────────────────────────────────────────────────
+Estimated total effort: ~4 hours
+┌────────────────────────────┬────────┬─────────────────────────────────┐
+│ Phase                      │ Effort │ Complexity                      │
+├────────────────────────────┼────────┼─────────────────────────────────┤
+│ 1 — Expand translations    │ ~1hr   │ Medium (lots of data entry)     │
+│ 2 — Wire up all pages      │ ~2hr   │ Medium (repetitive but careful) │
+│ 3 — RTL support            │ ~30min │ Medium (layout testing)         │
+│ 4 — Fix Settings remaining │ ~15min │ Easy                            │
+│ 5 — Fix ResetPassword      │ ~5min  │ Easy
+
+
+-- good job but we need improvements for the languages first:
+-- fix the status of the card they are only hardcoded chowing up with french.
+-- detail ticket still hardcoded so does my tickets.
+-- rechargement + paiment pages are still in french.
+-- help and support + validation page.
+
+
+-- change the client model + migrationes + controller to be called "user" + all the nesessary edits.
+-- and change the user model to be called admin + all the nsessary modificationes.  
+
+
+i want to add a student verification procecess driven by the admin:
+-- add a new column in user table "is_student" by default take false when the account is created.
+-- make a new table migration + model called student verificationes. 
+-- if the user is student is false a question in the bottom of the profile page is shown when the user press on it it takes him to a form page "StudentVerification" were he give 2 docs.
+-- if the is student is true the link do not show up in the profile page.
+-- one doc is a pdf of his cin card or his parent card the second doc is a student school atestation or a payement recipt of his school.
+-- the form will add a new verfication to the table with the proper docs path and the user id.
+-- the docs shall be stored in 2 folders one for the cin and one for the school atestation they shall be stored locally just like avatars and shall take pdfs,words,or docx form only. 
+-- the instance of student verification shall containe the user id as foreign key and the path of the docs with a status column "approved/rejected/pending" with timestamps.
+-- this shall be added to the usercontroller for proper functionnes.
+-- this is the process for now the admin side will be dealt with later i only need the user side for now.
+-- waht is your plan ? do you have any seggestionnes ? any suggestionnes.
+
+i want a plan for the pages folder to make it more structure by adding sub folders like auth , profile for the nesseary pages of each part give me a plan for them and suggest some name change of the the pages file name i feel like they are mixed and inproper for a dev to name some files like i did. 

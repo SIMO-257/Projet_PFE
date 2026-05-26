@@ -7,6 +7,7 @@ use App\Http\Requests\RechargeConfirmRequest;
 use App\Models\Wallet;
 use App\Models\Transaction;
 use App\Models\Ticket;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;

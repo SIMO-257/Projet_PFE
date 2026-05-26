@@ -1,10 +1,12 @@
+import { useTranslation } from '../../hooks/useTranslation';
 import styles from '../../Styles/TicketSelection.module.css'; // Assuming similar styles
 
 
 export default function ProgressSteps({ currentStep = 1 }) {
+    const { t } = useTranslation();
     const steps = [
-        { number: 1, label: 'Sélection' },
-        { number: 2, label: 'Confirmation' }
+        { number: 1, label: t('progress_selection') },
+        { number: 2, label: t('progress_confirmation') }
     ];
 
     return (

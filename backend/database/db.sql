@@ -5,7 +5,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- 1. Core tables (no foreign keys)
 -- =============================================
 
-CREATE TABLE `clients` (
+CREATE TABLE `users` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `uuid` CHAR(36) NOT NULL,
     `full_name` VARCHAR(100) NULL,
@@ -18,26 +18,28 @@ CREATE TABLE `clients` (
     `password_hash` VARCHAR(255) NOT NULL,
     `avatar_path` VARCHAR(255) NULL,
     `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+    `is_student` TINYINT(1) NOT NULL DEFAULT 0,
     `last_active_at` TIMESTAMP NULL,
     `fcm_token` VARCHAR(255) NULL,
     `notification_prefs` JSON NULL,
-    `client_preferences` JSON NULL,
+    `user_preferences` JSON NULL,
+    `default_ticket_id` BIGINT UNSIGNED NULL,
     `created_at` TIMESTAMP NULL,
     `updated_at` TIMESTAMP NULL,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `clients_uuid_unique` (`uuid`),
-    UNIQUE KEY `clients_phone_unique` (`phone`),
-    UNIQUE KEY `clients_email_unique` (`email`),
-    KEY `clients_email_index` (`email`),
-    KEY `clients_uuid_index` (`uuid`),
-    KEY `clients_is_active_index` (`is_active`)
+    UNIQUE KEY `users_uuid_unique` (`uuid`),
+    UNIQUE KEY `users_phone_unique` (`phone`),
+    UNIQUE KEY `users_email_unique` (`email`),
+    KEY `users_email_index` (`email`),
+    KEY `users_uuid_index` (`uuid`),
+    KEY `users_is_active_index` (`is_active`)
 ) ENGINE=InnoDB;
 
 CREATE TABLE `ticket_types` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `code` VARCHAR(50) NOT NULL,
-    `name_fr` VARCHAR(100) NOT NULL,
-    `description` TEXT NOT NULL,
+    `name` JSON NOT NULL,
+    `description` JSON NULL,
     `price` DECIMAL(10,2) NOT NULL,
     `duration_minutes` INT NULL,
     `is_reusable` TINYINT(1) NOT NULL DEFAULT 0,
@@ -51,11 +53,11 @@ CREATE TABLE `ticket_types` (
     KEY `ticket_types_is_active_index` (`is_active`)
 ) ENGINE=InnoDB;
 
-INSERT INTO `ticket_types` (`id`, `code`, `name_fr`, `description`, `price`, `duration_minutes`, `is_reusable`, `max_uses`, `is_active`) VALUES
-(1, 'BILLET_SIMPLE', 'Billet Normal', 'Valable pour un trajet avec 2 correspondances.', 8.00, 10080, 0, 1, 1),
-(2, 'BILLET_DOUBLE', 'Carte Aller/Retour (A/R)', 'Valable pour un trajet aller-retour.', 14.00, 10080, 0, 2, 1),
-(4, 'BILLET_SEMAINE', 'Billet de Semaine', 'Voyages illimités pendant 7 jours.', 70.00, 10080, 1, 999, 1),
-(5, 'BILLET_MOIS', 'Billet de Mois', 'Voyages illimités pendant 30 jours.', 250.00, 43200, 1, 999, 1);
+INSERT INTO `ticket_types` (`id`, `code`, `name`, `description`, `price`, `duration_minutes`, `is_reusable`, `max_uses`, `is_active`) VALUES
+(1, 'BILLET_SIMPLE', '{"fr":"Billet Normal","en":"Standard Ticket","ar":"تذكرة عادية"}', '{"fr":"Valable pour un trajet avec 2 correspondances.","en":"Valid for one trip with 2 connections.","ar":"صالحة لرحلة واحدة مع وصلتين"}', 8.00, 10080, 0, 1, 1),
+(2, 'BILLET_DOUBLE', '{"fr":"Carte Aller/Retour (A/R)","en":"Round Trip Card","ar":"بطاقة ذهاب وإياب"}', '{"fr":"Valable pour un trajet aller-retour.","en":"Valid for a round trip.","ar":"صالحة لرحلة ذهاب وإياب"}', 14.00, 10080, 0, 2, 1),
+(4, 'BILLET_SEMAINE', '{"fr":"Billet de Semaine","en":"Weekly Ticket","ar":"تذكرة أسبوعية"}', '{"fr":"Voyages illimités pendant 7 jours.","en":"Unlimited travel for 7 days.","ar":"سفر غير محدود لمدة 7 أيام"}', 70.00, 10080, 1, 999, 1),
+(5, 'BILLET_MOIS', '{"fr":"Billet de Mois","en":"Monthly Ticket","ar":"تذكرة شهرية"}', '{"fr":"Voyages illimités pendant 30 jours.","en":"Unlimited travel for 30 days.","ar":"سفر غير محدود لمدة 30 يوماً"}', 250.00, 43200, 1, 999, 1);
 
 
 CREATE TABLE `pending_registrations` (
@@ -76,7 +78,7 @@ CREATE TABLE `pending_registrations` (
 ) ENGINE=InnoDB;
 
 -- =============================================
--- 2. Tables with simple foreign keys (to clients only)
+-- 2. Tables with simple foreign keys (to users only)
 -- =============================================
 
 CREATE TABLE `wallets` (
@@ -87,7 +89,24 @@ CREATE TABLE `wallets` (
     `updated_at` TIMESTAMP NULL,
     PRIMARY KEY (`id`),
     KEY `wallets_user_id_index` (`user_id`),
-    CONSTRAINT `wallets_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE
+    CONSTRAINT `wallets_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE `student_verifications` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `user_id` BIGINT UNSIGNED NOT NULL,
+    `cin_doc_path` VARCHAR(255) NOT NULL,
+    `school_doc_path` VARCHAR(255) NOT NULL,
+    `status` ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
+    `admin_id` BIGINT UNSIGNED NULL,
+    `rejected_reason` TEXT NULL,
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    KEY `student_verifications_user_id_index` (`user_id`),
+    KEY `student_verifications_status_index` (`status`),
+    CONSTRAINT `student_verifications_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `student_verifications_admin_id_foreign` FOREIGN KEY (`admin_id`) REFERENCES `admins` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE `transactions` (
@@ -114,7 +133,7 @@ CREATE TABLE `transactions` (
     KEY `transactions_type_index` (`type`),
     KEY `transactions_status_index` (`status`),
     KEY `transactions_created_at_index` (`created_at`),
-    CONSTRAINT `transactions_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE
+    CONSTRAINT `transactions_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- =============================================
@@ -142,17 +161,16 @@ CREATE TABLE `tickets` (
     KEY `tickets_status_index` (`status`),
     KEY `tickets_valid_until_index` (`valid_until`),
     KEY `tickets_user_id_status_index` (`user_id`, `status`),
-    CONSTRAINT `tickets_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `tickets_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
     CONSTRAINT `tickets_ticket_type_id_foreign` FOREIGN KEY (`ticket_type_id`) REFERENCES `ticket_types` (`id`) ON DELETE CASCADE,
     CONSTRAINT `tickets_purchase_id_foreign` FOREIGN KEY (`purchase_id`) REFERENCES `transactions` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- =============================================
--- 4. Add default_ticket_id to clients (circular reference fix)
+-- 4. Add default_ticket_id to users (circular reference fix)
 -- =============================================
 
-ALTER TABLE `clients` ADD COLUMN `default_ticket_id` BIGINT UNSIGNED NULL AFTER `client_preferences`;
-ALTER TABLE `clients` ADD CONSTRAINT `clients_default_ticket_id_foreign` 
+ALTER TABLE `users` ADD CONSTRAINT `users_default_ticket_id_foreign` 
     FOREIGN KEY (`default_ticket_id`) REFERENCES `tickets` (`id`) ON DELETE SET NULL;
 
 -- =============================================
@@ -179,7 +197,7 @@ CREATE TABLE `validation_logs` (
     KEY `validation_logs_created_at_index` (`created_at`),
     KEY `validation_logs_user_id_status_index` (`user_id`, `status`),
     CONSTRAINT `validation_logs_ticket_id_foreign` FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`id`) ON DELETE SET NULL,
-    CONSTRAINT `validation_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE
+    CONSTRAINT `validation_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE `audit_logs` (
@@ -195,7 +213,7 @@ CREATE TABLE `audit_logs` (
     KEY `audit_logs_action_index` (`action`),
     KEY `audit_logs_created_at_index` (`created_at`),
     KEY `audit_logs_user_id_action_index` (`user_id`, `action`),
-    CONSTRAINT `audit_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE
+    CONSTRAINT `audit_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE `notifications` (
@@ -215,7 +233,7 @@ CREATE TABLE `notifications` (
     KEY `notifications_user_id_is_read_index` (`user_id`, `is_read`),
     KEY `notifications_user_id_created_at_index` (`user_id`, `created_at`),
     KEY `notifications_type_index` (`type`),
-    CONSTRAINT `notifications_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE
+    CONSTRAINT `notifications_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE `processed_stripe_events` (
@@ -304,7 +322,7 @@ CREATE TABLE `personal_access_tokens` (
     KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`, `tokenable_id`)
 ) ENGINE=InnoDB;
 
-CREATE TABLE IF NOT EXISTS `users` (
+CREATE TABLE `admins` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `first_name` VARCHAR(255) NOT NULL,
     `last_name` VARCHAR(255) NOT NULL,
@@ -314,7 +332,7 @@ CREATE TABLE IF NOT EXISTS `users` (
     `created_at` TIMESTAMP NULL,
     `updated_at` TIMESTAMP NULL,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `users_email_unique` (`email`)
+    UNIQUE KEY `admins_email_unique` (`email`)
 ) ENGINE=InnoDB;
 
 -- =============================================

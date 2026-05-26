@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from '../../Styles/HomeScreen.module.css';
 import GoldenSpinner from '../UI/GoldenSpinner';
+import { useTranslation } from '../../hooks/useTranslation';
 
 /**
  * DefaultTicketCard Component
@@ -22,6 +23,7 @@ const DefaultTicketCard = ({
   onAction = null,
   isNavigatingToValidation = false,
 }) => {
+  const { t } = useTranslation();
   const hasTicket = !!defaultTicket;
 
   // Background gradient based on color logic
@@ -85,7 +87,7 @@ const DefaultTicketCard = ({
               {/* Ticket Name & Price */}
               <div>
                 <p className="text-white/70 text-xs font-semibold uppercase tracking-wider mb-2">
-                  {defaultTicket.name || 'Ticket par défaut'}
+                  {defaultTicket.name || t('default_ticket')}
                 </p>
                 <h3 className="text-white text-4xl font-extrabold tracking-tight">
                   {defaultTicket.price || '0.00 MAD'}
@@ -123,10 +125,10 @@ const DefaultTicketCard = ({
               {/* No Cards Purchased Display */}
               <div>
                 <p className="text-white/70 text-xs font-semibold uppercase tracking-wider mb-2">
-                  Ticket par défaut
+                  {t('default_ticket')}
                 </p>
                 <h3 className="text-white/60 text-lg font-medium italic mt-2">
-                  No cards purchased
+                  {t('no_cards_purchased')}
                 </h3>
               </div>
 

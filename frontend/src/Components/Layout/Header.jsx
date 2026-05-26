@@ -1,7 +1,8 @@
 import React from 'react';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const Header = ({ 
-    title = "Home", 
+    title: titleProp, 
     onBack, 
     showBackButton = false,
     onMenu,
@@ -11,6 +12,8 @@ const Header = ({
     variant = "default", // 'default' | 'centered'
     className = ""
 }) => {
+    const { t } = useTranslation();
+    const title = titleProp || t('header_title_default');
     const renderLeftButton = () => {
         if (showBackButton) {
             return (
@@ -18,7 +21,7 @@ const Header = ({
                     onClick={onBack}
                     className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors"
                 >
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-6 h-6 text-white rtl-flip" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"/>
                     </svg>
                 </button>

@@ -1,7 +1,8 @@
 import React from 'react';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const SavedCardItem = ({ 
-    type = 'Visa',
+    type,
     number = '**** 0000',
     status,
     expiry,
@@ -19,7 +20,7 @@ const SavedCardItem = ({
             }`}
         >
             <div className="flex items-center justify-between mb-2">
-                <span className="text-white text-sm font-medium">{type} {number}</span>
+                <span className="text-white text-sm font-medium">{type || t('card_visa_default')} {number}</span>
                 {isDefault && status && (
                     <span className="text-green-400 text-xs bg-green-500/20 px-2 py-0.5 rounded">
                         {status}
@@ -27,7 +28,7 @@ const SavedCardItem = ({
                 )}
             </div>
             {expiry && (
-                <p className="text-white/50 text-xs">Expire {expiry}</p>
+                <p className="text-white/50 text-xs">{t('expires_on')} {expiry}</p>
             )}
         </div>
     );

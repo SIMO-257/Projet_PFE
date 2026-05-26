@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const TicketInfoCard = ({ 
     ticketType = "Ticket Unitaire",
@@ -7,6 +8,7 @@ const TicketInfoCard = ({
     currency = "DH",
     className = ""
 }) => {
+    const { t } = useTranslation();
     return (
         <div className={`bg-white/5 rounded-2xl p-5 border border-white/10 ${className}`}>
             <div className="space-y-4">
@@ -17,7 +19,7 @@ const TicketInfoCard = ({
                         <p className="text-white font-semibold">{ticketType}</p>
                     </div>
                     <div className="text-right">
-                        <p className="text-white/60 text-sm">Prix</p>
+                        <p className="text-white/60 text-sm">{t('price')}</p>
                         <p className="text-white font-bold text-lg">{price}</p>
                     </div>
                 </div>

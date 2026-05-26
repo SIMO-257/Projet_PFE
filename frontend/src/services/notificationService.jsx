@@ -21,16 +21,16 @@ export const logFailure = (payload) =>
     clientApi.post('/notifications/log-failure', payload).then(extractPayload);
 
 export const updateFcmToken = (token) =>
-    clientApi.put('/user/fcm-token', { fcm_token: token }).then(extractPayload);
+    clientApi.put('/users/fcm-token', { fcm_token: token }).then(extractPayload);
 
 export const getNotificationPreferences = () =>
-    clientApi.get('/user/notification-preferences').then(extractPayload);
+    clientApi.get('/users/notification-preferences').then(extractPayload);
 
 export const updateNotificationPreferences = (preferences) =>
-    clientApi.patch('/user/notification-preferences', { preferences }).then(extractPayload);
+    clientApi.patch('/users/notification-preferences', { preferences }).then(extractPayload);
 
-export const getClientPreferences = () =>
-    clientApi.get('/user/preferences').then(extractPayload);
+export const getUserPreferences = () =>
+    clientApi.get('/users/preferences').then(extractPayload);
 
-export const updateClientPreferences = (preferences) =>
-    clientApi.patch('/user/preferences', preferences).then(extractPayload);
+export const updateUserPreferences = (preferences) =>
+    clientApi.patch('/users/preferences', preferences).then(extractPayload);

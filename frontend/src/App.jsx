@@ -10,46 +10,52 @@ import { shouldRestoreAuthSession } from "./services/clientService";
 import GlobalPageLoader from "./Components/UI/GlobalPageLoader";
 import LoadingOverlay from "./Components/UI/LoadingOverlay";
 import { setRouteLoading } from "./Redux/Slices/uiSlice";
-import RechargePayment from "./Pages/RechargePayment";
+import RechargePaymentPage from "./Pages/payment/RechargePaymentPage";
 
-// Lazy pages
+// Lazy pages - Auth
+const LoginPage = lazy(() => import("./Pages/auth/LoginPage"));
+const SignUpPage = lazy(() => import("./Pages/auth/SignUpPage"));
+const VerifyEmailPage = lazy(() => import("./Pages/auth/VerifyEmailPage"));
+const ForgotPasswordPage = lazy(() => import("./Pages/auth/ForgotPasswordPage"));
+const ResetPasswordPage = lazy(() => import("./Pages/auth/ResetPasswordPage"));
 
-const Login = lazy(() => import("./Pages/Login"));
-const SignUp = lazy(() => import("./Pages/SignUp"));
-const VerifyEmail = lazy(() => import("./Pages/auth/VerifyEmail"));
-const ForgotPassword = lazy(() => import("./Pages/ForgotPassword"));
-const ResetPassword = lazy(() => import("./Pages/ResetPassword"));
+// Lazy pages - Home
+const HomePage = lazy(() => import("./Pages/home/HomePage"));
 
-const Home = lazy(() => import("./Pages/Home"));
-const Wallet = lazy(() => import("./Pages/Wallet"));
-const Profile = lazy(() => import("./Pages/Profile"));
-const EditProfileScreen = lazy(() => import("./Pages/EditProfile"));
-const Settings = lazy(() => import("./Pages/Settings"));
-const HelpSupport = lazy(() => import("./Pages/HelpSupport"));
-const Security = lazy(() => import("./Pages/Security"));
+// Lazy pages - Profile
+const ProfilePage = lazy(() => import("./Pages/profile/ProfilePage"));
+const EditProfilePage = lazy(() => import("./Pages/profile/EditProfilePage"));
+const SettingsPage = lazy(() => import("./Pages/profile/SettingsPage"));
+const HelpSupportPage = lazy(() => import("./Pages/profile/HelpSupportPage"));
+const SecurityPage = lazy(() => import("./Pages/profile/SecurityPage"));
+const StudentVerificationPage = lazy(() => import("./Pages/profile/StudentVerificationPage"));
 
-const MyTickets = lazy(() => import("./Pages/MyTickets"));
-const AllTickets = lazy(() => import("./Pages/AllTickets"));
-const TicketSelection = lazy(() => import("./Pages/TicketSelection"));
-const ViewTicket = lazy(() => import("./Pages/ViewTicket"));
-const Validation = lazy(() => import("./Pages/Validation"));
-const ValidationSuccess = lazy(() => import("./Pages/ValidationSuccess"));
-const ValidatorScreen = lazy(() => import("./Pages/Validator"));
+// Lazy pages - Tickets
+const MyTicketsPage = lazy(() => import("./Pages/tickets/MyTicketsPage"));
+const TicketsHistoryPage = lazy(() => import("./Pages/tickets/TicketsHistoryPage"));
+const TicketSelectionPage = lazy(() => import("./Pages/tickets/TicketSelectionPage"));
+const TicketDetailPage = lazy(() => import("./Pages/tickets/TicketDetailPage"));
 
+// Lazy pages - Validation
+const ValidationPage = lazy(() => import("./Pages/validation/ValidationPage"));
+const ValidationSuccessPage = lazy(() => import("./Pages/validation/ValidationSuccessPage"));
+const ValidatorPage = lazy(() => import("./Pages/validation/ValidatorPage"));
 
-const Paiment = lazy(() => import("./Pages/Paiment"));
-const PurchasedCards = lazy(() => import("./Pages/PurchasedCards"));
-const ConfirmationPaiment = lazy(() => import("./Pages/ConfirmationPaiment"));
-const PaimentHistory = lazy(() => import("./Pages/PaimentHistory"));
+// Lazy pages - Payment
+const PaymentPage = lazy(() => import("./Pages/payment/PaymentPage"));
+const ChangeDefaultCardPage = lazy(() => import("./Pages/payment/ChangeDefaultCardPage"));
+const PaymentConfirmationPage = lazy(() => import("./Pages/payment/PaymentConfirmationPage"));
+const PaymentHistoryPage = lazy(() => import("./Pages/payment/PaymentHistoryPage"));
+const WalletPage = lazy(() => import("./Pages/payment/WalletPage"));
 
-const Notifications = lazy(() => import("./Pages/Notifications"));
-const TermsAndConditions = lazy(() => import("./Pages/TermsAndConditions"));
-
+// Lazy pages - Notifications & Info
+const NotificationsPage = lazy(() => import("./Pages/notifications/NotificationsPage"));
+const TermsPage = lazy(() => import("./Pages/info/TermsPage"));
 
 // Admin Pages
 const AdminLogin = lazy(() => import("./Pages/admin/AdminLogin"));
 const AdminDashboard = lazy(() => import("./Pages/admin/AdminDashboard"));
-const AdminClients = lazy(() => import("./Pages/admin/AdminClients"));
+const AdminUsers = lazy(() => import("./Pages/admin/AdminUsers"));
 const AdminTickets = lazy(() => import("./Pages/admin/AdminTickets"));
 const AdminTransactions = lazy(() => import("./Pages/admin/AdminTransactions"));
 const AdminNotifications = lazy(() => import("./Pages/admin/AdminNotifications"));
@@ -98,6 +104,7 @@ function App() {
   const dispatch = useDispatch();
   const { refreshProfile, isAuthChecked } = useAuth();
   const theme = useSelector((state) => state.settings.theme);
+  const language = useSelector((state) => state.settings.language);
   const { isGlobalLoading, isRouteLoading } = useSelector((state) => state.ui || { isGlobalLoading: false, isRouteLoading: false });
 
   useEffect(() => {
@@ -124,6 +131,11 @@ function App() {
     }
   }, [theme]);
 
+  // Set document direction based on language (RTL for Arabic, LTR for others)
+  useEffect(() => {
+    document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+  }, [language]);
+
   return (
     <BrowserRouter>
       <RouteWatcher />
@@ -136,40 +148,41 @@ function App() {
 
           {/* PUBLIC ROUTES */}
           <Route element={<PublicRoute />}>
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/verify-email" element={<VerifyEmail />} />
-            <Route path="/forgot_password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignUpPage />} />
+            <Route path="/verify-email" element={<VerifyEmailPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
           </Route>
 
           {/* SHARED ROUTES (Both Public & Protected) */}
-          <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+          <Route path="/terms" element={<TermsPage />} />
 
           {/* PROTECTED ROUTES */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/home" element={<Home />} />
-            <Route path="/wallet" element={<Wallet />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/edit-profile" element={<EditProfileScreen />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/help-support" element={<HelpSupport />} />
-            <Route path="/security" element={<Security />} />
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/wallet" element={<WalletPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/edit-profile" element={<EditProfilePage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/help-support" element={<HelpSupportPage />} />
+            <Route path="/security" element={<SecurityPage />} />
+            <Route path="/student-verification" element={<StudentVerificationPage />} />
 
-            <Route path="/mytickets" element={<MyTickets />} />
-            <Route path="/all-tickets" element={<AllTickets />} />
-            <Route path="/ticket-selection" element={<TicketSelection />} />
-            <Route path="/viewticket/:id" element={<ViewTicket />} />
-            <Route path="/validation" element={<Validation />} />
-            <Route path="/validation-success" element={<ValidationSuccess />} />
-            <Route path="/validator" element={<ValidatorScreen />} />
+            <Route path="/my-tickets" element={<MyTicketsPage />} />
+            <Route path="/tickets-history" element={<TicketsHistoryPage />} />
+            <Route path="/ticket-selection" element={<TicketSelectionPage />} />
+            <Route path="/tickets/:id" element={<TicketDetailPage />} />
+            <Route path="/validation" element={<ValidationPage />} />
+            <Route path="/validation-success" element={<ValidationSuccessPage />} />
+            <Route path="/validator" element={<ValidatorPage />} />
 
-            <Route path="/recharge-payment" element={<RechargePayment />} />
-            <Route path="/change-card" element={<PurchasedCards />} />
-            <Route path="/payment-confirmation" element={<ConfirmationPaiment />} />
-            <Route path="/payment-history" element={<PaimentHistory />} />
+            <Route path="/recharge-payment" element={<RechargePaymentPage />} />
+            <Route path="/change-default-card" element={<ChangeDefaultCardPage />} />
+            <Route path="/payment-confirmation" element={<PaymentConfirmationPage />} />
+            <Route path="/payment-history" element={<PaymentHistoryPage />} />
 
-            <Route path="/notifications" element={<Notifications />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
           </Route>
 
           {/* ADMIN ROUTES */}
@@ -179,7 +192,7 @@ function App() {
             <Route element={<AdminLayout />}>
               <Route index element={<Navigate to="/admin/dashboard" replace />} />
               <Route path="dashboard" element={<AdminDashboard />} />
-              <Route path="clients" element={<AdminClients />} />
+              <Route path="users" element={<AdminUsers />} />
               <Route path="tickets" element={<AdminTickets />} />
               <Route path="transactions" element={<AdminTransactions />} />
               <Route path="notifications" element={<AdminNotifications />} />

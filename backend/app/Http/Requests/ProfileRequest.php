@@ -16,14 +16,14 @@ class ProfileRequest extends FormRequest
 
     public function rules(): array
     {
-        $client = $this->user();
+        $user = $this->user();
 
         return [
             'phone' => [
                 'nullable',
                 'string',
                 'regex:/^(06|07)\d{8}$/',
-                Rule::unique('clients', 'phone')->ignore($client?->id),
+                Rule::unique('users', 'phone')->ignore($user?->id),
             ],
             'full_name' => 'required|string|max:255',
             'profile_file' => 'nullable|file|max:5120|mimes:jpg,jpeg,png,webp',

@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from '../../hooks/useTranslation';
 import { getAdminTransactions } from '../../services/adminService';
 
 const AdminTransactions = () => {
+  const { t } = useTranslation();
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -16,7 +18,7 @@ const AdminTransactions = () => {
       setTransactions(response.data.data.data);
       setPagination(response.data.data);
     } catch (err) {
-      console.error('Erreur lors du chargement des transactions');
+      console.error('Error loading transactions');
     } finally {
       setLoading(false);
     }
@@ -30,8 +32,8 @@ const AdminTransactions = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-white">Gestion des Transactions</h2>
-          <p className="text-white/50">Surveillance des flux financiers (Recharges et Débits).</p>
+          <h2 className="text-2xl font-bold text-white">{t('admin_transaction_management')}</h2>
+          <p className="text-white/50">{t('admin_transaction_subtitle')}</p>
         </div>
         <div className="flex space-x-3">
           <select
@@ -39,14 +41,14 @@ const AdminTransactions = () => {
             onChange={(e) => setType(e.target.value)}
             className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-yellow-500/50"
           >
-            <option value="">Tous les types</option>
-            <option value="recharge">Recharge</option>
-            <option value="purchase">Achat</option>
-            <option value="validation">Validation</option>
+            <option value="">{t('all_types')}</option>
+            <option value="recharge">{t('recharge_type')}</option>
+            <option value="purchase">{t('type_purchase')}</option>
+            <option value="validation">{t('type_validation_admin')}</option>
           </select>
           <input
             type="text"
-            placeholder="Rechercher (Email)..."
+            placeholder={t('search_email')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white w-64 focus:outline-none focus:border-yellow-500/50"
@@ -58,22 +60,22 @@ const AdminTransactions = () => {
         <table className="w-full text-left">
           <thead className="bg-white/5 text-white/60 text-xs uppercase">
             <tr>
-              <th className="px-6 py-4 font-medium">ID / Ref</th>
-              <th className="px-6 py-4 font-medium">Client</th>
-              <th className="px-6 py-4 font-medium">Type</th>
-              <th className="px-6 py-4 font-medium">Montant (DH)</th>
-              <th className="px-6 py-4 font-medium">Statut</th>
-              <th className="px-6 py-4 font-medium">Date</th>
+              <th className="px-6 py-4 font-medium">{t('table_id_ref')}</th>
+              <th className="px-6 py-4 font-medium">{t('table_client')}</th>
+              <th className="px-6 py-4 font-medium">{t('table_type')}</th>
+              <th className="px-6 py-4 font-medium">{t('table_amount')}</th>
+              <th className="px-6 py-4 font-medium">{t('table_status')}</th>
+              <th className="px-6 py-4 font-medium">{t('table_date')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
             {loading && transactions.length === 0 ? (
               <tr>
-                <td colSpan="6" className="px-6 py-12 text-center text-white/40">Chargement des transactions...</td>
+                <td colSpan="6" className="px-6 py-12 text-center text-white/40">{t('loading_transactions')}</td>
               </tr>
             ) : transactions.length === 0 ? (
               <tr>
-                <td colSpan="6" className="px-6 py-12 text-center text-white/40">Aucune transaction trouvée.</td>
+                <td colSpan="6" className="px-6 py-12 text-center text-white/40">{t('no_transaction_admin')}</td>
               </tr>
             ) : (
               transactions.map((tx) => (
@@ -82,9 +84,9 @@ const AdminTransactions = () => {
                     <div className="text-xs text-white/70 font-mono truncate max-w-[120px]" title={tx.uuid}>
                       {tx.uuid.split('-')[0]}...
                     </div>
-                    <div className="text-[10px] text-white/30 truncate max-w-[120px]">{tx.reference || 'No ref'}</div>
+                    <div className="text-[10px] text-white/30 truncate max-w-[120px]">{tx.reference || t('ref_no_ref')}</div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-white">{tx.client?.email || 'N/A'}</td>
+                  <td className="px-6 py-4 text-sm text-white">{tx.client?.email || t('not_applicable')}</td>
                   <td className="px-6 py-4">
                     <span className={`text-[10px] font-bold uppercase tracking-wider ${
                       tx.type === 'recharge' ? 'text-green-400' : 'text-red-400'

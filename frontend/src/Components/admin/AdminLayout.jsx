@@ -1,12 +1,15 @@
 import React, { useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+
 import { fetchAdminMe, logoutAdmin } from '../../Redux/Slices/adminSlice';
 import { getAdminToken } from '../../services/adminService';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const AdminLayout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { admin } = useSelector((state) => state.admin);
 
   // Fetch admin profile on mount if not already loaded (e.g. page refresh)
@@ -22,12 +25,12 @@ const AdminLayout = () => {
   };
 
   const navItems = [
-    { path: '/admin/dashboard', label: 'Tableau de bord', icon: 'grid' },
-    { path: '/admin/clients', label: 'Clients', icon: 'users' },
-    { path: '/admin/tickets', label: 'Tickets', icon: 'ticket' },
-    { path: '/admin/transactions', label: 'Transactions', icon: 'credit-card' },
-    { path: '/admin/notifications', label: 'Notifications', icon: 'bell' },
-    { path: '/admin/rapports', label: 'Rapports', icon: 'message' },
+    { path: '/admin/dashboard', label: t('admin_dashboard'), icon: 'grid' },
+    { path: '/admin/users', label: t('admin_nav_clients'), icon: 'users' },
+    { path: '/admin/tickets', label: t('admin_nav_tickets'), icon: 'ticket' },
+    { path: '/admin/transactions', label: t('admin_nav_transactions'), icon: 'credit-card' },
+    { path: '/admin/notifications', label: t('admin_nav_notifications'), icon: 'bell' },
+    { path: '/admin/rapports', label: t('admin_nav_rapports') || 'Rapports', icon: 'message' },
   ];
 
   return (
@@ -38,7 +41,7 @@ const AdminLayout = () => {
           <h1 className="text-xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
             CasaWay Admin
           </h1>
-          <p className="text-xs text-white/50 mt-1">Système de Gestion</p>
+          <p className="text-xs text-white/50 mt-1">{t('admin_management_system')}</p>
         </div>
 
         <nav className="flex-1 px-4 space-y-2">
@@ -79,13 +82,13 @@ const AdminLayout = () => {
               }`
             }
           >
-            <span>Mon Profil</span>
+            <span>{t('admin_my_profile')}</span>
           </NavLink>
           <button
             onClick={handleLogout}
             className="w-full flex items-center justify-center space-x-2 px-4 py-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-all text-sm"
           >
-            <span>Déconnexion</span>
+            <span>{t('admin_logout')}</span>
           </button>
         </div>
       </aside>

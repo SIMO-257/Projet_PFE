@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { getAdminTickets, getClient } from '../../services/adminService';
+import { useTranslation } from '../../hooks/useTranslation';
+import { getAdminTickets, getUser } from '../../services/adminService';
 
 const AdminTickets = () => {
+  const { t } = useTranslation();
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -21,7 +23,7 @@ const AdminTickets = () => {
       setTickets(response.data.data.data);
       setPagination(response.data.data);
     } catch (err) {
-      console.error('Erreur lors du chargement des tickets');
+      console.error('Error loading tickets');
     } finally {
       setLoading(false);
     }
@@ -38,7 +40,7 @@ const AdminTickets = () => {
     setClientDetailed(null);
     setClientLoading(true);
     try {
-      const res = await getClient(client.id);
+      const res = await getUser(client.id);
       setClientDetailed(res.data?.data ?? res.data);
     } catch {
       // Fallback to basic client info from ticket
@@ -59,8 +61,8 @@ const AdminTickets = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-white">Gestion des Tickets</h2>
-          <p className="text-white/50">Historique complet des tickets et validations.</p>
+          <h2 className="text-2xl font-bold text-white">{t('admin_ticket_management')}</h2>
+          <p className="text-white/50">{t('admin_ticket_subtitle')}</p>
         </div>
         <div className="flex space-x-3">
           <select
@@ -68,14 +70,14 @@ const AdminTickets = () => {
             onChange={(e) => setStatus(e.target.value)}
             className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-yellow-500/50"
           >
-            <option value="">Tous les statuts</option>
-            <option value="active">Actif</option>
-            <option value="validated">Validé</option>
-            <option value="expired">Expiré</option>
+            <option value="">{t('all_statuses')}</option>
+            <option value="active">{t('status_active')}</option>
+            <option value="validated">{t('status_validated')}</option>
+            <option value="expired">{t('status_expired')}</option>
           </select>
           <input
             type="text"
-            placeholder="Rechercher (UUID)..."
+            placeholder={t('search_uuid')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white w-64 focus:outline-none focus:border-yellow-500/50"
@@ -87,22 +89,22 @@ const AdminTickets = () => {
         <table className="w-full text-left">
           <thead className="bg-white/5 text-white/60 text-xs uppercase">
             <tr>
-              <th className="px-6 py-4 font-medium">UUID</th>
-              <th className="px-6 py-4 font-medium">Client</th>
-              <th className="px-6 py-4 font-medium">Type</th>
-              <th className="px-6 py-4 font-medium">Statut</th>
-              <th className="px-6 py-4 font-medium">Prix (DH)</th>
-              <th className="px-6 py-4 font-medium">Date</th>
+              <th className="px-6 py-4 font-medium">{t('table_uuid')}</th>
+              <th className="px-6 py-4 font-medium">{t('table_client')}</th>
+              <th className="px-6 py-4 font-medium">{t('table_type')}</th>
+              <th className="px-6 py-4 font-medium">{t('table_status')}</th>
+              <th className="px-6 py-4 font-medium">{t('table_price')}</th>
+              <th className="px-6 py-4 font-medium">{t('table_date')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
             {loading && tickets.length === 0 ? (
               <tr>
-                <td colSpan="6" className="px-6 py-12 text-center text-white/40">Chargement des tickets...</td>
+                <td colSpan="6" className="px-6 py-12 text-center text-white/40">{t('loading_tickets')}</td>
               </tr>
             ) : tickets.length === 0 ? (
               <tr>
-                <td colSpan="6" className="px-6 py-12 text-center text-white/40">Aucun ticket trouvé.</td>
+                <td colSpan="6" className="px-6 py-12 text-center text-white/40">{t('no_ticket_admin')}</td>
               </tr>
             ) : (
               tickets.map((ticket) => (
@@ -112,13 +114,15 @@ const AdminTickets = () => {
                   </td>
                   <td className="px-6 py-4">
                     <button
-                      onClick={() => handleClientClick(ticket.client)}
+                      onClick={() => handleClientClick(ticket.client || ticket.user)}
                       className="text-sm text-yellow-400 hover:text-yellow-300 underline underline-offset-2 decoration-yellow-500/30 hover:decoration-yellow-400/60 transition-all"
                     >
-                      {ticket.client?.email || 'N/A'}
+                      {(ticket.client?.email || ticket.user?.email) || t('not_applicable')}
                     </button>
                   </td>
-                  <td className="px-6 py-4 text-sm text-white/70">{ticket.ticket_type?.name_fr || 'N/A'}</td>
+                  <td className="px-6 py-4 text-sm text-white/70">
+                    {ticket.ticket_type?.name || ticket.ticket_type?.name_fr || t('not_applicable')}
+                  </td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${
                       ticket.status === 'active' 

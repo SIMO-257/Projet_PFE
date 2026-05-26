@@ -34,15 +34,15 @@ export const clearAuthData = () => {
 
 export const shouldRestoreAuthSession = () => !!getAuthToken();
 
-export const setClientUuid = (uuid, rememberMe = false) => {
+export const setUserUuid = (uuid, rememberMe = false) => {
   if (!uuid) return;
 
   if (rememberMe) {
-    localStorage.setItem('client_uuid', uuid);
-    sessionStorage.removeItem('client_uuid');
+    localStorage.setItem('user_uuid', uuid);
+    sessionStorage.removeItem('user_uuid');
   } else {
-    sessionStorage.setItem('client_uuid', uuid);
-    localStorage.removeItem('client_uuid');
+    sessionStorage.setItem('user_uuid', uuid);
+    localStorage.removeItem('user_uuid');
   }
 };
 
@@ -51,6 +51,12 @@ clientApi.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
+  // Send the user's language preference so the backend returns
+  // translated database content (ticket types, etc.) in the right locale
+  const lang = localStorage.getItem('app_lang') || 'fr';
+  config.headers['X-Locale'] = lang;
+
   return config;
 });
 
@@ -66,31 +72,31 @@ clientApi.interceptors.response.use(
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
-export const signupClient = async (payload) => {
-  return clientApi.post('/signup', payload);
+export const signupUser = async (payload) => {
+  return clientApi.post('/users/signup', payload);
 };
 
-export const loginClient = async (payload) => {
-  return clientApi.post('/login', payload);
+export const loginUser = async (payload) => {
+  return clientApi.post('/users/login', payload);
 };
 
 export const resendVerificationEmail = (email) => clientApi.post('/email/resend', { email });
 
 export const verifyEmailCode = (email, code) => clientApi.post('/email/verify-code', { email, code });
 
-export const forgotPasswordClient = async (payload) => {
-  return clientApi.post('/forgot-password', payload);
+export const forgotPasswordUser = async (payload) => {
+  return clientApi.post('/users/forgot-password', payload);
 };
 
-export const resetPasswordClient = async (payload) => {
-  return clientApi.post('/reset-password', payload);
+export const resetPasswordUser = async (payload) => {
+  return clientApi.post('/users/reset-password', payload);
 };
 
 // ── Profile ───────────────────────────────────────────────────────────────────
 
-export const fetchClientProfile = () => clientApi.get('/profile').then(extractPayload);
+export const fetchUserProfile = () => clientApi.get('/users/profile').then(extractPayload);
 
-export const updateClientProfile = ({ payload = {}, avatarFile = null }) => {
+export const updateUserProfile = ({ payload = {}, avatarFile = null }) => {
   if (avatarFile) {
     const form = new FormData();
     form.append('_method', 'PUT');
@@ -100,13 +106,22 @@ export const updateClientProfile = ({ payload = {}, avatarFile = null }) => {
       }
     });
     form.append('profile_file', avatarFile);
-    return clientApi.post('/profile', form);
+    return clientApi.post('/users/profile', form);
   }
-  return clientApi.put('/profile', payload);
+  return clientApi.put('/users/profile', payload);
 };
 
-export const logoutClient = () => clientApi.post('/logout');
+export const logoutUser = () => clientApi.post('/users/logout');
 
-export const logoutAllClient = () => clientApi.post('/logout-all');
+export const logoutAllUser = () => clientApi.post('/users/logout-all');
+
+// ── Student Verification ───────────────────────────────────────────────────────
+
+export const fetchStudentStatus = () => clientApi.get('/users/student-status').then(extractPayload);
+
+export const submitStudentVerification = (formData) =>
+  clientApi.post('/users/student-verification', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }).then(extractPayload);
 
 export default clientApi;

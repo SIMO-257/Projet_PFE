@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Client;
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,28 +11,28 @@ class TrackActivity
 {
     public function handle(Request $request, Closure $next): Response
     {
-        /** @var Client|null $client */
-        $client = $request->user();
+        /** @var User|null $user */
+        $user = $request->user();
 
-        if ($client) {
+        if ($user) {
             $sessionLifetime = (int) config('session.lifetime', 120);
             $threshold = now()->subMinutes($sessionLifetime);
 
-            if ($client->last_active_at && $client->last_active_at->lt($threshold)) {
-                $client->is_active = false;
-                $client->last_active_at = null;
-                $client->save();
+            if ($user->last_active_at && $user->last_active_at->lt($threshold)) {
+                $user->is_active = false;
+                $user->last_active_at = null;
+                $user->save();
 
-                if ($client->currentAccessToken()) {
-                    $client->currentAccessToken()->delete();
+                if ($user->currentAccessToken()) {
+                    $user->currentAccessToken()->delete();
                 }
 
                 return response()->json(['message' => 'Session expired due to inactivity.'], 401);
             } else {
-                $client->last_active_at = now();
+                $user->last_active_at = now();
             }
 
-            $client->save();
+            $user->save();
         }
 
         return $next($request);

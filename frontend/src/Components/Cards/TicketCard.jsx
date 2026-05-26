@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from '../../Styles/Ticket.module.css';
 import CardButton from '../Buttons/CardButton';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const TicketCard = ({ 
     item, 
@@ -8,6 +9,7 @@ const TicketCard = ({
     variant = 'active', // 'active' | 'purchase'
     statusBadgeClass = ''
 }) => {
+    const { t } = useTranslation();
     const isPurchase = variant === 'purchase';
 
     return (
@@ -29,7 +31,7 @@ const TicketCard = ({
 
             <div className={styles.ticketDetails}>
                 <div className={styles.detailRow}>
-                    <span className={styles.detailLabel}>Prix</span>
+                    <span className={styles.detailLabel}>{t('price')}</span>
                     <span className={styles.priceValue}>{item.price}</span>
                 </div>
 

@@ -46,10 +46,10 @@ export const adminMe     = ()             => adminApi.get('/admin/me');
 // Dashboard
 export const getDashboardStats = () => adminApi.get('/admin/dashboard');
 
-// Clients
-export const getClients       = (params) => adminApi.get('/admin/clients', { params });
-export const getClient        = (id)     => adminApi.get(`/admin/clients/${id}`);
-export const toggleClientStatus = (id)  => adminApi.patch(`/admin/clients/${id}/toggle-status`);
+// Users (formerly Clients)
+export const getUsers       = (params) => adminApi.get('/admin/users', { params });
+export const getUser        = (id)     => adminApi.get(`/admin/users/${id}`);
+export const toggleUserStatus = (id)  => adminApi.patch(`/admin/users/${id}/toggle-status`);
 
 // Tickets
 export const getAdminTickets = (params) => adminApi.get('/admin/tickets', { params });

@@ -19,11 +19,11 @@ class Wallet extends Model
     ];
 
     /**
-     * Get the client that owns the wallet.
+     * Get the user that owns the wallet.
      */
-    public function client()
+    public function user()
     {
-        return $this->belongsTo(Client::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     /**
