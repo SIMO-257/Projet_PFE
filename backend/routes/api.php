@@ -86,9 +86,9 @@ use App\Http\Controllers\Admin\AdminTransactionController;
 use App\Http\Controllers\Admin\AdminNotificationController;
 use App\Http\Controllers\Admin\AdminProfileController;
 
-// Public admin route — no auth required
+// Public admin route — no auth required (throttled like user login)
 Route::prefix('admin')->group(function () {
-    Route::post('/login',  [AdminAuthController::class, 'login']);
+    Route::post('/login',  [AdminAuthController::class, 'login'])->middleware('throttle:login');
 });
 
 // Protected admin routes — requires sanctum token and admin check

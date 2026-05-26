@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
+use App\Models\AuditLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -21,6 +22,7 @@ class AdminAuthController extends Controller
         $admin = Admin::where('email', $request->email)->first();
 
         if (!$admin || !Hash::check($request->password, $admin->password)) {
+            AuditLog::log('admin_login_failed', null, ['email' => $request->email, 'ip' => $request->ip()]);
             return response()->json([
                 'status' => 'error',
                 'message' => 'Identifiants incorrects.',
@@ -28,6 +30,7 @@ class AdminAuthController extends Controller
         }
 
         if (!$admin->is_active) {
+            AuditLog::log('admin_login_failed_inactive', $admin->id, ['email' => $request->email]);
             return response()->json([
                 'status' => 'error',
                 'message' => 'Ce compte administrateur est désactivé.',
@@ -37,6 +40,8 @@ class AdminAuthController extends Controller
         // Revoke old tokens, issue new one
         $admin->tokens()->delete();
         $token = $admin->createToken('admin-token', ['role:admin'])->plainTextToken;
+
+        AuditLog::log('admin_login_success', $admin->id, ['ip' => $request->ip()]);
 
         return response()->json([
             'status' => 'success',

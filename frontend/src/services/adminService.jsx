@@ -38,6 +38,21 @@ adminApi.interceptors.request.use((config) => {
   return config;
 });
 
+// 401 interceptor — clear admin token and redirect to admin login
+adminApi.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      clearAdminToken();
+      // Redirect to admin login (only if not already there)
+      if (!window.location.pathname.startsWith('/admin/login')) {
+        window.location.href = '/admin/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Auth
 export const adminLogin  = (credentials) => adminApi.post('/admin/login', credentials);
 export const adminLogout = ()             => adminApi.post('/admin/logout');

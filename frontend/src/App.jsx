@@ -64,6 +64,7 @@ const AdminProfile = lazy(() => import("./Pages/admin/AdminProfile"));
 // Admin Components
 import AdminGuard from './Components/guards/AdminGuard';
 import AdminLayout from './Components/admin/AdminLayout';
+import { fetchAdminMe } from './Redux/Slices/adminSlice';
 
 function RootRedirect() {
   const { isAuthenticated, isAuthChecked, isLoading } = useAuth();
@@ -105,6 +106,16 @@ function App() {
   const theme = useSelector((state) => state.settings.theme);
   const language = useSelector((state) => state.settings.language);
   const { isGlobalLoading, isRouteLoading } = useSelector((state) => state.ui || { isGlobalLoading: false, isRouteLoading: false });
+
+  const adminToken = useSelector((state) => state.admin.token);
+
+  useEffect(() => {
+    // Restore admin session on load if token exists
+    const storedAdminToken = localStorage.getItem('admin_token') || sessionStorage.getItem('admin_token');
+    if (storedAdminToken && !adminToken) {
+      dispatch(fetchAdminMe());
+    }
+  }, [dispatch, adminToken]);
 
   useEffect(() => {
     if (isAuthChecked) {

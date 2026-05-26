@@ -335,6 +335,9 @@ CREATE TABLE `admins` (
     UNIQUE KEY `admins_email_unique` (`email`)
 ) ENGINE=InnoDB;
 
+INSERT INTO `admins` (`first_name`, `last_name`, `email`, `password`, `is_active`, `created_at`, `updated_at`)
+VALUES ('Admin', 'CasaWay', 'admin@casaway.ma', '$2y$10$P4PRiB8kSuA/YuNk4cQ5hut5RBeQ/2mwkWW0y5yJer7M4NJEIAEFG', 1, NOW(), NOW());
+
 -- =============================================
 -- 6. Event (MySQL only)
 -- =============================================

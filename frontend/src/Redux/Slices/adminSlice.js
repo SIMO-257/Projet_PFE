@@ -46,13 +46,21 @@ const adminSlice = createSlice({
   initialState: {
     admin: null,
     token: getAdminToken(),
-    isAuthenticated: !!getAdminToken(),
+    isAuthenticated: false, // Changed: no longer trust token without server verification
+    adminChecked: false,     // New: becomes true once server verifies (or rejects) the token
     loading: false,
     error: null,
   },
   reducers: {
     clearAdminError: (state) => {
       state.error = null;
+    },
+    clearAdminAuth: (state) => {
+      state.admin = null;
+      state.token = null;
+      state.isAuthenticated = false;
+      state.adminChecked = true;
+      clearAdminToken();
     },
   },
   extraReducers: (builder) => {
@@ -64,23 +72,28 @@ const adminSlice = createSlice({
       .addCase(loginAdmin.fulfilled, (state, action) => {
         state.loading = false;
         state.isAuthenticated = true;
+        state.adminChecked = true;
         state.admin = action.payload.admin;
         state.token = action.payload.token;
       })
       .addCase(loginAdmin.rejected, (state, action) => {
         state.loading = false;
+        state.adminChecked = true;
         state.error = action.payload;
       })
       .addCase(logoutAdmin.fulfilled, (state) => {
         state.admin = null;
         state.token = null;
         state.isAuthenticated = false;
+        state.adminChecked = true;
       })
       .addCase(fetchAdminMe.fulfilled, (state, action) => {
+        state.adminChecked = true;
         state.admin = action.payload;
         state.isAuthenticated = true;
       })
       .addCase(fetchAdminMe.rejected, (state) => {
+        state.adminChecked = true;
         state.admin = null;
         state.token = null;
         state.isAuthenticated = false;
@@ -101,5 +114,5 @@ const adminSlice = createSlice({
   },
 });
 
-export const { clearAdminError } = adminSlice.actions;
+export const { clearAdminError, clearAdminAuth } = adminSlice.actions;
 export default adminSlice.reducer;
