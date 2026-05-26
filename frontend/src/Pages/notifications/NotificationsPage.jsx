@@ -9,14 +9,14 @@ import {
     fetchUnreadCount,
     markAllNotificationsRead,
     setFilter
-} from '../Redux/Slices/notificationSlice';
-import NotificationItem from '../Components/notifications/NotificationItem';
-import Header from '../Components/Layout/Header';
-import BottomNavigation from '../Components/Layout/BottomNavigation';
-import { useTranslation } from '../hooks/useTranslation';
-import styles from '../Styles/Notifications.module.css';
+} from '../../Redux/Slices/notificationSlice';
+import NotificationItem from '../../Components/notifications/NotificationItem';
+import Header from '../../Components/Layout/Header';
+import BottomNavigation from '../../Components/Layout/BottomNavigation';
+import { useTranslation } from '../../hooks/useTranslation';
+import styles from '../../Styles/Notifications.module.css';
 
-export default function Notifications() {
+export default function NotificationsPage() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { t } = useTranslation();

@@ -12,7 +12,7 @@ const BottomNavigation = ({ onNavigate }) => {
     const getActiveTab = () => {
         const path = location.pathname;
         if (path.startsWith('/home')) return 'home';
-        if (path.startsWith('/mytickets') || path.startsWith('/viewticket')) return 'tickets';
+        if (path.startsWith('/my-tickets') || path.startsWith('/tickets/')) return 'tickets';
         if (path.startsWith('/wallet')) return 'wallet';
         if (path.startsWith('/profile') || path.startsWith('/edit-profile') || path.startsWith('/settings')) return 'profile';
         return '';
@@ -28,7 +28,7 @@ const BottomNavigation = ({ onNavigate }) => {
 
         switch (id) {
             case 'home': navigate('/home'); break;
-            case 'tickets': navigate('/mytickets'); break;
+            case 'tickets': navigate('/my-tickets'); break;
             case 'wallet': navigate('/wallet'); break;
             case 'profile': navigate('/profile'); break;
             default: break;

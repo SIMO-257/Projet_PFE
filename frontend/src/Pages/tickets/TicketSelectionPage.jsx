@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { useTranslation } from '../hooks/useTranslation';
-import { fetchTicketTypes, purchaseTicket } from '../services/ticketService';
+import { useTranslation } from '../../hooks/useTranslation';
+import { fetchTicketTypes, purchaseTicket } from '../../services/ticketService';
 
-export default function TicketSelection() {
+export default function TicketSelectionPage() {
     const { t } = useTranslation();
 
     const navigate = useNavigate();

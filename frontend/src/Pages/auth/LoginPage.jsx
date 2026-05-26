@@ -1,18 +1,18 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { useAuth } from '../hooks/useAuth';
-import { useTranslation } from '../hooks/useTranslation';
+import { useAuth } from '../../hooks/useAuth';
+import { useTranslation } from '../../hooks/useTranslation';
 
 
-import InputField from '../Components/Inputs/InputField';
-import CheckboxInput from '../Components/Inputs/CheckboxInput';
-import ConnexionButton from '../Components/Buttons/ConnexionButton';
-import FormOptions from '../Components/Form/FormOptions';
-import AuthLayout from '../Components/Layout/AuthLayout';
-import LoadingOverlay from '../Components/UI/LoadingOverlay';
-import styles from '../Styles/Auth.module.css';
+import InputField from '../../Components/Inputs/InputField';
+import CheckboxInput from '../../Components/Inputs/CheckboxInput';
+import ConnexionButton from '../../Components/Buttons/ConnexionButton';
+import FormOptions from '../../Components/Form/FormOptions';
+import AuthLayout from '../../Components/Layout/AuthLayout';
+import LoadingOverlay from '../../Components/UI/LoadingOverlay';
+import styles from '../../Styles/Auth.module.css';
 
-export default function Login() {
+export default function LoginPage() {
     const navigate = useNavigate();
     const { login, isAuthenticated, error: authError, isLoading } = useAuth();
     const { t } = useTranslation();
@@ -111,7 +111,7 @@ export default function Login() {
               
                 <FormOptions
                     leftContent={<CheckboxInput label={t('remember_me')} id="remember" setCheck={toggleRemember} check={form.remember_me} />}
-                    rightContent={<Link to="/forgot_password" className={styles.forgotPassword} >{t('forgot_password')}</Link>}
+                    rightContent={<Link to="/forgot-password" className={styles.forgotPassword} >{t('forgot_password')}</Link>}
                 />
 
                 <ConnexionButton type="submit" variant="primary" disabled={isLoading}>

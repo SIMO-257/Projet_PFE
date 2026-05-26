@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTickets } from '../hooks/useTickets';
-import { useTranslation } from '../hooks/useTranslation';
-import Header from '../Components/Layout/Header';
-import BottomNavigation from '../Components/Layout/BottomNavigation';
-import TicketCard from '../Components/Cards/TicketCard';
-import TicketCardSkeleton from '../Components/Skeletons/TicketCardSkeleton';
+import { useTickets } from '../../hooks/useTickets';
+import { useTranslation } from '../../hooks/useTranslation';
+import Header from '../../Components/Layout/Header';
+import BottomNavigation from '../../Components/Layout/BottomNavigation';
+import TicketCard from '../../Components/Cards/TicketCard';
+import TicketCardSkeleton from '../../Components/Skeletons/TicketCardSkeleton';
 
-export default function MyTickets() {
+export default function MyTicketsPage() {
   const navigateHook = useNavigate();
   const { t, language } = useTranslation();
   const { tickets, availableTypes, isLoading, refreshTickets } = useTickets();
@@ -59,7 +59,7 @@ export default function MyTickets() {
                           buttonText: t('view_ticket_btn'),
                           isActive: ticket.status === 'active' || ticket.status === 'used'
                         }} 
-                        onAction={() => navigateHook(`/viewticket/${ticket.uuid}`)} 
+                        onAction={() => navigateHook(`/tickets/${ticket.uuid}`)} 
                       />
                     ))}
                   </>

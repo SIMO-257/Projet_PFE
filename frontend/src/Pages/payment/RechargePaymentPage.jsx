@@ -2,23 +2,23 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
-import { useTranslation } from "../hooks/useTranslation";
-import { createPaymentIntent, cancelPaymentIntent } from "../services/walletService";
+import { useTranslation } from "../../hooks/useTranslation";
+import { createPaymentIntent, cancelPaymentIntent } from "../../services/walletService";
 
 // Layout Components
-import Header from "../Components/Layout/Header";
-import ProgressDots from "../Components/UI/ProgressDots";
+import Header from "../../Components/Layout/Header";
+import ProgressDots from "../../Components/UI/ProgressDots";
 
 // UI Components
-import ValidationCard from "../Components/Cards/ValidationCard";
-import AmountDisplay from "../Components/Cards/AmountDisplay";
-import StripeCheckoutForm from "../Components/Payment/StripeCheckoutForm";
-import InputField from "../Components/Inputs/InputField";
+import ValidationCard from "../../Components/Cards/ValidationCard";
+import AmountDisplay from "../../Components/Cards/AmountDisplay";
+import StripeCheckoutForm from "../../Components/Payment/StripeCheckoutForm";
+import InputField from "../../Components/Inputs/InputField";
 
 const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
 
-export default function RechargePayment() {
+export default function RechargePaymentPage() {
   const { t, language } = useTranslation();
   const navigate = useNavigate();
   const [step, setStep] = useState(1); // 1: Amount Selection, 2: Card Details

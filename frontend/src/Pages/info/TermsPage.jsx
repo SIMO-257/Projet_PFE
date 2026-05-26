@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Info, CheckCircle2 } from 'lucide-react';
-import { useTranslation } from '../hooks/useTranslation';
+import { useTranslation } from '../../hooks/useTranslation';
 
-export default function TermsAndConditions() {
+export default function TermsPage() {
     const navigate = useNavigate();
     const { t } = useTranslation();
     const [hasReadToBottom, setHasReadToBottom] = useState(false);

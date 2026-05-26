@@ -1,22 +1,22 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import BottomNavigation from '../Components/Layout/BottomNavigation';
-import BalanceCard from '../Components/Cards/BalanceCard';
-import DefaultTicketCard from '../Components/Cards/DefaultTicketCard';
-import TicketHistoryCard from '../Components/Cards/TicketHistoryCard';
-import BalanceCardSkeleton from '../Components/Skeletons/BalanceCardSkeleton';
-import TicketHistorySkeleton from '../Components/Skeletons/TicketHistorySkeleton';
-import GoldenSpinner from '../Components/UI/GoldenSpinner';
-import styles from '../Styles/HomeScreen.module.css';
-import { useAuth } from '../hooks/useAuth';
-import { useWallet } from '../hooks/useWallet';
-import { useTickets } from '../hooks/useTickets';
-import { useTranslation } from '../hooks/useTranslation';
-import { fetchPurchasedCards } from '../services/ticketService';
-import { fetchUnreadCount } from '../Redux/Slices/notificationSlice';
+import BottomNavigation from '../../Components/Layout/BottomNavigation';
+import BalanceCard from '../../Components/Cards/BalanceCard';
+import DefaultTicketCard from '../../Components/Cards/DefaultTicketCard';
+import TicketHistoryCard from '../../Components/Cards/TicketHistoryCard';
+import BalanceCardSkeleton from '../../Components/Skeletons/BalanceCardSkeleton';
+import TicketHistorySkeleton from '../../Components/Skeletons/TicketHistorySkeleton';
+import GoldenSpinner from '../../Components/UI/GoldenSpinner';
+import styles from '../../Styles/HomeScreen.module.css';
+import { useAuth } from '../../hooks/useAuth';
+import { useWallet } from '../../hooks/useWallet';
+import { useTickets } from '../../hooks/useTickets';
+import { useTranslation } from '../../hooks/useTranslation';
+import { fetchPurchasedCards } from '../../services/ticketService';
+import { fetchUnreadCount } from '../../Redux/Slices/notificationSlice';
 
-export default function Home() {
+export default function HomePage() {
   const dispatch = useDispatch();
   const { user } = useAuth();
   const { refreshWallet } = useWallet();
@@ -90,7 +90,7 @@ export default function Home() {
   }
 
   const handleNotifications = () => navigateHook('/notifications');
-  const handleChangeCard = () => navigateHook('/change-card');
+  const handleChangeDefaultCard = () => navigateHook('/change-default-card');
   const handleDefaultCardPress = () => {
     if (!defaultCard?.uuid || isNavigatingToValidation) {
       return;
@@ -111,8 +111,8 @@ export default function Home() {
         setTimeout(() => setIsNavigatingToValidation(false), 1000);
     }, 10);
   };
-  const handleTicketPress = (ticket) => navigateHook(`/viewticket/${ticket.uuid}`);
-  const handleAllTickets = () => navigateHook('/all-tickets');
+  const handleTicketPress = (ticket) => navigateHook(`/tickets/${ticket.uuid}`);
+  const handleTicketsHistory = () => navigateHook('/tickets-history');
   const greeting = new Date().getHours() >= 18 ? t('good_evening') : t('good_morning');
 
   return (
@@ -144,7 +144,7 @@ export default function Home() {
                   <DefaultTicketCard
                     defaultTicket={defaultTicketProp}
                     onClick={handleDefaultCardPress}
-                    onAction={handleChangeCard}
+                    onAction={handleChangeDefaultCard}
                     isNavigatingToValidation={isNavigatingToValidation}
                   />
                 )}
@@ -154,7 +154,7 @@ export default function Home() {
               <div className="mb-6">
                 <div className="flex justify-between items-center mb-3">
                   <h2 className="text-white/60 text-xs uppercase tracking-widest font-bold">{t('history')}</h2>
-                  <button onClick={handleAllTickets} className="text-yellow-500 text-sm font-semibold">{t('view_all')}</button>
+                  <button onClick={handleTicketsHistory} className="text-yellow-500 text-sm font-semibold">{t('view_all')}</button>
                 </div>
                 <div className="space-y-3">
                   {isDataLoading ? (

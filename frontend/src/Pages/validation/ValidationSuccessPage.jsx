@@ -1,9 +1,9 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useTranslation } from '../hooks/useTranslation';
-import styles from '../Styles/ConfirmationPaiment.module.css';
+import { useTranslation } from '../../hooks/useTranslation';
+import styles from '../../Styles/ConfirmationPaiment.module.css';
 
-export default function ValidationSuccess () {
+export default function ValidationSuccessPage () {
     const { t, language } = useTranslation();
     const location = useLocation();
     const navigate = useNavigate();
@@ -15,9 +15,9 @@ export default function ValidationSuccess () {
 
     const handleViewTicket = () => {
         if (ticket?.uuid) {
-            navigate(`/viewticket/${ticket.uuid}`);
+            navigate(`/tickets/${ticket.uuid}`);
         } else {
-            navigate('/mytickets');
+            navigate('/my-tickets');
         }
     };
 

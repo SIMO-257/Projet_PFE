@@ -4,7 +4,7 @@ import { resendVerificationEmail, verifyEmailCode } from '../../services/clientS
 import { useTranslation } from '../../hooks/useTranslation';
 import styles from '../../Styles/Auth.module.css';
 
-export default function VerifyEmail() {
+export default function VerifyEmailPage() {
   const { t } = useTranslation();
   const [searchParams, setSearchParams]  = useSearchParams();
   const navigate        = useNavigate();

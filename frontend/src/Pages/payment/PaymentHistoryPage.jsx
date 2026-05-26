@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from '../hooks/useTranslation';
-import { fetchTransactionHistory } from '../services/walletService';
-import styles from '../Styles/PaimentHistory.module.css';
-import BottomNavigation from '../Components/Layout/BottomNavigation';
-import TransactionItem from '../Components/Cards/TransactionItem';
+import { useTranslation } from '../../hooks/useTranslation';
+import { fetchTransactionHistory } from '../../services/walletService';
+import styles from '../../Styles/PaimentHistory.module.css';
+import BottomNavigation from '../../Components/Layout/BottomNavigation';
+import TransactionItem from '../../Components/Cards/TransactionItem';
 
-export default function PaimentHistory() {
+export default function PaymentHistoryPage() {
     const navigate = useNavigate();
     const { t, language, formatReference } = useTranslation();
     const [activeDateFilter, setActiveDateFilter] = useState('all');

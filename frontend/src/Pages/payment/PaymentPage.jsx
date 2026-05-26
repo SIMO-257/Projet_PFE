@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import ProgressSteps from '../Components/NavBar/ProgressSteps';
+import ProgressSteps from '../../Components/NavBar/ProgressSteps';
 
-export default function Paiment() {
+export default function PaymentPage() {
   const navigate = useNavigate();
 
   return (

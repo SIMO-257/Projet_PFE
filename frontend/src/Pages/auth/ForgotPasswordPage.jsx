@@ -1,14 +1,14 @@
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { forgotPasswordUser } from '../services/clientService';
-import { useTranslation } from '../hooks/useTranslation';
+import { forgotPasswordUser } from '../../services/clientService';
+import { useTranslation } from '../../hooks/useTranslation';
 
-import InputField from '../Components/Inputs/InputField';
-import ConnexionButton from '../Components/Buttons/ConnexionButton';
-import AuthLayout from '../Components/Layout/AuthLayout';
-import styles from '../Styles/Auth.module.css';
+import InputField from '../../Components/Inputs/InputField';
+import ConnexionButton from '../../Components/Buttons/ConnexionButton';
+import AuthLayout from '../../Components/Layout/AuthLayout';
+import styles from '../../Styles/Auth.module.css';
 
-export default function ForgotPassword() {
+export default function ForgotPasswordPage() {
     const { t } = useTranslation();
     const [form, setForm] = useState({ email: '' });
     const [errors, setErrors] = useState({});

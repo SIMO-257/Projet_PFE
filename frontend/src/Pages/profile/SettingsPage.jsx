@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import Header from "../Components/Layout/Header";
-import ModalOverlay from "../Components/Layout/ModalOverlay";
-import styles from "../Styles/Settings.module.css";
+import Header from "../../Components/Layout/Header";
+import ModalOverlay from "../../Components/Layout/ModalOverlay";
+import styles from "../../Styles/Settings.module.css";
 import {
   getNotificationPreferences,
   updateNotificationPreferences,
   getUserPreferences,
   updateUserPreferences,
-} from "../services/notificationService";
-import { setTheme, setLanguage } from "../Redux/Slices/settingsSlice";
-import { useTranslation } from "../hooks/useTranslation";
+} from "../../services/notificationService";
+import { setTheme, setLanguage } from "../../Redux/Slices/settingsSlice";
+import { useTranslation } from "../../hooks/useTranslation";
 
-const Settings = () => {
+const SettingsPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { theme, language } = useSelector((state) => state.settings);
@@ -586,4 +586,4 @@ const Icon = ({ name }) => {
   );
 };
 
-export default Settings;
+export default SettingsPage;

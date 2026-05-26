@@ -1,15 +1,15 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { useState } from 'react';
-import { signupUser } from '../services/clientService';
-import { useTranslation } from '../hooks/useTranslation';
+import { signupUser } from '../../services/clientService';
+import { useTranslation } from '../../hooks/useTranslation';
 
-import InputField from '../Components/Inputs/InputField';
-import CheckboxInput from '../Components/Inputs/CheckboxInput';
-import ConnexionButton from '../Components/Buttons/ConnexionButton';
-import FormOptions from '../Components/Form/FormOptions';
-import AuthLayout from '../Components/Layout/AuthLayout';
-import LoadingOverlay from '../Components/UI/LoadingOverlay';
-import styles from '../Styles/Auth.module.css';
+import InputField from '../../Components/Inputs/InputField';
+import CheckboxInput from '../../Components/Inputs/CheckboxInput';
+import ConnexionButton from '../../Components/Buttons/ConnexionButton';
+import FormOptions from '../../Components/Form/FormOptions';
+import AuthLayout from '../../Components/Layout/AuthLayout';
+import LoadingOverlay from '../../Components/UI/LoadingOverlay';
+import styles from '../../Styles/Auth.module.css';
 
 const DISPOSABLE_DOMAINS = [
     'mailinator.com', 'guerrillamail.com', 'tempmail.com', 'throwaway.email',
@@ -19,7 +19,7 @@ const DISPOSABLE_DOMAINS = [
     'mail-temporaire.fr', '10minutemail.com', 'tempinbox.com',
 ];
 
-export default function SignUp() {
+export default function SignUpPage() {
 
     const navigate = useNavigate();
     const { t } = useTranslation();
@@ -261,7 +261,7 @@ export default function SignUp() {
                 />
 
                 <FormOptions
-                    leftContent={<CheckboxInput label={<>{t('accept_terms')} <Link className={styles.authLink} to='/terms-and-conditions'>{t('terms_conditions')}</Link> {t('and')} <Link className={styles.authLink} to='/terms-and-conditions'>{t('privacy_policy')}</Link></>} id="remember" setCheck={toggleTerms} check={form.accept_terms} />}
+                    leftContent={<CheckboxInput label={<>{t('accept_terms')} <Link className={styles.authLink} to='/terms'>{t('terms_conditions')}</Link> {t('and')} <Link className={styles.authLink} to='/terms'>{t('privacy_policy')}</Link></>} id="remember" setCheck={toggleTerms} check={form.accept_terms} />}
                     rightContent=""
                 />
 

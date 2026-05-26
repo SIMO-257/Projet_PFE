@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from '../hooks/useTranslation';
-import Header from '../Components/Layout/Header';
-import styles from '../Styles/Security.module.css';
-import { getUserPreferences, updateUserPreferences } from '../services/notificationService';
+import { useTranslation } from '../../hooks/useTranslation';
+import Header from '../../Components/Layout/Header';
+import styles from '../../Styles/Security.module.css';
+import { getUserPreferences, updateUserPreferences } from '../../services/notificationService';
 
-const Security = () => {
+const SecurityPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -315,4 +315,4 @@ const Icon = ({ name }) => {
   return icons[name] || null;
 };
 
-export default Security;
+export default SecurityPage;

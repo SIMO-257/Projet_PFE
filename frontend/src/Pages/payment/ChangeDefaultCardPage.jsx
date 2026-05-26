@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from '../hooks/useTranslation';
-import Header from '../Components/Layout/Header';
-import PurchasedCardItem from '../Components/Cards/PurchasedCardItem';
-import { fetchPurchasedCards, setDefaultPurchasedCard } from '../services/ticketService';
+import { useTranslation } from '../../hooks/useTranslation';
+import Header from '../../Components/Layout/Header';
+import PurchasedCardItem from '../../Components/Cards/PurchasedCardItem';
+import { fetchPurchasedCards, setDefaultPurchasedCard } from '../../services/ticketService';
 
-export default function PurchasedCards  ()  {
+export default function ChangeDefaultCardPage  ()  {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [cards, setCards] = useState([]);

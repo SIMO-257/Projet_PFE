@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import jsQR from 'jsqr';
-import Header from '../Components/Layout/Header';
-import { consumeQrValidationToken, validateTicket } from '../services/ticketService';
+import Header from '../../Components/Layout/Header';
+import { consumeQrValidationToken, validateTicket } from '../../services/ticketService';
 
-export default function ValidatorScreen ()  {
+export default function ValidatorPage ()  {
   const navigate = useNavigate();
   const videoRef = useRef(null);
   const streamRef = useRef(null);

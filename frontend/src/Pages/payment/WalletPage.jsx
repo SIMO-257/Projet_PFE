@@ -1,20 +1,20 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../Components/Layout/Header';
-import BalanceCard from '../Components/Cards/BalanceCard';
-import ActionButtonCard from '../Components/Cards/ActionButtonCard';
-import BottomNavigation from '../Components/Layout/BottomNavigation';
-import TransactionItem from '../Components/Cards/TransactionItem';
-import SectionHeader from '../Components/Layout/SectionHeader';
-import BalanceCardSkeleton from '../Components/Skeletons/BalanceCardSkeleton';
-import TicketHistorySkeleton from '../Components/Skeletons/TicketHistorySkeleton';
-import styles from '../Styles/WalletScreen.module.css';
+import Header from '../../Components/Layout/Header';
+import BalanceCard from '../../Components/Cards/BalanceCard';
+import ActionButtonCard from '../../Components/Cards/ActionButtonCard';
+import BottomNavigation from '../../Components/Layout/BottomNavigation';
+import TransactionItem from '../../Components/Cards/TransactionItem';
+import SectionHeader from '../../Components/Layout/SectionHeader';
+import BalanceCardSkeleton from '../../Components/Skeletons/BalanceCardSkeleton';
+import TicketHistorySkeleton from '../../Components/Skeletons/TicketHistorySkeleton';
+import styles from '../../Styles/WalletScreen.module.css';
 import { useDispatch } from 'react-redux';
-import { setGlobalLoading } from '../Redux/Slices/uiSlice';
-import { useTranslation } from '../hooks/useTranslation';
-import { useWallet } from '../hooks/useWallet';
+import { setGlobalLoading } from '../../Redux/Slices/uiSlice';
+import { useTranslation } from '../../hooks/useTranslation';
+import { useWallet } from '../../hooks/useWallet';
 
-export default function Wallet() {
+export default function WalletPage() {
   const { t, language, formatReference } = useTranslation();
   const { balance, transactions, isLoading, refreshWallet } = useWallet();
   const navigateHook = useNavigate();

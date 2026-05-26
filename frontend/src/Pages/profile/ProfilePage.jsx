@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../Components/Layout/Header';
-import BottomNavigation from '../Components/Layout/BottomNavigation';
-import ProfilInfo from '../Components/Cards/ProfilInfo';
-import ProfileOpt from '../Components/Cards/ProfileOpt';
-import styles from '../Styles/ProfileScreen.module.css';
-import { useAuth } from '../hooks/useAuth';
-import { fetchUserProfile } from '../services/clientService';
-import { useTranslation } from '../hooks/useTranslation';
+import Header from '../../Components/Layout/Header';
+import BottomNavigation from '../../Components/Layout/BottomNavigation';
+import ProfilInfo from '../../Components/Cards/ProfilInfo';
+import ProfileOpt from '../../Components/Cards/ProfileOpt';
+import styles from '../../Styles/ProfileScreen.module.css';
+import { useAuth } from '../../hooks/useAuth';
+import { fetchUserProfile } from '../../services/clientService';
+import { useTranslation } from '../../hooks/useTranslation';
 
-export default function Profile()  {
+export default function ProfilePage()  {
   const [profile, setProfile] = useState(null);
   const navigateHook = useNavigate();
   const { logout } = useAuth();

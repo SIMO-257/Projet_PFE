@@ -1,17 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Header from '../Components/Layout/Header';
-import styles from '../Styles/EditProfile.module.css';
-import { useTranslation } from '../hooks/useTranslation';
+import Header from '../../Components/Layout/Header';
+import styles from '../../Styles/EditProfile.module.css';
+import { useTranslation } from '../../hooks/useTranslation';
 import {
   clearAuthData,
   fetchUserProfile,
   forgotPasswordUser,
   getAuthToken,
   updateUserProfile,
-} from '../services/clientService';
+} from '../../services/clientService';
 
-export default function EditProfileScreen  ()  {
+export default function EditProfilePage()  {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();

@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useTranslation } from '../hooks/useTranslation';
-import { fetchTicketDetails } from '../services/ticketService';
+import { useTranslation } from '../../hooks/useTranslation';
+import { fetchTicketDetails } from '../../services/ticketService';
 import { CheckCircle, Ticket, Calendar, ShieldCheck, RefreshCcw } from 'lucide-react';
-import Header from '../Components/Layout/Header';
+import Header from '../../Components/Layout/Header';
 
-export default function ViewTicket() {
+export default function TicketDetailPage() {
     const { t, language } = useTranslation();
     const { id: uuid } = useParams();
     const navigate = useNavigate();
@@ -36,7 +36,7 @@ export default function ViewTicket() {
         }
     }, [uuid]);
 
-    const goBack = () => navigate('/mytickets');
+    const goBack = () => navigate('/my-tickets');
 
     if (loading) {
         return (

@@ -1,13 +1,13 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useState } from 'react';
-import { resetPasswordUser } from '../services/clientService';
-import { useTranslation } from '../hooks/useTranslation';
-import InputField from '../Components/Inputs/InputField';
-import ConnexionButton from '../Components/Buttons/ConnexionButton';
-import AuthLayout from '../Components/Layout/AuthLayout';
-import styles from '../Styles/Auth.module.css';
+import { resetPasswordUser } from '../../services/clientService';
+import { useTranslation } from '../../hooks/useTranslation';
+import InputField from '../../Components/Inputs/InputField';
+import ConnexionButton from '../../Components/Buttons/ConnexionButton';
+import AuthLayout from '../../Components/Layout/AuthLayout';
+import styles from '../../Styles/Auth.module.css';
 
-export default function ResetPassword() {
+export default function ResetPasswordPage() {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();

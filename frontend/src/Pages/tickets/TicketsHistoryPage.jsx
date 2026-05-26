@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTickets } from '../hooks/useTickets';
-import { useTranslation } from '../hooks/useTranslation';
-import Header from '../Components/Layout/Header';
-import TicketHistoryCard from '../Components/Cards/TicketHistoryCard';
+import { useTickets } from '../../hooks/useTickets';
+import { useTranslation } from '../../hooks/useTranslation';
+import Header from '../../Components/Layout/Header';
+import TicketHistoryCard from '../../Components/Cards/TicketHistoryCard';
 
-export default function AllTickets ()  {
+export default function TicketsHistoryPage ()  {
   const navigateHook = useNavigate();
   const { t, language } = useTranslation();
   const { tickets, isLoading, refreshTickets } = useTickets();
@@ -87,7 +87,7 @@ export default function AllTickets ()  {
     ) },
   ];
 
-  const handleTicketPress = (ticket) => navigateHook(`/viewticket/${ticket.uuid}`);
+  const handleTicketPress = (ticket) => navigateHook(`/tickets/${ticket.uuid}`);
   const handleBack = () => {
     if (window.history.length > 1) {
       navigateHook(-1);

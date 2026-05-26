@@ -1,10 +1,10 @@
 
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useTranslation } from '../hooks/useTranslation';
-import ProgressSteps from '../Components/NavBar/ProgressSteps';
-import styles from '../Styles/ConfirmationPaiment.module.css';
+import { useTranslation } from '../../hooks/useTranslation';
+import ProgressSteps from '../../Components/NavBar/ProgressSteps';
+import styles from '../../Styles/ConfirmationPaiment.module.css';
 
-export default function Confirmation () {
+export default function PaymentConfirmationPage () {
     const location = useLocation();
     const navigate = useNavigate();
     const { t, language } = useTranslation();
@@ -55,12 +55,12 @@ export default function Confirmation () {
     const handleViewTicket = () => {
         if (quantity > 1) {
             // If multiple tickets, go to the list so they can see all of them
-            navigate('/mytickets');
+            navigate('/my-tickets');
         } else if (mainTicket) {
             // If single ticket, go straight to the detail/QR
-            navigate(`/viewticket/${mainTicket.uuid}`);
+            navigate(`/tickets/${mainTicket.uuid}`);
         } else {
-            navigate('/mytickets');
+            navigate('/my-tickets');
         }
     };
 

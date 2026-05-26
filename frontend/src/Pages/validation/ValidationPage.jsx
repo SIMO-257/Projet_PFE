@@ -1,29 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useTranslation } from '../hooks/useTranslation';
-import { useTickets } from '../hooks/useTickets';
+import { useTranslation } from '../../hooks/useTranslation';
+import { useTickets } from '../../hooks/useTickets';
 import {
   createNfcChallenge,
   consumeNfcChallenge,
   createQrValidationToken,
   fetchTicketDetails,
-} from '../services/ticketService';
-import Header from '../Components/Layout/Header';
-import BottomNavigation from '../Components/Layout/BottomNavigation';
-import ValidationCard from '../Components/Cards/ValidationCard';
-import InfoCard from '../Components/Cards/InfoCard';
-import ActionButtonCard from '../Components/Cards/ActionButtonCard';
-import TicketIconAnimation from '../Components/UI/TicketIconAnimation';
-import Notification from '../Components/UI/Notification';
-import ModalOverlay from '../Components/Layout/ModalOverlay';
-import NFCAnimation from '../Components/UI/NFCAnimation';
-import ProcessingIndicator from '../Components/UI/ProcessingIndicator';
-import QRCodeDisplay from '../Components/UI/QRCodeDisplay';
-import TimerDisplay from '../Components/UI/TimerDisplay';
-import GoldenSpinner from '../Components/UI/GoldenSpinner';
-import styles from '../Styles/ValidationScreen.module.css';
+} from '../../services/ticketService';
+import Header from '../../Components/Layout/Header';
+import BottomNavigation from '../../Components/Layout/BottomNavigation';
+import ValidationCard from '../../Components/Cards/ValidationCard';
+import InfoCard from '../../Components/Cards/InfoCard';
+import ActionButtonCard from '../../Components/Cards/ActionButtonCard';
+import TicketIconAnimation from '../../Components/UI/TicketIconAnimation';
+import Notification from '../../Components/UI/Notification';
+import ModalOverlay from '../../Components/Layout/ModalOverlay';
+import NFCAnimation from '../../Components/UI/NFCAnimation';
+import ProcessingIndicator from '../../Components/UI/ProcessingIndicator';
+import QRCodeDisplay from '../../Components/UI/QRCodeDisplay';
+import TimerDisplay from '../../Components/UI/TimerDisplay';
+import GoldenSpinner from '../../Components/UI/GoldenSpinner';
+import styles from '../../Styles/ValidationScreen.module.css';
 
-export default function Validation() {
+export default function ValidationPage() {
   const { t } = useTranslation();
   const { tickets, refreshTickets } = useTickets();
   const navigateHook = useNavigate();

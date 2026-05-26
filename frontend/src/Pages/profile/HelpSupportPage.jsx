@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from '../hooks/useTranslation';
-import Header from '../Components/Layout/Header';
-import styles from '../Styles/HelpSupport.module.css';
+import { useTranslation } from '../../hooks/useTranslation';
+import Header from '../../Components/Layout/Header';
+import styles from '../../Styles/HelpSupport.module.css';
 
-const HelpSupport = () => {
+const HelpSupportPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   // State for FAQ expand/collapse
@@ -251,4 +251,4 @@ const Icon = ({ name }) => {
   return icons[name] || null;
 };
 
-export default HelpSupport;
+export default HelpSupportPage;
