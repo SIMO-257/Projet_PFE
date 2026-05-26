@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Admin;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class AdminSeeder extends Seeder
 {
@@ -20,7 +19,7 @@ class AdminSeeder extends Seeder
             'first_name' => 'Admin',
             'last_name'  => 'CasaWay',
             'email'      => 'admin@casaway.ma',
-            'password'   => Hash::make('Admin@CasaWay2026!'),
+            'password'   => 'Admin@CasaWay2026!', // 'hashed' cast auto-hashes this
             'is_active'  => true,
         ]);
 

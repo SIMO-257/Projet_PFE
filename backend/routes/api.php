@@ -66,15 +66,23 @@ Route::middleware(['auth:sanctum', 'track.activity'])->group(function () {
         Route::delete('/{id}', [\App\Http\Controllers\NotificationController::class, 'destroy'])->name('api.notifications.destroy');
     });
 
+
+    // User Preferences & FCM
     Route::put('/users/fcm-token', [UserController::class, 'updateFcmToken'])->name('api.users.fcm_token.update');
     Route::get('/users/notification-preferences', [UserController::class, 'getNotificationPreferences'])->name('api.users.notification_preferences.get');
     Route::patch('/users/notification-preferences', [UserController::class, 'updateNotificationPreferences'])->name('api.users.notification_preferences.update');
     Route::get('/users/preferences', [UserController::class, 'getPreferences'])->name('api.users.preferences.get');
     Route::patch('/users/preferences', [UserController::class, 'updatePreferences'])->name('api.users.preferences.update');
 
+    // Help & Support Routes
+    Route::get('/help', [\App\Http\Controllers\RapportController::class, 'index'])->name('api.help.index');
+    Route::post('/rapports', [\App\Http\Controllers\RapportController::class, 'store'])->name('api.rapports.store');
+
     // Student Verification
     Route::get('/users/student-status', [UserController::class, 'studentStatus'])->name('api.users.student.status');
     Route::post('/users/student-verification', [UserController::class, 'submitStudentVerification'])->middleware('throttle:3,60')->name('api.users.student.verification');
+
+    
 });
 
 // ─── ADMIN ROUTES ────────────────────────────────────────────
@@ -115,4 +123,8 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'admin'])->group(function ()
 
     // Profile
     Route::put('/profile', [AdminProfileController::class, 'update']);
+
+    // Help & Support — Admin Rapports
+    Route::get('/rapports', [\App\Http\Controllers\Admin\AdminRapportController::class, 'index']);
+    Route::patch('/rapports/{id}/statut', [\App\Http\Controllers\Admin\AdminRapportController::class, 'updateStatut']);
 });

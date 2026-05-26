@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { logoutAdmin } from '../../Redux/Slices/adminSlice';
+
+import { fetchAdminMe, logoutAdmin } from '../../Redux/Slices/adminSlice';
+import { getAdminToken } from '../../services/adminService';
 import { useTranslation } from '../../hooks/useTranslation';
 
 const AdminLayout = () => {
@@ -10,8 +12,15 @@ const AdminLayout = () => {
   const { t } = useTranslation();
   const { admin } = useSelector((state) => state.admin);
 
-  const handleLogout = () => {
-    dispatch(logoutAdmin());
+  // Fetch admin profile on mount if not already loaded (e.g. page refresh)
+  useEffect(() => {
+    if (!admin && getAdminToken()) {
+      dispatch(fetchAdminMe());
+    }
+  }, []);
+
+  const handleLogout = async () => {
+    await dispatch(logoutAdmin());
     navigate('/admin/login');
   };
 
@@ -21,6 +30,7 @@ const AdminLayout = () => {
     { path: '/admin/tickets', label: t('admin_nav_tickets'), icon: 'ticket' },
     { path: '/admin/transactions', label: t('admin_nav_transactions'), icon: 'credit-card' },
     { path: '/admin/notifications', label: t('admin_nav_notifications'), icon: 'bell' },
+    { path: '/admin/rapports', label: t('admin_nav_rapports') || 'Rapports', icon: 'message' },
   ];
 
   return (

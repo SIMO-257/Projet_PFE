@@ -87,6 +87,11 @@ const adminSlice = createSlice({
         state.isAuthenticated = false;
         state.adminChecked = true;
       })
+      .addCase(logoutAdmin.rejected, (state) => {
+        state.admin = null;
+        state.token = null;
+        state.isAuthenticated = false;
+      })
       .addCase(fetchAdminMe.fulfilled, (state, action) => {
         state.adminChecked = true;
         state.admin = action.payload;

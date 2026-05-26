@@ -152,7 +152,14 @@ class UserController extends Controller
         }
 
         $code = $pending->generateVerificationCode();
-        $pending->notify(new \App\Notifications\VerifyEmailNotification($code));
+        try {
+            $pending->notify(new \App\Notifications\VerifyEmailNotification($code));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Failed to send verification email', [
+                'email' => $pending->email,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         AuditLog::log('signup', null, ['email' => $pending->email]);
 
