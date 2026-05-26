@@ -28,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
         'authMiddleware' => \App\Http\Middleware\AuthMiddleware::class,
         'track.activity' => \App\Http\Middleware\TrackActivity::class,
         'set.locale' => \App\Http\Middleware\SetLocale::class,
+        'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
     ]);
 
     $middleware->api(prepend: [
