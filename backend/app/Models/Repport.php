@@ -5,8 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Rapport extends Model
+class Repport extends Model
 {
+    protected $table = 'repports';
+
     /**
      * @var list<string>
      */
@@ -15,6 +17,7 @@ class Rapport extends Model
         'type_probleme',
         'sujet',
         'description',
+        'image_path',
         'statut',
     ];
 

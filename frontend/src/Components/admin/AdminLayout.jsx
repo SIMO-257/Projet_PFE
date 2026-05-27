@@ -31,6 +31,7 @@ const AdminLayout = () => {
     { path: '/admin/transactions', label: t('admin_nav_transactions'), icon: 'credit-card' },
     { path: '/admin/notifications', label: t('admin_nav_notifications'), icon: 'bell' },
     { path: '/admin/rapports', label: t('admin_nav_rapports') || 'Rapports', icon: 'message' },
+    { path: '/admin/student-verifications', label: 'Vérifications Étudiant', icon: 'graduation' },
   ];
 
   return (

@@ -25,7 +25,11 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://nginx',
+        changeOrigin: true,
+      },
+      '/storage': {
+        target: 'http://nginx',
         changeOrigin: true,
       },
     },

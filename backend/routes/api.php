@@ -76,7 +76,7 @@ Route::middleware(['auth:sanctum', 'track.activity'])->group(function () {
 
     // Help & Support Routes
     Route::get('/help', [\App\Http\Controllers\RapportController::class, 'index'])->name('api.help.index');
-    Route::post('/rapports', [\App\Http\Controllers\RapportController::class, 'store'])->name('api.rapports.store');
+    Route::post('/repports', [\App\Http\Controllers\RapportController::class, 'store'])->name('api.repports.store');
 
     // Student Verification
     Route::get('/users/student-status', [UserController::class, 'studentStatus'])->name('api.users.student.status');
@@ -124,7 +124,13 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'admin'])->group(function ()
     // Profile
     Route::put('/profile', [AdminProfileController::class, 'update']);
 
-    // Help & Support — Admin Rapports
-    Route::get('/rapports', [\App\Http\Controllers\Admin\AdminRapportController::class, 'index']);
-    Route::patch('/rapports/{id}/statut', [\App\Http\Controllers\Admin\AdminRapportController::class, 'updateStatut']);
+    // Help & Support — Admin Repports
+    Route::get('/repports', [\App\Http\Controllers\Admin\AdminRapportController::class, 'index']);
+    Route::patch('/repports/{id}/statut', [\App\Http\Controllers\Admin\AdminRapportController::class, 'updateStatut']);
+
+    // Student Verifications
+    Route::get('/student-verifications', [\App\Http\Controllers\Admin\AdminStudentVerificationController::class, 'index']);
+    Route::get('/student-verifications/{id}', [\App\Http\Controllers\Admin\AdminStudentVerificationController::class, 'show']);
+    Route::post('/student-verifications/{id}/approve', [\App\Http\Controllers\Admin\AdminStudentVerificationController::class, 'approve']);
+    Route::post('/student-verifications/{id}/reject', [\App\Http\Controllers\Admin\AdminStudentVerificationController::class, 'reject']);
 });

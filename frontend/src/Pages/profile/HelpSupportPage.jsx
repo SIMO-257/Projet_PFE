@@ -22,6 +22,8 @@ const HelpSupportPage = () => {
   const [formSubject, setFormSubject] = useState('');
   const [formDescription, setFormDescription] = useState('');
   const [formSubmitting, setFormSubmitting] = useState(false);
+  const [screenshotFile, setScreenshotFile] = useState(null);
+  const [screenshotPreview, setScreenshotPreview] = useState(null);
 
   // Detail modal state
   const [selectedRapport, setSelectedRapport] = useState(null);
@@ -62,15 +64,20 @@ const HelpSupportPage = () => {
     if (!formDescription.trim()) return;
     setFormSubmitting(true);
     try {
-      await submitRapport({
-        type_probleme: formType,
-        sujet: formSubject,
-        description: formDescription,
-      });
+      const formData = new FormData();
+      formData.append('type_probleme', formType);
+      formData.append('sujet', formSubject);
+      formData.append('description', formDescription);
+      if (screenshotFile) {
+        formData.append('image', screenshotFile);
+      }
+      await submitRapport(formData);
       showToast(t('report_sent_success'), 'success');
       setFormType('Paiement');
       setFormSubject('');
       setFormDescription('');
+      setScreenshotFile(null);
+      setScreenshotPreview(null);
       loadRapports();
     } catch {
       showToast(t('report_send_error'), 'error');
@@ -85,7 +92,7 @@ const HelpSupportPage = () => {
   };
 
   const handleEmail = () => {
-    window.location.href = 'mailto:support@transport.ma';
+    window.open('https://mail.google.com/mail/?view=cm&fs=1&to=7mohammed.mammah@gmail.com', '_blank');
   };
 
   const handleChat = () => {
@@ -189,6 +196,45 @@ const HelpSupportPage = () => {
                   <div className="text-right text-[rgba(232,221,208,0.3)] text-xs mt-1">{formDescription.length}/5000</div>
                 </div>
 
+                {screenshotPreview && (
+                  <div className="relative">
+                    <img src={screenshotPreview} alt="Screenshot preview" className="w-full h-40 object-cover rounded-xl border border-[rgba(200,169,110,0.2)]" />
+                    <button
+                      type="button"
+                      onClick={() => { setScreenshotFile(null); setScreenshotPreview(null); }}
+                      className="absolute top-2 right-2 bg-black/60 rounded-full p-1 text-white hover:bg-black/80 transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => document.getElementById('screenshot-input').click()}
+                  className="w-full bg-[rgba(200,169,110,0.1)] border border-dashed border-[rgba(200,169,110,0.3)] text-[#c8a96e] font-medium py-3 rounded-xl hover:bg-[rgba(200,169,110,0.15)] transition-all flex items-center justify-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+                  </svg>
+                  {screenshotFile ? t('change_screenshot') || 'Changer la capture' : t('add_screenshot')}
+                </button>
+                <input
+                  id="screenshot-input"
+                  type="file"
+                  accept="image/jpeg,image/png,image/jpg,image/gif,image/webp"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      setScreenshotFile(file);
+                      setScreenshotPreview(URL.createObjectURL(file));
+                    }
+                  }}
+                />
+
                 <button
                   type="submit"
                   disabled={formSubmitting || !formDescription.trim()}
@@ -273,7 +319,7 @@ const HelpSupportPage = () => {
                 <ContactItem
                   icon="phone"
                   title={t('contact_phone_title')}
-                  subtitle="05-22-XX-XX-XX"
+                  subtitle="05-22-12-34-45"
                   description={t('contact_phone_hours')}
                   buttonText={t('contact_call_now')}
                   onClick={handleCall}
@@ -281,7 +327,7 @@ const HelpSupportPage = () => {
                 <ContactItem
                   icon="email"
                   title={t('contact_email_title')}
-                  subtitle="support@transport.ma"
+                  subtitle="7mohammed.mammah@gmail.com"
                   description={t('contact_email_response')}
                   buttonText={t('contact_send_email')}
                   onClick={handleEmail}
@@ -404,6 +450,17 @@ const HelpSupportPage = () => {
                 <p className="text-[rgba(232,221,208,0.4)] text-xs uppercase tracking-wide mb-1">{t('submitted_on')}</p>
                 <p className="text-[rgba(232,221,208,0.6)] text-sm">{formatDate(selectedRapport.created_at)}</p>
               </div>
+
+              {selectedRapport.image_path && (
+                <div>
+                  <p className="text-[rgba(232,221,208,0.4)] text-xs uppercase tracking-wide mb-1">Capture d'écran</p>
+                  <img
+                    src={`/storage/${selectedRapport.image_path}`}
+                    alt="Screenshot"
+                    className="w-full rounded-xl border border-[rgba(200,169,110,0.2)] object-cover max-h-48"
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -9,6 +9,7 @@ const AdminRapports = () => {
   const [filter, setFilter] = useState('');
   const [counts, setCounts] = useState({ en_attente: 0, en_cours: 0, resolu: 0 });
   const [selectedRapport, setSelectedRapport] = useState(null);
+  const [zoomImage, setZoomImage] = useState(null);
 
   const fetchRapports = async () => {
     try {
@@ -38,6 +39,14 @@ const AdminRapports = () => {
   useEffect(() => {
     fetchRapports();
   }, [filter]);
+
+  // Close zoom on Escape key
+  useEffect(() => {
+    if (!zoomImage) return;
+    const handler = (e) => { if (e.key === 'Escape') setZoomImage(null); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [zoomImage]);
 
   const handleAdvanceStatus = async (id, currentStatut) => {
     const idx = STATUT_FLOW.indexOf(currentStatut);
@@ -143,7 +152,7 @@ const AdminRapports = () => {
                 <tr
                   key={r.id}
                   className="hover:bg-white/[0.02] transition-colors cursor-pointer"
-                  onClick={() => setSelectedRapport(r)}
+                  onClick={() => { setSelectedRapport(r); setZoomImage(null); }}
                 >
                   <td className="px-6 py-4">
                     <div className="text-sm text-white font-medium">{r.client?.full_name || '—'}</div>
@@ -180,7 +189,7 @@ const AdminRapports = () => {
       {selectedRapport && (
         <div
           className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-          onClick={() => setSelectedRapport(null)}
+          onClick={() => { setSelectedRapport(null); setZoomImage(null); }}
         >
           <div
             className="bg-gradient-to-br from-[#2d1410] to-[#1a0507] border border-white/10 rounded-2xl max-w-lg w-full max-h-[80vh] overflow-y-auto p-6 shadow-2xl"
@@ -227,6 +236,17 @@ const AdminRapports = () => {
                   <p className="text-white/40 text-xs uppercase tracking-wide mb-1">Description</p>
                   <p className="text-white/80 text-sm leading-relaxed whitespace-pre-wrap">{selectedRapport.description}</p>
                 </div>
+                {selectedRapport.image_path && (
+                  <div>
+                    <p className="text-white/40 text-xs uppercase tracking-wide mb-1">Capture d'écran</p>
+                    <img
+                      src={`/storage/${selectedRapport.image_path}`}
+                      alt="Screenshot du rapport"
+                      onClick={() => setZoomImage(`/storage/${selectedRapport.image_path}`)}
+                      className="w-full rounded-xl border border-white/10 object-cover max-h-64 cursor-pointer hover:opacity-80 transition-opacity"
+                    />
+                  </div>
+                )}
                 <div>
                   <p className="text-white/40 text-xs uppercase tracking-wide mb-1">Soumis le</p>
                   <p className="text-white/60 text-sm">{formatDate(selectedRapport.created_at)}</p>
@@ -259,6 +279,32 @@ const AdminRapports = () => {
           </div>
         </div>
       )}
+      {/* Image Zoom Lightbox */}
+      {zoomImage && (
+        <div
+          className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[60] flex items-center justify-center p-4"
+          onClick={() => setZoomImage(null)}
+        >
+          <div className="relative max-w-4xl w-full max-h-[90vh] flex items-center justify-center">
+            <img
+              src={zoomImage}
+              alt="Screenshot agrandi"
+              className="max-w-full max-h-[90vh] object-contain rounded-2xl shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            />
+            <button
+              onClick={() => setZoomImage(null)}
+              className="absolute -top-3 -right-3 w-10 h-10 rounded-full bg-black/80 border border-white/20 text-white hover:bg-white/20 transition-all flex items-center justify-center shadow-lg"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </button>
+            <p className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/50 text-xs">Cliquez en dehors de l'image ou appuyez sur Échap pour fermer</p>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

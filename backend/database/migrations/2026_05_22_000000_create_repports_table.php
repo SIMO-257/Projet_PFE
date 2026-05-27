@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rapports', function (Blueprint $table) {
+        Schema::create('repports', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('clients')->onDelete('cascade');
             $table->string('type_probleme');
             $table->string('sujet')->nullable();
+            $table->string('image_path')->nullable();
             $table->text('description');
             $table->enum('statut', ['en attente', 'en cours', 'résolu'])->default('en attente');
             $table->timestamps();

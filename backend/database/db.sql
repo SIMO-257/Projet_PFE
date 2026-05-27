@@ -109,19 +109,20 @@ CREATE TABLE `student_verifications` (
     CONSTRAINT `student_verifications_admin_id_foreign` FOREIGN KEY (`admin_id`) REFERENCES `admins` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
-CREATE TABLE `rapports` (
+CREATE TABLE `repports` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `user_id` BIGINT UNSIGNED NOT NULL,
     `type_probleme` VARCHAR(255) NOT NULL,
     `sujet` VARCHAR(255) NULL,
     `description` TEXT NOT NULL,
+    `image_path` VARCHAR(255) NULL,
     `statut` ENUM('en attente', 'en cours', 'résolu') NOT NULL DEFAULT 'en attente',
     `created_at` TIMESTAMP NULL,
     `updated_at` TIMESTAMP NULL,
     PRIMARY KEY (`id`),
-    KEY `rapports_user_id_index` (`user_id`),
-    KEY `rapports_statut_index` (`statut`),
-    CONSTRAINT `rapports_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+    KEY `repports_user_id_index` (`user_id`),
+    KEY `repports_statut_index` (`statut`),
+    CONSTRAINT `repports_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE `transactions` (

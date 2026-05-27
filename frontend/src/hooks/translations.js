@@ -332,7 +332,24 @@ const translations = {
         submit_success: "Votre demande a été envoyée avec succès",
         submit_error: "Erreur lors de l'envoi",
         max_chars: "{count}/500",
-        response_time: "Nous vous répondrons sous 24 à 48 heures",
+                response_time: "Nous vous répondrons sous 24 à 48 heures",
+
+        // ========== Help & Support (new keys) ==========
+        submit_report: "Soumettre un rapport",
+        contact_us: "Nous contacter",
+        my_reports: "Mes rapports",
+        no_reports: "Aucun rapport pour le moment",
+        report_sent_success: "Rapport envoyé avec succès !",
+        report_send_error: "Erreur lors de l'envoi du rapport",
+        add_screenshot: "Ajouter une capture d'écran",
+        change_screenshot: "Changer la capture d'écran",
+        member_student: "Membre Étudiant",
+        member_user: "Utilisateur",
+        report_subject: "Sujet du rapport",
+        problem_summary: "Résumé du problème",
+        report_detail: "Détail du rapport",
+        submitted_on: "Soumis le",
+
 
         // ========== Terms & Conditions ==========
         terms_title: "Conditions générales",
@@ -1135,7 +1152,24 @@ const translations = {
         submit_success: "تم إرسال طلبك بنجاح",
         submit_error: "خطأ في الإرسال",
         max_chars: "{count}/500",
-        response_time: "سوف نقوم بالرد خلال 24 إلى 48 ساعة",
+                response_time: "سوف نقوم بالرد خلال 24 إلى 48 ساعة",
+
+        // ========== Help & Support (new keys) ==========
+        submit_report: "إرسال تقرير",
+        contact_us: "اتصل بنا",
+        my_reports: "تقاريري",
+        no_reports: "لا توجد تقارير حتى الآن",
+        report_sent_success: "تم إرسال التقرير بنجاح!",
+        report_send_error: "خطأ في إرسال التقرير",
+        add_screenshot: "إضافة لقطة شاشة",
+        change_screenshot: "تغيير لقطة الشاشة",
+        member_student: "عضو طالب",
+        member_user: "مستخدم",
+        report_subject: "موضوع التقرير",
+        problem_summary: "ملخص المشكلة",
+        report_detail: "تفاصيل التقرير",
+        submitted_on: "أرسل في",
+
 
         // ========== Terms & Conditions ==========
         terms_title: "الشروط والأحكام",
@@ -1939,7 +1973,24 @@ const translations = {
         submit_success: "Your request has been submitted successfully",
         submit_error: "Error submitting your request",
         max_chars: "{count}/500",
-        response_time: "We will respond within 24 to 48 hours",
+                response_time: "We will respond within 24 to 48 hours",
+
+        // ========== Help & Support (new keys) ==========
+        submit_report: "Submit a Report",
+        contact_us: "Contact Us",
+        my_reports: "My Reports",
+        no_reports: "No reports yet",
+        report_sent_success: "Report sent successfully!",
+        report_send_error: "Error sending report",
+        add_screenshot: "Add Screenshot",
+        change_screenshot: "Change Screenshot",
+        member_student: "Student Member",
+        member_user: "User",
+        report_subject: "Report Subject",
+        problem_summary: "Problem Summary",
+        report_detail: "Report Details",
+        submitted_on: "Submitted on",
+
 
         // ========== Terms & Conditions ==========
         terms_title: "Terms & Conditions",

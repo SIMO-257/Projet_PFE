@@ -98,7 +98,7 @@ export default function ProfilePage()  {
 
               <div className="text-center mb-6">
                 <h2 className="text-white text-2xl font-bold mb-1">{profile?.name ?? '—'}</h2>
-                <p className="text-yellow-500 text-sm font-medium">{t('member_premium')}</p>
+                <p className="text-yellow-500 text-sm font-medium">{profile?.is_student ? t('member_student') : t('member_user')}</p>
               </div>
 
               <div className="space-y-3">

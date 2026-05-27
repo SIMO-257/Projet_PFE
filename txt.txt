@@ -170,3 +170,58 @@ i want to add a student verification procecess driven by the admin:
 -- waht is your plan ? do you have any seggestionnes ? any suggestionnes.
 
 i want a plan for the pages folder to make it more structure by adding sub folders like auth , profile for the nesseary pages of each part give me a plan for them and suggest some name change of the the pages file name i feel like they are mixed and inproper for a dev to name some files like i did. 
+
+dmin Side Audit Report
+🔴 CRITICAL - Will break functionality
+1. AdminTransactions.jsx:89 — Client column always shows "N/A"
+- Backend AdminTransactionController uses Transaction::with('user') → JSON key is user
+- Frontend accesses tx.client?.email → tx.client is always undefined
+- Fix: Change tx.client?.email to tx.user?.email
+2. AdminTickets.jsx:137 — price_paid shown as raw number
+- No currency symbol or formatting (shows 50 instead of 50.00 MAD)
+3. frontend/src/services/ticketsService.jsx — Empty file (0 lines)
+- Dead/unused import if referenced anywhere, otherwise dead code
+🟡 MODERATE
+4. AdminDashboardController.php:20 — validated_tickets counts status = 'used'
+- But the admin tickets filter (AdminTickets.jsx:76) uses value="validated" as a filter option
+- If used and validated are different DB values, the dashboard stat and the filter are misaligned
+5. AdminNotifications.jsx:25 — User lookup fragile with pagination
+- getUsers({ search }) returns paginated results (20 per page)
+- If the target user's email isn't in the first 20 matches (due to fuzzy search), the lookup silently fails
+6. AdminLogin.jsx:64-65 — Non-standard InputField props
+- Uses var={form.email} and setVar={setField('email')} instead of standard value/onChange
+- Works, but diverges from React conventions
+🟢 MINOR / STYLE
+7. No loading skeleton states — All admin pages use plain text/spinner instead of skeleton components that exist in Components/Skeletons/
+8. homeService.jsx — Fetches /api/home which returns only a status message; endpoint seems incomplete
+🔄 ADMIN / USER SYNC CHECK
+Feature	Admin Side	User Side	Status
+Rapport statuses	en attente / en cours / résolu	Same 3 statuses	✅ Synced
+Notification types	validation, payment, security, promo, system	Same types	✅ Synced
+Rapport API	GET /admin/rapports (paginated)	GET /help (collection, not paginated)	✅ Different needs, both correct
+Ticket statuses	Filter uses active, validated, expired	Same values expected	⚠️ Dashboard uses used not validated
+User UUID key	user.uuid (raw model)	Returns as client_uuid	⚠️ Different key names
+User name field	user.full_name (raw model)	Returns as name	⚠️ Different key names
+Transaction user key	tx.client?.email	N/A	🔴 BROKEN — should be user
+Recommended Actions (by priority)
+1. Fix AdminTransactions.jsx:89 — tx.client → tx.user
+2. Verify ticket status values: is the DB value used or validated? Align dashboard and filter
+3. Remove or implement the empty ticketsService.jsx
+4. Add currency formatting to ticket prices in AdminTickets.jsx
+5. Consider unifying key names between admin and user APIs (uuid vs client_uuid, full_name vs name)
+
+in profile page.
+-- i need you to change "membre premuim" based of the user if the user is a student then it show them Etudiant if they are not it show them user in a formal way tou take care of it make it like membre etudiant or what ever you think.
+in the aide and support page:
+-- the names with "_" have to be edited remove the underscore to make the phrases look formal like contact us ,sublmit repport and my reports.
+-- make sure the changes are applied to all 3 languages.
+-- the envoyer email should work by sending the user to gmail page to sent an email to the mail in the .env file "7mohammed...". 
+-- change the number in appler from "05-xx-xx .." to "05-22-12-34-45".
+-- in the repport part add an "add screenshot" btn to add an image.
+-- make a new folder in the storage public called "repports_images" just like avatars.
+-- make the needed changes in the repport migration + model and the db.sql rapport table.
+-- rename the table in all the necessary places(model+migration..) to "repports" instead of rapports.
+
+
+in the admin page add a new page in the nav called "students verifications" for student verifications.
+-- 

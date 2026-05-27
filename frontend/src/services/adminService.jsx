@@ -78,4 +78,10 @@ export const sendAdminNotification = (data) => adminApi.post('/admin/notificatio
 // Profile
 export const updateAdminProfile = (data) => adminApi.put('/admin/profile', data);
 
+// Student Verifications
+export const getStudentVerifications = (params) => adminApi.get('/admin/student-verifications', { params });
+export const getStudentVerification = (id) => adminApi.get(`/admin/student-verifications/${id}`);
+export const approveStudentVerification = (id) => adminApi.post(`/admin/student-verifications/${id}/approve`);
+export const rejectStudentVerification = (id, reason) => adminApi.post(`/admin/student-verifications/${id}/reject`, { reason });
+
 export default adminApi;
