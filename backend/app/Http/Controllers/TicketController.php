@@ -138,7 +138,14 @@ class TicketController extends Controller
      */
     public function getTicketTypes()
     {
-        $types = TicketType::where('is_active', true)->get();
+        $user = Auth::user();
+        $types = TicketType::where('is_active', true)->get()->map(function ($type) use ($user) {
+            $isStudent = $user && $user->is_student;
+            $type->effective_price = $isStudent && $type->student_price !== null
+                ? (float) $type->student_price
+                : (float) $type->price;
+            return $type;
+        });
         return $this->successResponse($types);
     }
 
@@ -151,7 +158,10 @@ class TicketController extends Controller
         $user = Auth::user();
         $ticketType = TicketType::find($validated['ticket_type_id']);
         
-        $totalPrice = $ticketType->price * $validated['quantity'];
+        $effectivePrice = $user->is_student && $ticketType->student_price !== null
+            ? (float) $ticketType->student_price
+            : (float) $ticketType->price;
+        $totalPrice = $effectivePrice * $validated['quantity'];
 
         try {
             return DB::transaction(function () use ($totalPrice, $ticketType, $validated, $user) {
@@ -218,7 +228,7 @@ class TicketController extends Controller
                         'valid_from' => $validFrom,
                         'valid_until' => $validUntil,
                         'remaining_uses' => $ticketType->max_uses ?? 1,
-                        'price_paid' => $ticketType->price,
+                        'price_paid' => $effectivePrice,
                     ]);
                     $tickets[] = $ticket;
                     event(new TicketPurchasedEvent($ticket->id, $ticket->valid_until));

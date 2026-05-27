@@ -19,6 +19,7 @@ class TicketType extends Model
         'name',
         'description',
         'price',
+        'student_price',
         'duration_minutes',
         'is_reusable',
         'max_uses',
@@ -32,6 +33,7 @@ class TicketType extends Model
     {
         return [
             'price' => 'decimal:2',
+            'student_price' => 'decimal:2',
             'duration_minutes' => 'integer',
             'is_reusable' => 'boolean',
             'max_uses' => 'integer',

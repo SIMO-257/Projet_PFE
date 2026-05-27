@@ -224,4 +224,14 @@ in the aide and support page:
 
 
 in the admin page add a new page in the nav called "students verifications" for student verifications.
--- 
+
+
+-- for the users who are students i want the weeklly pass to be costed "40" dh instaed of 70 and the monthlly pass to cost 150 dh.
+-- i am thinking of adding a new column to the ticket type "for_students" so we can have offers that are only for students and ones thatare onlly for users.
+-- how do we think we can distingue that without repeating the same ticket type make in mind the non reusable ticket types are the same for both categories.
+-- what is your plan ?
+
+i want the validation procecces to change in the validator:
+-- when a ticket reach 0 uses with the non reusbale type the status wont change from used -> expired it will be used -> validated.
+-- in home screen the tickets type shown are actif used and expired , remove actife tickets in the display loop and replace it with validated it will have the same style with the green just the status name will change.
+-- do not forget to change the status in the filter nav in all tickets remove actif and add vaildated. 

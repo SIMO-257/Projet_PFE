@@ -109,7 +109,7 @@ export default function TicketSelectionPage() {
         );
     }
 
-    const totalPrice = selectedType ? (selectedType.price * quantity).toFixed(2) : 0;
+    const totalPrice = selectedType ? ((selectedType.effective_price || selectedType.price) * quantity).toFixed(2) : 0;
 
     return (
         <div className="app-shell font-sora">
@@ -157,7 +157,7 @@ export default function TicketSelectionPage() {
                                     >
                                         <div className="flex justify-between items-center mb-3">
                                             <span className="text-white font-bold text-lg">{type.name}</span>
-                                            <span className="text-[#f5d579] font-bold text-xl">{type.price} {t('currency')}</span>
+                                            <span className="text-[#f5d579] font-bold text-xl">{(type.effective_price || type.price)} {t('currency')}</span>
                                         </div>
                                         <p className="text-white/60 text-sm leading-relaxed">{type.description}</p>
                                     </div>

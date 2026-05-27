@@ -76,7 +76,7 @@ export default function MyTicketsPage() {
                         title: simpleBilletType.name,
                         status: t('available'),
                         description: simpleBilletType.description,
-                        price: `${simpleBilletType.price} ${t('currency')}`,
+                        price: `${simpleBilletType.effective_price || simpleBilletType.price} ${t('currency')}`,
                         buttonText: `${t('buy')} ${t('ticket_type')}`,
                       }} 
                       onAction={() => navigateHook('/ticket-selection', { state: { selectedTypeId: simpleBilletType.id } })} 
@@ -96,7 +96,7 @@ export default function MyTicketsPage() {
                           title: type.name,
                           status: t('available'),
                           description: type.description,
-                          price: `${type.price} ${t('currency')}`,
+                          price: `${type.effective_price || type.price} ${t('currency')}`,
                           buttonText: t('buy'),
                         }} 
                         onAction={() => navigateHook('/ticket-selection', { state: { selectedTypeId: type.id } })} 
