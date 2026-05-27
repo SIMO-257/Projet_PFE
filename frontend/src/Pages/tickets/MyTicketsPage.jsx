@@ -51,13 +51,13 @@ export default function MyTicketsPage() {
                         variant="active"
                         item={{
                           title: ticket.ticket_type?.name || t('ticket_type'),
-                          status: ticket.status === 'active' ? t('active') : (ticket.status === 'used' ? t('used') : t('expired')),
+                          status: ticket.status === 'active' ? t('active') : (ticket.status === 'validated' ? t('validated') : (ticket.status === 'used' ? t('used') : t('expired'))),
                           description: ticket.ticket_type?.description || t('valid_for_single'),
                           price: `${ticket.price_paid} ${t('currency')}`,
                           validInfo: t('valid_until'),
                           validTime: new Date(ticket.valid_until).toLocaleString(language === 'ar' ? 'ar-MA' : language === 'en' ? 'en-US' : 'fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }),
                           buttonText: t('view_ticket_btn'),
-                          isActive: ticket.status === 'active' || ticket.status === 'used'
+                          isActive: ticket.status === 'active' || ticket.status === 'used' || ticket.status === 'validated'
                         }} 
                         onAction={() => navigateHook(`/tickets/${ticket.uuid}`)} 
                       />

@@ -47,7 +47,7 @@ export default function HomePage() {
   const safeTickets = Array.isArray(tickets) ? tickets : [];
 
   const lastSixTickets = useMemo(() => {
-    const allowedStatuses = new Set(['active', 'expired', 'used']);
+    const allowedStatuses = new Set(['validated', 'expired', 'used']);
 
     return [...safeTickets]
       .filter((ticket) => allowedStatuses.has(String(ticket?.status || '').toLowerCase()))

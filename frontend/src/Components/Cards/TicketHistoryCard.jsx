@@ -5,7 +5,7 @@ const TicketHistoryCard = ({
     ticketName: nameProp,
     price = '0.00 DH',
     date: dateProp,
-    status = 'active', // 'active' | 'expired' | 'used'
+    status = 'active', // 'active' | 'validated' | 'expired' | 'used'
     onClick = null
 }) => {
     const { t } = useTranslation();
@@ -16,6 +16,7 @@ const TicketHistoryCard = ({
     const getStatusColor = () => {
         switch (normalizedStatus) {
             case 'active':
+            case 'validated':
                 return 'text-green-400';
             case 'expired':
                 return 'text-red-400';
@@ -29,6 +30,7 @@ const TicketHistoryCard = ({
     const getStatusBgColor = () => {
         switch (normalizedStatus) {
             case 'active':
+            case 'validated':
                 return 'bg-green-500/20';
             case 'expired':
                 return 'bg-red-500/20';
@@ -43,6 +45,8 @@ const TicketHistoryCard = ({
         switch (normalizedStatus) {
             case 'active':
                 return t('status_active');
+            case 'validated':
+                return t('validated');
             case 'expired':
                 return t('status_expired');
             case 'used':
@@ -55,6 +59,7 @@ const TicketHistoryCard = ({
     const getStatusIcon = () => {
         switch (normalizedStatus) {
             case 'active':
+            case 'validated':
                 return (
                     <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>

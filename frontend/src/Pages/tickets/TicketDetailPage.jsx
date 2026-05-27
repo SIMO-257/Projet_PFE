@@ -81,11 +81,11 @@ export default function TicketDetailPage() {
 
                 <div className="app-content p-6 pb-12 custom-scrollbar">
 
-                    <div className={`flex items-center space-x-3 p-4 rounded-2xl mb-6 ${ticket.status === 'active' ? 'bg-green-500/10 border border-green-500/20' : (ticket.status === 'used' ? 'bg-yellow-500/10 border border-yellow-500/20' : 'bg-red-500/10 border border-red-500/20')}`}>
-                        <CheckCircle size={24} className={ticket.status === 'active' ? 'text-green-500' : (ticket.status === 'used' ? 'text-yellow-500' : 'text-red-500')} />
+                    <div className={`flex items-center space-x-3 p-4 rounded-2xl mb-6 ${ticket.status === 'active' || ticket.status === 'validated' ? 'bg-green-500/10 border border-green-500/20' : (ticket.status === 'used' ? 'bg-yellow-500/10 border border-yellow-500/20' : 'bg-red-500/10 border border-red-500/20')}`}>
+                        <CheckCircle size={24} className={ticket.status === 'active' || ticket.status === 'validated' ? 'text-green-500' : (ticket.status === 'used' ? 'text-yellow-500' : 'text-red-500')} />
                         <div>
-                            <p className={`font-bold ${ticket.status === 'active' ? 'text-green-500' : (ticket.status === 'used' ? 'text-yellow-500' : 'text-red-500')}`}>
-                                {ticket.status === 'active' ? t('ticket_valid_status') : (ticket.status === 'used' ? t('ticket_used_status') : t('ticket_expired_status'))}
+                            <p className={`font-bold ${ticket.status === 'active' || ticket.status === 'validated' ? 'text-green-500' : (ticket.status === 'used' ? 'text-yellow-500' : 'text-red-500')}`}>
+                                {ticket.status === 'active' ? t('ticket_valid_status') : (ticket.status === 'validated' ? t('validated') : (ticket.status === 'used' ? t('ticket_used_status') : t('ticket_expired_status')))}
                             </p>
                             <p className="text-white/60 text-xs">{t('valid_until_label', { date: validUntil })}</p>
                         </div>

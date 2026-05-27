@@ -107,7 +107,7 @@ export default function ValidationPage() {
         try {
           const updatedTicket = await fetchTicketDetails(activeTicket.uuid);
           if (updatedTicket) {
-            const hasStatusChanged = activeTicket.status === 'active' && updatedTicket.status === 'used';
+            const hasStatusChanged = (activeTicket.status === 'active' && (updatedTicket.status === 'used' || updatedTicket.status === 'validated'));
             const hasUsesDecreased = updatedTicket.remaining_uses < activeTicket.remaining_uses;
             
             if (hasStatusChanged || hasUsesDecreased) {

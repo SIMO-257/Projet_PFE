@@ -24,7 +24,7 @@ class TicketController extends Controller
     private function normalizeTicketStatus(Ticket $ticket): void
     {
         if (in_array($ticket->status, ['active', 'used']) && $this->shouldConsumeUse($ticket) && $ticket->remaining_uses <= 0) {
-            $ticket->status = 'expired';
+            $ticket->status = 'validated';
             $ticket->save();
         } elseif (in_array($ticket->status, ['active', 'used']) && !empty($ticket->valid_until) && Carbon::parse($ticket->valid_until)->isPast()) {
             $ticket->status = 'expired';
@@ -548,7 +548,7 @@ class TicketController extends Controller
                     $ticket->remaining_uses -= 1;
 
                     if ($ticket->remaining_uses <= 0) {
-                        $ticket->status = 'expired';
+                        $ticket->status = 'validated';
                     }
                 }
 
@@ -613,7 +613,7 @@ class TicketController extends Controller
                     $ticket->save();
                 } elseif ($this->shouldConsumeUse($ticket) && $ticket->remaining_uses <= 0) {
                     $failureReason = "Plus d'utilisations restantes.";
-                    $ticket->status = 'expired';
+                    $ticket->status = 'validated';
                     $ticket->save();
                 }
 
@@ -632,7 +632,7 @@ class TicketController extends Controller
                     $ticket->remaining_uses -= 1;
                     
                     if ($ticket->remaining_uses <= 0) {
-                        $ticket->status = 'expired';
+                        $ticket->status = 'validated';
                     }
                 }
                 

@@ -38,8 +38,8 @@ export default function TicketsHistoryPage ()  {
       const normalizedStatus = String(ticket?.status || '').toLowerCase();
       const remainingUses = Number(ticket?.remaining_uses ?? 0);
       const ticketDate = new Date(ticket.created_at);
-      const isAllowedStatus = normalizedStatus === 'active' || normalizedStatus === 'used';
-      const hasRemainingUses = remainingUses > 0;
+      const isAllowedStatus = normalizedStatus === 'validated' || normalizedStatus === 'used';
+      const hasRemainingUsesOrValidated = remainingUses > 0 || normalizedStatus === 'validated';
 
       const matchesStatus = statusFilter === 'all' || normalizedStatus === statusFilter;
       const matchesTime =
@@ -47,7 +47,7 @@ export default function TicketsHistoryPage ()  {
         (timeFilter === 'today' && ticketDate >= startOfToday && ticketDate <= endOfToday) ||
         (timeFilter === 'week' && ticketDate >= startOfWeek && ticketDate <= endOfWeek);
 
-      return isAllowedStatus && hasRemainingUses && matchesStatus && matchesTime;
+      return isAllowedStatus && hasRemainingUsesOrValidated && matchesStatus && matchesTime;
     });
   }, [tickets, statusFilter, timeFilter]);
 
@@ -57,7 +57,7 @@ export default function TicketsHistoryPage ()  {
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
       </svg>
     ) },
-    { id: 'active', label: t('active'), color: 'text-green-400', icon: (
+    { id: 'validated', label: t('validated'), color: 'text-green-400', icon: (
       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
         <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
       </svg>
