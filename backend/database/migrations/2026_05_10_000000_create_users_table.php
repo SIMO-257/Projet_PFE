@@ -14,13 +14,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Guard: on existing databases the table already exists
-        // (renamed from `clients` by the rename migration)
-        if (Schema::hasTable('users')) {
-            return;
-        }
 
-        $this->created = true;
 
         Schema::create('users', function (Blueprint $table) {
             $table->id();

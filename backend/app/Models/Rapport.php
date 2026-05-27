@@ -31,6 +31,6 @@ class Rapport extends Model
 
     public function client(): BelongsTo
     {
-        return $this->belongsTo(Client::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

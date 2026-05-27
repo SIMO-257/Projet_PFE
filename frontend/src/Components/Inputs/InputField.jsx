@@ -16,6 +16,7 @@ export default function InputField(props) {
                 value={value}
                 onChange={onChange}
                 {...rest}
+                autoComplete={props.type === 'password' ? 'new-password' : undefined}
             />
             {normalizedError && <p className={styles.fieldError}>{normalizedError}</p>}
         </div>

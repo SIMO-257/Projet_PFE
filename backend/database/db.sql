@@ -109,6 +109,21 @@ CREATE TABLE `student_verifications` (
     CONSTRAINT `student_verifications_admin_id_foreign` FOREIGN KEY (`admin_id`) REFERENCES `admins` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
+CREATE TABLE `rapports` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `user_id` BIGINT UNSIGNED NOT NULL,
+    `type_probleme` VARCHAR(255) NOT NULL,
+    `sujet` VARCHAR(255) NULL,
+    `description` TEXT NOT NULL,
+    `statut` ENUM('en attente', 'en cours', 'résolu') NOT NULL DEFAULT 'en attente',
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    KEY `rapports_user_id_index` (`user_id`),
+    KEY `rapports_statut_index` (`statut`),
+    CONSTRAINT `rapports_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
 CREATE TABLE `transactions` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `uuid` CHAR(36) NOT NULL,
@@ -336,7 +351,7 @@ CREATE TABLE `admins` (
 ) ENGINE=InnoDB;
 
 INSERT INTO `admins` (`first_name`, `last_name`, `email`, `password`, `is_active`, `created_at`, `updated_at`)
-VALUES ('Admin', 'CasaWay', 'admin@casaway.ma', '$2y$10$P4PRiB8kSuA/YuNk4cQ5hut5RBeQ/2mwkWW0y5yJer7M4NJEIAEFG', 1, NOW(), NOW());
+VALUES ('Admin', 'CasaWay', 'admin@casaway.ma', '$2y$10$WuqkRgbZpbhi20dbEHROFe19B/2LE2KiJPv15jTn.neaK6ES57diO', 1, NOW(), NOW());
 
 -- =============================================
 -- 6. Event (MySQL only)

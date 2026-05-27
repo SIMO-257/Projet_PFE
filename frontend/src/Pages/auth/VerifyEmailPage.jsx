@@ -124,7 +124,7 @@ export default function VerifyEmailPage() {
                 </div>
 
                 {/* Content Area */}
-                <div className="app-content p-6 md:p-8 space-y-8 scroll-smooth relative flex-grow flex items-center justify-center">
+                <div className="app-content p-6 md:p-8 space-y-8 scroll-smooth relative flex-grow flex flex-col items-center justify-start md:justify-center py-12 md:py-8">
                     <div className="w-full max-w-md mx-auto space-y-8">
                         
                         <div className="text-center mb-8">
@@ -201,12 +201,6 @@ export default function VerifyEmailPage() {
                                 {t('login_after_verify')}
                             </button>
                         )}
-                        
-                        <div className="pt-6 text-center">
-                            <button onClick={() => navigate('/login')} className="text-white/50 hover:text-white text-sm transition-colors">
-                                {t('back_to_login')}
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>

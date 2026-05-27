@@ -760,6 +760,7 @@ const translations = {
         admin_nav_tickets: "Tickets",
         admin_nav_transactions: "Transactions",
         admin_nav_notifications: "Notifications",
+        admin_nav_rapports: "Rapports utilisateurs",
         sections_count: "{count} sections",
         section_intro: "Introduction",
         section_purchase_tickets: "Achat de billets",
@@ -1431,6 +1432,7 @@ const translations = {
         admin_nav_tickets: "التذاكر",
         admin_nav_transactions: "المعاملات",
         admin_nav_notifications: "الإشعارات",
+        admin_nav_rapports: "تقارير المستخدمين",
         sections_count: "{count} أقسام",
         section_intro: "مقدمة",
         section_purchase_tickets: "شراء التذاكر",
@@ -2294,6 +2296,17 @@ const translations = {
         reset_link_sent_success: "Reset link sent successfully.",
         email_edit_placeholder: "your@email.com",
         edit_change_password_btn: "Change Password",
+
+        // ========== Admin Layout ==========
+        admin_management_system: "Management System",
+        admin_my_profile: "My Profile",
+        admin_logout: "Logout",
+        admin_dashboard: "Dashboard",
+        admin_nav_clients: "Clients",
+        admin_nav_tickets: "Tickets",
+        admin_nav_transactions: "Transactions",
+        admin_nav_notifications: "Notifications",
+        admin_nav_rapports: "Users Rapports",
 
         // ========== Admin / Status ==========
         loading_tickets: "Loading tickets...",
