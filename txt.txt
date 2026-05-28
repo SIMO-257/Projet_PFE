@@ -294,3 +294,8 @@ Mes 3 priorités recommandées
 2. Page "Activité Client" — timeline complète pour le support
 3. Colonne Étudiant + filtre dans Users/Tickets — info utile au quotidien
 Tu veux que je commence par une ou plusieurs de ces suggestions ? Je peux aussi implémenter tout ça progressivement.
+
+
+-- in the parametrs section there is this authentification part were you need the PIN code or biometrie how can i add the to my app?.
+-- i want in bot wallet transaction and tickets so when the user buy or add anew transaction it required the password.
+-- give me an idea on how can we integrate partage des donnes in the admin part can we like use them for analysis or what ?

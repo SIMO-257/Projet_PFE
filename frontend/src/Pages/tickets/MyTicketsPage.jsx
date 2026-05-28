@@ -27,10 +27,7 @@ export default function MyTicketsPage() {
     <div className="app-shell">
       <div className="app-frame">
         <div className="app-card relative overflow-hidden bg-gradient-to-br from-[#400106]/90 to-[#260101]/90 backdrop-blur-sm">
-          
-          <Header title={t('my_tickets')} />
-
-          <div className="app-content no-scrollbar px-6 pb-24">
+          <div className="app-content no-scrollbar px-6 pb-24 pt-6">
             <p className="text-white/60 text-sm mb-6 mt-4">{t('select_ticket_type')}</p>
             
             {isLoading && safeTickets.length === 0 ? (
@@ -68,7 +65,7 @@ export default function MyTicketsPage() {
                 {/* Main Purchase Option (Billet) */}
                 {simpleBilletType && (
                   <>
-                    <h3 className="text-yellow-500 text-xs uppercase tracking-wider font-bold mb-2 mt-8">{t('buy')} {t('ticket_type')}</h3>
+                    <h3 className="text-yellow-500 text-xs uppercase tracking-wider font-bold mb-2 mt-8">{t('buy')}</h3>
                     <TicketCard 
                       key={simpleBilletType.id} 
                       variant="purchase"
@@ -77,7 +74,7 @@ export default function MyTicketsPage() {
                         status: t('available'),
                         description: simpleBilletType.description,
                         price: `${simpleBilletType.effective_price || simpleBilletType.price} ${t('currency')}`,
-                        buttonText: `${t('buy')} ${t('ticket_type')}`,
+                        buttonText: t('buy'),
                       }} 
                       onAction={() => navigateHook('/ticket-selection', { state: { selectedTypeId: simpleBilletType.id } })} 
                     />

@@ -7,13 +7,14 @@ use App\Models\User;
 use App\Jobs\SendAdminNotificationJob;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class AdminNotificationController extends Controller
 {
     // POST /api/admin/notifications/send
     public function send(Request $request)
     {
-        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'title'     => 'required|string|max:100',
             'body'      => 'required|string|max:255',
             'type'      => 'required|in:validation,payment,security,promo,system',

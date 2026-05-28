@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\RechargeInitRequest;
 use App\Http\Requests\RechargeConfirmRequest;
 use App\Models\Wallet;
 use App\Models\Transaction;
-use App\Models\Ticket;
-use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,82 +13,9 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
-use App\Models\AuditLog;
-use Carbon\Carbon;
 
 class WalletController extends Controller
 {
-
-    private function isTicketExpired(Ticket $ticket): bool
-    {
-        if ($ticket->status === 'expired') {
-            return true;
-        }
-
-        return $ticket->valid_until ? Carbon::parse($ticket->valid_until)->isPast() : false;
-    }
-
-    private function resolveDefaultTicketForUser($user): ?Ticket
-    {
-        $defaultTicket = null;
-        if (!empty($user->default_ticket_id)) {
-            $defaultTicket = Ticket::with('ticketType')
-                ->where('id', $user->default_ticket_id)
-                ->where('user_id', $user->id)
-                ->first();
-        }
-
-        if ($defaultTicket) {
-            return $defaultTicket;
-        }
-
-        $fallback = Ticket::with('ticketType')
-            ->where('user_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->first();
-
-        $user->default_ticket_id = $fallback?->id;
-        $user->save();
-
-        return $fallback;
-    }
-
-    /**
-     * Initialize a wallet recharge by creating a Stripe PaymentIntent.
-     */
-    public function rechargeInit(RechargeInitRequest $request)
-    {
-        $stripeSecret = (string) config('services.stripe.secret');
-        if ($stripeSecret === '' || str_contains($stripeSecret, 'REPLACE_ME')) {
-            return $this->errorResponse('Stripe n\'est pas configure: STRIPE_SECRET manquante.', 500);
-        }
-        Stripe::setApiKey($stripeSecret);
-        $user = Auth::user();
-        $amount = (int) ($request->amount * 100); // Amount in cents for Stripe
-
-        try {
-            $paymentIntent = PaymentIntent::create([
-                'amount' => $amount,
-                'currency' => 'mad',
-                'metadata' => [
-                    'user_id' => $user->id,
-                    'type' => 'wallet_recharge',
-                ],
-                'automatic_payment_methods' => [
-                    'enabled' => true,
-                ],
-            ]);
-
-            AuditLog::log('wallet_recharge_init', $user->id, ['amount' => $request->amount, 'pi_id' => $paymentIntent->id]);
-
-            return $this->successResponse([
-                'clientSecret' => $paymentIntent->client_secret,
-                'paymentIntentId' => $paymentIntent->id,
-            ]);
-        } catch (\Exception $e) {
-            return $this->errorResponse('Erreur lors de l\'initialisation du paiement.', 500);
-        }
-    }
 
     /**
      * Confirm the wallet recharge after successful Stripe payment.
@@ -109,7 +34,7 @@ class WalletController extends Controller
                 $errorMessage = $paymentIntent->last_payment_error ? $paymentIntent->last_payment_error->message : 'Le paiement a ete refuse.';
 
                 try {
-                    app(\App\Services\NotificationService::class)->send(
+                    app(NotificationService::class)->send(
                         Auth::user(),
                         'payment',
                         'danger',
@@ -194,7 +119,7 @@ class WalletController extends Controller
                 ]);
 
                 try {
-                    app(\App\Services\NotificationService::class)->send(
+                    app(NotificationService::class)->send(
                         $user,
                         'payment',
                         'success',

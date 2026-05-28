@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\UserRegisteredEvent;
 use App\Models\AuditLog;
+use App\Models\PendingRegistration;
 use App\Models\User;
 use App\Notifications\VerifyEmailNotification;
 use Illuminate\Http\Request;
@@ -33,7 +34,7 @@ class EmailVerificationController extends Controller
         }
 
         // Then try pending registrations
-        $pending = \App\Models\PendingRegistration::where('email_verification_token', $token)->first();
+        $pending = PendingRegistration::where('email_verification_token', $token)->first();
         if (!$pending) {
             return redirect(config('app.frontend_url') . '/verify-email?status=invalid');
         }
@@ -90,7 +91,7 @@ class EmailVerificationController extends Controller
         }
 
         // Then try pending registrations
-        $pending = \App\Models\PendingRegistration::where('email', $request->email)
+        $pending = PendingRegistration::where('email', $request->email)
             ->where('email_verification_code', $request->code)
             ->first();
 
@@ -135,7 +136,7 @@ class EmailVerificationController extends Controller
 
         if (!$user) {
             // If a pending registration exists, resend to it; otherwise return success to avoid enumeration
-            $pending = \App\Models\PendingRegistration::where('email', $request->email)->first();
+            $pending = PendingRegistration::where('email', $request->email)->first();
             if (!$pending) {
                 return $this->successResponse(null, 'Si un compte existe avec cet email, un code de vérification a été envoyé.');
             }

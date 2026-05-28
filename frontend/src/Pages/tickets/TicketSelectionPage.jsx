@@ -4,7 +4,7 @@ import { useTranslation } from '../../hooks/useTranslation';
 import { fetchTicketTypes, purchaseTicket } from '../../services/ticketService';
 
 export default function TicketSelectionPage() {
-    const { t } = useTranslation();
+    const { t, language } = useTranslation();
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -16,7 +16,7 @@ export default function TicketSelectionPage() {
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(true);
-    const [acceptedTerms, setAcceptedTerms] = useState(false);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
 
     useEffect(() => {
         const fetchTypes = async () => {
@@ -56,20 +56,17 @@ export default function TicketSelectionPage() {
     const incrementQuantity = () => setQuantity(prev => prev < 10 ? prev + 1 : prev);
     const decrementQuantity = () => setQuantity(prev => prev > 1 ? prev - 1 : prev);
 
-    const handlePurchase = async () => {
+    const handlePurchase = () => {
+        if (!selectedType || processing) return;
+        setShowConfirmModal(true);
+    };
 
-        if (!selectedType) return;
-
-        if (!acceptedTerms) {
-            setErrors({ terms: t('must_accept_terms_cgv') });
-            return;
-        }
-
+    const handleConfirmPurchase = async () => {
+        setShowConfirmModal(false);
         setProcessing(true);
         setErrors({});
 
         try {
-
             const payload = {
                 ticket_type_id: selectedType.id,
                 quantity: selectedType.is_reusable ? 1 : quantity
@@ -85,7 +82,6 @@ export default function TicketSelectionPage() {
             });
 
         } catch (err) {
-
             const responseErrors = err?.response?.data?.errors;
 
             if (responseErrors) {
@@ -207,37 +203,12 @@ export default function TicketSelectionPage() {
                                 </p>
                             )}
                             
-                            {errors.terms && (
-                                <p className="text-red-400 text-sm font-medium bg-red-900/40 p-5 rounded-2xl border border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.15)]">
-                                    {errors.terms}
-                                </p>
-                            )}
-
                         </div>
                     </div>
                     
                     {/* Footer */}
                     <div className="p-6 md:p-8 border-t border-[#f5d579]/10 bg-black/20 flex-shrink-0 z-10 shadow-[0_-10px_20px_rgba(0,0,0,0.2)]">
                         <div className="max-w-3xl mx-auto">
-                            <label className="flex items-start gap-3 cursor-pointer select-none mb-6">
-                                <div className="relative flex items-center mt-0.5 z-0">
-                                    <input
-                                        type="checkbox"
-                                        checked={acceptedTerms}
-                                        onChange={() => setAcceptedTerms(!acceptedTerms)}
-                                        className={`w-5 h-5 rounded border-2 appearance-none cursor-pointer transition-all ${acceptedTerms ? 'bg-[#f5d579] border-[#f5d579]' : 'bg-transparent border-[#f5d579]/40'}`}
-                                    />
-                                    {acceptedTerms && (
-                                        <svg className="absolute left-0.5 top-0.5 w-4 h-4 text-[#260101] pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    )}
-                                </div>
-                                <span className={`text-sm leading-tight ${acceptedTerms ? 'text-white' : 'text-white/60'}`}>
-                                    {t('accept_terms_cgv')}
-                                </span>
-                            </label>
-
                             <button
                                 className={`w-full py-4 px-6 rounded-2xl font-bold text-sm transition-all ${processing || !selectedType ? 'bg-[#f5d579]/10 text-[#f5d579]/30 cursor-not-allowed' : 'bg-gradient-to-r from-[#f5d579] to-[#d4af37] text-[#260101] shadow-xl shadow-[#f5d579]/20 hover:scale-[1.02] active:scale-95'}`}
                                 onClick={handlePurchase}
@@ -247,6 +218,59 @@ export default function TicketSelectionPage() {
                             </button>
                         </div>
                     </div>
+
+                    {/* Confirmation Popup Modal */}
+                    {showConfirmModal && (
+                        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
+                            <div className="bg-gradient-to-br from-[#400106] to-[#260101] border border-[#f5d579]/30 rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl relative animate-countUp">
+                                {/* Header icon */}
+                                <div className="mx-auto w-16 h-16 rounded-full bg-[#f5d579]/10 border border-[#f5d579]/20 flex items-center justify-center mb-4">
+                                    <svg className="w-8 h-8 text-[#f5d579]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                    </svg>
+                                </div>
+
+                                {/* Title */}
+                                <h2 className="text-[#f5d579] font-bold text-xl mb-4">
+                                    {language === 'ar' ? 'ملخص الشراء' : language === 'en' ? 'Purchase Summary' : "Résumé de l'achat"}
+                                </h2>
+
+                                {/* Details */}
+                                <div className="bg-black/30 border border-white/10 rounded-2xl p-4 mb-6 space-y-3 text-left">
+                                    <div className="flex justify-between items-center text-sm">
+                                        <span className="text-white/60">{t('ticket_type')}</span>
+                                        <span className="text-white font-semibold">{selectedType?.name}</span>
+                                    </div>
+                                    {!selectedType?.is_reusable && (
+                                        <div className="flex justify-between items-center text-sm">
+                                            <span className="text-white/60">{language === 'ar' ? 'الكمية' : language === 'en' ? 'Quantity' : 'Quantité'}</span>
+                                            <span className="text-white font-semibold">{quantity}</span>
+                                        </div>
+                                    )}
+                                    <div className="border-t border-white/10 my-2 pt-2 flex justify-between items-center">
+                                        <span className="text-white/60 text-sm font-medium">{t('total_to_pay') || (language === 'ar' ? 'إجمالي الدفع' : language === 'en' ? 'Total to pay' : 'Total à payer')}</span>
+                                        <span className="text-[#f5d579] font-bold text-lg">{totalPrice} {t('currency')}</span>
+                                    </div>
+                                </div>
+
+                                {/* Actions */}
+                                <div className="space-y-3">
+                                    <button
+                                        onClick={handleConfirmPurchase}
+                                        className="w-full py-3 px-6 rounded-xl font-bold bg-gradient-to-r from-[#f5d579] to-[#d4af37] text-[#260101] shadow-lg shadow-[#f5d579]/10 hover:scale-[1.02] active:scale-95 transition-all text-sm"
+                                    >
+                                        {t('confirm')}
+                                    </button>
+                                    <button
+                                        onClick={() => setShowConfirmModal(false)}
+                                        className="w-full py-3 px-6 rounded-xl font-medium bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-white/20 transition-all text-sm"
+                                    >
+                                        {t('cancel')}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                 </div>
             </div>

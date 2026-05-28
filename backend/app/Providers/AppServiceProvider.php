@@ -12,6 +12,7 @@ use App\Events\TicketValidatedEvent;
 use App\Listeners\SendTicketValidatedNotification;
 use App\Events\LowBalanceEvent;
 use App\Listeners\SendLowBalanceNotification;
+use Stripe\Stripe;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -29,7 +30,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Set Stripe API Key globally
-        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+        Stripe::setApiKey(config('services.stripe.secret'));
 
         // Register Event Listeners
         Event::listen(

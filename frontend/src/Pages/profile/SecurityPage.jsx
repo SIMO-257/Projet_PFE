@@ -65,12 +65,6 @@ const SecurityPage = () => {
       if (setters[key]) setters[key](!value);
     }
   };
-  const handleRevokeSession = (id) => {
-    setSessions(sessions.filter(s => s.id !== id));
-  };
-  const handleLogoutAll = () => {
-    setSessions(sessions.filter(s => s.current));
-  };
   const handleFreezeCard = () => {
     handlePreferenceChange('card_frozen', !cardFrozen);
   };
@@ -113,44 +107,6 @@ const SecurityPage = () => {
                 value={requireAuthSensitive}
                 onChange={(v) => handlePreferenceChange('auth_purchase', v)}
               />
-            </Section>
-
-            {/* Session Management */}
-            <Section title={t('sessions')}>
-              <div className="space-y-2">
-                {sessions.map(session => (
-                  <div key={session.id} className="bg-black/40 rounded-xl border border-white/10 p-3">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2">
-                          <p className="text-white font-medium text-sm">{session.device}</p>
-                          {session.current && (
-                            <span className="bg-green-500/20 text-green-400 text-xs px-2 py-0.5 rounded-full">{t('current_session_badge')}</span>
-                          )}
-                        </div>
-                        <p className="text-white/40 text-xs mt-1">{session.location}</p>
-                        <p className="text-white/40 text-xs">{t('last_activity')}: {session.lastActive}</p>
-                      </div>
-                      {!session.current && (
-                        <button
-                          onClick={() => handleRevokeSession(session.id)}
-                          className="text-red-400 text-xs hover:text-red-300"
-                        >
-                          {t('revoke_session')}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-                {sessions.filter(s => !s.current).length > 0 && (
-                  <button
-                    onClick={handleLogoutAll}
-                    className="w-full bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 p-3 text-center text-white/70 text-sm mt-2 transition-all"
-                  >
-                    {t('disconnect_other_devices')}
-                  </button>
-                )}
-              </div>
             </Section>
 
             {/* Fraud Prevention */}

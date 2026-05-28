@@ -332,14 +332,6 @@ const HelpSupportPage = () => {
                   buttonText={t('contact_send_email')}
                   onClick={handleEmail}
                 />
-                <ContactItem
-                  icon="chat"
-                  title={t('contact_chat_title')}
-                  status={t('contact_online')}
-                  description={t('contact_chat_hours')}
-                  buttonText={t('contact_start_chat')}
-                  onClick={handleChat}
-                />
               </div>
             </div>
 

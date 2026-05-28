@@ -113,8 +113,6 @@ export const updateUserProfile = ({ payload = {}, avatarFile = null }) => {
 
 export const logoutUser = () => clientApi.post('/users/logout');
 
-export const logoutAllUser = () => clientApi.post('/users/logout-all');
-
 // ── Student Verification ───────────────────────────────────────────────────────
 
 export const fetchStudentStatus = () => clientApi.get('/users/student-status').then(extractPayload);

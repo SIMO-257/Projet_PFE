@@ -65,11 +65,7 @@ export default function WalletPage() {
           <div className={`${styles.walletCard} app-card relative rounded-3xl shadow-2xl border border-yellow-500/20 overflow-hidden 
             bg-gradient-to-br from-[#400106]/90 to-[#260101]/90 backdrop-blur-sm`}>
             
-            <Header 
-              title={t('wallet')} 
-            />
-
-            <div className="app-content no-scrollbar px-6 pb-24">
+            <div className="app-content no-scrollbar px-6 pb-24 pt-6">
               
               {isLoading && balance === undefined ? (
                 <BalanceCardSkeleton />

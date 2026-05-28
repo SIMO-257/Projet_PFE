@@ -1,19 +1,32 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserPreferenceController;
+use App\Http\Controllers\StudentVerificationController;
+use App\Http\Controllers\TicketTypeController;
+use App\Http\Controllers\TicketPurchaseController;
 use App\Http\Controllers\TicketController;
+use App\Http\Controllers\TicketValidationController;
 use App\Http\Controllers\EmailVerificationController;
+use App\Http\Controllers\StripeWebhookController;
+use App\Http\Controllers\WalletController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\RapportController;
+use App\Http\Controllers\Admin\AdminRapportController;
+use App\Http\Controllers\Admin\AdminStudentVerificationController;
 
 Route::get('/health', function () {
     return response()->json(['status' => 'ok']);
 });
 
 // Public Routes
-Route::post('/users/signup', [UserController::class, 'signup'])->middleware('throttle:6,1')->name('api.users.signup');
-Route::post('/users/login', [UserController::class, 'login'])->middleware('throttle:login')->name('api.users.login');
-Route::post('/users/forgot-password', [UserController::class, 'forgotPassword'])->middleware('throttle:3,1')->name('api.users.forgot_password');
-Route::post('/users/reset-password', [UserController::class, 'resetPassword'])->middleware('throttle:3,1')->name('api.users.reset_password');
+Route::post('/users/signup', [AuthController::class, 'signup'])->middleware('throttle:6,1')->name('api.users.signup');
+Route::post('/users/login', [AuthController::class, 'login'])->middleware('throttle:login')->name('api.users.login');
+Route::post('/users/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:3,1')->name('api.users.forgot_password');
+Route::post('/users/reset-password', [AuthController::class, 'resetPassword'])->middleware('throttle:3,1')->name('api.users.reset_password');
 
 // Email verification resend — no auth required (user is not logged in yet)
 Route::post('/email/resend', [EmailVerificationController::class, 'resend'])
@@ -22,65 +35,74 @@ Route::post('/email/verify-code', [EmailVerificationController::class, 'verifyCo
     ->middleware('throttle:6,1');   // max 6 attempts per minute per IP
 
 // Stripe Webhook (Public, CSRF excluded in bootstrap/app.php)
-Route::post('/webhooks/stripe', [\App\Http\Controllers\StripeWebhookController::class, 'handle'])->middleware('throttle:60,1')->name('api.stripe.webhook');
+Route::post('/webhooks/stripe', [StripeWebhookController::class, 'handle'])->middleware('throttle:60,1')->name('api.stripe.webhook');
 
 // Protected Routes
 Route::middleware(['auth:sanctum', 'track.activity'])->group(function () {
-    Route::get('/users/profile', [UserController::class, 'fetch_profile'])->name('api.users.profile');
-    Route::post('/users/profile/avatar', [UserController::class, 'upload_avatar'])->name('api.users.profile.avatar');
-    Route::put('/users/profile', [UserController::class, 'update_profile'])->name('api.users.profile.update');
-    Route::post('/users/logout', [UserController::class, 'logout'])->name('api.users.logout');
-    Route::post('/users/logout-all', [UserController::class, 'logoutAll'])->name('api.users.logout_all');
-    Route::get('/users/home', [UserController::class, 'home'])->name('api.users.home');
+    Route::get('/users/profile', [ProfileController::class, 'fetch_profile'])->name('api.users.profile');
+    Route::put('/users/profile', [ProfileController::class, 'update_profile'])->name('api.users.profile.update');
+    Route::post('/users/logout', [AuthController::class, 'logout'])->name('api.users.logout');
+    Route::get('/users/home', [ProfileController::class, 'home'])->name('api.users.home');
 
-    // Ticket Routes
-    Route::get('/ticket-types', [TicketController::class, 'getTicketTypes'])->name('api.tickets.types');
-    Route::post('/tickets/purchase', [TicketController::class, 'purchase'])->middleware('throttle:10,1')->name('api.tickets.purchase');
+    // Ticket Types
+    Route::get('/ticket-types', [TicketTypeController::class, 'index'])->name('api.tickets.types');
+
+    // Ticket Purchase
+    Route::post('/tickets/purchase', [TicketPurchaseController::class, 'purchase'])->middleware('throttle:10,1')->name('api.tickets.purchase');
+
+    // Ticket Display & Cards
     Route::get('/tickets', [TicketController::class, 'index'])->name('api.tickets.index');
     Route::get('/tickets/cards', [TicketController::class, 'cards'])->name('api.tickets.cards');
     Route::post('/tickets/cards/default', [TicketController::class, 'setDefaultCard'])->name('api.tickets.cards.default');
-    Route::post('/tickets/nfc/challenge', [TicketController::class, 'createNfcChallenge'])->middleware('throttle:validation')->name('api.tickets.nfc.challenge');
-    Route::post('/tickets/nfc/consume', [TicketController::class, 'consumeNfcChallenge'])->middleware('throttle:validation')->name('api.tickets.nfc.consume');
-    Route::post('/tickets/qr/token', [TicketController::class, 'createQrValidationToken'])->middleware('throttle:validation')->name('api.tickets.qr.token');
-    Route::post('/tickets/qr/consume', [TicketController::class, 'consumeQrValidationToken'])->middleware('throttle:validation')->name('api.tickets.qr.consume');
     Route::get('/tickets/{uuid}', [TicketController::class, 'show'])->name('api.tickets.show');
-    Route::post('/tickets/{uuid}/validate', [TicketController::class, 'validateTicket'])->middleware('throttle:validation')->name('api.tickets.validate');
+
+    // NFC Validation
+    Route::post('/tickets/nfc/challenge', [TicketValidationController::class, 'createNfcChallenge'])->middleware('throttle:validation')->name('api.tickets.nfc.challenge');
+    Route::post('/tickets/nfc/consume', [TicketValidationController::class, 'consumeNfcChallenge'])->middleware('throttle:validation')->name('api.tickets.nfc.consume');
+
+    // QR Validation
+    Route::post('/tickets/qr/token', [TicketValidationController::class, 'createQrValidationToken'])->middleware('throttle:validation')->name('api.tickets.qr.token');
+    Route::post('/tickets/qr/consume', [TicketValidationController::class, 'consumeQrValidationToken'])->middleware('throttle:validation')->name('api.tickets.qr.consume');
+
+    // Direct Validation
+    Route::post('/tickets/{uuid}/validate', [TicketValidationController::class, 'validateTicket'])->middleware('throttle:validation')->name('api.tickets.validate');
 
     // Wallet Routes
-    Route::get('/wallet', [\App\Http\Controllers\WalletController::class, 'index'])->name('api.wallet.index');
-    Route::get('/wallet/transactions', [\App\Http\Controllers\WalletController::class, 'transactions'])->name('api.wallet.transactions');
-    Route::post('/wallet/recharge/init', [\App\Http\Controllers\WalletController::class, 'rechargeInit'])->middleware('throttle:recharge')->name('api.wallet.recharge.init');
-    Route::post('/wallet/recharge/confirm', [\App\Http\Controllers\WalletController::class, 'rechargeConfirm'])->middleware('throttle:10,1')->name('api.wallet.recharge.confirm');
+    Route::get('/wallet', [WalletController::class, 'index'])->name('api.wallet.index');
+    Route::get('/wallet/transactions', [WalletController::class, 'transactions'])->name('api.wallet.transactions');
+    Route::post('/wallet/recharge/init', [PaymentController::class, 'createIntent'])->middleware('throttle:recharge')->name('api.wallet.recharge.init');
+    Route::post('/wallet/recharge/confirm', [WalletController::class, 'rechargeConfirm'])->middleware('throttle:10,1')->name('api.wallet.recharge.confirm');
+    Route::post('/wallet/recharge/cancel', [PaymentController::class, 'cancelIntent'])->middleware('throttle:10,1')->name('api.wallet.recharge.cancel');
 
     // Checkout & Payment Routes
-    Route::post('/payments/create-intent', [\App\Http\Controllers\PaymentController::class, 'createIntent'])->middleware('throttle:10,1')->name('api.payments.create_intent');
-    Route::post('/payments/cancel-intent', [\App\Http\Controllers\PaymentController::class, 'cancelIntent'])->middleware('throttle:10,1')->name('api.payments.cancel_intent');
+    Route::post('/payments/create-intent', [PaymentController::class, 'createIntent'])->middleware('throttle:10,1')->name('api.payments.create_intent');
+    Route::post('/payments/cancel-intent', [PaymentController::class, 'cancelIntent'])->middleware('throttle:10,1')->name('api.payments.cancel_intent');
 
     // Notification Routes
     Route::prefix('notifications')->group(function () {
-        Route::get('/', [\App\Http\Controllers\NotificationController::class, 'index'])->name('api.notifications.index');
-        Route::get('/unread-count', [\App\Http\Controllers\NotificationController::class, 'unreadCount'])->name('api.notifications.unread_count');
-        Route::post('/log-failure', [\App\Http\Controllers\NotificationController::class, 'logFailure'])->name('api.notifications.log_failure');
-        Route::patch('/read-all', [\App\Http\Controllers\NotificationController::class, 'markAllRead'])->name('api.notifications.read_all');
-        Route::patch('/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markRead'])->name('api.notifications.read');
-        Route::delete('/{id}', [\App\Http\Controllers\NotificationController::class, 'destroy'])->name('api.notifications.destroy');
+        Route::get('/', [NotificationController::class, 'index'])->name('api.notifications.index');
+        Route::get('/unread-count', [NotificationController::class, 'unreadCount'])->name('api.notifications.unread_count');
+        Route::post('/log-failure', [NotificationController::class, 'logFailure'])->name('api.notifications.log_failure');
+        Route::patch('/read-all', [NotificationController::class, 'markAllRead'])->name('api.notifications.read_all');
+        Route::patch('/{id}/read', [NotificationController::class, 'markRead'])->name('api.notifications.read');
+        Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('api.notifications.destroy');
     });
 
 
     // User Preferences & FCM
-    Route::put('/users/fcm-token', [UserController::class, 'updateFcmToken'])->name('api.users.fcm_token.update');
-    Route::get('/users/notification-preferences', [UserController::class, 'getNotificationPreferences'])->name('api.users.notification_preferences.get');
-    Route::patch('/users/notification-preferences', [UserController::class, 'updateNotificationPreferences'])->name('api.users.notification_preferences.update');
-    Route::get('/users/preferences', [UserController::class, 'getPreferences'])->name('api.users.preferences.get');
-    Route::patch('/users/preferences', [UserController::class, 'updatePreferences'])->name('api.users.preferences.update');
+    Route::put('/users/fcm-token', [UserPreferenceController::class, 'updateFcmToken'])->name('api.users.fcm_token.update');
+    Route::get('/users/notification-preferences', [UserPreferenceController::class, 'getNotificationPreferences'])->name('api.users.notification_preferences.get');
+    Route::patch('/users/notification-preferences', [UserPreferenceController::class, 'updateNotificationPreferences'])->name('api.users.notification_preferences.update');
+    Route::get('/users/preferences', [UserPreferenceController::class, 'getPreferences'])->name('api.users.preferences.get');
+    Route::patch('/users/preferences', [UserPreferenceController::class, 'updatePreferences'])->name('api.users.preferences.update');
 
     // Help & Support Routes
-    Route::get('/help', [\App\Http\Controllers\RapportController::class, 'index'])->name('api.help.index');
-    Route::post('/repports', [\App\Http\Controllers\RapportController::class, 'store'])->name('api.repports.store');
+    Route::get('/help', [RapportController::class, 'index'])->name('api.help.index');
+    Route::post('/repports', [RapportController::class, 'store'])->name('api.repports.store');
 
     // Student Verification
-    Route::get('/users/student-status', [UserController::class, 'studentStatus'])->name('api.users.student.status');
-    Route::post('/users/student-verification', [UserController::class, 'submitStudentVerification'])->middleware('throttle:3,60')->name('api.users.student.verification');
+    Route::get('/users/student-status', [StudentVerificationController::class, 'studentStatus'])->name('api.users.student.status');
+    Route::post('/users/student-verification', [StudentVerificationController::class, 'submitStudentVerification'])->middleware('throttle:3,60')->name('api.users.student.verification');
 
     
 });
@@ -125,12 +147,12 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'admin'])->group(function ()
     Route::put('/profile', [AdminProfileController::class, 'update']);
 
     // Help & Support — Admin Repports
-    Route::get('/repports', [\App\Http\Controllers\Admin\AdminRapportController::class, 'index']);
-    Route::patch('/repports/{id}/statut', [\App\Http\Controllers\Admin\AdminRapportController::class, 'updateStatut']);
+    Route::get('/repports', [AdminRapportController::class, 'index']);
+    Route::patch('/repports/{id}/statut', [AdminRapportController::class, 'updateStatut']);
 
     // Student Verifications
-    Route::get('/student-verifications', [\App\Http\Controllers\Admin\AdminStudentVerificationController::class, 'index']);
-    Route::get('/student-verifications/{id}', [\App\Http\Controllers\Admin\AdminStudentVerificationController::class, 'show']);
-    Route::post('/student-verifications/{id}/approve', [\App\Http\Controllers\Admin\AdminStudentVerificationController::class, 'approve']);
-    Route::post('/student-verifications/{id}/reject', [\App\Http\Controllers\Admin\AdminStudentVerificationController::class, 'reject']);
+    Route::get('/student-verifications', [AdminStudentVerificationController::class, 'index']);
+    Route::get('/student-verifications/{id}', [AdminStudentVerificationController::class, 'show']);
+    Route::post('/student-verifications/{id}/approve', [AdminStudentVerificationController::class, 'approve']);
+    Route::post('/student-verifications/{id}/reject', [AdminStudentVerificationController::class, 'reject']);
 });

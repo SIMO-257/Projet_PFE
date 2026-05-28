@@ -25,15 +25,16 @@ class PaymentController extends Controller
 
         $request->validate([
             'amount' => 'required|numeric|min:5|max:500',
-            'currency' => 'required|string|size:3',
+            'currency' => 'sometimes|string|size:3',
         ]);
 
+        $currency = strtolower($request->currency ?? 'MAD');
         $amountInCents = (int) ($request->amount * 100);
 
         try {
             $paymentIntent = PaymentIntent::create([
                 'amount' => $amountInCents,
-                'currency' => strtolower($request->currency),
+                'currency' => $currency,
                 'metadata' => [
                     'user_id' => $user->id,
                     'type' => 'wallet_recharge',
@@ -45,7 +46,7 @@ class PaymentController extends Controller
 
             AuditLog::log('payment_intent_created', $user->id, [
                 'amount' => $request->amount,
-                'currency' => $request->currency,
+                'currency' => $currency,
                 'pi_id' => $paymentIntent->id,
                 'type' => 'wallet_recharge'
             ]);

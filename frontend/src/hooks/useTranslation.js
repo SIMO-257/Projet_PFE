@@ -4,7 +4,7 @@ import adminTranslations from './adminTranslations';
 
 // Merge both translation sets (admin takes precedence for overlapping keys)
 const allTranslations = {};
-for (const lang of ['fr', 'ar', 'en']) {
+for (const lang of Object.keys(userTranslations)) {
     allTranslations[lang] = { ...userTranslations[lang], ...adminTranslations[lang] };
 }
 
@@ -43,4 +43,3 @@ export const useTranslation = () => {
 
     return { t, language, formatReference };
 };
-

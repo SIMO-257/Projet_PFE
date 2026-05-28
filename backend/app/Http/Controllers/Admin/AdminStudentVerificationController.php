@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\StudentVerification;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class AdminStudentVerificationController extends Controller
@@ -96,7 +97,7 @@ class AdminStudentVerificationController extends Controller
         $user->update(['is_student' => true]);
 
         // Log the action
-        \Illuminate\Support\Facades\Log::info('Student verification approved', [
+        Log::info('Student verification approved', [
             'verification_id' => $verification->id,
             'user_id' => $user->id,
             'admin_id' => $request->user()->id,
