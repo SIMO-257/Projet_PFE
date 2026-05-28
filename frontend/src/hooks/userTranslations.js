@@ -1,5 +1,6 @@
-const translations = {
+const userTranslations = {
     fr: {
+
         // ========== Navigation & Layout ==========
         settings: "Paramètres",
         home: "Accueil",
@@ -478,10 +479,6 @@ const translations = {
         no_ticket_scanned: "Aucun billet",
         invalid_code_uuid: "Code invalide. Aucun ticket UUID détecté.",
         no_qr_detected: "Aucun code QR détecté dans cette image.",
-        admin_clients: "Clients",
-        admin_tickets: "Tickets",
-        admin_transactions: "Transactions",
-        admin_notifications: "Notifications",
         all_filter: "Tous",
         received_filter: "Reçus",
         expenses_filter: "Dépenses",
@@ -637,41 +634,6 @@ const translations = {
         ticket_used_status: "BILLET UTILISÉ",
         ticket_expired_status: "BILLET EXPIRÉ",
 
-        // ========== Admin Pages ==========
-        admin_client_management: "Gestion des Clients",
-        admin_client_subtitle: "Liste des utilisateurs de l'application CasaWay.",
-        admin_ticket_management: "Gestion des Tickets",
-        admin_ticket_subtitle: "Historique complet des tickets et validations.",
-        admin_transaction_management: "Gestion des Transactions",
-        admin_transaction_subtitle: "Surveillance des flux financiers (Recharges et Débits).",
-        search_name_email: "Rechercher (Nom, Email)...",
-        search_uuid: "Rechercher (UUID)...",
-        search_email: "Rechercher (Email)...",
-        table_name: "Nom",
-        table_email: "Email",
-        table_status: "Statut",
-        table_registration: "Inscription",
-        table_actions: "Actions",
-        table_uuid: "UUID",
-        table_client: "Client",
-        table_type: "Type",
-        table_price: "Prix (DH)",
-        table_date: "Date",
-        table_id_ref: "ID / Ref",
-        table_amount: "Montant (DH)",
-        status_active: "Actif",
-        status_blocked: "Bloqué",
-        status_validated: "Validé",
-        status_completed: "Complété",
-        action_block: "Bloquer",
-        action_unblock: "Débloquer",
-        all_statuses: "Tous les statuts",
-        all_types: "Tous les types",
-        type_purchase: "Achat",
-        type_validation_admin: "Validation",
-        ref_no_ref: "No ref",
-        not_applicable: "N/A",
-
         // ========== Component Defaults ==========
         balance_card_label: "Solde disponible",
         transaction_title_default: "Transaction",
@@ -702,11 +664,6 @@ const translations = {
         reset_link_sent_success: "Lien de réinitialisation envoyé avec succès.",
         email_edit_placeholder: "votre @email.com",
         edit_change_password_btn: "Modifier le mot de passe",
-
-        // ========== Admin / Status ==========
-        loading_tickets: "Chargement des tickets...",
-        loading_transactions: "Chargement des transactions...",
-        status_expired: "Expiré",
 
         // ========== Terms & Conditions ==========
         scroll_to_read: "⬇️ Faites défiler pour lire tout le contenu",
@@ -741,61 +698,6 @@ const translations = {
         code_placeholder: "000000",
         email_verify_placeholder: "votre@email.com",
 
-        // ========== Admin Dashboard ==========
-        admin_dashboard_title: "Tableau de bord",
-        admin_dashboard_subtitle: "Vue d'ensemble de l'activité du système.",
-        admin_total_clients: "Total Clients",
-        admin_tickets_sold: "Tickets vendus",
-        admin_total_revenue: "Revenus total",
-        admin_transactions_today: "Transactions aujourd'hui",
-        admin_daily_activity: "Activité du jour",
-        admin_new_clients_today: "Nouveaux clients",
-        admin_revenue_today: "Revenus du jour",
-        admin_ticket_usage: "Utilisation des tickets",
-        admin_validated_tickets: "Tickets validés",
-        admin_usage_rate: "Taux d'utilisation",
-        admin_loading: "Chargement...",
-        admin_access_denied: "Accès refusé. Veuillez vous reconnecter en tant qu'administrateur.",
-        admin_stats_error: "Impossible de charger les statistiques.",
-        admin_loading_data: "Chargement des données...",
-
-        // ========== Admin Login ==========
-        admin_login_subtitle: "Administration CasaWay",
-        admin_login_desc: "Espace réservé aux administrateurs.",
-        admin_email_placeholder: "admin@casaway.ma",
-        admin_login_error: "Identifiants incorrects.",
-        admin_connecting: "Connexion...",
-        admin_connect_btn: "Connexion",
-        admin_auth_failed: "Authentication failed",
-
-        // ========== Admin Layout ==========
-        admin_management_system: "Système de Gestion",
-        admin_my_profile: "Mon Profil",
-        admin_logout: "Déconnexion",
-        admin_dashboard: "Tableau de bord",
-        admin_nav_clients: "Clients",
-        admin_nav_tickets: "Tickets",
-        admin_nav_transactions: "Transactions",
-        admin_nav_notifications: "Notifications",
-        admin_nav_rapports: "Rapports utilisateurs",
-        sections_count: "{count} sections",
-        section_intro: "Introduction",
-        section_purchase_tickets: "Achat de billets",
-        section_pricing: "Tarifs et paiement",
-        section_validity: "Validité et utilisation",
-        section_refund: "Remboursement",
-        section_liability: "Responsabilité",
-        pricing_currency: "Tous nos tarifs sont exprimés en <strong>MAD TTC</strong>.",
-        pricing_methods: "Modes de recharge : Cartes bancaires, Portefeuille numérique, et points de vente partenaires.",
-        pricing_no_hidden: "<strong>Aucun frais caché</strong> : le prix affiché est le prix final payé.",
-        pricing_valid_at_time: "Le prix en vigueur au moment de l'achat fait foi pour la transaction.",
-        pricing_note: "Note : Les tarifs sont susceptibles d'évoluer selon les décisions réglementaires de transport urbain.",
-        section_intro_text: "Les présentes conditions générales de vente régissent l'achat de titres de transport via notre application mobile. En accédant à nos services, vous reconnaissez avoir pris connaissance et accepté sans réserve l'intégralité de ces conditions. Ce document constitue un contrat entre vous et le prestataire de service.",
-        section_purchase_text: "L'acquisition de billets s'effectue directement via l'interface sécurisée de l'application. Chaque billet est dématérialisé et lié de manière unique à votre compte utilisateur. Il est strictement personnel et non transférable à un tiers après activation.",
-        section_validity_text: "La validité d'un billet commence dès son achat ou son activation selon le type de titre choisi. Un billet doit être impérativement validé à chaque montée dans un véhicule via le scan du QR Code présent à bord. En cas de contrôle, vous devez présenter l'écran de validation actif sur votre appareil.",
-        section_refund_text: "Compte tenu de la nature instantanée du service, aucun remboursement n'est accordé après l'achat, sauf en cas de défaut technique majeur imputable à la plateforme. Toute réclamation doit être formulée via le support client dans un délai maximum de 48h suivant l'incident.",
-        section_liability_text: "L'utilisateur est seul responsable de la sécurité de son compte et de son appareil mobile. Le prestataire décline toute responsabilité en cas de perte, vol de l'appareil ou épuisement de la batterie lors d'un contrôle de titre de transport. Veillez à maintenir votre appareil chargé et sécurisé.",
-
         // ========== Student Verification ==========
         student_verification: "Vérification Étudiant",
         student_verification_desc: "Vérifiez votre statut étudiant pour bénéficier de tarifs réduits",
@@ -818,8 +720,10 @@ const translations = {
         student_not_eligible: "Vous êtes déjà vérifié en tant qu'étudiant.",
         student_file_required: "Veuillez télécharger les deux documents requis.",
         student_invalid_file: "Type de fichier invalide. Veuillez télécharger uniquement des fichiers PDF, DOC ou DOCX.",
+    
     },
     ar: {
+
         // ========== Navigation & Layout ==========
         settings: "الإعدادات",
         home: "الرئيسية",
@@ -1298,10 +1202,6 @@ const translations = {
         no_ticket_scanned: "لا توجد تذكرة",
         invalid_code_uuid: "رمز غير صالح. لم يتم العثور على UUID للتذكرة.",
         no_qr_detected: "لم يتم اكتشاف رمز QR في هذه الصورة.",
-        admin_clients: "العملاء",
-        admin_tickets: "التذاكر",
-        admin_transactions: "المعاملات",
-        admin_notifications: "الإشعارات",
         all_filter: "الكل",
         received_filter: "مستلمة",
         expenses_filter: "مصروفات",
@@ -1392,11 +1292,6 @@ const translations = {
         email_edit_placeholder: "بريدك@email.com",
         edit_change_password_btn: "تغيير كلمة المرور",
 
-        // ========== Admin / Status ==========
-        loading_tickets: "جاري تحميل التذاكر...",
-        loading_transactions: "جاري تحميل المعاملات...",
-        status_expired: "منتهية",
-
         // ========== Terms & Conditions ==========
         scroll_to_read: "⬇️ قم بالتمرير لقراءة كل المحتوى",
         accept_and_continue: "قبول ومتابعة",
@@ -1429,62 +1324,6 @@ const translations = {
         code_6_digits_label: "رمز من 6 أرقام",
         code_placeholder: "000000",
         email_verify_placeholder: "بريدك@email.com",
-
-        // ========== Admin Dashboard ==========
-        admin_dashboard_title: "لوحة القيادة",
-        admin_dashboard_subtitle: "نظرة عامة على نشاط النظام.",
-        admin_total_clients: "إجمالي العملاء",
-        admin_tickets_sold: "التذاكر المباعة",
-        admin_total_revenue: "إجمالي الإيرادات",
-        admin_transactions_today: "معاملات اليوم",
-        admin_daily_activity: "نشاط اليوم",
-        admin_new_clients_today: "عملاء جدد",
-        admin_revenue_today: "إيرادات اليوم",
-        admin_ticket_usage: "استخدام التذاكر",
-        admin_validated_tickets: "التذاكر التي تم التحقق منها",
-        admin_usage_rate: "معدل الاستخدام",
-        admin_loading: "جاري التحميل...",
-        admin_access_denied: "تم رفض الوصول. يرجى إعادة تسجيل الدخول كمسؤول.",
-        admin_stats_error: "تعذر تحميل الإحصائيات.",
-        admin_loading_data: "جاري تحميل البيانات...",
-
-        // ========== Admin Login ==========
-        admin_login_subtitle: "إدارة CasaWay",
-        admin_login_desc: "مساحة مخصصة للمسؤولين.",
-        admin_email_placeholder: "admin@casaway.ma",
-        admin_login_error: "بيانات دخول غير صحيحة.",
-        admin_connecting: "جاري الاتصال...",
-        admin_connect_btn: "اتصال",
-        admin_auth_failed: "فشل المصادقة",
-
-        // ========== Admin Layout ==========
-        admin_management_system: "نظام الإدارة",
-        admin_my_profile: "ملفي الشخصي",
-        admin_logout: "تسجيل الخروج",
-        admin_dashboard: "لوحة القيادة",
-        admin_nav_clients: "العملاء",
-        admin_nav_tickets: "التذاكر",
-        admin_nav_transactions: "المعاملات",
-        admin_nav_notifications: "الإشعارات",
-        admin_nav_rapports: "تقارير المستخدمين",
-        sections_count: "{count} أقسام",
-        section_intro: "مقدمة",
-        section_purchase_tickets: "شراء التذاكر",
-        section_pricing: "الأسعار والدفع",
-        section_validity: "الصلاحية والاستخدام",
-        section_refund: "الاسترداد",
-        section_liability: "المسؤولية",
-        pricing_currency: "جميع أسعارنا معبر عنها بـ <strong>درهم شامل الضريبة</strong>.",
-        pricing_methods: "طرق الشحن: البطاقات البنكية، المحفظة الرقمية، ونقاط البيع الشريكة.",
-        pricing_no_hidden: "<strong>لا توجد رسوم مخفية</strong>: السعر المعروض هو السعر النهائي المدفوع.",
-        pricing_valid_at_time: "السعر الساري وقت الشراء هو المعتمد للمعاملة.",
-        pricing_note: "ملاحظة: الأسعار قابلة للتغيير وفقًا للقرارات التنظيمية للنقل الحضري.",
-        section_intro_text: "تنطبق شروط البيع العامة هذه على شراء تذاكر النقل عبر تطبيقنا للجوال. من خلال الوصول إلى خدماتنا، فإنك تقر بأنك قد اطلعت على هذه الشروط وقبلتها بالكامل دون تحفظ. تشكل هذه الوثيقة عقدًا بينك وبين مزود الخدمة.",
-        section_purchase_text: "يتم شراء التذاكر مباشرة عبر الواجهة الآمنة للتطبيق. كل تذكرة غير مادية ومرتبطة بشكل فريد بحساب المستخدم الخاص بك. وهي شخصية بحتة ولا يمكن نقلها للغير بعد التفعيل.",
-        section_validity_text: "تبدأ صلاحية التذكرة من وقت شرائها أو تفعيلها حسب نوع التذكرة المختارة. يجب التحقق من التذكرة عند كل صعود إلى المركبة عبر مسح رمز QR الموجود على متنها. في حالة التفتيش، يجب عليك عرض شاشة التحقق النشطة على جهازك.",
-        section_refund_text: "نظرًا للطبيعة الفورية للخدمة، لا يتم منح أي استرداد بعد الشراء، إلا في حالة وجود عيب تقني كبير يعزى إلى المنصة. يجب تقديم أي شكوى عبر دعم العملاء في غضون 48 ساعة كحد أقصى من الحادث.",
-        section_liability_text: "المستخدم هو المسؤول الوحيد عن أمان حسابه وجهازه المحمول. يخلي مزود الخدمة مسؤوليته في حالة فقدان الجهاز أو سرقته أو نفاد البطارية أثناء تفتيش التذكرة. يرجى الحفاظ على جهازك مشحونًا وآمنًا.",
-
 
         // ========== Student Verification ==========
         student_verification: "التحقق من الطالب",
@@ -1584,41 +1423,6 @@ const translations = {
         ticket_used_status: "تذكرة مستخدمة",
         ticket_expired_status: "تذكرة منتهية",
 
-        // ========== Admin Pages ==========
-        admin_client_management: "إدارة العملاء",
-        admin_client_subtitle: "قائمة مستخدمي تطبيق CasaWay.",
-        admin_ticket_management: "إدارة التذاكر",
-        admin_ticket_subtitle: "السجل الكامل للتذاكر والتحققات.",
-        admin_transaction_management: "إدارة المعاملات",
-        admin_transaction_subtitle: "مراقبة التدفقات المالية (الشحن والخصم).",
-        search_name_email: "بحث (الاسم، البريد الإلكتروني)...",
-        search_uuid: "بحث (المعرف)...",
-        search_email: "بحث (البريد الإلكتروني)...",
-        table_name: "الاسم",
-        table_email: "البريد الإلكتروني",
-        table_status: "الحالة",
-        table_registration: "التسجيل",
-        table_actions: "الإجراءات",
-        table_uuid: "المعرف",
-        table_client: "العميل",
-        table_type: "النوع",
-        table_price: "السعر (درهم)",
-        table_date: "التاريخ",
-        table_id_ref: "المعرف / المرجع",
-        table_amount: "المبلغ (درهم)",
-        status_active: "نشط",
-        status_blocked: "محظور",
-        status_validated: "تم التحقق",
-        status_completed: "مكتمل",
-        action_block: "حظر",
-        action_unblock: "إلغاء الحظر",
-        all_statuses: "جميع الحالات",
-        all_types: "جميع الأنواع",
-        type_purchase: "شراء",
-        type_validation_admin: "تحقق",
-        ref_no_ref: "بدون مرجع",
-        not_applicable: "غير متاح",
-
         // ========== Component Defaults ==========
         balance_card_label: "الرصيد المتاح",
         transaction_title_default: "معاملة",
@@ -1639,8 +1443,10 @@ const translations = {
         saved_card_default_status: "افتراضي",
         card_visa_default: "Visa",
         no_expiration: "بدون انتهاء",
+    
     },
     en: {
+
         // ========== Navigation & Layout ==========
         settings: "Settings",
         home: "Home",
@@ -2119,10 +1925,6 @@ const translations = {
         no_ticket_scanned: "No ticket",
         invalid_code_uuid: "Invalid code. No ticket UUID detected.",
         no_qr_detected: "No QR code detected in this image.",
-        admin_clients: "Clients",
-        admin_tickets: "Tickets",
-        admin_transactions: "Transactions",
-        admin_notifications: "Notifications",
         all_filter: "All",
         received_filter: "Received",
         expenses_filter: "Expenses",
@@ -2278,45 +2080,6 @@ const translations = {
         ticket_used_status: "TICKET USED",
         ticket_expired_status: "TICKET EXPIRED",
 
-        // ========== Admin Pages ==========
-        admin_client_management: "Client Management",
-        admin_client_subtitle: "List of CasaWay application users.",
-        admin_ticket_management: "Ticket Management",
-        admin_ticket_subtitle: "Complete ticket and validation history.",
-        admin_transaction_management: "Transaction Management",
-        admin_transaction_subtitle: "Financial flow monitoring (Recharges & Debits).",
-        search_name_email: "Search (Name, Email)...",
-        search_uuid: "Search (UUID)...",
-        search_email: "Search (Email)...",
-        table_name: "Name",
-        table_email: "Email",
-        table_status: "Status",
-        table_registration: "Registration",
-        table_actions: "Actions",
-        table_uuid: "UUID",
-        table_client: "Client",
-        table_type: "Type",
-        table_price: "Price (MAD)",
-        table_date: "Date",
-        table_id_ref: "ID / Ref",
-        table_amount: "Amount (MAD)",
-        status_active: "Active",
-        status_blocked: "Blocked",
-        status_validated: "Validated",
-        status_completed: "Completed",
-        status_active_admin: "Active",
-        status_blocked_admin: "Blocked",
-        status_validated_admin: "Validated",
-        status_completed_admin: "Completed",
-        action_block: "Block",
-        action_unblock: "Unblock",
-        all_statuses: "All statuses",
-        all_types: "All types",
-        type_purchase: "Purchase",
-        type_validation_admin: "Validation",
-        ref_no_ref: "No ref",
-        not_applicable: "N/A",
-
         // ========== Component Defaults ==========
         balance_card_label: "Available Balance",
         transaction_title_default: "Transaction",
@@ -2348,22 +2111,6 @@ const translations = {
         email_edit_placeholder: "your@email.com",
         edit_change_password_btn: "Change Password",
 
-        // ========== Admin Layout ==========
-        admin_management_system: "Management System",
-        admin_my_profile: "My Profile",
-        admin_logout: "Logout",
-        admin_dashboard: "Dashboard",
-        admin_nav_clients: "Clients",
-        admin_nav_tickets: "Tickets",
-        admin_nav_transactions: "Transactions",
-        admin_nav_notifications: "Notifications",
-        admin_nav_rapports: "Users Rapports",
-
-        // ========== Admin / Status ==========
-        loading_tickets: "Loading tickets...",
-        loading_transactions: "Loading transactions...",
-        status_expired: "Expired",
-
         // ========== Terms & Conditions ==========
         scroll_to_read: "⬇️ Scroll to read all content",
         accept_and_continue: "Accept & Continue",
@@ -2388,6 +2135,7 @@ const translations = {
 
 
         // ========== Student Verification ==========
+
         student_verification: "Student Verification",
         student_verification_desc: "Verify your student status for reduced fares",
         student_verification_title: "Student Verification",
@@ -2412,4 +2160,4 @@ const translations = {
     },
 };
 
-export default translations;
+export default userTranslations;

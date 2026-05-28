@@ -1,12 +1,19 @@
 import { useSelector } from 'react-redux';
-import translations from './translations';
+import userTranslations from './userTranslations';
+import adminTranslations from './adminTranslations';
+
+// Merge both translation sets (admin takes precedence for overlapping keys)
+const allTranslations = {};
+for (const lang of ['fr', 'ar', 'en']) {
+    allTranslations[lang] = { ...userTranslations[lang], ...adminTranslations[lang] };
+}
 
 export const useTranslation = () => {
     const language = useSelector((state) => state.settings?.language || 'fr');
     
     const t = (key, params = {}) => {
-        const lang = translations[language] || translations['fr'];
-        const value = lang[key] || translations['fr'][key] || key;
+        const lang = allTranslations[language] || allTranslations['fr'];
+        const value = lang[key] || allTranslations['fr'][key] || key;
         const str = typeof value === 'string' ? value : key;
         
         // Replace {paramName} with actual values from params object
