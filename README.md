@@ -1,222 +1,210 @@
-# React + Vite
+# 🚌 CasaWay — Projet PFE
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Application de gestion de tickets de bus avec portefeuille électronique, validation NFC/QR et administration.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Quick Start — Two Ways to Run
 
-## React Compiler
+You can run the project **with Docker** (full stack, MySQL) or **directly with artisan + npm** (lighter, SQLite).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 🐳 Option 1 — Docker (Full Stack)
 
-## Expanding the ESLint configuration
+```bash
+# 1. Copy Docker env file to Laravel
+cp .env.docker backend/.env
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+# 2. Start all services
+docker-compose up -d
+
+# 3. Generate app key & run migrations
+docker-compose exec app php artisan key:generate
+docker-compose exec app php artisan migrate
+docker-compose exec app php artisan db:seed
+
+# 4. Install frontend deps (inside container)
+docker-compose exec frontend npm install
+```
+
+**Access:**
+| Service | URL |
+|---------|-----|
+| Frontend | http://localhost:5173 |
+| Backend API | http://localhost/api |
+| MySQL | localhost:3307 (user: projet_user, password: projet_password) |
+
+> Full Docker reference: see [DOCKER_SETUP.md](DOCKER_SETUP.md)
+
+---
+
+### 💻 Option 2 — Local (Artisan + NPM)
+
+Requires PHP 8.2+, Composer, Node.js 22+, and optionally MySQL.
+
+```bash
+# ── 1. Backend Setup ──────────────────────────────────
+
+cd backend
+
+# Copy env file (SQLite by default — no MySQL needed!)
+cp .env.example .env
+
+# Install PHP dependencies
+composer install
+
+# Generate app key
+php artisan key:generate
+
+# Create SQLite database file & run migrations
+touch database/database.sqlite
+php artisan migrate
+
+# Seed the database (optional)
+php artisan db:seed
+
+# ── 2. Frontend Setup ────────────────────────────────
+
+cd ../frontend
+
+# Install JS dependencies
+npm install
+
+# ── 3. Run Everything ────────────────────────────────
+
+# Backend terminal (stays running):
+cd backend && php artisan serve
+
+# Frontend terminal (stays running):
+cd frontend && npm run dev
+
+# Or do both with one command (from backend/):
+cd backend && composer run dev
+```
+
+*(`composer run dev` starts artisan serve, queue worker, logs, and Vite all at once using `concurrently`)*
+
+**Access:**
+| Service | URL |
+|---------|-----|
+| Frontend | http://localhost:5173 |
+| Backend API | http://localhost:8000/api |
+
+The frontend Vite dev server proxies `/api/*` requests to the backend automatically.
+
+---
+
+## 🔀 Switching Between Modes
+
+| You want… | What to do |
+|-----------|------------|
+| **Run with Docker** | `cp .env.docker backend/.env`, then `docker-compose up -d` |
+| **Run locally** | `cp backend/.env.example backend/.env`, then `php artisan serve` + `npm run dev` |
+| **Stop Docker** | `docker-compose down` |
+| **Switch from local to Docker** | `docker-compose up -d` (containers use their own DB) |
+
+> ⚠️ **Env files are different:** `.env.docker` uses MySQL via Docker, `.env.example` uses SQLite.
+> Keep them separate — never copy one over the other without knowing which mode you want.
+
+---
+
+## 📁 Project Structure
 
 ```
-Projet_PFE
-├─ backend
-│  ├─ .editorconfig
-│  ├─ .env.example
-│  ├─ app
-│  │  ├─ Http
-│  │  │  └─ Controllers
-│  │  │     └─ Controller.php
-│  │  ├─ Models
-│  │  │  └─ User.php
-│  │  └─ Providers
-│  │     └─ AppServiceProvider.php
-│  ├─ artisan
-│  ├─ bootstrap
-│  │  ├─ app.php
-│  │  ├─ cache
-│  │  └─ providers.php
-│  ├─ composer.json
-│  ├─ composer.lock
-│  ├─ config
-│  │  ├─ app.php
-│  │  ├─ auth.php
-│  │  ├─ cache.php
-│  │  ├─ database.php
-│  │  ├─ filesystems.php
-│  │  ├─ logging.php
-│  │  ├─ mail.php
-│  │  ├─ queue.php
-│  │  ├─ services.php
-│  │  └─ session.php
-│  ├─ database
-│  │  ├─ factories
-│  │  │  └─ UserFactory.php
-│  │  ├─ migrations
-│  │  │  ├─ 0001_01_01_000000_create_users_table.php
-│  │  │  ├─ 0001_01_01_000001_create_cache_table.php
-│  │  │  └─ 0001_01_01_000002_create_jobs_table.php
-│  │  └─ seeders
-│  │     └─ DatabaseSeeder.php
-│  ├─ package.json
-│  ├─ phpunit.xml
-│  ├─ public
-│  │  ├─ .htaccess
-│  │  ├─ favicon.ico
-│  │  ├─ index.php
-│  │  └─ robots.txt
-│  ├─ README.md
-│  ├─ resources
-│  │  ├─ css
-│  │  │  └─ app.css
-│  │  ├─ js
-│  │  │  ├─ app.js
-│  │  │  └─ bootstrap.js
-│  │  └─ views
-│  │     └─ welcome.blade.php
-│  ├─ routes
-│  │  ├─ console.php
-│  │  └─ web.php
-│  ├─ storage
-│  │  ├─ app
-│  │  │  ├─ private
-│  │  │  └─ public
-│  │  └─ framework
-│  │     ├─ cache
-│  │     │  └─ data
-│  │     ├─ sessions
-│  │     ├─ testing
-│  │     └─ views
-│  ├─ tests
-│  │  ├─ Feature
-│  │  │  └─ ExampleTest.php
-│  │  ├─ TestCase.php
-│  │  └─ Unit
-│  │     └─ ExampleTest.php
-│  └─ vite.config.js
-├─ eslint.config.js
-├─ index.html
-├─ package-lock.json
-├─ package.json
-├─ postcss.config.cjs
-├─ postcss.config.js
-├─ public
-│  └─ vite.svg
-├─ README.md
-├─ src
-│  ├─ App.jsx
-│  ├─ assets
-│  │  └─ react.svg
-│  ├─ Components
-│  │  ├─ Buttons
-│  │  │  ├─ ActionButton.jsx
-│  │  │  ├─ CardButton.jsx
-│  │  │  ├─ ConnexionButton.jsx
-│  │  │  ├─ NavButton.jsx
-│  │  │  ├─ PaymentButton.jsx
-│  │  │  └─ SocialButton.jsx
-│  │  ├─ Cards
-│  │  │  ├─ ActionButtonCard.jsx
-│  │  │  ├─ BalanceCard.jsx
-│  │  │  ├─ InfoCard.jsx
-│  │  │  ├─ JourneyInfoCard.jsx
-│  │  │  ├─ PurchaseCard.jsx
-│  │  │  ├─ RechargeSummaryCard.jsx
-│  │  │  ├─ SummaryCard.jsx
-│  │  │  ├─ Ticket.jsx
-│  │  │  ├─ TicketInfoCard.jsx
-│  │  │  ├─ TransactionDetailsCard.jsx
-│  │  │  ├─ TransactionItem.jsx
-│  │  │  └─ ValidationCard.jsx
-│  │  ├─ Form
-│  │  │  └─ FormOptions.jsx
-│  │  ├─ Inputs
-│  │  │  ├─ CheckboxInput.jsx
-│  │  │  ├─ InputField.jsx
-│  │  │  └─ PasswordInput.jsx
-│  │  ├─ Layout
-│  │  │  ├─ BottomNavigation.jsx
-│  │  │  ├─ Header.jsx
-│  │  │  ├─ ModalOverlay.jsx
-│  │  │  ├─ SectionHeader.jsx
-│  │  │  └─ TransactionGroup.jsx
-│  │  ├─ NavBar
-│  │  │  ├─ NavBar.jsx
-│  │  │  └─ ProgressSteps.jsx
-│  │  ├─ Payment
-│  │  │  ├─ PaymentMethod.jsx
-│  │  │  ├─ PaymentSummary.jsx
-│  │  │  └─ TicketInfo.jsx
-│  │  └─ UI
-│  │     ├─ CollapsibleSection.jsx
-│  │     ├─ FilterTabs.jsx
-│  │     ├─ NFCAnimation.jsx
-│  │     ├─ Notification.jsx
-│  │     ├─ NotificationButton.jsx
-│  │     ├─ ProcessingIndicator.jsx
-│  │     ├─ QRCodeDisplay.jsx
-│  │     ├─ StatusIndicator.jsx
-│  │     ├─ TicketIconAnimation.jsx
-│  │     └─ TimerDisplay.jsx
-│  ├─ main.jsx
-│  ├─ Pages
-│  │  ├─ ConfirmationPaiment
-│  │  │  └─ ConfirmationPaiment.jsx
-│  │  ├─ ForgotPassword
-│  │  │  └─ ForgotPassword.jsx
-│  │  ├─ Home
-│  │  │  └─ HomeScreen.jsx
-│  │  ├─ Login
-│  │  │  └─ Login.jsx
-│  │  ├─ MyTickets
-│  │  │  └─ MyTickets.jsx
-│  │  ├─ NFCValidationScreen
-│  │  │  └─ NFCValidationScreen.jsx
-│  │  ├─ Paiment
-│  │  │  └─ Paiment.jsx
-│  │  ├─ QRValidationScreen
-│  │  │  └─ QRValidationScreen.jsx
-│  │  ├─ RechargeConfirmationScreen
-│  │  │  └─ RechargeConfirmationScreen.jsx
-│  │  ├─ RechargePaymentScreen
-│  │  │  └─ RechargePaymentScreen.jsx
-│  │  ├─ SignUp
-│  │  │  └─ SignUp.jsx
-│  │  ├─ TicketSelection
-│  │  │  └─ TicketSelection.jsx
-│  │  ├─ TransactionHistoryScreen
-│  │  │  └─ TransactionHistoryScreen.jsx
-│  │  ├─ ValidationResultScreen
-│  │  │  └─ ValidationResultScreen.jsx
-│  │  ├─ ValidationScreen
-│  │  │  └─ ValidationScreen.jsx
-│  │  ├─ ViewTicket
-│  │  │  └─ ViewTicket.jsx
-│  │  └─ WalletScreen
-│  │     └─ WalletScreen.jsx
-│  ├─ Redux
-│  │  ├─ Actions
-│  │  ├─ Slices
-│  │  │  ├─ PurchaseseSlice.js
-│  │  │  └─ TicketsSlice.js
-│  │  └─ store.js
-│  └─ Styles
-│     ├─ App.css
-│     ├─ Auth.module.css
-│     ├─ ConfirmationPaiment.module.css
-│     ├─ HomeScreen.module.css
-│     ├─ index.css
-│     ├─ NFCValidation.module.css
-│     ├─ Paiment.module.css
-│     ├─ QRValidation.module.css
-│     ├─ RechargeConfirmation.module.css
-│     ├─ RechargePaymentScreen.module.css
-│     ├─ Ticket.module.css
-│     ├─ TicketSelection.module.css
-│     ├─ TransactionHistoryScreen.module.css
-│     ├─ ValidationResult.module.css
-│     ├─ ValidationScreen.module.css
-│     ├─ ViewTicket.module.css
-│     └─ WalletScreen.module.css
-├─ tailwind.config.js
-├─ TODO.md
-└─ vite.config.js
-
+Projet_PFE/
+├── backend/              # Laravel API (PHP 8.2)
+│   ├── app/              # Models, Controllers, Services, Events, Jobs
+│   ├── config/           # App configuration
+│   ├── database/         # Migrations, seeders, SQLite file
+│   ├── routes/           # API & web routes
+│   ├── .env.example      # Template for local dev
+│   └── Dockerfile
+├── frontend/             # React SPA (Vite + Redux)
+│   ├── src/
+│   │   ├── Pages/        # Route pages
+│   │   ├── Components/   # Reusable components
+│   │   ├── hooks/        # Custom hooks
+│   │   ├── services/     # API client (axios)
+│   │   └── Redux/        # State management
+│   ├── vite.config.js    # Dev server + proxy config
+│   └── Dockerfile
+├── docker-compose.yml    # Docker orchestration
+├── docker-compose.prod.yml
+├── .env.docker           # Env template for Docker
+├── nginx.conf            # Nginx config for Docker
+└── DOCKER_SETUP.md       # Detailed Docker guide
 ```
+
+---
+
+## 🔧 Common Tasks
+
+### Database
+
+```bash
+# Local (SQLite) — after migrations, the file is at:
+backend/database/database.sqlite
+
+# Docker (MySQL) — access via:
+docker-compose exec db mysql -u projet_user -p projet_pfe
+
+# Reset all data (Docker):
+docker-compose down -v && docker-compose up -d
+```
+
+### Artisan Commands
+
+```bash
+# Local:
+cd backend && php artisan <command>
+
+# Docker:
+docker-compose exec app php artisan <command>
+```
+
+### NPM Commands (frontend)
+
+```bash
+# Local:
+cd frontend && npm <command>
+
+# Docker:
+docker-compose exec frontend npm <command>
+```
+
+### Adding Packages
+
+```bash
+# PHP package (local):
+cd backend && composer require vendor/package
+
+# PHP package (Docker):
+docker-compose exec app composer require vendor/package
+
+# JS package (local):
+cd frontend && npm install package-name
+
+# JS package (Docker):
+docker-compose exec frontend npm install package-name
+```
+
+---
+
+## 🧪 Environment Variables
+
+| Variable | Docker value | Local value | Purpose |
+|----------|-------------|-------------|---------|
+| `DB_CONNECTION` | `mysql` | `sqlite` | Database driver |
+| `DB_HOST` | `db` | (ignored for SQLite) | Database host |
+| `DB_DATABASE` | `projet_pfe` | `database/database.sqlite` | Database name/path |
+| `SESSION_DRIVER` | `file` | `file` | Session storage |
+| `VITE_API_URL` | `http://localhost` | *(blank — uses proxy)* | API base URL |
+
+---
+
+## 📚 Reference Docs
+
+- [Docker Setup Guide](DOCKER_SETUP.md)
+- [Database Schema](DATABASE_SCHEMA_REFERENCE.md)
+- [Codebase Analysis](CODEBASE_ANALYSIS.md)
+- [DB Usage Report](backend/DB_USAGE_REPORT.md)
+- [Email Setup](EMAIL_SETUP.md)

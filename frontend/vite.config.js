@@ -1,15 +1,20 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
+// Proxy target for API requests.
+// - Docker:     http://nginx      (internal Docker network)
+// - Local dev:  http://localhost:8000  (php artisan serve)
+const PROXY_TARGET = process.env.VITE_API_PROXY_TARGET || 'http://localhost:8000';
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react()
   ],
-  base: '/',  // ← ADD THIS
+  base: '/',
   build: {
-    outDir: 'dist',  // ← ADD THIS
-    assetsDir: 'assets',  // ← ADD THIS
+    outDir: 'dist',
+    assetsDir: 'assets',
   },
   server: {
     host: '0.0.0.0',
@@ -25,11 +30,11 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
-        target: 'http://nginx',
+        target: PROXY_TARGET,
         changeOrigin: true,
       },
       '/storage': {
-        target: 'http://nginx',
+        target: PROXY_TARGET,
         changeOrigin: true,
       },
     },
