@@ -1,5 +1,5 @@
-import clientApi from './clientService';
+import userApi from './userService';
 
 const extractPayload = (response) => response?.data?.data ?? null;
 
-export const fetchClientHome = () => clientApi.get('/home').then(extractPayload);
+export const fetchClientHome = () => userApi.get('/home').then(extractPayload);

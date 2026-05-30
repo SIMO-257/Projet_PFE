@@ -1,6 +1,6 @@
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { resendVerificationEmail, verifyEmailCode } from '../../services/clientService';
+import { resendVerificationEmail, verifyEmailCode } from '../../services/userService';
 import { useTranslation } from '../../hooks/useTranslation';
 import styles from '../../Styles/Auth.module.css';
 

@@ -1,11 +1,11 @@
-import clientApi from './clientService';
+import userApi from './userService';
 import adminApi from './adminService';
 
 // ── User-facing ─────────────────────────────────────────────────
 
-export const getUserRapports = () => clientApi.get('/help');
+export const getUserRapports = () => userApi.get('/help');
 
-export const submitRapport = (data) => clientApi.post('/repports', data);
+export const submitRapport = (data) => userApi.post('/repports', data);
 
 // ── Admin ────────────────────────────────────────────────────────
 

@@ -9,7 +9,7 @@ import {
   forgotPasswordUser,
   getAuthToken,
   updateUserProfile,
-} from '../../services/clientService';
+} from '../../services/userService';
 
 export default function EditProfilePage()  {
   const navigate = useNavigate();

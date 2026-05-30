@@ -5,7 +5,7 @@ import PublicRoute from "./Components/Layout/PublicRoute";
 import ProtectedRoute from "./Components/Layout/ProtectedRoute";
 import { useAuth } from "./hooks/useAuth";
 import { markAuthCheckedUnauthenticated } from "./Redux/Slices/AuthSlice";
-import { shouldRestoreAuthSession } from "./services/clientService";
+import { shouldRestoreAuthSession } from "./services/userService";
 
 import GlobalPageLoader from "./Components/UI/GlobalPageLoader";
 import LoadingOverlay from "./Components/UI/LoadingOverlay";
