@@ -58,6 +58,7 @@ const AdminLayout = () => {
     { path: '/admin/notifications', label: t('admin_nav_notifications'), icon: 'bell' },
     { path: '/admin/rapports', label: t('admin_nav_rapports') || 'Rapports', icon: 'message' },
     { path: '/admin/student-verifications', label: 'Vérifications Étudiant', icon: 'graduation' },
+    { path: '/admin/validator', label: 'Validateur QR', icon: 'qr' },
   ];
 
   return (
@@ -103,6 +104,7 @@ const AdminLayout = () => {
                     {item.icon === 'bell' && '🔔'}
                     {item.icon === 'message' && '💬'}
                     {item.icon === 'graduation' && '🎓'}
+                    {item.icon === 'qr' && '📷'}
                   </span>
                   <span>{item.label}</span>
                 </NavLink>

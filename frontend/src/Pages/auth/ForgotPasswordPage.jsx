@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { forgotPasswordUser } from '../../services/clientService';
+import { forgotPasswordUser } from '../../services/userService';
 import { useTranslation } from '../../hooks/useTranslation';
 
 import InputField from '../../Components/Inputs/InputField';

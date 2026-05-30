@@ -6,7 +6,7 @@ import ProfilInfo from '../../Components/Cards/ProfilInfo';
 import ProfileOpt from '../../Components/Cards/ProfileOpt';
 import styles from '../../Styles/ProfileScreen.module.css';
 import { useAuth } from '../../hooks/useAuth';
-import { fetchUserProfile } from '../../services/clientService';
+import { fetchUserProfile } from '../../services/userService';
 import { useTranslation } from '../../hooks/useTranslation';
 
 export default function ProfilePage()  {

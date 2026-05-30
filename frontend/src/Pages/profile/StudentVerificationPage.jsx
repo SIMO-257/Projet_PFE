@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../../Components/Layout/Header';
 import BottomNavigation from '../../Components/Layout/BottomNavigation';
 import { useTranslation } from '../../hooks/useTranslation';
-import { fetchStudentStatus, submitStudentVerification } from '../../services/clientService';
+import { fetchStudentStatus, submitStudentVerification } from '../../services/userService';
 import styles from '../../Styles/ProfileScreen.module.css';
 
 export default function StudentVerificationPage() {

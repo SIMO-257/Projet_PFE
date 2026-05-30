@@ -54,17 +54,17 @@ adminApi.interceptors.response.use(
 );
 
 // Auth
-export const adminLogin  = (credentials) => adminApi.post('/admin/login', credentials);
-export const adminLogout = ()             => adminApi.post('/admin/logout');
-export const adminMe     = ()             => adminApi.get('/admin/me');
+export const adminLogin = (credentials) => adminApi.post('/admin/login', credentials);
+export const adminLogout = () => adminApi.post('/admin/logout');
+export const adminMe = () => adminApi.get('/admin/me');
 
 // Dashboard
 export const getDashboardStats = () => adminApi.get('/admin/dashboard');
 
 // Users (formerly Clients)
-export const getUsers       = (params) => adminApi.get('/admin/users', { params });
-export const getUser        = (id)     => adminApi.get(`/admin/users/${id}`);
-export const toggleUserStatus = (id)  => adminApi.patch(`/admin/users/${id}/toggle-status`);
+export const getUsers = (params) => adminApi.get('/admin/users', { params });
+export const getUser = (id) => adminApi.get(`/admin/users/${id}`);
+export const toggleUserStatus = (id) => adminApi.patch(`/admin/users/${id}/toggle-status`);
 
 // Tickets
 export const getAdminTickets = (params) => adminApi.get('/admin/tickets', { params });
@@ -83,5 +83,15 @@ export const getStudentVerifications = (params) => adminApi.get('/admin/student-
 export const getStudentVerification = (id) => adminApi.get(`/admin/student-verifications/${id}`);
 export const approveStudentVerification = (id) => adminApi.post(`/admin/student-verifications/${id}/approve`);
 export const rejectStudentVerification = (id, reason) => adminApi.post(`/admin/student-verifications/${id}/reject`, { reason });
+
+// Validator (admin)
+export const adminValidateTicket = (uuid, payload) =>
+  adminApi.post(`/admin/validator/validate-ticket/${uuid}`, payload);
+
+export const adminConsumeQrValidationToken = (payload) =>
+  adminApi.post('/admin/validator/consume-qr', payload);
+
+export const adminLookupTicket = (ticketUuid) =>
+  adminApi.post('/admin/validator/lookup', { ticket_uuid: ticketUuid });
 
 export default adminApi;

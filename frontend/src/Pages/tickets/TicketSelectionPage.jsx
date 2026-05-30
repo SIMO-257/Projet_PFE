@@ -183,6 +183,47 @@ export default function TicketSelectionPage() {
                                 </div>
                             )}
 
+                            {/* Ticket Type Description Card */}
+                            {selectedType && selectedType.description && (
+                                <div className="rounded-2xl bg-gradient-to-br from-[#5C2A36]/40 to-[#3D1A24]/40 border border-[#f5d579]/15 overflow-hidden">
+                                    <div className="p-5">
+                                        <div className="flex items-center gap-3 mb-3">
+                                            <div className="w-8 h-8 rounded-lg bg-[#f5d579]/10 border border-[#f5d579]/20 flex items-center justify-center">
+                                                <svg className="w-4 h-4 text-[#f5d579]" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd"/>
+                                                </svg>
+                                            </div>
+                                            <h4 className="text-[#f5d579] font-semibold text-sm uppercase tracking-wider">
+                                                {language === 'ar' ? 'وصف التذكرة' : language === 'en' ? 'Ticket Details' : "Détails du billet"}
+                                            </h4>
+                                        </div>
+                                        <p className="text-white/70 text-sm leading-relaxed">
+                                            {selectedType.description}
+                                        </p>
+                                        {selectedType.duration_minutes && (
+                                            <div className="mt-3 pt-3 border-t border-[#f5d579]/10 flex items-center gap-2">
+                                                <svg className="w-4 h-4 text-[#f5d579]/60" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd"/>
+                                                </svg>
+                                                <span className="text-white/60 text-xs">
+                                                    {language === 'ar' ? `المدة: ${selectedType.duration_minutes} دقيقة` : language === 'en' ? `Duration: ${selectedType.duration_minutes} min` : `Durée: ${selectedType.duration_minutes} min`}
+                                                </span>
+                                            </div>
+                                        )}
+                                        {selectedType.effective_price && selectedType.effective_price !== selectedType.price && (
+                                            <div className="mt-2 flex items-center gap-2">
+                                                <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                                                </svg>
+                                                <span className="text-green-400 text-xs font-medium">
+                                                    {language === 'ar' ? `خصم الطالب` : language === 'en' ? 'Student discount applied' : 'Tarif étudiant appliqué'}
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
                             {errors.balance && (
                                 <div className="bg-red-900/40 border border-red-500/50 rounded-2xl p-5 mb-4 shadow-[0_0_15px_rgba(239,68,68,0.15)]">
                                     <p className="text-red-400 text-sm mb-3 font-medium">

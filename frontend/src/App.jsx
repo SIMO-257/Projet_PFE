@@ -5,7 +5,7 @@ import PublicRoute from "./Components/Layout/PublicRoute";
 import ProtectedRoute from "./Components/Layout/ProtectedRoute";
 import { useAuth } from "./hooks/useAuth";
 import { markAuthCheckedUnauthenticated } from "./Redux/Slices/AuthSlice";
-import { shouldRestoreAuthSession } from "./services/clientService";
+import { shouldRestoreAuthSession } from "./services/userService";
 
 import GlobalPageLoader from "./Components/UI/GlobalPageLoader";
 import LoadingOverlay from "./Components/UI/LoadingOverlay";
@@ -39,7 +39,6 @@ const TicketDetailPage = lazy(() => import("./Pages/tickets/TicketDetailPage"));
 // Lazy pages - Validation
 const ValidationPage = lazy(() => import("./Pages/validation/ValidationPage"));
 const ValidationSuccessPage = lazy(() => import("./Pages/validation/ValidationSuccessPage"));
-const ValidatorPage = lazy(() => import("./Pages/validation/ValidatorPage"));
 
 // Lazy pages - Payment
 const PaymentPage = lazy(() => import("./Pages/payment/PaymentPage"));
@@ -62,6 +61,7 @@ const AdminNotifications = lazy(() => import("./Pages/admin/AdminNotifications")
 const AdminProfile = lazy(() => import("./Pages/admin/AdminProfile"));
 const AdminRapports = lazy(() => import("./Pages/admin/AdminRapports"));
 const AdminStudentVerifications = lazy(() => import("./Pages/admin/AdminStudentVerifications"));
+const ValidatorPage = lazy(() => import("./Pages/validation/ValidatorPage"));
 
 // Admin Components
 import AdminGuard from './Components/guards/AdminGuard';
@@ -187,7 +187,6 @@ function App() {
             <Route path="/tickets/:id" element={<TicketDetailPage />} />
             <Route path="/validation" element={<ValidationPage />} />
             <Route path="/validation-success" element={<ValidationSuccessPage />} />
-            <Route path="/validator" element={<ValidatorPage />} />
 
             <Route path="/recharge-payment" element={<RechargePaymentPage />} />
             <Route path="/change-default-card" element={<ChangeDefaultCardPage />} />
@@ -210,6 +209,7 @@ function App() {
               <Route path="notifications" element={<AdminNotifications />} />
               <Route path="rapports" element={<AdminRapports />} />
               <Route path="student-verifications" element={<AdminStudentVerifications />} />
+              <Route path="validator" element={<ValidatorPage />} />
               <Route path="profil" element={<AdminProfile />} />
             </Route>
           </Route>

@@ -115,6 +115,7 @@ use App\Http\Controllers\Admin\AdminTicketController;
 use App\Http\Controllers\Admin\AdminTransactionController;
 use App\Http\Controllers\Admin\AdminNotificationController;
 use App\Http\Controllers\Admin\AdminProfileController;
+use App\Http\Controllers\Admin\AdminValidationController;
 
 // Public admin route — no auth required (throttled like user login)
 Route::prefix('admin')->group(function () {
@@ -155,4 +156,11 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'admin'])->group(function ()
     Route::get('/student-verifications/{id}', [AdminStudentVerificationController::class, 'show']);
     Route::post('/student-verifications/{id}/approve', [AdminStudentVerificationController::class, 'approve']);
     Route::post('/student-verifications/{id}/reject', [AdminStudentVerificationController::class, 'reject']);
+
+    // Validator (admin can validate any user's tickets)
+    Route::prefix('validator')->group(function () {
+        Route::post('/validate-ticket/{uuid}', [AdminValidationController::class, 'validateTicket']);
+        Route::post('/consume-qr', [AdminValidationController::class, 'consumeQr']);
+        Route::post('/lookup', [AdminValidationController::class, 'lookupTicket']);
+    });
 });

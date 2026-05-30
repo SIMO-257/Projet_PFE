@@ -3,7 +3,7 @@ import axios from 'axios';
 const configuredApiBase = import.meta.env.VITE_API_URL;
 const apiBase = configuredApiBase.replace(/\/+$/, '');
 
-const clientApi = axios.create({
+const userApi = axios.create({
   baseURL: `${apiBase}/api`,
   headers: {
     Accept: 'application/json',
@@ -46,7 +46,7 @@ export const setUserUuid = (uuid, rememberMe = false) => {
   }
 };
 
-clientApi.interceptors.request.use((config) => {
+userApi.interceptors.request.use((config) => {
   const token = getAuthToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -60,7 +60,7 @@ clientApi.interceptors.request.use((config) => {
   return config;
 });
 
-clientApi.interceptors.response.use(
+userApi.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401 && !error.config?.url?.startsWith('/admin')) {
@@ -73,28 +73,28 @@ clientApi.interceptors.response.use(
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
 export const signupUser = async (payload) => {
-  return clientApi.post('/users/signup', payload);
+  return userApi.post('/users/signup', payload);
 };
 
 export const loginUser = async (payload) => {
-  return clientApi.post('/users/login', payload);
+  return userApi.post('/users/login', payload);
 };
 
-export const resendVerificationEmail = (email) => clientApi.post('/email/resend', { email });
+export const resendVerificationEmail = (email) => userApi.post('/email/resend', { email });
 
-export const verifyEmailCode = (email, code) => clientApi.post('/email/verify-code', { email, code });
+export const verifyEmailCode = (email, code) => userApi.post('/email/verify-code', { email, code });
 
 export const forgotPasswordUser = async (payload) => {
-  return clientApi.post('/users/forgot-password', payload);
+  return userApi.post('/users/forgot-password', payload);
 };
 
 export const resetPasswordUser = async (payload) => {
-  return clientApi.post('/users/reset-password', payload);
+  return userApi.post('/users/reset-password', payload);
 };
 
 // ── Profile ───────────────────────────────────────────────────────────────────
 
-export const fetchUserProfile = () => clientApi.get('/users/profile').then(extractPayload);
+export const fetchUserProfile = () => userApi.get('/users/profile').then(extractPayload);
 
 export const updateUserProfile = ({ payload = {}, avatarFile = null }) => {
   if (avatarFile) {
@@ -106,20 +106,20 @@ export const updateUserProfile = ({ payload = {}, avatarFile = null }) => {
       }
     });
     form.append('profile_file', avatarFile);
-    return clientApi.post('/users/profile', form);
+    return userApi.post('/users/profile', form);
   }
-  return clientApi.put('/users/profile', payload);
+  return userApi.put('/users/profile', payload);
 };
 
-export const logoutUser = () => clientApi.post('/users/logout');
+export const logoutUser = () => userApi.post('/users/logout');
 
 // ── Student Verification ───────────────────────────────────────────────────────
 
-export const fetchStudentStatus = () => clientApi.get('/users/student-status').then(extractPayload);
+export const fetchStudentStatus = () => userApi.get('/users/student-status').then(extractPayload);
 
 export const submitStudentVerification = (formData) =>
-  clientApi.post('/users/student-verification', formData, {
+  userApi.post('/users/student-verification', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   }).then(extractPayload);
 
-export default clientApi;
+export default userApi;

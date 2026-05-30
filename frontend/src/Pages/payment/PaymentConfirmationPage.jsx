@@ -1,13 +1,16 @@
 
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
+import { useAuth } from '../../hooks/useAuth';
 import ProgressSteps from '../../Components/NavBar/ProgressSteps';
+import TransactionDetailsCard from '../../Components/Cards/TransactionDetailsCard';
 import styles from '../../Styles/ConfirmationPaiment.module.css';
 
 export default function PaymentConfirmationPage () {
     const location = useLocation();
     const navigate = useNavigate();
     const { t, language } = useTranslation();
+    const { user } = useAuth();
     const { tickets, message } = location.state || {};
 
     // Get the first ticket to display primary info
@@ -49,7 +52,7 @@ export default function PaymentConfirmationPage () {
         transactionNumber: mainTicket?.uuid ? `#TRX-${mainTicket.uuid.split('-')[0].toUpperCase()}` : "#TRX-UNKNOWN",
         transactionDateTime: formatDate(mainTicket?.created_at),
         paymentMethodFull: t('payment_by_wallet'),
-        receiptEmail: "Client@PFE.com"
+        receiptEmail: user?.email || mainTicket?.user?.email || t('guest')
     };
 
     const handleViewTicket = () => {
@@ -173,24 +176,14 @@ export default function PaymentConfirmationPage () {
                         </svg>
                     </summary>
                     <div className={styles.accordionContent}>
-                        <div className={styles.transactionInfo}>
-                            <div className={styles.detailRow}>
-                                <span className={styles.label}>{t('transaction_number')}</span>
-                                <span className={styles.value}>{ticketData.transactionNumber}</span>
-                            </div>
-                            <div className={styles.detailRow}>
-                                <span className={styles.label}>{t('date_and_time')}</span>
-                                <span className={styles.value}>{ticketData.transactionDateTime}</span>
-                            </div>
-                            <div className={styles.detailRow}>
-                                <span className={styles.label}>{t('payment_method_full')}</span>
-                                <span className={styles.value}>{ticketData.paymentMethodFull}</span>
-                            </div>
-                            <div className={styles.detailRow}>
-                                <span className={styles.label}>{t('client_label')}</span>
-                                <span className={styles.value}>{ticketData.receiptEmail}</span>
-                            </div>
-                        </div>
+                        <TransactionDetailsCard
+                            transactionNumber={ticketData.transactionNumber}
+                            method={ticketData.paymentMethod}
+                            transactionDateTime={ticketData.transactionDateTime}
+                            paymentMethodFull={ticketData.paymentMethodFull}
+                            receiptEmail={ticketData.receiptEmail}
+                            t={t}
+                        />
                         <button className={styles.btnDownload} onClick={handleDownloadReceipt}>
                             <svg className={styles.downloadIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" strokeWidth="2"/>
