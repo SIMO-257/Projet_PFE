@@ -20,8 +20,8 @@ const AdminTickets = () => {
     try {
       setLoading(true);
       const response = await getAdminTickets({ search, status, page });
-      setTickets(response.data.data.data);
-      setPagination(response.data.data);
+      setTickets(response.data?.data?.data || []);
+      setPagination(response.data?.data);
     } catch (err) {
       console.error('Error loading tickets');
     } finally {

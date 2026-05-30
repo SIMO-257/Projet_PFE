@@ -102,7 +102,7 @@ export default function MyTicketsPage() {
                   </>
                 )}
 
-                {!isLoading && tickets.length === 0 && !simpleBilletType && otherTicketTypes.length === 0 && (
+                {!isLoading && safeTickets.length === 0 && !simpleBilletType && otherTicketTypes.length === 0 && (
                    <p className="text-white/40 text-center py-10">{t('no_ticket_available')}</p>
                 )}
               </div>

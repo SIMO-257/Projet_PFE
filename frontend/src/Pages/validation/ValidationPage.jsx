@@ -29,6 +29,9 @@ export default function ValidationPage() {
   const navigateHook = useNavigate();
   const location = useLocation();
 
+  const safeTickets = Array.isArray(tickets) ? tickets : [];
+
+
   const [showNFCModal, setShowNFCModal] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
   const [qrTimeRemaining, setQRTimeRemaining] = useState(300);
@@ -43,21 +46,21 @@ export default function ValidationPage() {
   const [isGeneratingNFC, setIsGeneratingNFC] = useState(false);
 
   useEffect(() => {
-    if (tickets.length === 0) {
+    if (safeTickets.length === 0) {
       refreshTickets();
     }
-  }, [tickets.length, refreshTickets]);
+  }, [safeTickets.length, refreshTickets]);
 
   const selectedTicketUuid = location.state?.ticketUuid ?? null;
   const hideBottomNav = location.state?.hideBottomNav === true || location.state?.source === 'home-card';
   const selectedTicket = selectedTicketUuid
-    ? tickets.find((t) => t.uuid === selectedTicketUuid)
+    ? safeTickets.find((t) => t.uuid === selectedTicketUuid)
     : null;
 
   const activeTicket =
     selectedTicket && ['active', 'used'].includes(selectedTicket.status) && selectedTicket.remaining_uses > 0
       ? selectedTicket
-      : tickets.find((t) => ['active', 'used'].includes(t.status) && t.remaining_uses > 0);
+      : safeTickets.find((t) => ['active', 'used'].includes(t.status) && t.remaining_uses > 0);
 
   useEffect(() => {
     if (activeTicket && !nfcTicketUuidInput) {
@@ -67,16 +70,16 @@ export default function ValidationPage() {
 
   useEffect(() => {
     // Automatically trigger method if passed in state
-    if (location.state?.method === 'NFC' && tickets.length > 0 && !showNFCModal) {
+    if (location.state?.method === 'NFC' && safeTickets.length > 0 && !showNFCModal) {
       startNfcChallenge();
       // Clear method from state to prevent re-triggering
       navigateHook(location.pathname, { replace: true, state: { ...location.state, method: null } });
-    } else if (location.state?.method === 'QR' && tickets.length > 0 && !showQRModal) {
+    } else if (location.state?.method === 'QR' && safeTickets.length > 0 && !showQRModal) {
       validateQR();
       // Clear method from state to prevent re-triggering
       navigateHook(location.pathname, { replace: true, state: { ...location.state, method: null } });
     }
-  }, [location.state, tickets.length, showNFCModal, showQRModal]);
+  }, [location.state, safeTickets.length, showNFCModal, showQRModal]);
 
   useEffect(() => {
     let timer;
