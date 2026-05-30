@@ -306,12 +306,26 @@ export default function EditProfilePage()  {
                   </svg>
                 </div>
               </button>
-              {resetStatus && <p className="text-green-400 text-xs mt-2">{resetStatus}</p>}
+              {resetStatus && (
+                <div className="bg-green-900/30 border border-green-500/50 rounded-xl p-3 mt-2 flex items-start gap-2">
+                  <svg className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                  </svg>
+                  <p className="text-green-300 text-xs font-medium">{resetStatus}</p>
+                </div>
+              )}
             </div>
 
             {/* Save Button */}
             <div className="mt-8">
-              {errors.form?.[0] && <p className="text-red-400 text-sm mb-3">{errors.form[0]}</p>}
+              {errors.form?.[0] && (
+                <div className="bg-red-900/30 border border-red-500/50 rounded-xl p-3 mb-3 flex items-start gap-2">
+                  <svg className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd"/>
+                  </svg>
+                  <p className="text-red-400 text-xs">{errors.form[0]}</p>
+                </div>
+              )}
               <button
                 onClick={handleSaveChanges}
                 disabled={processing}

@@ -104,6 +104,7 @@ export default function TicketDetailPage() {
                         </div>
                     </div>
 
+
                     <p className="text-white/30 text-[10px] text-center mt-8 px-6">
                         {t('ticket_disclaimer')}
                     </p>

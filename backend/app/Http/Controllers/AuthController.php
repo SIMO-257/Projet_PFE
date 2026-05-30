@@ -77,8 +77,11 @@ class AuthController extends Controller
     {
         $data = $request->validated();
 
-        if (User::where('email', $data['email'])->exists() || PendingRegistration::where('email', $data['email'])->exists()) {
+        if (User::where('email', $data['email'])->exists()) {
             return $this->errorResponse('This email is already used.', 422, ['email' => ['This email is already used.']]);
+        }
+        if (PendingRegistration::where('email', $data['email'])->exists()) {
+            return $this->errorResponse('This email is pending verification. Please check your email or wait 5 minutes before trying again.', 422, ['email' => ['pending_verification']]);
         }
         if (User::where('phone', $data['phone'] ?? '')->exists() || PendingRegistration::where('phone', $data['phone'] ?? '')->exists()) {
             return $this->errorResponse('This phone number is already used.', 422, ['phone' => ['This phone number is already used.']]);

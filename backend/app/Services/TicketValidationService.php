@@ -135,6 +135,93 @@ class TicketValidationService
         return is_array($payload) ? $payload : null;
     }
 
+    // ─── Admin Validation ────────────────────────────────────────
+
+    /**
+     * Validate a ticket by UUID without user_id restriction — for admin use.
+     * Admins can validate any user's ticket.
+     */
+    public function adminValidateTicketByUuid(string $uuid, string $validatorId, ?string $location = null): array
+    {
+        try {
+            return DB::transaction(function () use ($uuid, $validatorId, $location) {
+                $ticket = Ticket::with('ticketType')
+                    ->where('uuid', $uuid)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$ticket) {
+                    AuditLog::log('admin_validation_failed_not_found', null, ['uuid' => $uuid]);
+                    return ['success' => false, 'message' => 'Ticket non trouvé.', 'status' => 404];
+                }
+
+                $user = $ticket->user;
+                if (!$user) {
+                    return ['success' => false, 'message' => 'Propriétaire du ticket introuvable.', 'status' => 404];
+                }
+
+                $failureReason = null;
+
+                if (!$this->canValidateStatus((string) $ticket->status)) {
+                    $failureReason = "Le billet est déjà {$ticket->status}.";
+                } elseif (!empty($ticket->valid_until) && Carbon::parse($ticket->valid_until)->isPast()) {
+                    $failureReason = "Le billet est expiré.";
+                    $ticket->status = 'expired';
+                    $ticket->save();
+                } elseif ($this->shouldConsumeUse($ticket) && $ticket->remaining_uses <= 0) {
+                    $failureReason = "Plus d'utilisations restantes.";
+                    $ticket->status = 'validated';
+                    $ticket->save();
+                }
+
+                if ($failureReason) {
+                    $this->logValidation($ticket->id, $user->id, $validatorId, 'qr', 'failure', $failureReason, $location);
+                    AuditLog::log('admin_validation_failed', $user->id, ['uuid' => $uuid, 'reason' => $failureReason, 'validator' => $validatorId]);
+                    return ['success' => false, 'message' => $failureReason, 'status' => 422];
+                }
+
+                if ($ticket->status === 'active') {
+                    $ticket->status = 'used';
+                }
+
+                if ($this->shouldConsumeUse($ticket)) {
+                    $ticket->remaining_uses -= 1;
+                    if ($ticket->remaining_uses <= 0) {
+                        $ticket->status = 'validated';
+                    }
+                }
+
+                $ticket->save();
+
+                $this->logValidation($ticket->id, $user->id, $validatorId, 'qr', 'success', null, $location);
+                AuditLog::log('admin_validation_success', $user->id, [
+                    'uuid' => $uuid,
+                    'validator' => $validatorId,
+                ]);
+
+                return [
+                    'success' => true,
+                    'data' => [
+                        'remaining_uses' => $ticket->remaining_uses,
+                        'status_after' => $ticket->status,
+                    ],
+                    'message' => 'Billet validé avec succès.',
+                    'ticket' => $ticket,
+                    'user' => $user,
+                    'location' => $location,
+                    'validatorId' => $validatorId,
+                ];
+            });
+        } catch (\Throwable $e) {
+            Log::error('Admin ticket validation failed', [
+                'ticket_uuid' => $uuid,
+                'validator_id' => $validatorId,
+                'error' => $e->getMessage(),
+            ]);
+            return ['success' => false, 'message' => 'Une erreur est survenue lors de la validation.', 'status' => 500];
+        }
+    }
+
     // ─── Core Validation Logic ───────────────────────────────────
 
     /**

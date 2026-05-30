@@ -84,4 +84,14 @@ export const getStudentVerification = (id) => adminApi.get(`/admin/student-verif
 export const approveStudentVerification = (id) => adminApi.post(`/admin/student-verifications/${id}/approve`);
 export const rejectStudentVerification = (id, reason) => adminApi.post(`/admin/student-verifications/${id}/reject`, { reason });
 
+// Validator (admin)
+export const adminValidateTicket = (uuid, payload) =>
+  adminApi.post(`/admin/validator/validate-ticket/${uuid}`, payload);
+
+export const adminConsumeQrValidationToken = (payload) =>
+  adminApi.post('/admin/validator/consume-qr', payload);
+
+export const adminLookupTicket = (ticketUuid) =>
+  adminApi.post('/admin/validator/lookup', { ticket_uuid: ticketUuid });
+
 export default adminApi;

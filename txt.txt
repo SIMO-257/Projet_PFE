@@ -299,3 +299,119 @@ Tu veux que je commence par une ou plusieurs de ces suggestions ? Je peux aussi 
 -- in the parametrs section there is this authentification part were you need the PIN code or biometrie how can i add the to my app?.
 -- i want in bot wallet transaction and tickets so when the user buy or add anew transaction it required the password.
 -- give me an idea on how can we integrate partage des donnes in the admin part can we like use them for analysis or what ?
+
+-- if the email is in the pending registartion and the user sign up a pop up error have to be appear like "The email is getting verfied wait 5 min if it is your email". 
+-- verify if the resend paswword is working for email verfification.
+-- look for every good response with greeen text it hase to be in a container with green background you know what i mean juts like in erros but the opposite.
+-- when buying a ticket you get the selection interface under the counter if it exists because it doesnt for reusable tickets anyway under that section the ticket type description with the proper language should appear in a card like a "detail type" card improvise in the style but make it match teh app.
+-- there should also be a desription button when pressing a ticket in ticket detail but it has to be like "Description" and when you press on it the descriptio appear in like a drop menu just liek transa tion detail when buying a ticket you know what i mean ?
+-- also verify if the transaction detaill are random or are they static and unesfull .
+-- scan for a repport then give me a plan.
+
+-- this project is already focused on the user part but the validation part were the scanner will know if  the user is scanning from the entiry or the exit with proper logic or when the user switch statioens etc.
+-- in other words i dont have the tramway/basway systeme validation properlly implemented in my validation proceese so the validation isn't relastic but i dont thinkk this is my job it is the comapnny job who will implement that logic.
+-- i just want to make it more realistic but it is already too much and i cant keep adding.
+-- how about i only simulate 2 line the busw 1 and tram 3 they are the most used in the city the willl be easier than implemting the whole network.
+-- what do you think what is your plan ? 
+
+
+
+-- god but there are some cathes that need to be added in the tables :
+-- reusable tickets dont have a num of switches they are infinite but for non reusable ticket they have 2 switches at max.
+-- when the user validate at an exit he have 5min to switch by scanning in entry if he doesn't the ticket isnt scannable anymore it counts as done.
+-- idk how to implent this feature logic.
+The Logic Explained
+
+
+Think of each non-reusable ticket going through a journey state machine with 4 states:
+  ◉ NOT_STARTED  ───(entry)──▶  ◉ IN_JOURNEY  
+                                      │
+                                 (exit via validator)
+                                      │
+                                      ▼
+                                ◉ SWITCH_WINDOW
+                               (5 min timer starts)
+                             │                  │
+                      (entry within 5 min)    (5 min expires)
+                             │                  │
+                             ▼                  ▼
+                       ◉ IN_JOURNEY        ◉ COMPLETED
+                       (switch #1 used)    (ticket done)
+                             │
+                        (exit via validator)
+                             │
+                    switches_count ≥ 2?
+                             │
+                        ┌────┴────┐
+                       YES        NO
+                        │          │
+                        ▼          ▼
+                   COMPLETED   SWITCH_WINDOW
+                   (done)      (timer restarts)
+Concrete example: Non-reusable single ticket
+┌──────┬───────────────────────────┬──────────────────────────────────────────────────────────────┐
+│ Step │ Action                    │ What happens                                                 │
+├──────┼───────────────────────────┼──────────────────────────────────────────────────────────────┤
+│ 1    │ Entry at Station A (T3)   │ journey_status = 'in_journey', entry_station = 'A',          │
+│      │                           │ switches_count = 0                                           │
+│ 2    │ Exit at Station B (T3)    │ switches_count = 1, journey_status = 'switch_window', timer  │
+│      │                           │ starts → expires in 5 min                                    │
+│ 3a   │ Entry at Station C (T3)   │ switches_count = 1 (still), journey_status = 'in_journey',   │
+│      │ within 5 min              │ timer cleared                                                │
+│ 4a   │ Exit at Station D (T3)    │ switches_count = 2 → max reached. status = 'validated',      │
+│      │                           │ remaining_uses = 0                                           │
+│ 3b   │ Entry at Station C after  │ Timer expired → REJECTED. Ticket → 'validated', journey      │
+│      │ 5 min                     │ ended.                                                       │
+└──────┴───────────────────────────┴──────────────────────────────────────────────────────────────┘
+Reusable tickets (monthly/weekly passes)
+For reusable tickets, journey tracking is informational only — entry/exit is recorded for display, but no enforcement occurs. No switch limits, no timer enforcement, no status change.
+────────────────────────────────────────────────────────────────────────────────
+Implementation Plan
+Here's exactly what needs to happen:
+1. One new migration:  add_journey_fields_to_tickets 
+Add these nullable columns to the  tickets  table:
+-  journey_status  (string, nullable) —  'in_journey'  |  'switch_window'  | null
+-  entry_station  (string, nullable)
+-  entry_line  (string, nullable)
+-  entry_at  (timestamp, nullable)
+-  exit_station  (string, nullable)
+-  exit_line  (string, nullable)
+-  exit_at  (timestamp, nullable)
+-  switches_count  (integer, default 0)
+-  switch_window_expires_at  (timestamp, nullable)
+2. Update  Ticket  model fillable + casts
+3. Create  TransitLineService  — a simple PHP service with station data
+A static config with 2 lines, ~5-8 stations each:
+B1: ["Casa Voyageurs", "Tahaddart", "Oulfa", "Hay Mohammadi", "Sidi Moumen"]
+T3: ["Hay Hassani", "Bd Zerktouni", "Marché Central", "Place des Nations-Unies", "Sidi Maârouf", "Hay El Fida"]
+4. Rewrite journey logic in  TicketValidationService 
+Two new methods:
+-  processEntry()  — handles entry logic (start journey / resume within window)
+-  processExit()  — handles exit logic (first exit → start timer / final exit → done)
+Both called from  adminValidateTicketByUuid()  which now accepts  direction ,  line , and  station .
+5. Update  AdminValidationController 
+- Accept  direction  (entry/exit),  line ,  station  in the request
+- Pass to service
+6. Update  ValidatorPage.jsx  — the big UI change
+Instead of just "Validate" — the admin now selects:
+- Line dropdown (B1 / T3)
+- Station dropdown (populated based on line selection)
+- Direction toggle (Entry / Exit)
+- Then scan or enter the ticket UUID
+The result modal shows: entry station, exit station, line, switches used, timer status, etc.
+This is the biggest file change.
+────────────────────────────────────────────────────────────────────────────────
+Summary
+┌────────────────────────────────────────────────────┬────────────────────────────────────────────┐
+│ File                                               │ Action                                     │
+├────────────────────────────────────────────────────┼────────────────────────────────────────────┤
+│ database/migrations/..._add_journey_fields.php     │ New — 9 columns                            │
+│ backend/app/Models/Ticket.php                      │ Edit — fillable + casts                    │
+│ backend/app/Services/TicketValidationService.php   │ Edit — journey methods                     │
+│ backend/app/Services/TransitLineService.php        │ New — station data                         │
+│ backend/app/Http/Controllers/Admin/AdminValidation │ Edit — accept direction/line/station       │
+│ Controller.php                                     │                                            │
+│ frontend/src/Pages/validation/ValidatorPage.jsx    │ Edit — line+station+direction UI,          │
+│                                                    │ journey-aware result                       │
+└────────────────────────────────────────────────────┴────────────────────────────────────────────┘
+Want me to implement this? I'd start by creating the migration and transit line service, then work through each layer bottom-up (backend → frontend).
