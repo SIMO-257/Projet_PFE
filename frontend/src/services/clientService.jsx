@@ -4,7 +4,7 @@ const configuredApiBase = import.meta.env.VITE_API_URL;
 const apiBase = configuredApiBase.replace(/\/+$/, '');
 
 const clientApi = axios.create({
-  baseURL: `${apiBase}/api`,
+  baseURL: apiBase,
   headers: {
     Accept: 'application/json',
   },
