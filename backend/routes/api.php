@@ -119,13 +119,13 @@ use App\Http\Controllers\Admin\AdminValidationController;
 
 // Public admin route — no auth required (throttled like user login)
 Route::prefix('admin')->group(function () {
-    Route::post('/login',  [AdminAuthController::class, 'login'])->middleware('throttle:login');
+    Route::post('/login',[AdminAuthController::class, 'login'])->middleware('throttle:login');
 });
 
 // Protected admin routes — requires sanctum token and admin check
 Route::prefix('admin')->middleware(['auth:sanctum', 'admin'])->group(function () {
-    Route::post('/logout',  [AdminAuthController::class, 'logout']);
-    Route::get('/me',       [AdminAuthController::class, 'me']);
+    Route::post('/logout',[AdminAuthController::class, 'logout']);
+    Route::get('/me',[AdminAuthController::class, 'me']);
 
     // Dashboard
     Route::get('/dashboard', [AdminDashboardController::class, 'index']);

@@ -3,13 +3,13 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmailVerificationController;
 
-Route::get('/{any}', function () {
-    $path = public_path('index.html');
-    if (!file_exists($path)) {
-        return response()->json(['message' => 'Frontend not built'], 404);
-    }
-    return file_get_contents($path);
-})->where('any', '.*');
+// Route::get('/{any}', function () {
+//     $path = public_path('index.html');
+//     if (!file_exists($path)) {
+//         return response()->json(['message' => 'Frontend not built'], 404);
+//     }
+//     return file_get_contents($path);
+// })->where('any', '.*');
 
 Route::get('/login', function () {
     return response()->json([
