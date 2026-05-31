@@ -11,13 +11,13 @@ use App\Http\Controllers\EmailVerificationController;
 //     return file_get_contents($path);
 // })->where('any', '.*');
 
-Route::get('/login', function () {
-    return response()->json([
-        'status' => 'error',
-        'message' => 'Unauthenticated.',
-    ], 401);
-})->name('login');
+// Route::get('/login', function () {
+//     return response()->json([
+//         'status' => 'error',
+//         'message' => 'Unauthenticated.',
+//     ], 401);
+// })->name('login');
 
-// Email verification click link — web route, no auth required
-Route::get('/email/verify/{token}', [EmailVerificationController::class, 'verify'])
-    ->name('verification.verify');
+// // Email verification click link — web route, no auth required
+// Route::get('/email/verify/{token}', [EmailVerificationController::class, 'verify'])
+//     ->name('verification.verify');
