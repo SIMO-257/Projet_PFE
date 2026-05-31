@@ -15,6 +15,7 @@ class CustomPolicy extends Basic
             ->addDirective(Directive::SCRIPT, [
                 'self',
                 'https://js.stripe.com',
+                'unsafe-inline',
             ])
             ->addDirective(Directive::STYLE, [
                 'self',

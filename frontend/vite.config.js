@@ -44,7 +44,7 @@ export default defineConfig({
   'X-XSS-Protection': '1; mode=block',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
-  'Content-Security-Policy': "default-src 'self'; script-src 'self' https://js.stripe.com; style-src 'self'; img-src 'self' data: https; connect-src 'self' https://api.stripe.com;",
+  'Content-Security-Policy': "default-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; media-src 'self'; script-src 'self' https://js.stripe.com 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' * data: blob:; font-src 'self' data:; connect-src 'self' http://localhost https://api.stripe.com; frame-src 'self' https://js.stripe.com;",
   },
  
   }

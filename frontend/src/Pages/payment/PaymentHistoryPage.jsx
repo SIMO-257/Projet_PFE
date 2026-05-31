@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import { fetchTransactionHistory } from '../../services/walletService';
 import styles from '../../Styles/PaimentHistory.module.css';
-import BottomNavigation from '../../Components/Layout/BottomNavigation';
 import TransactionItem from '../../Components/Cards/TransactionItem';
 
 export default function PaymentHistoryPage() {
@@ -204,7 +203,6 @@ export default function PaymentHistoryPage() {
                             <p className="text-white/50 text-center py-10">{t('no_transaction_found')}</p>
                         )}
                     </div>
-                    <BottomNavigation />
                 </div>
             </div>
         </div>
