@@ -43,15 +43,15 @@ const Skeleton = () => (
     <div className="h-8 w-48 bg-white/5 rounded-xl" />
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {[1, 2, 3, 4].map(i => (
-        <div key={i} className="bg-black/40 border border-white/10 p-6 rounded-2xl space-y-4">
+        <div key={i} className="bg-[#1a0507]/80 border border-white/10 p-6 rounded-2xl space-y-4">
           <div className="h-4 w-24 bg-white/5 rounded" />
           <div className="h-8 w-32 bg-white/5 rounded" />
         </div>
       ))}
     </div>
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div className="bg-black/40 border border-white/10 p-6 rounded-2xl h-64" />
-      <div className="bg-black/40 border border-white/10 p-6 rounded-2xl h-64" />
+      <div className="bg-[#1a0507]/80 border border-white/10 p-6 rounded-2xl h-64" />
+      <div className="bg-[#1a0507]/80 border border-white/10 p-6 rounded-2xl h-64" />
     </div>
   </div>
 );
@@ -214,7 +214,7 @@ const AdminDashboard = () => {
       {/* Chart + Quick Links Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Chart */}
-        <div className="lg:col-span-2 bg-black/40 border border-white/10 rounded-2xl p-6">
+        <div className="lg:col-span-2 bg-[#1a0507]/80 border border-white/10 rounded-2xl p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-bold text-white">{t('admin_chart_title')}</h3>
             <div className="flex gap-1.5 bg-white/5 rounded-xl p-1">
@@ -320,7 +320,7 @@ const AdminDashboard = () => {
         {/* Quick Actions & Pending Links */}
         <div className="space-y-4">
           {/* Pending Reports */}
-          <div className="bg-black/40 border border-white/10 rounded-2xl p-5 hover:border-white/20 transition-all group">
+          <div className="bg-[#1a0507]/80 border border-white/10 rounded-2xl p-5 hover:border-white/20 transition-all group">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-orange-500/15 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                 <svg className="w-6 h-6 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -344,7 +344,7 @@ const AdminDashboard = () => {
           </div>
 
           {/* Pending Student Verifications */}
-          <div className="bg-black/40 border border-white/10 rounded-2xl p-5 hover:border-white/20 transition-all group">
+          <div className="bg-[#1a0507]/80 border border-white/10 rounded-2xl p-5 hover:border-white/20 transition-all group">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-blue-500/15 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                 <svg className="w-6 h-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -368,7 +368,7 @@ const AdminDashboard = () => {
           </div>
 
           {/* Daily Activity Summary */}
-          <div className="bg-black/40 border border-white/10 rounded-2xl p-5">
+          <div className="bg-[#1a0507]/80 border border-white/10 rounded-2xl p-5">
             <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider mb-4">{t('admin_daily_activity')}</h3>
             <div className="space-y-3">
               <div className="flex justify-between items-center p-3 bg-white/5 rounded-xl">
@@ -395,7 +395,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Recent Transactions */}
-      <div className="bg-black/40 border border-white/10 rounded-2xl overflow-hidden">
+      <div className="bg-[#1a0507]/80 border border-white/10 rounded-2xl overflow-hidden">
         <div className="px-6 py-5 border-b border-white/5 flex items-center justify-between">
           <h3 className="text-lg font-bold text-white">{t('admin_recent_transactions')}</h3>
           <a

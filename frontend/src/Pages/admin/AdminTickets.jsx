@@ -85,7 +85,7 @@ const AdminTickets = () => {
         </div>
       </div>
 
-      <div className="bg-black/40 border border-white/10 rounded-2xl overflow-hidden">
+      <div className="bg-[#1a0507]/80 border border-white/10 rounded-2xl overflow-hidden">
         <table className="w-full text-left">
           <thead className="bg-white/5 text-white/60 text-xs uppercase">
             <tr>
@@ -177,7 +177,7 @@ const AdminTickets = () => {
           {/* Modal card */}
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-lg mx-4 bg-zinc-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
+            className="relative w-full max-w-lg mx-4 bg-[#1a0507] border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-5 border-b border-white/5">

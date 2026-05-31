@@ -132,6 +132,8 @@ input[type="number"] {
 
 /* ── 3. Solid dark backgrounds → light surfaces ── */
 [data-theme='light'] .bg-\[\#1a0507\] { background-color: #ffffff; }
+[data-theme='light'] .bg-\[\#1a0507\]\/80 { background-color: rgba(255, 255, 255, 0.85); }
+[data-theme='light'] .bg-\[\#1a0507\]\/\[0\.80\] { background-color: rgba(255, 255, 255, 0.85); }
 [data-theme='light'] .bg-\[\#0a0e27\] { background-color: #f5f7fa; }
 [data-theme='light'] .bg-\[\#0a0a0a\] { background-color: #f5f7fa; }
 [data-theme='light'] .bg-\[\#1a1a1a\]\/50 { background-color: rgba(92, 42, 46, 0.05); }
@@ -184,7 +186,13 @@ input[type="number"] {
 [data-theme='light'] .hover\:border-white\/20:hover { border-color: rgba(92, 42, 46, 0.24); }
 
 /* ── 9. GRADIENT OVERRIDES ── */
-/* Main card gradient: from-[#400106]/95 to-[#260101]/95 and variants */
+/* Main card gradient: from-[#2f0205]/95 to-[#180103]/95 (darker burgundy) */
+[data-theme='light'] .from-\[\#2f0205\] { --tw-gradient-from: #ffffff var(--tw-gradient-from-position); }
+[data-theme='light'] .from-\[\#2f0205\]\/95 { --tw-gradient-from: rgba(255, 255, 255, 0.97) var(--tw-gradient-from-position); }
+[data-theme='light'] .to-\[\#180103\] { --tw-gradient-to: #f8f3ee var(--tw-gradient-to-position); }
+[data-theme='light'] .to-\[\#180103\]\/95 { --tw-gradient-to: rgba(248, 243, 238, 0.97) var(--tw-gradient-to-position); }
+
+/* Legacy fallback: from-[#400106]/95 to-[#260101]/95 for any remaining references */
 [data-theme='light'] .from-\[\#400106\] { --tw-gradient-from: #ffffff var(--tw-gradient-from-position); }
 [data-theme='light'] .from-\[\#400106\]\/90 { --tw-gradient-from: rgba(255, 255, 255, 0.95) var(--tw-gradient-from-position); }
 [data-theme='light'] .from-\[\#400106\]\/95 { --tw-gradient-from: rgba(255, 255, 255, 0.97) var(--tw-gradient-from-position); }

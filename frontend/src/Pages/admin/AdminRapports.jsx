@@ -126,7 +126,7 @@ const AdminRapports = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-black/40 border border-white/10 rounded-2xl overflow-hidden">
+      <div className="bg-[#1a0507]/80 border border-white/10 rounded-2xl overflow-hidden">
         <table className="w-full text-left">
           <thead className="bg-white/5 text-white/60 text-xs uppercase">
             <tr>

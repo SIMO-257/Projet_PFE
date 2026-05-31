@@ -85,7 +85,7 @@ const AdminNotifications = () => {
         <p className="text-white/50">Envoyez des messages push aux utilisateurs de CasaWay.</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-black/40 border border-white/10 p-8 rounded-2xl space-y-6">
+      <form onSubmit={handleSubmit} className="bg-[#1a0507]/80 border border-white/10 p-8 rounded-2xl space-y-6">
         <div className="space-y-2">
           <label className="text-white/70 text-sm font-medium">Titre</label>
           <input
