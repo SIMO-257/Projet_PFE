@@ -48,12 +48,12 @@ class StudentVerificationController extends Controller
             'school_doc' => 'required|file|mimes:pdf,doc,docx|max:10240',
         ]);
 
-        $cinPath = $request->file('cin_doc')->store('student_cin', 'public');
-        $schoolPath = $request->file('school_doc')->store('student_school', 'public');
+        $cinPath = $request->file('cin_doc')->store('student_cin', 'spaces');
+        $schoolPath = $request->file('school_doc')->store('student_school', 'spaces');
 
         if ($existing) {
-            Storage::disk('public')->delete($existing->cin_doc_path);
-            Storage::disk('public')->delete($existing->school_doc_path);
+            Storage::disk('spaces')->delete($existing->cin_doc_path);
+            Storage::disk('spaces')->delete($existing->school_doc_path);
 
             $existing->update([
                 'cin_doc_path' => $cinPath,

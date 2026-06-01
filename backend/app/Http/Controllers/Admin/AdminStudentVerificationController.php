@@ -65,8 +65,8 @@ class AdminStudentVerificationController extends Controller
                     'member_since' => $verification->user->created_at->toDateString(),
                 ] : null,
                 'document_urls'      => [
-                    'cin_doc'    => $verification->cin_doc_path ? Storage::disk('public')->url($verification->cin_doc_path) : null,
-                    'school_doc' => $verification->school_doc_path ? Storage::disk('public')->url($verification->school_doc_path) : null,
+                    'cin_doc'    => $verification->cin_doc_path ? Storage::disk('spaces')->url($verification->cin_doc_path) : null,
+                    'school_doc' => $verification->school_doc_path ? Storage::disk('spaces')->url($verification->school_doc_path) : null,
                 ],
             ],
         ]);

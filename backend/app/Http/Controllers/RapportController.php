@@ -36,7 +36,7 @@ class RapportController extends Controller
 
         $imagePath = null;
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('repports_images', 'public');
+            $imagePath = $request->file('image')->store('repports_images', 'spaces');
         }
 
         $repport = Repport::create([

@@ -96,7 +96,7 @@ class AuthController extends Controller
         ]);
 
         if ($request->hasFile('profile_file')) {
-            $pending->avatar_path = $request->file('profile_file')->store('avatars', 'public');
+            $pending->avatar_path = $request->file('profile_file')->store('avatars', 'spaces');
             $pending->save();
         }
 

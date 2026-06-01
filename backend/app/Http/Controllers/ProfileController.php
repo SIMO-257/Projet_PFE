@@ -64,7 +64,7 @@ class ProfileController extends Controller
     {
         if ($request->hasFile($key)) {
             if ($user->avatar_path) {
-                Storage::disk('public')->delete($user->avatar_path);
+                Storage::disk('spaces')->delete($user->avatar_path);
             }
             $user->avatar_path = $request->file($key)->store('avatars', 'spaces');
         }
