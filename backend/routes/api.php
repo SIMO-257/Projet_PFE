@@ -116,6 +116,7 @@ use App\Http\Controllers\Admin\AdminTransactionController;
 use App\Http\Controllers\Admin\AdminNotificationController;
 use App\Http\Controllers\Admin\AdminProfileController;
 use App\Http\Controllers\Admin\AdminValidationController;
+use App\Http\Controllers\Admin\AdminManagementController;
 
 // Public admin route — no auth required (throttled like user login)
 Route::prefix('admin')->group(function () {
@@ -150,6 +151,14 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'admin'])->group(function ()
     // Help & Support — Admin Repports
     Route::get('/repports', [AdminRapportController::class, 'index']);
     Route::patch('/repports/{id}/statut', [AdminRapportController::class, 'updateStatut']);
+
+    // Admin Management (super admin only)
+    Route::get('/admins', [AdminManagementController::class, 'index']);
+    Route::get('/admins/{admin}', [AdminManagementController::class, 'show']);
+    Route::post('/admins', [AdminManagementController::class, 'store']);
+    Route::put('/admins/{admin}', [AdminManagementController::class, 'update']);
+    Route::patch('/admins/{admin}/toggle-status', [AdminManagementController::class, 'toggleStatus']);
+    Route::delete('/admins/{admin}', [AdminManagementController::class, 'destroy']);
 
     // Student Verifications
     Route::get('/student-verifications', [AdminStudentVerificationController::class, 'index']);

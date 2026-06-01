@@ -117,17 +117,24 @@ const AdminNotifications = () => {
         <div className="grid grid-cols-2 gap-6">
           <div className="space-y-2">
             <label className="text-white/70 text-sm font-medium">Type</label>
-            <select
-              value={form.type}
-              onChange={(e) => setForm({ ...form, type: e.target.value })}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-yellow-500/50"
-            >
-              <option value="system">Système</option>
-              <option value="promo">Promotion</option>
-              <option value="security">Sécurité</option>
-              <option value="payment">Paiement</option>
-              <option value="validation">Validation</option>
-            </select>
+            <div className="relative">
+              <select
+                value={form.type}
+                onChange={(e) => setForm({ ...form, type: e.target.value })}
+                className="w-full bg-white/5 border border-white/10 rounded-xl pl-4 pr-10 py-3 text-white focus:outline-none focus:border-yellow-500/50 appearance-none cursor-pointer"
+              >
+                <option value="system" className="bg-[#1a0507] text-white">Système</option>
+                <option value="promo" className="bg-[#1a0507] text-white">Promotion</option>
+                <option value="security" className="bg-[#1a0507] text-white">Sécurité</option>
+                <option value="payment" className="bg-[#1a0507] text-white">Paiement</option>
+                <option value="validation" className="bg-[#1a0507] text-white">Validation</option>
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-white/40">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+              </div>
+            </div>
           </div>
 
           <div className="space-y-2">

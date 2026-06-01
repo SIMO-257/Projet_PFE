@@ -1,0 +1,118 @@
+@startuml
+left to right direction
+
+skinparam actor {
+    BorderColor #651939
+    BackgroundColor #FFD700
+    FontStyle bold
+}
+
+skinparam usecase {
+    BorderColor #651939
+    BackgroundColor #FFF8E7
+}
+
+skinparam package {
+    BorderColor #8B4049
+    BackgroundColor #FFF0E0
+}
+
+actor ":Citoyen:\n(Utilisateur)" as User
+actor ":Administrateur:" as Admin
+actor ":Système\nStripe:" as Stripe
+
+package "Authentification & Compte" {
+  (Créer un compte\n(signup + vérification email)) as UC1
+  (Se connecter / Déconnecter) as UC2
+  (Réinitialiser mot de passe) as UC3
+  (Gérer profil\n(nom, téléphone, avatar)) as UC4
+  (Vérifier statut étudiant\n+soumettre documents) as UC5
+}
+
+package "Portefeuille & Paiement" {
+  (Consulter solde\n+ historique) as UC6
+  (Recharger wallet\nvia Stripe) as UC7
+  (Acheter des billets\n(1 à 10, wallet)) as UC8
+}
+
+package "Billets & Validation" {
+  (Lister mes billets\n+ voir détails) as UC9
+  (Définir billet\npar défaut) as UC10
+  (Valider billet par QR\ncode généré 5min) as UC11
+  (Valider billet par NFC\nchallenge 60s) as UC12
+  (Valider billet\ndirectement par UUID) as UC13
+}
+
+package "Notifications" {
+  (Voir notifications\n+ filtrer par type) as UC14
+  (Marquer comme lu\n/tout lu / supprimer) as UC15
+  (Gérer préférences\nde notification) as UC16
+}
+
+package "Support" {
+  (Soumettre un\nsignalement/réclamation) as UC17
+  (Suivre mes\nsignalements) as UC18
+}
+
+package "Administration" {
+  (Consulter\nTableau de bord) as UC19
+  (Gérer utilisateurs\n(voir, bloquer/activer)) as UC20
+  (Voir tous les billets\ntransactions) as UC21
+  (Gérer signalements\n(statut)) as UC22
+  (Vérifier étudiants\n(approuver/rejeter)) as UC23
+  (Envoyer notification\nà tous ou un user) as UC24
+  (Valider un billet\ncross-user) as UC25
+}
+
+package "Système" {
+  (Expirer billets\nautomatiquement) as UC26
+  (Nettoyer billets\nexpirés chaque jour) as UC27
+  (Rappeler expiration\nbillets) as UC28
+  (Traiter webhook\nStripe) as UC29
+}
+
+' ===== Relationships =====
+
+User --> UC1
+User --> UC2
+User --> UC3
+User --> UC4
+User --> UC5
+User --> UC6
+User --> UC7
+User --> UC8
+User --> UC9
+User --> UC10
+User --> UC11
+User --> UC12
+User --> UC13
+User --> UC14
+User --> UC15
+User --> UC16
+User --> UC17
+User --> UC18
+
+Admin --> UC19
+Admin --> UC20
+Admin --> UC21
+Admin --> UC22
+Admin --> UC23
+Admin --> UC24
+Admin --> UC25
+Admin --> UC2
+Admin --> UC3
+
+Stripe --> UC29
+UC7 ..> UC29 : <<inclut>>
+UC8 ..> UC6 : <<inclut>>
+
+note top of User
+  Acteur principal
+  Application mobile CasaWay
+end note
+
+note bottom of Admin
+  Back-office web
+end note
+
+@enduml

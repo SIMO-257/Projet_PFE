@@ -16,8 +16,11 @@ export const UsersIcon = ({ className = "w-5 h-5" }) => (
 );
 
 export const TicketIcon = ({ className = "w-5 h-5" }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-6.75 2.25h13.5a2.25 2.25 0 002.25-2.25V6a2.25 2.25 0 00-2.25-2.25H9.75A2.25 2.25 0 007.5 6v12a2.25 2.25 0 002.25 2.25zm-3-15.75v15m3-3h6.75l-3-3 3-3H9.75l3 3-3 3z" />
+  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+    <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
+    <path d="M13 5v2" />
+    <path d="M13 11v2" />
+    <path d="M13 17v2" />
   </svg>
 );
 
@@ -52,6 +55,12 @@ export const QRIcon = ({ className = "w-5 h-5" }) => (
   </svg>
 );
 
+export const ShieldIcon = ({ className = "w-5 h-5" }) => (
+  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+  </svg>
+);
+
 // Map of icon name to component
 const iconMap = {
   dashboard: DashboardIcon,
@@ -62,6 +71,7 @@ const iconMap = {
   message: MessageIcon,
   graduation: GraduationIcon,
   qr: QRIcon,
+  shield: ShieldIcon,
 };
 
 export default iconMap;

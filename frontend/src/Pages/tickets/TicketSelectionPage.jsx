@@ -105,6 +105,30 @@ export default function TicketSelectionPage() {
         );
     }
 
+    const formatDuration = (minutes) => {
+        if (!minutes) return '';
+        if (minutes % 1440 === 0) {
+            const days = minutes / 1440;
+            if (language === 'ar') {
+                if (days === 1) return 'المدة: يوم واحد';
+                if (days === 2) return 'المدة: يومين';
+                if (days >= 3 && days <= 10) return `المدة: ${days} أيام`;
+                return `المدة: ${days} يوماً`;
+            } else if (language === 'en') {
+                return `Duration: ${days} ${days === 1 ? 'day' : 'days'}`;
+            } else {
+                return `Durée: ${days} ${days === 1 ? 'jour' : 'jours'}`;
+            }
+        }
+        if (language === 'ar') {
+            return `المدة: ${minutes} دقيقة`;
+        } else if (language === 'en') {
+            return `Duration: ${minutes} min`;
+        } else {
+            return `Durée: ${minutes} min`;
+        }
+    };
+
     const totalPrice = selectedType ? ((selectedType.effective_price || selectedType.price) * quantity).toFixed(2) : 0;
 
     return (
@@ -206,7 +230,7 @@ export default function TicketSelectionPage() {
                                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd"/>
                                                 </svg>
                                                 <span className="text-white/60 text-xs">
-                                                    {language === 'ar' ? `المدة: ${selectedType.duration_minutes} دقيقة` : language === 'en' ? `Duration: ${selectedType.duration_minutes} min` : `Durée: ${selectedType.duration_minutes} min`}
+                                                    {formatDuration(selectedType.duration_minutes)}
                                                 </span>
                                             </div>
                                         )}

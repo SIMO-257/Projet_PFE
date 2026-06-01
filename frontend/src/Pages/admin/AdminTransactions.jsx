@@ -36,16 +36,23 @@ const AdminTransactions = () => {
           <p className="text-white/50">{t('admin_transaction_subtitle')}</p>
         </div>
         <div className="flex space-x-3">
-          <select
-            value={type}
-            onChange={(e) => setType(e.target.value)}
-            className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-yellow-500/50"
-          >
-            <option value="">{t('all_types')}</option>
-            <option value="recharge">{t('recharge_type')}</option>
-            <option value="purchase">{t('type_purchase')}</option>
-            <option value="validation">{t('type_validation_admin')}</option>
-          </select>
+          <div className="relative">
+            <select
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              className="bg-white/5 border border-white/10 rounded-xl pl-4 pr-10 py-2 text-sm text-white focus:outline-none focus:border-yellow-500/50 appearance-none cursor-pointer"
+            >
+              <option value="" className="bg-[#1a0507] text-white">{t('all_types')}</option>
+              <option value="recharge" className="bg-[#1a0507] text-white">{t('recharge_type')}</option>
+              <option value="purchase" className="bg-[#1a0507] text-white">{t('type_purchase')}</option>
+              <option value="validation" className="bg-[#1a0507] text-white">{t('type_validation_admin')}</option>
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-white/40">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </div>
+          </div>
           <input
             type="text"
             placeholder={t('search_email')}

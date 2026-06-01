@@ -214,7 +214,7 @@ const AdminDashboard = () => {
       {/* Chart + Quick Links Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Chart */}
-        <div className="lg:col-span-2 bg-[#1a0507]/80 border border-white/10 rounded-2xl p-6">
+        <div className="lg:col-span-2 bg-[#1a0507]/80 border border-white/10 rounded-2xl p-6 flex flex-col h-full">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-bold text-white">{t('admin_chart_title')}</h3>
             <div className="flex gap-1.5 bg-white/5 rounded-xl p-1">
@@ -256,9 +256,9 @@ const AdminDashboard = () => {
           </div>
 
           {/* Chart */}
-          <div className="h-72">
+          <div className="flex-1 min-h-[300px]">
             {chartData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={288} minWidth={0}>
+              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                 <BarChart data={chartData} barCategoryGap="20%">
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                   <XAxis

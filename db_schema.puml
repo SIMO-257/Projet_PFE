@@ -1,0 +1,250 @@
+@startuml
+!define TABLE(x) class x << (T,#FFEEEE) >>
+!define PK(x) <u>x</u>
+!define FK(x) <i><color:blue>x</color></i>
+!define INDEX(x) <color:green>x</color>
+
+hide methods
+hide stereotypes
+
+skinparam class {
+    BackgroundColor White
+    BorderColor Black
+    ArrowColor Black
+}
+
+TABLE(users) {
+    PK(id) BIGINT UNSIGNED AUTO_INCREMENT
+    uuid CHAR(36) UNIQUE NOT NULL
+    full_name VARCHAR(100)
+    phone VARCHAR(20) UNIQUE
+    email VARCHAR(255) UNIQUE NOT NULL
+    password_hash VARCHAR(255) NOT NULL
+    avatar_path VARCHAR(255)
+    is_active TINYINT(1) DEFAULT 1
+    is_student TINYINT(1) DEFAULT 0
+    last_active_at TIMESTAMP
+    fcm_token VARCHAR(255)
+    notification_prefs JSON
+    user_preferences JSON
+    email_verification_code VARCHAR(6)
+    email_verification_token VARCHAR(255)
+    email_verification_sent_at TIMESTAMP
+    email_verified_at TIMESTAMP
+    FK(default_ticket_id) BIGINT UNSIGNED
+    created_at TIMESTAMP
+    updated_at TIMESTAMP
+    --
+    INDEX(email)
+    INDEX(uuid)
+    INDEX(is_active)
+}
+
+TABLE(pending_registrations) {
+    PK(id) BIGINT UNSIGNED AUTO_INCREMENT
+    email VARCHAR(255) UNIQUE NOT NULL
+    phone VARCHAR(255) UNIQUE NOT NULL
+    password_hash VARCHAR(255) NOT NULL
+    full_name VARCHAR(255)
+    avatar_path VARCHAR(255)
+    email_verification_code VARCHAR(6)
+    email_verification_token VARCHAR(255)
+    email_verification_sent_at TIMESTAMP
+    created_at TIMESTAMP
+    updated_at TIMESTAMP
+}
+
+TABLE(ticket_types) {
+    PK(id) BIGINT UNSIGNED AUTO_INCREMENT
+    code VARCHAR(50) UNIQUE NOT NULL
+    name JSON NOT NULL
+    description JSON
+    price DECIMAL(10,2) NOT NULL
+    student_price DECIMAL(10,2)
+    duration_minutes INT
+    is_reusable TINYINT(1) DEFAULT 0
+    max_uses INT DEFAULT 1
+    is_active TINYINT(1) DEFAULT 1
+    created_at TIMESTAMP
+    updated_at TIMESTAMP
+    --
+    INDEX(code)
+    INDEX(is_active)
+}
+
+TABLE(tickets) {
+    PK(id) BIGINT UNSIGNED AUTO_INCREMENT
+    uuid CHAR(36) UNIQUE NOT NULL
+    FK(user_id) BIGINT UNSIGNED NOT NULL
+    FK(ticket_type_id) BIGINT UNSIGNED NOT NULL
+    FK(purchase_id) BIGINT UNSIGNED
+    status ENUM(active,used,expired) DEFAULT active
+    valid_from TIMESTAMP
+    valid_until TIMESTAMP
+    remaining_uses INT
+    price_paid DECIMAL(10,2) NOT NULL
+    created_at TIMESTAMP
+    updated_at TIMESTAMP
+    --
+    INDEX(user_id)
+    INDEX(uuid)
+    INDEX(ticket_type_id)
+    INDEX(status)
+    INDEX(valid_until)
+    INDEX(user_id, status)
+}
+
+TABLE(wallets) {
+    PK(id) BIGINT UNSIGNED AUTO_INCREMENT
+    FK(user_id) BIGINT UNSIGNED NOT NULL
+    balance DECIMAL(10,2) DEFAULT 0.00
+    created_at TIMESTAMP
+    updated_at TIMESTAMP
+    --
+    INDEX(user_id)
+}
+
+TABLE(transactions) {
+    PK(id) BIGINT UNSIGNED AUTO_INCREMENT
+    uuid CHAR(36) UNIQUE NOT NULL
+    payment_intent_id VARCHAR(100) UNIQUE
+    FK(user_id) BIGINT UNSIGNED NOT NULL
+    type VARCHAR(20) NOT NULL
+    status VARCHAR(20) DEFAULT completed
+    payment_method VARCHAR(50) DEFAULT wallet
+    amount DECIMAL(10,2) NOT NULL
+    currency VARCHAR(3) DEFAULT MAD
+    balance_before DECIMAL(10,2) NOT NULL
+    balance_after DECIMAL(10,2) NOT NULL
+    reference VARCHAR(100)
+    metadata JSON
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    --
+    INDEX(user_id)
+    INDEX(uuid)
+    INDEX(payment_intent_id)
+    INDEX(type)
+    INDEX(status)
+    INDEX(created_at)
+}
+
+TABLE(validation_logs) {
+    PK(id) BIGINT UNSIGNED AUTO_INCREMENT
+    FK(ticket_id) BIGINT UNSIGNED
+    FK(user_id) BIGINT UNSIGNED NOT NULL
+    validator_id VARCHAR(100) NOT NULL
+    validation_type ENUM(nfc,qr) NOT NULL
+    status ENUM(success,failure,offline_accepted) NOT NULL
+    failure_reason VARCHAR(255)
+    location JSON
+    metadata JSON
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    --
+    INDEX(ticket_id)
+    INDEX(user_id)
+    INDEX(validator_id)
+    INDEX(validation_type)
+    INDEX(status)
+    INDEX(created_at)
+    INDEX(user_id, status)
+}
+
+TABLE(notifications) {
+    PK(id) CHAR(36) UUID
+    FK(user_id) BIGINT UNSIGNED NOT NULL
+    type ENUM(validation,payment,security,promo,system) NOT NULL
+    severity ENUM(info,success,warning,danger) DEFAULT info
+    title VARCHAR(255) NOT NULL
+    body VARCHAR(255) NOT NULL
+    meta JSON
+    is_read TINYINT(1) DEFAULT 0
+    read_at TIMESTAMP
+    created_at TIMESTAMP
+    updated_at TIMESTAMP
+    --
+    INDEX(user_id)
+    INDEX(user_id, is_read)
+    INDEX(user_id, created_at)
+    INDEX(type)
+}
+
+TABLE(audit_logs) {
+    PK(id) BIGINT UNSIGNED AUTO_INCREMENT
+    FK(user_id) BIGINT UNSIGNED
+    action VARCHAR(255) NOT NULL
+    ip_address VARCHAR(45)
+    user_agent TEXT
+    metadata JSON
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    --
+    INDEX(user_id)
+    INDEX(action)
+    INDEX(created_at)
+    INDEX(user_id, action)
+}
+
+TABLE(repports) {
+    PK(id) BIGINT UNSIGNED AUTO_INCREMENT
+    FK(user_id) BIGINT UNSIGNED NOT NULL
+    type_probleme VARCHAR(255) NOT NULL
+    sujet VARCHAR(255)
+    description TEXT NOT NULL
+    image_path VARCHAR(255)
+    statut ENUM(en attente,en cours,resolu) DEFAULT en attente
+    created_at TIMESTAMP
+    updated_at TIMESTAMP
+}
+
+TABLE(student_verifications) {
+    PK(id) BIGINT UNSIGNED AUTO_INCREMENT
+    FK(user_id) BIGINT UNSIGNED NOT NULL
+    cin_doc_path VARCHAR(255) NOT NULL
+    school_doc_path VARCHAR(255) NOT NULL
+    status ENUM(pending,approved,rejected) DEFAULT pending
+    FK(admin_id) BIGINT UNSIGNED
+    rejected_reason TEXT
+    created_at TIMESTAMP
+    updated_at TIMESTAMP
+    --
+    INDEX(status)
+    INDEX(user_id)
+}
+
+TABLE(admins) {
+    PK(id) BIGINT UNSIGNED AUTO_INCREMENT
+    first_name VARCHAR(255) NOT NULL
+    last_name VARCHAR(255) NOT NULL
+    email VARCHAR(255) UNIQUE NOT NULL
+    password VARCHAR(255) NOT NULL
+    is_active TINYINT(1) DEFAULT 1
+    remember_token VARCHAR(100)
+    created_at TIMESTAMP
+    updated_at TIMESTAMP
+}
+
+TABLE(processed_stripe_events) {
+    PK(id) BIGINT UNSIGNED AUTO_INCREMENT
+    event_id VARCHAR(255) UNIQUE NOT NULL
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    --
+    INDEX(event_id)
+}
+
+' ===== RELATIONSHIPS =====
+
+users ||--o{ wallets : "user_id"
+users ||--o{ transactions : "user_id"
+users ||--o{ tickets : "user_id"
+users ||--o{ notifications : "user_id"
+users ||--o{ audit_logs : "user_id"
+users ||--o{ validation_logs : "user_id"
+users ||--o{ repports : "user_id"
+users ||--o{ student_verifications : "user_id"
+users ||--o| tickets : "default_ticket_id"
+
+ticket_types ||--o{ tickets : "ticket_type_id"
+transactions ||--o{ tickets : "purchase_id"
+tickets ||--o{ validation_logs : "ticket_id"
+admins ||--o{ student_verifications : "admin_id"
+
+@enduml

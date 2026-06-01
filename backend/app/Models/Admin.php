@@ -28,6 +28,7 @@ class Admin extends Authenticatable
         'email',
         'password',
         'is_active',
+        'is_super_admin',
     ];
 
     /**
@@ -47,7 +48,8 @@ class Admin extends Authenticatable
     protected function casts(): array
     {
         return [
-            'is_active' => 'boolean',
+            'is_active'      => 'boolean',
+            'is_super_admin' => 'boolean',
         ];
     }
 

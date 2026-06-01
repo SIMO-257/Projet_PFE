@@ -48,10 +48,11 @@ class AdminAuthController extends Controller
             'message' => 'Connexion réussie.',
             'token'   => $token,
             'admin'   => [
-                'id'         => $admin->id,
-                'first_name' => $admin->first_name,
-                'last_name'  => $admin->last_name,
-                'email'      => $admin->email,
+                'id'             => $admin->id,
+                'first_name'     => $admin->first_name,
+                'last_name'      => $admin->last_name,
+                'email'          => $admin->email,
+                'is_super_admin' => $admin->is_super_admin,
             ],
         ]);
     }

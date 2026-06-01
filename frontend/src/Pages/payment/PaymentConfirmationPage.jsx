@@ -26,7 +26,24 @@ export default function PaymentConfirmationPage () {
         if (code === 'BILLET_SEMAINE') return t('valid_for_week');
         if (code === 'BILLET_MOIS') return t('valid_for_month');
         
-        return ticket.ticket_type.duration_minutes ? `${ticket.ticket_type.duration_minutes} min` : t('valid_for_single');
+        if (ticket.ticket_type.duration_minutes) {
+            const mins = ticket.ticket_type.duration_minutes;
+            if (mins % 1440 === 0) {
+                const days = mins / 1440;
+                if (language === 'ar') {
+                    if (days === 1) return 'يوم واحد';
+                    if (days === 2) return 'يومين';
+                    if (days >= 3 && days <= 10) return `${days} أيام`;
+                    return `${days} يوماً`;
+                } else if (language === 'en') {
+                    return `${days} ${days === 1 ? 'day' : 'days'}`;
+                } else {
+                    return `${days} ${days === 1 ? 'jour' : 'jours'}`;
+                }
+            }
+            return `${mins} min`;
+        }
+        return t('valid_for_single');
     };
 
     const getLocale = () => language === 'ar' ? 'ar-MA' : language === 'en' ? 'en-US' : 'fr-FR';

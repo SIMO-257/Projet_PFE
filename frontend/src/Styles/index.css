@@ -232,6 +232,16 @@ input[type="number"] {
 [data-theme='light'] .bg-\[\#1a0507\].border-yellow-500\/20 { background-color: #ffffff; border-color: rgba(212, 175, 55, 0.24); }
 [data-theme='light'] select option.bg-\[\#1a0507\] { background-color: #ffffff; }
 
+select option {
+  background-color: #1a0507;
+  color: #ffffff;
+}
+
+[data-theme='light'] select option {
+  background-color: #ffffff;
+  color: #1f1718;
+}
+
 /* ── 12. Admin layout overrides ── */
 [data-theme='light'] .bg-\[\#1a0507\].text-white { background-color: #f5f7fa; color: #1f1718; }
 

@@ -94,4 +94,12 @@ export const adminConsumeQrValidationToken = (payload) =>
 export const adminLookupTicket = (ticketUuid) =>
   adminApi.post('/admin/validator/lookup', { ticket_uuid: ticketUuid });
 
+// Admin Management (super admin)
+export const getAdmins = (params) => adminApi.get('/admin/admins', { params });
+export const getAdmin = (id) => adminApi.get(`/admin/admins/${id}`);
+export const createAdmin = (data) => adminApi.post('/admin/admins', data);
+export const updateAdminBySuper = (id, data) => adminApi.put(`/admin/admins/${id}`, data);
+export const toggleAdminStatus = (id) => adminApi.patch(`/admin/admins/${id}/toggle-status`);
+export const deleteAdmin = (id) => adminApi.delete(`/admin/admins/${id}`);
+
 export default adminApi;

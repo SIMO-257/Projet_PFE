@@ -1,0 +1,48 @@
+@startuml
+actor ":Validateur\n(Admin/Appareil)" as Validator
+participant "Application\nMobile" as Mobile
+participant "Backend\nAPI" as API
+participant "TicketValidation\nService" as Service
+database "DB" as DB
+
+== Validation par QR ==
+
+Validator -> Mobile: Scanner QR code
+Mobile -> API: POST /tickets/qr/consume\n{token, validator_id}
+API -> Service: parseValidationToken(token)
+Service -> Service: Vérifier signature HMAC\n+ expiry (5min) + replay (JTI)
+alt Token invalide
+    API --> Mobile: 400 - Token invalide/expiré
+    Mobile --> Validator: ❌ Échec validation
+else Token valide
+    API -> Service: validateTicketByUuid(uuid, user, ...)
+    Service -> DB: SELECT ticket (LOCK FOR UPDATE)
+    Service -> Service: Vérifier propriété\n+ status (active/used) + expiry
+    alt Billet valide
+        Service -> DB: UPDATE status, remaining_uses
+        Service -> DB: INSERT validation_log
+        Service -> DB: INSERT notification
+        API --> Mobile: 200 - Succès
+        Mobile --> Validator: ✅ Billet valide
+    else Billet invalide
+        Service -> DB: INSERT validation_log
+        API --> Mobile: 400 - Billet expiré/invalide
+        Mobile --> Validator: ❌ Billet invalide
+    end
+end
+
+== Validation par NFC ==
+
+Validator -> Mobile: Tap NFC
+Mobile -> API: POST /tickets/nfc/challenge
+API --> Mobile: {challenge_token}
+Mobile -> API: POST /tickets/nfc/consume\n{challenge, ticket_uuid, validator_id}
+API -> Service: Vérifier challenge\n(cache 60s)
+alt Challenge invalide/expiré
+    API --> Mobile: 400 - Challenge invalide
+else
+    API -> Service: validateTicketByUuid(...)
+    note right: Même logique que QR
+end
+
+@enduml

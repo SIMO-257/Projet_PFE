@@ -17,11 +17,12 @@ class AdminSeeder extends Seeder
         }
 
         Admin::create([
-            'first_name' => 'Admin',
-            'last_name'  => 'CasaWay',
-            'email'      => 'admin@casaway.ma',
-            'password'   => Hash::make('Admin@CasaWay2026!'),
-            'is_active'  => true,
+            'first_name'     => 'Admin',
+            'last_name'      => 'CasaWay',
+            'email'          => 'admin@casaway.ma',
+            'password'       => Hash::make('Admin@CasaWay2026!'),
+            'is_active'      => true,
+            'is_super_admin' => true,
         ]);
 
         $this->command->info('Admin created: admin@casaway.ma / Admin@CasaWay2026!');
