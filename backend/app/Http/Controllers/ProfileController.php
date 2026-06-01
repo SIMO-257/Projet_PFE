@@ -25,7 +25,7 @@ class ProfileController extends Controller
             'email' => $user->email,
             'phone' => $user->phone,
             'created_at' => $user->created_at->toDateString(),
-            'avatar_url' => $user->avatar_path ? Storage::disk('public')->url($user->avatar_path) : null,
+            'avatar_url' => $user->avatar_path ? Storage::disk('spaces')->url($user->avatar_path) : null,
             'is_student' => (bool) $user->is_student,
         ]);
     }
