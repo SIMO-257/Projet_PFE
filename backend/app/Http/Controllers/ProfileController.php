@@ -55,7 +55,7 @@ class ProfileController extends Controller
             'name' => $user->full_name,
             'email' => $user->email,
             'phone' => $user->phone,
-            'avatar_url' => $user->avatar_path ? Storage::disk('public')->url($user->avatar_path) : null,
+            'avatar_url' => $user->avatar_path ? Storage::disk('spaces')->url($user->avatar_path) : null,
             'is_student' => (bool) $user->is_student,
         ], 'Profile updated successfully.');
     }
@@ -66,7 +66,7 @@ class ProfileController extends Controller
             if ($user->avatar_path) {
                 Storage::disk('public')->delete($user->avatar_path);
             }
-            $user->avatar_path = $request->file($key)->store('avatars', 'public');
+            $user->avatar_path = $request->file($key)->store('avatars', 'spaces');
         }
     }
 }
