@@ -102,7 +102,11 @@ const AdminTransactions = () => {
                     </span>
                   </td>
                   <td className={`px-6 py-4 text-sm font-bold ${
-                    tx.type === 'recharge' ? 'text-green-400' : 'text-white'
+                    tx.type === 'recharge' 
+                      ? 'text-green-400' 
+                      : tx.type === 'purchase' 
+                        ? 'text-red-400' 
+                        : 'text-white'
                   }`}>
                     {tx.type === 'recharge' ? '+' : '-'}{tx.amount}
                   </td>
