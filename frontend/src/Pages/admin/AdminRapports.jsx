@@ -240,9 +240,9 @@ const AdminRapports = () => {
                   <div>
                     <p className="text-white/40 text-xs uppercase tracking-wide mb-1">Capture d'écran</p>
                     <img
-                      src={`/storage/${selectedRapport.image_path}`}
+                      src={selectedRapport.image_url}
                       alt="Screenshot du rapport"
-                      onClick={() => setZoomImage(`/storage/${selectedRapport.image_path}`)}
+                      onClick={() => setZoomImage(selectedRapport.image_url)}
                       className="w-full rounded-xl border border-white/10 object-cover max-h-64 cursor-pointer hover:opacity-80 transition-opacity"
                     />
                   </div>

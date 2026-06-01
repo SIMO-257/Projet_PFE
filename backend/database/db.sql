@@ -16,6 +16,7 @@ CREATE TABLE `users` (
     `email_verified_at` TIMESTAMP NULL,
     `email_verification_sent_at` TIMESTAMP NULL,
     `password_hash` VARCHAR(255) NOT NULL,
+    `pin_hash` VARCHAR(60) NULL,
     `avatar_path` VARCHAR(255) NULL,
     `is_active` TINYINT(1) NOT NULL DEFAULT 1,
     `is_student` TINYINT(1) NOT NULL DEFAULT 0,

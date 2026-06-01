@@ -97,7 +97,7 @@ class TicketPurchaseController extends Controller
                         'price_paid' => $effectivePrice,
                     ]);
                     $tickets[] = $ticket;
-                    event(new TicketPurchasedEvent($ticket->id, $ticket->valid_until));
+                    event(new TicketPurchasedEvent($user, $ticket->id, $ticket->valid_until, $wallet->balance));
 
                     if ($ticketType->is_reusable) {
                         $nextReusableStartAt = $validUntil->copy();

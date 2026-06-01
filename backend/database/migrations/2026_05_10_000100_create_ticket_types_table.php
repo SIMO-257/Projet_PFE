@@ -17,6 +17,7 @@ return new class extends Migration
             $table->json('name');
             $table->json('description')->nullable();
             $table->decimal('price', 10, 2);
+            $table->decimal('student_price', 10, 2)->nullable();
             $table->integer('duration_minutes')->nullable();
             $table->boolean('is_reusable')->default(false);
             $table->integer('max_uses')->default(1);

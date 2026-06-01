@@ -152,11 +152,14 @@ export default function ValidatorPage () {
         audio: false,
       });
       streamRef.current = stream;
+      // Show the (already-mounted) video element first, then attach stream
+      setIsScanning(true);
+      // Small delay so React renders the video visible before we attach the stream
+      await new Promise((r) => setTimeout(r, 50));
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
       }
-      setIsScanning(true);
       frameRequestRef.current = requestAnimationFrame(scanFrame);
     } catch (err) {
       setError(err?.message || 'Could not start camera. Check permissions.');
@@ -265,19 +268,18 @@ export default function ValidatorPage () {
 
       {/* ── Camera Section ── */}
       <div className="bg-black/20 border border-white/10 rounded-2xl overflow-hidden">
-        {isScanning && (
-          <div className="relative">
-            <video ref={videoRef} className="w-full aspect-video object-cover bg-black/60" muted playsInline />
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="w-48 h-48 border-2 border-yellow-500/60 rounded-xl animate-pulse" />
-            </div>
-            <div className="absolute bottom-3 left-1/2 -translate-x-1/2">
-              <div className="bg-yellow-500/20 backdrop-blur-sm text-yellow-300 text-xs px-4 py-1.5 rounded-full border border-yellow-500/30">
-                Scanning...
-              </div>
+        {/* Always render the video element so the ref stays valid; hide via CSS when not scanning */}
+        <div className={`relative ${isScanning ? '' : 'hidden'}`}>
+          <video ref={videoRef} className="w-full aspect-video object-cover bg-black/60" muted playsInline />
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="w-48 h-48 border-2 border-yellow-500/60 rounded-xl animate-pulse" />
+          </div>
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2">
+            <div className="bg-yellow-500/20 backdrop-blur-sm text-yellow-300 text-xs px-4 py-1.5 rounded-full border border-yellow-500/30">
+              Scanning...
             </div>
           </div>
-        )}
+        </div>
 
         <div className="p-4">
           {isScanning ? (

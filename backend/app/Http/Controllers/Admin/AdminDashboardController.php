@@ -15,8 +15,44 @@ use Illuminate\Support\Facades\DB;
 class AdminDashboardController extends Controller
 {
     // GET /api/admin/dashboard
-    public function index()
+    public function index(Request $request)
     {
+        // Optional period filter for preference analytics (defaults to all time)
+        $prefDays = (int) ($request->query('pref_days', 0));
+
+        // Scope for users within the preference period
+        $prefUserQuery = User::query();
+        if ($prefDays > 0) {
+            $prefUserQuery->where('created_at', '>=', now()->subDays($prefDays));
+        }
+
+        // ── User preferences analytics (aggregated from the JSON column) ──
+        $totalUsers = (clone $prefUserQuery)->count();
+
+        $analyticsEnabled  = (clone $prefUserQuery)->whereRaw("COALESCE(JSON_EXTRACT(user_preferences, '$.analytics_enabled'), true) = true")->count();
+        $analyticsDisabled = $totalUsers - $analyticsEnabled;
+
+        $authPurchase        = (clone $prefUserQuery)->whereRaw("COALESCE(JSON_EXTRACT(user_preferences, '$.auth_purchase'), false) = true")->count();
+        $authPurchaseDisabled = $totalUsers - $authPurchase;
+
+        $notifValidation = (clone $prefUserQuery)->whereRaw("COALESCE(JSON_EXTRACT(notification_prefs, '$.validation'), true) = true")->count();
+        $notifPayment    = (clone $prefUserQuery)->whereRaw("COALESCE(JSON_EXTRACT(notification_prefs, '$.payment'), true) = true")->count();
+        $notifSecurity   = (clone $prefUserQuery)->whereRaw("COALESCE(JSON_EXTRACT(notification_prefs, '$.security'), true) = true")->count();
+        $notifPromo      = (clone $prefUserQuery)->whereRaw("COALESCE(JSON_EXTRACT(notification_prefs, '$.promo'), false) = true")->count();
+
+        $preferencesAnalytics = [
+            'total_users'             => $totalUsers,
+            'analytics_enabled'       => $analyticsEnabled,
+            'analytics_disabled'      => $analyticsDisabled,
+            'auth_purchase_enabled'   => $authPurchase,
+            'auth_purchase_disabled'  => $authPurchaseDisabled,
+            'notif_validation'        => $notifValidation,
+            'notif_payment'           => $notifPayment,
+            'notif_security'          => $notifSecurity,
+            'notif_promo'             => $notifPromo,
+            'period_days'             => $prefDays,
+        ];
+
         $stats = [
             'total_clients'      => User::count(),
             'active_clients'     => User::where('is_active', true)->count(),
@@ -97,6 +133,7 @@ class AdminDashboardController extends Controller
                 'pending_reports_count'    => $pendingReportsCount,
                 'pending_verifications_count' => $pendingVerifCount,
                 'failed_validation_alerts' => $alertUsers,
+                'preferences_analytics'    => $preferencesAnalytics,
             ],
         ]);
     }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class Repport extends Model
 {
@@ -22,6 +23,11 @@ class Repport extends Model
     ];
 
     /**
+     * @var list<string>
+     */
+    protected $appends = ['image_url'];
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array
@@ -30,6 +36,17 @@ class Repport extends Model
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Get the full Spaces URL for the report screenshot.
+     */
+    public function getImageUrlAttribute(): ?string
+    {
+        if (!$this->image_path) {
+            return null;
+        }
+        return Storage::disk('spaces')->url($this->image_path);
     }
 
     public function client(): BelongsTo

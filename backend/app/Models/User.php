@@ -30,6 +30,7 @@ class User extends Authenticatable implements CanResetPasswordContract, MustVeri
         'email',
         'phone',
         'password_hash',
+        'pin_hash',
         'full_name',
         'avatar_path',
         'is_active',
@@ -52,6 +53,7 @@ class User extends Authenticatable implements CanResetPasswordContract, MustVeri
      */
     protected $hidden = [
         'password_hash',
+        'pin_hash',
         'profile_file',
     ];
 

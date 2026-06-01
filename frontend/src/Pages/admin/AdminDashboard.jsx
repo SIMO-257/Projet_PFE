@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { getDashboardStats } from '../../services/adminService';
 import { useTranslation } from '../../hooks/useTranslation';
 import { TicketIcon } from '../../assets/adminIcons';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  CartesianGrid, Legend,
+  CartesianGrid, Legend, PieChart, Pie, Cell
 } from 'recharts';
 
 const formatMAD = (val) => `${val?.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} DH`;
@@ -33,6 +33,15 @@ const KPI_COLORS = {
   yellow: { bg: 'from-yellow-500/20 to-yellow-600/5', border: 'border-yellow-500/20', text: 'text-yellow-400', glow: 'shadow-yellow-500/10' },
   green: { bg: 'from-green-500/20 to-green-600/5', border: 'border-green-500/20', text: 'text-green-400', glow: 'shadow-green-500/10' },
   purple: { bg: 'from-purple-500/20 to-purple-600/5', border: 'border-purple-500/20', text: 'text-purple-400', glow: 'shadow-purple-500/10' },
+};
+
+const PREF_COLORS = {
+  enabled: '#22c55e',
+  disabled: '#6b7280',
+  validation: '#3b82f6',
+  payment: '#eab308',
+  security: '#a855f7',
+  promo: '#f97316',
 };
 
 const Skeleton = () => (
@@ -80,26 +89,33 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [chartPeriod, setChartPeriod] = useState(7); // 7 or 30
+  const [prefPeriod, setPrefPeriod] = useState(0); // 0 = all time, 7, 30, 90
+
+  const fetchStats = useCallback(async (prefDays) => {
+    try {
+      setLoading(true);
+      const params = prefDays > 0 ? { pref_days: prefDays } : {};
+      const response = await getDashboardStats(params);
+      setData(response.data.data);
+    } catch (err) {
+      if (err.response?.status === 403) {
+        setError(t('admin_access_denied'));
+      } else {
+        setError(t('admin_stats_error'));
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [t]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const fetchStats = async () => {
-      try {
-        setLoading(true);
-        const response = await getDashboardStats();
-        setData(response.data.data);
-      } catch (err) {
-        if (err.response?.status === 403) {
-          setError(t('admin_access_denied'));
-        } else {
-          setError(t('admin_stats_error'));
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchStats();
-  }, []); // Intentionally run once on mount — t() is used only in error fallback text
+    fetchStats(prefPeriod);
+  }, [fetchStats, prefPeriod]);
+
+  // Reload preferences when the period changes without resetting the whole dashboard
+  const handlePrefPeriodChange = (days) => {
+    setPrefPeriod(days);
+  };
 
   const chartData = useMemo(() => {
     if (!data?.chart_data) return [];
@@ -255,7 +271,7 @@ const AdminDashboard = () => {
           {/* Chart */}
           <div className="flex-1 min-h-[300px]">
             {chartData.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+              <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={chartData} barCategoryGap="20%">
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                   <XAxis
@@ -390,6 +406,168 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* ── User Preferences Pie Charts ── */}
+      {data?.preferences_analytics && (
+        <>
+        {/* Period Selector for Preferences */}
+        <div className="flex items-center justify-between bg-[#1a0507]/80 border border-white/10 rounded-2xl px-6 py-4">
+          <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider">
+            {t('privacy')} & {t('notifications_pref')}
+          </h3>
+          <div className="flex gap-1.5 bg-white/5 rounded-xl p-1">
+            {[
+              { label: t('all'), days: 0 },
+              { label: '7j', days: 7 },
+              { label: '30j', days: 30 },
+              { label: '90j', days: 90 },
+            ].map((opt) => (
+              <button
+                key={opt.days}
+                onClick={() => handlePrefPeriodChange(opt.days)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
+                  prefPeriod === opt.days
+                    ? 'bg-yellow-500/20 text-yellow-500 shadow-sm'
+                    : 'text-white/50 hover:text-white/80'
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Analytics Enabled */}
+          <div className="bg-[#1a0507]/80 border border-white/10 rounded-2xl p-6">
+            <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider mb-4">
+              {t('share_analytics_data')}
+            </h3>
+            <ResponsiveContainer width="100%" height={220}>
+              <PieChart>
+                <Pie
+                  data={[
+                    { name: t('yes'), value: data.preferences_analytics.analytics_enabled },
+                    { name: t('no'), value: data.preferences_analytics.analytics_disabled },
+                  ]}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={55}
+                  outerRadius={85}
+                  paddingAngle={4}
+                  dataKey="value"
+                >
+                  <Cell fill={PREF_COLORS.enabled} />
+                  <Cell fill={PREF_COLORS.disabled} />
+                </Pie>
+                <Tooltip
+                  contentStyle={{
+                    background: '#1a0507',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '12px',
+                    fontSize: '13px',
+                  }}
+                  itemStyle={{ color: 'rgba(255,255,255,0.8)' }}
+                />
+                <Legend
+                  wrapperStyle={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}
+                  iconType="circle"
+                />
+              </PieChart>
+            </ResponsiveContainer>
+            <p className="text-center text-white/40 text-xs mt-2">
+              {data.preferences_analytics.analytics_enabled}/{data.preferences_analytics.total_users}
+            </p>
+          </div>
+
+          {/* Auth Purchase */}
+          <div className="bg-[#1a0507]/80 border border-white/10 rounded-2xl p-6">
+            <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider mb-4">
+              {t('auth_purchase')}
+            </h3>
+            <ResponsiveContainer width="100%" height={220}>
+              <PieChart>
+                <Pie
+                  data={[
+                    { name: t('yes'), value: data.preferences_analytics.auth_purchase_enabled },
+                    { name: t('no'), value: data.preferences_analytics.auth_purchase_disabled },
+                  ]}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={55}
+                  outerRadius={85}
+                  paddingAngle={4}
+                  dataKey="value"
+                >
+                  <Cell fill={PREF_COLORS.validation} />
+                  <Cell fill={PREF_COLORS.disabled} />
+                </Pie>
+                <Tooltip
+                  contentStyle={{
+                    background: '#1a0507',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '12px',
+                    fontSize: '13px',
+                  }}
+                  itemStyle={{ color: 'rgba(255,255,255,0.8)' }}
+                />
+                <Legend
+                  wrapperStyle={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}
+                  iconType="circle"
+                />
+              </PieChart>
+            </ResponsiveContainer>
+            <p className="text-center text-white/40 text-xs mt-2">
+              {data.preferences_analytics.auth_purchase_enabled}/{data.preferences_analytics.total_users}
+            </p>
+          </div>
+
+          {/* Notification Preferences */}
+          <div className="bg-[#1a0507]/80 border border-white/10 rounded-2xl p-6 md:col-span-2">
+            <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider mb-4">
+              {t('notifications_pref')}
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { key: 'notif_validation', label: t('validation'), color: PREF_COLORS.validation },
+                { key: 'notif_payment', label: t('payment'), color: PREF_COLORS.payment },
+                { key: 'notif_security', label: t('security'), color: PREF_COLORS.security },
+                { key: 'notif_promo', label: t('promo'), color: PREF_COLORS.promo },
+              ].map((item) => {
+                const val = data.preferences_analytics[item.key] ?? 0;
+                const total = data.preferences_analytics.total_users || 1;
+                const pct = Math.round((val / total) * 100);
+                return (
+                  <div key={item.key} className="bg-black/30 border border-white/5 rounded-xl p-4 text-center">
+                    <div className="flex items-center justify-center mb-3">
+                      <ResponsiveContainer width={80} height={80}>
+                        <PieChart>
+                          <Pie
+                            data={[
+                              { name: item.label, value: val },
+                              { name: t('no'), value: total - val },
+                            ]}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={24}
+                            outerRadius={38}
+                            dataKey="value"
+                          >
+                            <Cell fill={item.color} />
+                            <Cell fill="rgba(255,255,255,0.06)" />
+                          </Pie>
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                    <p className="text-white/80 text-sm font-medium">{item.label}</p>
+                    <p className="text-white/40 text-xs mt-1">{pct}% · {val}/{total}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+        </>
+      )}
 
       {/* Recent Transactions */}
       <div className="bg-[#1a0507]/80 border border-white/10 rounded-2xl overflow-hidden">

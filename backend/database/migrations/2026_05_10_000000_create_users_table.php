@@ -28,6 +28,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamp('email_verification_sent_at')->nullable();
             $table->string('password_hash', 255);
+            $table->string('pin_hash', 60)->nullable();
             $table->string('avatar_path')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamp('last_active_at')->nullable();

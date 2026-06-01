@@ -447,7 +447,7 @@ const HelpSupportPage = () => {
                 <div>
                   <p className="text-[rgba(232,221,208,0.4)] text-xs uppercase tracking-wide mb-1">Capture d'écran</p>
                   <img
-                    src={`/storage/${selectedRapport.image_path}`}
+                    src={selectedRapport.image_url}
                     alt="Screenshot"
                     className="w-full rounded-xl border border-[rgba(200,169,110,0.2)] object-cover max-h-48"
                   />

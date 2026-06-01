@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserPreferenceController;
+use App\Http\Controllers\UserPinController;
 use App\Http\Controllers\StudentVerificationController;
 use App\Http\Controllers\TicketTypeController;
 use App\Http\Controllers\TicketPurchaseController;
@@ -99,6 +100,12 @@ Route::middleware(['auth:sanctum', 'track.activity'])->group(function () {
     // Help & Support Routes
     Route::get('/help', [RapportController::class, 'index'])->name('api.help.index');
     Route::post('/repports', [RapportController::class, 'store'])->name('api.repports.store');
+
+    // PIN Code
+    Route::post('/users/pin/set', [UserPinController::class, 'set'])->name('api.users.pin.set');
+    Route::post('/users/pin/verify', [UserPinController::class, 'verify'])->name('api.users.pin.verify');
+    Route::post('/users/pin/disable', [UserPinController::class, 'disable'])->name('api.users.pin.disable');
+    Route::get('/users/pin/status', [UserPinController::class, 'status'])->name('api.users.pin.status');
 
     // Student Verification
     Route::get('/users/student-status', [StudentVerificationController::class, 'studentStatus'])->name('api.users.student.status');

@@ -9,7 +9,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class TicketPurchasedEvent implements ShouldBroadcastNow
+class NewNotificationEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -18,9 +18,12 @@ class TicketPurchasedEvent implements ShouldBroadcastNow
      */
     public function __construct(
         public User $user,
-        public int $ticketId,
-        public $validUntil,
-        public float $newBalance
+        public int $notificationId,
+        public string $type,
+        public string $title,
+        public string $body,
+        public string $severity = 'info',
+        public array $meta = []
     ) {}
 
     /**
@@ -36,7 +39,7 @@ class TicketPurchasedEvent implements ShouldBroadcastNow
      */
     public function broadcastAs(): string
     {
-        return 'ticket.purchased';
+        return 'notification.new';
     }
 
     /**
@@ -46,9 +49,12 @@ class TicketPurchasedEvent implements ShouldBroadcastNow
     {
         return [
             'user_id' => $this->user->id,
-            'ticket_id' => $this->ticketId,
-            'valid_until' => $this->validUntil,
-            'new_balance' => $this->newBalance,
+            'notification_id' => $this->notificationId,
+            'type' => $this->type,
+            'severity' => $this->severity,
+            'title' => $this->title,
+            'body' => $this->body,
+            'meta' => $this->meta,
         ];
     }
 }

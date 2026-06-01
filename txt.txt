@@ -296,9 +296,11 @@ Mes 3 priorités recommandées
 Tu veux que je commence par une ou plusieurs de ces suggestions ? Je peux aussi implémenter tout ça progressivement.
 
 
--- in the parametrs section there is this authentification part were you need the PIN code or biometrie how can i add the to my app?.
--- i want in bot wallet transaction and tickets so when the user buy or add anew transaction it required the password.
+-- in the parametrs section there is this authentification part were you need the PIN code how can i add the to my app?.
+-- activating or deactivating the pin opt require the pin it self.what do you think is the safest way to choose this pin ?by the user or random then sent to the email?or any more optionnes?
+-- i want in both wallet transaction and tickets so when the user buy or add anew transaction it required the password.
 -- give me an idea on how can we integrate partage des donnes in the admin part can we like use them for analysis or what ?
+-- thr reason behind this is i want like a safe mode for kids so that todlers cant perform transactiones purchases or edit their profile exept for the avatar of course and mess up their app while teir parent aren't aware the will mostlly only have acces to home page.
 
 -- if the email is in the pending registartion and the user sign up a pop up error have to be appear like "The email is getting verfied wait 5 min if it is your email". 
 -- verify if the resend paswword is working for email verfification.

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # MySQL Database Service
   db:
@@ -53,6 +51,7 @@ services:
       - /var/www/bootstrap/cache
     ports:
       - "9000:9000"
+      - "8080:8080"   # Laravel Reverb WebSocket
     depends_on:
       db:
         condition: service_healthy

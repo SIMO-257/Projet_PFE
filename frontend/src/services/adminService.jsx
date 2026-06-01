@@ -59,7 +59,7 @@ export const adminLogout = () => adminApi.post('/admin/logout');
 export const adminMe = () => adminApi.get('/admin/me');
 
 // Dashboard
-export const getDashboardStats = () => adminApi.get('/admin/dashboard');
+export const getDashboardStats = (params) => adminApi.get('/admin/dashboard', { params });
 
 // Users (formerly Clients)
 export const getUsers = (params) => adminApi.get('/admin/users', { params });
