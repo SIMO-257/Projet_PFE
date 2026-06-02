@@ -14,11 +14,14 @@ class CustomPolicy extends Basic
         $this
             ->addDirective(Directive::SCRIPT, [
                 'self',
-                'https://js.stripe.com',
                 'unsafe-inline',
+                'unsafe-eval',
+                'https://js.stripe.com',
+                'blob:',
             ])
             ->addDirective(Directive::STYLE, [
                 'self',
+                'unsafe-inline',
             ])
             ->addDirective(Directive::IMG, [
                 '*',

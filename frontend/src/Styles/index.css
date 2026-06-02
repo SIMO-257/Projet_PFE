@@ -438,3 +438,264 @@ select option {
   animation: countUp 0.3s ease-out both;
 }
 
+/* === INTRO SLIDER === */
+
+/* ── Root container ── */
+.intro-root {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: row;
+  z-index: 9999;
+  overflow: hidden;
+  animation: introFadeIn 0.4s ease both;
+  font-family: 'Sora', 'Arial', sans-serif;
+}
+
+.intro-exit {
+  animation: introFadeOut 0.45s ease forwards;
+}
+
+/* ── Left diagonal green panel ── */
+.intro-left {
+  position: relative;
+  width: 52%;
+  flex-shrink: 0;
+  /* Diagonal right edge via clip-path */
+  clip-path: polygon(0 0, 100% 0, 75% 100%, 0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.6s ease;
+  overflow: hidden;
+}
+
+/* Dot grid overlay for texture */
+.intro-dot-grid {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.10) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+}
+
+/* Decorative background circles */
+.intro-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  pointer-events: none;
+}
+.intro-circle-1 {
+  width: 240px;
+  height: 240px;
+  top: -60px;
+  left: -60px;
+}
+.intro-circle-2 {
+  width: 160px;
+  height: 160px;
+  bottom: -40px;
+  right: 30px;
+}
+
+/* Icon wrapper — re-animates on key change */
+.intro-icon-wrap {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  animation: iconPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.intro-icon {
+  font-size: 48px;
+  line-height: 1;
+}
+
+.intro-slide-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  animation: imageFadeIn 0.6s ease both;
+}
+
+@keyframes imageFadeIn {
+  from { opacity: 0; transform: scale(1.1); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── Right dark panel ── */
+.intro-right {
+  flex: 1;
+  background: #1a0507;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 28px 28px 32px 36px;
+  position: relative;
+  /* Slight overlap behind the diagonal edge */
+  margin-left: -2px;
+}
+
+/* Skip button */
+.intro-skip {
+  align-self: flex-end;
+  background: transparent;
+  border: none;
+  color: rgba(245, 213, 121, 0.55);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 4px 0;
+  letter-spacing: 0.02em;
+  transition: color 0.2s;
+}
+.intro-skip:hover {
+  color: rgba(245, 213, 121, 0.9);
+}
+
+/* Text block — re-animates on key change */
+.intro-text-block {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 24px 0;
+  animation: textSlideIn 0.45s ease both;
+}
+
+.intro-title {
+  font-size: 24px;
+  font-weight: 500;
+  color: #f5d579;
+  line-height: 1.25;
+  margin: 0 0 12px;
+  letter-spacing: -0.4px;
+}
+
+.intro-subtitle {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.65;
+  margin: 0;
+  max-width: 320px;
+}
+
+/* Bottom row — dots + CTA */
+.intro-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Progress dots */
+.intro-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.intro-dot {
+  height: 6px;
+  width: 8px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.2);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: width 0.35s ease, background 0.35s ease;
+}
+
+.intro-dot-active {
+  width: 24px;
+  background: #f5d579;  /* Gold accent */
+}
+
+/* CTA button overrides — sits on top of inherited button styles */
+.intro-cta {
+  width: 100%;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  animation: textSlideIn 0.4s ease 0.1s both;
+}
+
+/* ── Keyframe animations ── */
+@keyframes introFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes introFadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+@keyframes iconPop {
+  from { opacity: 0; transform: scale(0.6); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes textSlideIn {
+  from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Mobile — stack vertically below 600px ── */
+@media (max-width: 600px) {
+  .intro-root {
+    flex-direction: column;
+  }
+
+  .intro-left {
+    width: 100%;
+    height: 42%;
+    clip-path: polygon(0 0, 100% 0, 100% 75%, 0 100%);
+  }
+
+  .intro-right {
+    margin-left: 0;
+    margin-top: -2px;
+    padding: 20px 24px 28px;
+  }
+
+  .intro-title {
+    font-size: 20px;
+  }
+
+  .intro-subtitle {
+    font-size: 13px;
+    max-width: 100%;
+  }
+}
+
+/* === END INTRO SLIDER === */
+
+.signup-reveal {
+  animation: slideIn 0.5s ease both;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideOut {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-24px); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
