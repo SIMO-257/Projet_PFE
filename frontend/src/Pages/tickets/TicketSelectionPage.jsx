@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import { fetchTicketTypes, purchaseTicket } from '../../services/ticketService';
+import usePinGuard from '../../hooks/usePinGuard';
 
 export default function TicketSelectionPage() {
     const { t, language } = useTranslation();
@@ -17,6 +18,7 @@ export default function TicketSelectionPage() {
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(true);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const { checking: pinChecking, isPinEnabled } = usePinGuard();
 
     useEffect(() => {
         const fetchTypes = async () => {
@@ -97,10 +99,52 @@ export default function TicketSelectionPage() {
         }
     };
 
-    if (loading) {
+    if (loading || pinChecking) {
         return (
             <div className="app-shell flex items-center justify-center">
                 <p className="text-[#f5d579] font-bold text-lg animate-pulse">{t('loading')}</p>
+            </div>
+        );
+    }
+
+    // If PIN is enabled, show a locked screen — feature is unavailable
+    if (isPinEnabled) {
+        return (
+            <div className="app-shell">
+                <div className="app-frame">
+                    <div className="app-card bg-gradient-to-br from-[#400106] to-[#260101] relative flex flex-col h-[100dvh]">
+                        <div className="p-6 md:p-8 border-b border-[#f5d579]/10 bg-black/20 flex-shrink-0 z-10 shadow-lg">
+                            <div className="flex items-center justify-between mb-2">
+                                <h1 className="text-2xl md:text-3xl font-bold text-[#f5d579]">
+                                    {t('select_ticket_page')}
+                                </h1>
+                                <button
+                                    onClick={() => navigate('/home')}
+                                    className="text-white/60 hover:text-white transition-colors"
+                                >
+                                    <span className="text-4xl font-light line-height-1">×</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
+                            <div className="w-20 h-20 rounded-full bg-[#f5d579]/10 border border-[#f5d579]/20 flex items-center justify-center mb-6">
+                                <svg className="w-10 h-10 text-[#f5d579]" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"/>
+                                </svg>
+                            </div>
+                            <h2 className="text-[#f5d579] font-bold text-xl mb-2">Fonctionnalité verrouillée</h2>
+                            <p className="text-white/50 text-sm max-w-xs">
+                                La protection PIN est activée. Désactivez-la dans Paramètres &gt; Sécurité pour accéder à l'achat de tickets.
+                            </p>
+                            <button
+                                onClick={() => navigate('/settings')}
+                                className="mt-8 px-6 py-3 rounded-2xl bg-[#f5d579]/10 border border-[#f5d579]/30 text-[#f5d579] font-medium text-sm hover:bg-[#f5d579]/20 transition-all"
+                            >
+                                Aller aux paramètres
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -270,7 +314,7 @@ export default function TicketSelectionPage() {
                             
                         </div>
                     </div>
-                    
+
                     {/* Footer */}
                     <div className="p-6 md:p-8 border-t border-[#f5d579]/10 bg-black/20 flex-shrink-0 z-10 shadow-[0_-10px_20px_rgba(0,0,0,0.2)]">
                         <div className="max-w-3xl mx-auto">

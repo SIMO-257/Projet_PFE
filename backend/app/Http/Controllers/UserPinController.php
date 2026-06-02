@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Notifications\PinResetNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class UserPinController extends Controller
@@ -133,6 +135,100 @@ class UserPinController extends Controller
             'pin_set'       => !empty($user->pin_hash),
             'pin_enabled'   => $prefs['pin_enabled'] ?? !empty($user->pin_hash),
         ]);
+    }
+
+    /**
+     * Reset the PIN (recovery).
+     * Requires the account password to confirm identity.
+     * Generates a new random PIN and sends it via email or phone.
+     *
+     * POST /api/users/pin/reset
+     */
+    public function reset(Request $request)
+    {
+        $validated = $request->validate([
+            'current_password' => 'required|string',
+            'method'           => 'required|string|in:email,phone',
+        ]);
+
+        $user = $request->user();
+
+        // Verify account password first
+        if (!Hash::check($validated['current_password'], $user->password_hash)) {
+            throw ValidationException::withMessages([
+                'current_password' => ['Le mot de passe actuel est incorrect.'],
+            ]);
+        }
+
+        // Generate a new random 4-digit PIN (avoid trivial sequences)
+        $newPin = $this->generateSecurePin();
+
+        // Store the new PIN hash
+        $user->pin_hash = Hash::make($newPin);
+        $user->save();
+
+        // Also enable pin_enabled in preferences
+        $prefs = $user->user_preferences ?? [];
+        $prefs['pin_enabled'] = true;
+        $user->user_preferences = $prefs;
+        $user->save();
+
+        // Send the new PIN via the chosen method
+        if ($validated['method'] === 'email') {
+            $user->notify(new PinResetNotification($newPin));
+        } else {
+            // SMS — log for now; wire up to an SMS provider (Twilio, Vonage, etc.)
+            Log::info('PIN reset via SMS', [
+                'user_id' => $user->id,
+                'phone'   => $user->phone,
+                'new_pin' => $newPin,
+            ]);
+            // TODO: Send SMS via provider
+            // e.g. SmsService::send($user->phone, "Votre nouveau code PIN est : $newPin");
+        }
+
+        return $this->successResponse([
+            'method' => $validated['method'],
+            'masked' => $validated['method'] === 'email'
+                ? $this->maskEmail($user->email)
+                : $this->maskPhone($user->phone),
+        ], 'Un nouveau code PIN a été envoyé.');
+    }
+
+    /**
+     * Generate a secure random 4-digit PIN that is not a trivial sequence.
+     */
+    private function generateSecurePin(): string
+    {
+        do {
+            $pin = str_pad((string) random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+        } while ($this->isTrivialPin($pin));
+        return $pin;
+    }
+
+    /**
+     * Mask an email for display (e.g., j***@example.com).
+     */
+    private function maskEmail(?string $email): string
+    {
+        if (!$email) return '';
+        $parts = explode('@', $email);
+        $name = $parts[0];
+        $domain = $parts[1] ?? '';
+        $masked = substr($name, 0, 1) . str_repeat('*', max(0, strlen($name) - 1));
+        return $masked . '@' . $domain;
+    }
+
+    /**
+     * Mask a phone number for display (e.g., +2126******10).
+     */
+    private function maskPhone(?string $phone): string
+    {
+        if (!$phone) return '';
+        $len = strlen($phone);
+        if ($len <= 4) return $phone;
+        $visible = 2;
+        return substr($phone, 0, $visible) . str_repeat('*', $len - $visible * 2) . substr($phone, -$visible);
     }
 
     /**

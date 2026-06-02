@@ -1,7 +1,7 @@
 import userApi from './userService';
 
-export const setPin = (pin, password) =>
-    userApi.post('/users/pin/set', { pin, password }).then(r => r.data);
+export const setPin = (pin, currentPassword) =>
+    userApi.post('/users/pin/set', { pin, current_password: currentPassword }).then(r => r.data);
 
 export const verifyPin = (pin) =>
     userApi.post('/users/pin/verify', { pin }).then(r => r.data);
@@ -11,3 +11,6 @@ export const disablePin = (pin) =>
 
 export const getPinStatus = () =>
     userApi.get('/users/pin/status').then(r => r.data);
+
+export const resetPin = (currentPassword, method) =>
+    userApi.post('/users/pin/reset', { current_password: currentPassword, method }).then(r => r.data);

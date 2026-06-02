@@ -8,12 +8,14 @@ import styles from '../../Styles/ProfileScreen.module.css';
 import { useAuth } from '../../hooks/useAuth';
 import { fetchUserProfile } from '../../services/userService';
 import { useTranslation } from '../../hooks/useTranslation';
+import usePinGuard from '../../hooks/usePinGuard';
 
 export default function ProfilePage()  {
   const [profile, setProfile] = useState(null);
   const navigateHook = useNavigate();
   const { logout } = useAuth();
   const { t } = useTranslation();
+  const { checking: pinChecking, isPinEnabled } = usePinGuard();
 
   const loadProfile = () => {
     fetchUserProfile()
@@ -137,15 +139,28 @@ export default function ProfilePage()  {
                 />
               </div>
 
-              <button
-                onClick={handleEditProfile}
-                className="w-full mt-6 bg-gradient-to-r from-[#8B4049] to-[#5C2A2E] text-white font-semibold py-3 rounded-2xl hover:from-[#9B5059] hover:to-[#6C3A3E] transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
-                </svg>
-                <span>{t('edit_profile')}</span>
-              </button>
+              {pinChecking ? (
+                <div className="w-full mt-6 h-12 rounded-2xl bg-black/30 animate-pulse" />
+              ) : isPinEnabled ? (
+                <div className="w-full mt-6 p-4 rounded-2xl bg-black/30 border border-[#f5d579]/10 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-[#f5d579]/10 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-5 h-5 text-[#f5d579]" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"/>
+                    </svg>
+                  </div>
+                  <p className="text-white/40 text-xs flex-1">Édition du profil verrouillée — désactivez le PIN dans Sécurité</p>
+                </div>
+              ) : (
+                <button
+                  onClick={handleEditProfile}
+                  className="w-full mt-6 bg-gradient-to-r from-[#8B4049] to-[#5C2A2E] text-white font-semibold py-3 rounded-2xl hover:from-[#9B5059] hover:to-[#6C3A3E] transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg"
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                  </svg>
+                  <span>{t('edit_profile')}</span>
+                </button>
+              )}
             </div>
 
             <div className="space-y-3 mb-6">

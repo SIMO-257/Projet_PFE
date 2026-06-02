@@ -13,12 +13,14 @@ import { useDispatch } from 'react-redux';
 import { setGlobalLoading } from '../../Redux/Slices/uiSlice';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useWallet } from '../../hooks/useWallet';
+import usePinGuard from '../../hooks/usePinGuard';
 
 export default function WalletPage() {
   const { t, language, formatReference } = useTranslation();
   const { balance, transactions, isLoading, refreshWallet } = useWallet();
   const navigateHook = useNavigate();
   const dispatch = useDispatch();
+  const { checking: pinChecking, isPinEnabled } = usePinGuard();
 
   useEffect(() => {
     refreshWallet();
@@ -67,7 +69,9 @@ export default function WalletPage() {
             
             <div className="app-content no-scrollbar px-6 pb-24 pt-6">
               
-              {isLoading && balance === undefined ? (
+              {pinChecking ? (
+                <BalanceCardSkeleton />
+              ) : isLoading && balance === undefined ? (
                 <BalanceCardSkeleton />
               ) : (
                 <BalanceCard 
@@ -79,18 +83,29 @@ export default function WalletPage() {
                 />
               )}
 
-              <ActionButtonCard
-                variant="validation"
-                icon={
-                  <svg className="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"/>
-                  </svg>
-                }
-                label={t('recharge_wallet')}
-                onClick={handleRecharge}
-                className="mb-6 shadow-lg"
-                showArrow={false}
-              />
+              {isPinEnabled ? (
+                <div className="mb-6 p-4 rounded-2xl bg-black/30 border border-[#f5d579]/10 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-[#f5d579]/10 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-5 h-5 text-[#f5d579]" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"/>
+                    </svg>
+                  </div>
+                  <p className="text-white/40 text-xs flex-1">Recharge verrouillée — désactivez le PIN dans Sécurité</p>
+                </div>
+              ) : (
+                <ActionButtonCard
+                  variant="validation"
+                  icon={
+                    <svg className="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                  }
+                  label={t('recharge_wallet')}
+                  onClick={handleRecharge}
+                  className="mb-6 shadow-lg"
+                  showArrow={false}
+                />
+              )}
 
               <div className="mb-6">
                 <SectionHeader 

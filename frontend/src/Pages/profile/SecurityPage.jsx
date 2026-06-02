@@ -1,26 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import Header from '../../Components/Layout/Header';
 import styles from '../../Styles/Security.module.css';
 import { getUserPreferences, updateUserPreferences } from '../../services/notificationService';
-import { setPin, disablePin, getPinStatus } from '../../services/pinService';
+import { setPin, disablePin, getPinStatus, resetPin } from '../../services/pinService';
+import { fetchUserProfile } from '../../services/userService';
 
 const PIN_LENGTH = 4;
 
 const SecurityPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
 
   // Preference toggles
   const [pinEnabled, setPinEnabled] = useState(false);
   const [pinSet, setPinSet] = useState(false);
-  const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [requireAuthSensitive, setRequireAuthSensitive] = useState(false);
-  const [antiReplayAlerts, setAntiReplayAlerts] = useState(true);
-  const [suspiciousActivityAlerts, setSuspiciousActivityAlerts] = useState(true);
-  const [cardFrozen, setCardFrozen] = useState(false);
 
   // --- PIN Setup Modal State ---
   const [showPinSetup, setShowPinSetup] = useState(false);
@@ -40,6 +38,17 @@ const SecurityPage = () => {
   const [pinDisabling, setPinDisabling] = useState(false);
   const [pinDisableShake, setPinDisableShake] = useState(false);
 
+  // --- PIN Recovery Modal State ---
+  const [showRecovery, setShowRecovery] = useState(false);
+  const [recoveryStep, setRecoveryStep] = useState('password'); // 'password' | 'method' | 'sent'
+  const [recoveryPassword, setRecoveryPassword] = useState('');
+  const [recoveryPwError, setRecoveryPwError] = useState('');
+  const [recoveryPwShow, setRecoveryPwShow] = useState(false);
+  const [recoveryMethod, setRecoveryMethod] = useState('email');
+  const [recoverySending, setRecoverySending] = useState(false);
+  const [recoverySentTo, setRecoverySentTo] = useState('');
+  const [profile, setProfile] = useState(null);
+
   // ========== Load ==========
   useEffect(() => {
     const loadAll = async () => {
@@ -51,11 +60,7 @@ const SecurityPage = () => {
         const ps = pinStatus?.data || pinStatus;
         setPinSet(ps?.pin_set ?? false);
         setPinEnabled(prefs?.pin_enabled ?? ps?.pin_set ?? false);
-        setBiometricEnabled(prefs?.biometric_enabled ?? false);
         setRequireAuthSensitive(prefs?.auth_purchase ?? false);
-        setAntiReplayAlerts(prefs?.anti_replay_alerts ?? true);
-        setSuspiciousActivityAlerts(prefs?.suspicious_activity_alerts ?? true);
-        setCardFrozen(prefs?.card_frozen ?? false);
       } catch (err) {
         console.error('Failed to load security preferences:', err);
       } finally {
@@ -72,11 +77,7 @@ const SecurityPage = () => {
   const handlePreferenceChange = async (key, value) => {
     const setters = {
       pin_enabled: setPinEnabled,
-      biometric_enabled: setBiometricEnabled,
       auth_purchase: setRequireAuthSensitive,
-      anti_replay_alerts: setAntiReplayAlerts,
-      suspicious_activity_alerts: setSuspiciousActivityAlerts,
-      card_frozen: setCardFrozen,
     };
 
     if (setters[key]) setters[key](value);
@@ -268,6 +269,96 @@ const SecurityPage = () => {
     }
   };
 
+  // ========== PIN Recovery Modal ==========
+  const recoveryPwInputRef = useRef(null);
+
+  const openRecovery = async () => {
+    setRecoveryStep('password');
+    setRecoveryPassword('');
+    setRecoveryPwError('');
+    setRecoveryPwShow(false);
+    setRecoverySending(false);
+    setRecoverySentTo('');
+    setShowRecovery(true);
+    // Load user profile to get email/phone
+    try {
+      const res = await fetchUserProfile();
+      const p = res ?? null;
+      setProfile(p);
+      // Set default method based on what's available (prefer email)
+      setRecoveryMethod(p?.email ? 'email' : 'phone');
+    } catch (err) {
+      console.error('Failed to load profile for recovery', err);
+    }
+  };
+
+  // Auto-focus recovery password input
+  useEffect(() => {
+    if (recoveryStep === 'password' && showRecovery) {
+      setTimeout(() => recoveryPwInputRef.current?.focus(), 200);
+    }
+  }, [recoveryStep, showRecovery]);
+
+  const closeRecovery = () => {
+    setShowRecovery(false);
+    setRecoveryStep('password');
+    setRecoveryPassword('');
+    setRecoveryPwError('');
+    setRecoverySentTo('');
+  };
+
+  const handleRecoveryPasswordNext = async () => {
+    if (!recoveryPassword.trim()) {
+      setRecoveryPwError('Veuillez entrer votre mot de passe.');
+      return;
+    }
+    // Password will be verified server-side, move to method choice
+    setRecoveryPwError('');
+    setRecoveryStep('method');
+  };
+
+  const submitRecovery = async () => {
+    if (recoverySending) return;
+    setRecoverySending(true);
+    setRecoveryPwError('');
+
+    try {
+      const res = await resetPin(recoveryPassword, recoveryMethod);
+      const data = res?.data || res;
+      setRecoverySentTo(data?.masked || '');
+      setRecoveryStep('sent');
+    } catch (err) {
+      const msg = err?.response?.data?.message
+        || err?.response?.data?.errors?.current_password?.[0]
+        || 'Erreur lors de la réinitialisation.';
+      setRecoveryPwError(msg);
+      setRecoveryStep('password');
+    } finally {
+      setRecoverySending(false);
+    }
+  };
+
+  const userHasEmail = !!(profile?.email);
+  const userHasPhone = !!(profile?.phone);
+
+  // ========== Auto-open PIN modal from navigation state ==========
+  useEffect(() => {
+    if (loading) return;
+
+    const action = location.state?.openPinSetup;
+    if (!action) return;
+
+    // Clear the state so it doesn't re-trigger
+    window.history.replaceState({}, document.title);
+
+    if (action === 'setup') {
+      openPinSetup('setup');
+    } else if (action === 'disable') {
+      setShowPinDisable(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading]);
+
   // ========== Loading ==========
   if (loading) {
     return (
@@ -315,13 +406,7 @@ const SecurityPage = () => {
                   </svg>
                 </button>
               )}
-              <ToggleItem
-                icon="faceid"
-                label={t('biometric_label')}
-                description={t('biometric_desc')}
-                value={biometricEnabled}
-                onChange={(v) => handlePreferenceChange('biometric_enabled', v)}
-              />
+
               <ToggleItem
                 icon="shield"
                 label={t('sensitive_actions_label')}
@@ -329,79 +414,6 @@ const SecurityPage = () => {
                 value={requireAuthSensitive}
                 onChange={(v) => handlePreferenceChange('auth_purchase', v)}
               />
-            </Section>
-
-            {/* ── Fraud Prevention ── */}
-            <Section title={t('fraud_prevention')}>
-              <ToggleItem
-                icon="alert"
-                label={t('anti_replay_label')}
-                description={t('anti_replay_desc')}
-                value={antiReplayAlerts}
-                onChange={(v) => handlePreferenceChange('anti_replay_alerts', v)}
-              />
-              <ToggleItem
-                icon="suspicious"
-                label={t('suspicious_activity_label')}
-                description={t('suspicious_activity_desc')}
-                value={suspiciousActivityAlerts}
-                onChange={(v) => handlePreferenceChange('suspicious_activity_alerts', v)}
-              />
-            </Section>
-
-            {/* ── Encryption & Security Info ── */}
-            <Section title={t('encryption_section')}>
-              <div className="bg-black/40 rounded-xl border border-white/10 p-4 space-y-2">
-                <div className="flex items-center space-x-2">
-                  <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
-                  </svg>
-                  <p className="text-white/70 text-xs">{t('aes_encryption')}</p>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
-                  </svg>
-                  <p className="text-white/70 text-xs">{t('rsa_signing')}</p>
-                </div>
-                <div className="border-t border-white/10 pt-2 mt-2">
-                  <p className="text-white/40 text-xs">{t('last_security_audit')}</p>
-                </div>
-              </div>
-            </Section>
-
-            {/* ── Card Security ── */}
-            <Section title={t('card_security_section')}>
-              <div className="bg-black/40 rounded-xl border border-white/10 p-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 rounded-xl bg-yellow-500/20 flex items-center justify-center">
-                      <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h12v8H4V6z" clipRule="evenodd"/>
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-white font-medium text-sm">{t('freeze_virtual_card')}</p>
-                      <p className="text-white/40 text-xs">{t('prevent_use_loss')}</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => handlePreferenceChange('card_frozen', !cardFrozen)}
-                    className={`relative w-11 h-6 rounded-full transition-colors ${
-                      cardFrozen ? 'bg-yellow-500' : 'bg-white/20'
-                    }`}
-                  >
-                    <span
-                      className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${
-                        cardFrozen ? 'translate-x-5' : 'translate-x-0'
-                      }`}
-                    />
-                  </button>
-                </div>
-                {cardFrozen && (
-                  <p className="text-yellow-500 text-xs mt-3">{t('card_frozen_alert')}</p>
-                )}
-              </div>
             </Section>
 
             {/* ── Password & Recovery ── */}
@@ -415,7 +427,7 @@ const SecurityPage = () => {
                 <ArrowItem
                   icon="recovery"
                   label={t('set_recovery')}
-                  onClick={() => {}}
+                  onClick={openRecovery}
                 />
               </div>
             </Section>
@@ -579,6 +591,227 @@ const SecurityPage = () => {
       )}
 
       {/* ═══════════════════════════════════════════════════════
+          PIN RECOVERY MODAL (forgot PIN)
+      ════════════════════════════════════════════════════════ */}
+      {showRecovery && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fadeIn p-4">
+          <div
+            className="bg-gradient-to-br from-[#2f0205]/95 to-[#180103]/95 border border-[#f5d579]/20 rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl shadow-black/50 animate-countUp"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* ── STEP 1: Password ── */}
+            {recoveryStep === 'password' && (
+              <>
+                <div className="pt-8 pb-4 px-6 text-center">
+                  <div className="mx-auto w-14 h-14 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-4">
+                    <svg className="w-7 h-7 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                    </svg>
+                  </div>
+                  <h2 className="text-[#f5d579] font-bold text-lg">Réinitialiser le code PIN</h2>
+                  <p className="text-white/50 text-xs mt-1">
+                    Confirmez votre mot de passe pour autoriser la réinitialisation.
+                  </p>
+                </div>
+
+                <div className="px-6 pb-6">
+                  <div className="relative mb-4">
+                    <input
+                      ref={recoveryPwInputRef}
+                      type={recoveryPwShow ? 'text' : 'password'}
+                      value={recoveryPassword}
+                      onChange={(e) => { setRecoveryPassword(e.target.value); setRecoveryPwError(''); }}
+                      onKeyDown={(e) => { if (e.key === 'Enter' && recoveryPassword.trim()) handleRecoveryPasswordNext(); }}
+                      placeholder="Mot de passe actuel"
+                      className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-3.5 text-white text-sm
+                        placeholder:text-white/30 focus:outline-none focus:border-[#f5d579]/40 focus:ring-1 focus:ring-[#f5d579]/20 transition-all"
+                    />
+                    <button
+                      onClick={() => setRecoveryPwShow(!recoveryPwShow)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/60 transition-colors"
+                    >
+                      {recoveryPwShow ? (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                        </svg>
+                      ) : (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+
+                  {recoveryPwError && (
+                    <p className="text-red-400 text-xs text-center mb-4 animate-fadeIn">{recoveryPwError}</p>
+                  )}
+
+                  <button
+                    onClick={handleRecoveryPasswordNext}
+                    disabled={!recoveryPassword.trim()}
+                    className={`w-full py-3.5 rounded-2xl font-bold text-sm transition-all ${
+                      recoveryPassword.trim()
+                        ? 'bg-gradient-to-r from-[#f5d579] to-[#d4af37] text-[#260101] shadow-lg shadow-[#f5d579]/10 hover:scale-[1.02] active:scale-95'
+                        : 'bg-white/5 border border-white/10 text-white/30 cursor-not-allowed'
+                    }`}
+                  >
+                    Continuer
+                  </button>
+
+                  <button onClick={closeRecovery} className="w-full mt-3 py-3 rounded-2xl text-white/50 text-sm font-medium hover:text-white hover:bg-white/5 transition-all">
+                    Annuler
+                  </button>
+                </div>
+              </>
+            )}
+
+            {/* ── STEP 2: Choose method ── */}
+            {recoveryStep === 'method' && (
+              <>
+                <div className="pt-8 pb-4 px-6 text-center">
+                  <div className="mx-auto w-14 h-14 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-4">
+                    <svg className="w-7 h-7 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <h2 className="text-[#f5d579] font-bold text-lg">Choisissez une méthode</h2>
+                  <p className="text-white/50 text-xs mt-1">
+                    Un nouveau code PIN à 4 chiffres vous sera envoyé.
+                  </p>
+                </div>
+
+                <div className="px-6 pb-6 space-y-3">
+                  {/* Email option */}
+                  {userHasEmail && (
+                    <button
+                      onClick={() => setRecoveryMethod('email')}
+                      className={`w-full p-4 rounded-2xl border text-left flex items-center gap-3 transition-all ${
+                        recoveryMethod === 'email'
+                          ? 'bg-[#f5d579]/10 border-[#f5d579] shadow-[0_0_15px_rgba(245,213,121,0.1)]'
+                          : 'bg-black/40 border-white/10 hover:border-white/20'
+                      }`}
+                    >
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                        recoveryMethod === 'email' ? 'bg-[#f5d579]/20' : 'bg-yellow-500/20'
+                      }`}>
+                        <svg className={`w-5 h-5 ${recoveryMethod === 'email' ? 'text-[#f5d579]' : 'text-yellow-500'}`} fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                          <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-white font-medium text-sm">Par email</p>
+                        <p className="text-white/40 text-xs">{profile?.email || ''}</p>
+                      </div>
+                      {recoveryMethod === 'email' && (
+                        <svg className="w-5 h-5 text-[#f5d579]" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                    </button>
+                  )}
+
+                  {/* Phone option */}
+                  {userHasPhone && (
+                    <button
+                      onClick={() => setRecoveryMethod('phone')}
+                      className={`w-full p-4 rounded-2xl border text-left flex items-center gap-3 transition-all ${
+                        recoveryMethod === 'phone'
+                          ? 'bg-[#f5d579]/10 border-[#f5d579] shadow-[0_0_15px_rgba(245,213,121,0.1)]'
+                          : 'bg-black/40 border-white/10 hover:border-white/20'
+                      }`}
+                    >
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                        recoveryMethod === 'phone' ? 'bg-[#f5d579]/20' : 'bg-yellow-500/20'
+                      }`}>
+                        <svg className={`w-5 h-5 ${recoveryMethod === 'phone' ? 'text-[#f5d579]' : 'text-yellow-500'}`} fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-white font-medium text-sm">Par SMS</p>
+                        <p className="text-white/40 text-xs">{profile?.phone || ''}</p>
+                      </div>
+                      {recoveryMethod === 'phone' && (
+                        <svg className="w-5 h-5 text-[#f5d579]" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                    </button>
+                  )}
+
+                  {/* No method available */}
+                  {!userHasEmail && !userHasPhone && (
+                    <p className="text-white/40 text-xs text-center py-4">
+                      Aucun email ou numéro de téléphone trouvé sur votre compte.
+                    </p>
+                  )}
+
+                  <button
+                    onClick={submitRecovery}
+                    disabled={recoverySending || (!userHasEmail && !userHasPhone)}
+                    className={`w-full py-3.5 rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
+                      !recoverySending && (userHasEmail || userHasPhone)
+                        ? 'bg-gradient-to-r from-[#f5d579] to-[#d4af37] text-[#260101] shadow-lg shadow-[#f5d579]/10 hover:scale-[1.02] active:scale-95'
+                        : 'bg-white/5 border border-white/10 text-white/30 cursor-not-allowed'
+                    }`}
+                  >
+                    {recoverySending ? (
+                      <>
+                        <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        Envoi en cours...
+                      </>
+                    ) : 'Envoyer le nouveau code PIN'}
+                  </button>
+
+                  <button
+                    onClick={() => setRecoveryStep('password')}
+                    className="w-full mt-2 py-3 rounded-2xl text-white/40 text-xs font-medium hover:text-white/60 hover:bg-white/5 transition-all"
+                  >
+                    Retour
+                  </button>
+                </div>
+              </>
+            )}
+
+            {/* ── STEP 3: Confirmation ── */}
+            {recoveryStep === 'sent' && (
+              <>
+                <div className="pt-8 pb-4 px-6 text-center">
+                  <div className="mx-auto w-14 h-14 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center mb-4">
+                    <svg className="w-7 h-7 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <h2 className="text-[#f5d579] font-bold text-lg">Code PIN envoyé !</h2>
+                  <p className="text-white/50 text-xs mt-2 leading-relaxed">
+                    Un nouveau code PIN à 4 chiffres a été envoyé à :
+                  </p>
+                  <p className="text-[#f5d579] font-semibold text-sm mt-2">{recoverySentTo}</p>
+                  <p className="text-white/40 text-xs mt-3 leading-relaxed">
+                    Utilisez ce code pour vous connecter. Vous pourrez le modifier dans les paramètres de sécurité.
+                  </p>
+                </div>
+
+                <div className="px-6 pb-6">
+                  <button
+                    onClick={closeRecovery}
+                    className="w-full py-3.5 rounded-2xl font-bold text-sm bg-gradient-to-r from-[#f5d579] to-[#d4af37] text-[#260101] shadow-lg shadow-[#f5d579]/10 hover:scale-[1.02] active:scale-95 transition-all"
+                  >
+                    Terminé
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════
           PIN DISABLE MODAL
       ════════════════════════════════════════════════════════ */}
       {showPinDisable && (
@@ -684,10 +917,7 @@ const ArrowItem = ({ icon, label, onClick }) => (
 const Icon = ({ name }) => {
   const icons = {
     lock: <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"/></svg>,
-    faceid: <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm0 13c-2.33 0-4.31-1.46-5.11-3.5h10.22c-.8 2.04-2.78 3.5-5.11 3.5z"/></svg>,
     shield: <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd"/></svg>,
-    alert: <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd"/></svg>,
-    suspicious: <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd"/></svg>,
     key: <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1-2 1-2 1H2v-2l2-2 2-2 1-1 1.257-1.257A6 6 0 1118 8z" clipRule="evenodd"/></svg>,
     recovery: <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>,
   };

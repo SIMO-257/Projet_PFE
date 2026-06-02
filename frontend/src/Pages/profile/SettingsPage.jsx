@@ -10,6 +10,7 @@ import {
   getUserPreferences,
   updateUserPreferences,
 } from "../../services/notificationService";
+import { getPinStatus } from "../../services/pinService";
 import { setTheme, setLanguage } from "../../Redux/Slices/settingsSlice";
 import { useTranslation } from "../../hooks/useTranslation";
 
@@ -21,7 +22,8 @@ const SettingsPage = () => {
 
   // --- State for toggles ---
   const [analyticsEnabled, setAnalyticsEnabled] = useState(true);
-  const [authPurchase, setAuthPurchase] = useState(false);
+  const [pinEnabled, setPinEnabled] = useState(false);
+  const [pinSet, setPinSet] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Modals state
@@ -50,7 +52,16 @@ const SettingsPage = () => {
         }
         if (clientPrefs) {
           setAnalyticsEnabled(clientPrefs.analytics_enabled ?? true);
-          setAuthPurchase(clientPrefs.auth_purchase ?? false);
+        }
+
+        // Load PIN status
+        try {
+          const pinStatus = await getPinStatus();
+          const ps = pinStatus?.data || pinStatus;
+          setPinSet(ps?.pin_set ?? false);
+          setPinEnabled(ps?.pin_enabled ?? ps?.pin_set ?? false);
+        } catch (err) {
+          console.error("Failed to load PIN status:", err);
         }
       } catch (err) {
         console.error("Failed to load preferences:", err);
@@ -87,7 +98,6 @@ const SettingsPage = () => {
     try {
       await updateUserPreferences({
         analytics_enabled: value,
-        auth_purchase: authPurchase,
       });
     } catch (err) {
       console.error("Failed to update analytics preference:", err);
@@ -95,16 +105,33 @@ const SettingsPage = () => {
     }
   };
 
-  const handleAuthPurchaseToggle = async (value) => {
-    setAuthPurchase(value); // optimistic
-    try {
-      await updateUserPreferences({
-        analytics_enabled: analyticsEnabled,
-        auth_purchase: value,
-      });
-    } catch (err) {
-      console.error("Failed to update auth purchase preference:", err);
-      setAuthPurchase(!value); // revert
+  const handlePinToggle = () => {
+    if (!pinEnabled) {
+      // Turning ON
+      if (pinSet) {
+        // PIN already set — just enable the preference
+        setPinEnabled(true);
+        updateUserPreferences({ pin_enabled: true }).catch((err) => {
+          console.error("Failed to enable PIN:", err);
+          setPinEnabled(false);
+        });
+      } else {
+        // No PIN set — go to Security page to set one up (auto-open modal)
+        navigate('/security', { state: { openPinSetup: 'setup' } });
+      }
+    } else {
+      // Turning OFF
+      if (pinSet) {
+        // PIN is set — go to Security page to disable it (auto-open modal)
+        navigate('/security', { state: { openPinSetup: 'disable' } });
+      } else {
+        // No PIN — just disable the preference
+        setPinEnabled(false);
+        updateUserPreferences({ pin_enabled: false }).catch((err) => {
+          console.error("Failed to disable PIN:", err);
+          setPinEnabled(true);
+        });
+      }
     }
   };
 
@@ -200,6 +227,38 @@ const SettingsPage = () => {
             </Section>
 
 
+            {/* ========== SÉCURITÉ ========== */}
+            <Section title={t("security_title")}>
+              <ToggleItem
+                icon="lock"
+                label={t("pin_label")}
+                description={pinSet ? t("pin_set_desc") : t("pin_desc")}
+                value={pinEnabled}
+                onChange={handlePinToggle}
+              />
+              {pinEnabled && pinSet && (
+                <button
+                  onClick={() => navigate('/security')}
+                  className="w-full bg-black/40 rounded-xl border border-white/10 hover:border-white/20 transition-all p-3 text-left flex items-center justify-between group"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 rounded-xl bg-yellow-500/20 flex items-center justify-center">
+                      <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-white font-medium text-sm">{t('change_password')}</p>
+                      <p className="text-white/40 text-xs">{t('pin_change_label')}</p>
+                    </div>
+                  </div>
+                  <svg className="w-5 h-5 text-white/40 rtl-flip group-hover:text-white/60 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/>
+                  </svg>
+                </button>
+              )}
+            </Section>
+
             {/* ========== CONFIDENTIALITÉ ========== */}
             <Section title={t("privacy")}>
               <ToggleItem
@@ -208,13 +267,6 @@ const SettingsPage = () => {
                 description={t("share_analytics_desc")}
                 value={analyticsEnabled}
                 onChange={handleAnalyticsToggle}
-              />
-              <ToggleItem
-                icon="lock"
-                label={t("auth_purchase")}
-                description={t("auth_purchase_desc")}
-                value={authPurchase}
-                onChange={handleAuthPurchaseToggle}
               />
             </Section>
 
@@ -534,7 +586,7 @@ const Icon = ({ name }) => {
       >
         <path
           fillRule="evenodd"
-          d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
+          d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
           clipRule="evenodd"
         />
       </svg>
