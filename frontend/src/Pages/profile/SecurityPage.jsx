@@ -5,7 +5,6 @@ import Header from '../../Components/Layout/Header';
 import styles from '../../Styles/Security.module.css';
 import { getUserPreferences, updateUserPreferences } from '../../services/notificationService';
 import { setPin, disablePin, getPinStatus, resetPin } from '../../services/pinService';
-import { fetchUserProfile } from '../../services/userService';
 
 const PIN_LENGTH = 4;
 
@@ -18,7 +17,6 @@ const SecurityPage = () => {
   // Preference toggles
   const [pinEnabled, setPinEnabled] = useState(false);
   const [pinSet, setPinSet] = useState(false);
-  const [requireAuthSensitive, setRequireAuthSensitive] = useState(false);
 
   // --- PIN Setup Modal State ---
   const [showPinSetup, setShowPinSetup] = useState(false);
@@ -40,14 +38,12 @@ const SecurityPage = () => {
 
   // --- PIN Recovery Modal State ---
   const [showRecovery, setShowRecovery] = useState(false);
-  const [recoveryStep, setRecoveryStep] = useState('password'); // 'password' | 'method' | 'sent'
+  const [recoveryStep, setRecoveryStep] = useState('password'); // 'password' | 'sent'
   const [recoveryPassword, setRecoveryPassword] = useState('');
   const [recoveryPwError, setRecoveryPwError] = useState('');
   const [recoveryPwShow, setRecoveryPwShow] = useState(false);
-  const [recoveryMethod, setRecoveryMethod] = useState('email');
   const [recoverySending, setRecoverySending] = useState(false);
   const [recoverySentTo, setRecoverySentTo] = useState('');
-  const [profile, setProfile] = useState(null);
 
   // ========== Load ==========
   useEffect(() => {
@@ -60,7 +56,7 @@ const SecurityPage = () => {
         const ps = pinStatus?.data || pinStatus;
         setPinSet(ps?.pin_set ?? false);
         setPinEnabled(prefs?.pin_enabled ?? ps?.pin_set ?? false);
-        setRequireAuthSensitive(prefs?.auth_purchase ?? false);
+
       } catch (err) {
         console.error('Failed to load security preferences:', err);
       } finally {
@@ -77,7 +73,6 @@ const SecurityPage = () => {
   const handlePreferenceChange = async (key, value) => {
     const setters = {
       pin_enabled: setPinEnabled,
-      auth_purchase: setRequireAuthSensitive,
     };
 
     if (setters[key]) setters[key](value);
@@ -216,7 +211,9 @@ const SecurityPage = () => {
     }
     if (pinSetupStep === 'enter') {
       setPinTemp('');
-      setPinSetupError('');
+      // Ne pas effacer pinSetupError ici — il est set par submitPinSetup
+      // avant le changement d'étape. L'erreur est effacée quand l'utilisateur
+      // commence à taper (handlePinDigit) ou en ouvrant la modale (openPinSetup).
     }
     if (pinSetupStep === 'password') {
       setPinPassword('');
@@ -272,7 +269,7 @@ const SecurityPage = () => {
   // ========== PIN Recovery Modal ==========
   const recoveryPwInputRef = useRef(null);
 
-  const openRecovery = async () => {
+  const openRecovery = () => {
     setRecoveryStep('password');
     setRecoveryPassword('');
     setRecoveryPwError('');
@@ -280,16 +277,6 @@ const SecurityPage = () => {
     setRecoverySending(false);
     setRecoverySentTo('');
     setShowRecovery(true);
-    // Load user profile to get email/phone
-    try {
-      const res = await fetchUserProfile();
-      const p = res ?? null;
-      setProfile(p);
-      // Set default method based on what's available (prefer email)
-      setRecoveryMethod(p?.email ? 'email' : 'phone');
-    } catch (err) {
-      console.error('Failed to load profile for recovery', err);
-    }
   };
 
   // Auto-focus recovery password input
@@ -307,23 +294,17 @@ const SecurityPage = () => {
     setRecoverySentTo('');
   };
 
-  const handleRecoveryPasswordNext = async () => {
+  const submitRecovery = async () => {
+    if (recoverySending) return;
     if (!recoveryPassword.trim()) {
       setRecoveryPwError('Veuillez entrer votre mot de passe.');
       return;
     }
-    // Password will be verified server-side, move to method choice
-    setRecoveryPwError('');
-    setRecoveryStep('method');
-  };
-
-  const submitRecovery = async () => {
-    if (recoverySending) return;
     setRecoverySending(true);
     setRecoveryPwError('');
 
     try {
-      const res = await resetPin(recoveryPassword, recoveryMethod);
+      const res = await resetPin(recoveryPassword);
       const data = res?.data || res;
       setRecoverySentTo(data?.masked || '');
       setRecoveryStep('sent');
@@ -337,9 +318,6 @@ const SecurityPage = () => {
       setRecoverySending(false);
     }
   };
-
-  const userHasEmail = !!(profile?.email);
-  const userHasPhone = !!(profile?.phone);
 
   // ========== Auto-open PIN modal from navigation state ==========
   useEffect(() => {
@@ -407,29 +385,15 @@ const SecurityPage = () => {
                 </button>
               )}
 
-              <ToggleItem
-                icon="shield"
-                label={t('sensitive_actions_label')}
-                description={t('sensitive_actions_desc')}
-                value={requireAuthSensitive}
-                onChange={(v) => handlePreferenceChange('auth_purchase', v)}
-              />
             </Section>
 
             {/* ── Password & Recovery ── */}
             <Section title={t('password_recovery_section')}>
-              <div className="space-y-2">
-                <ArrowItem
-                  icon="key"
-                  label={t('change_password')}
-                  onClick={() => navigate('/forgot-password')}
-                />
-                <ArrowItem
-                  icon="recovery"
-                  label={t('set_recovery')}
-                  onClick={openRecovery}
-                />
-              </div>
+              <ArrowItem
+                icon="recovery"
+                label={t('set_recovery')}
+                onClick={openRecovery}
+              />
             </Section>
           </div>
         </div>
@@ -621,7 +585,7 @@ const SecurityPage = () => {
                       type={recoveryPwShow ? 'text' : 'password'}
                       value={recoveryPassword}
                       onChange={(e) => { setRecoveryPassword(e.target.value); setRecoveryPwError(''); }}
-                      onKeyDown={(e) => { if (e.key === 'Enter' && recoveryPassword.trim()) handleRecoveryPasswordNext(); }}
+                      onKeyDown={(e) => { if (e.key === 'Enter' && recoveryPassword.trim()) submitRecovery(); }}
                       placeholder="Mot de passe actuel"
                       className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-3.5 text-white text-sm
                         placeholder:text-white/30 focus:outline-none focus:border-[#f5d579]/40 focus:ring-1 focus:ring-[#f5d579]/20 transition-all"
@@ -648,111 +612,10 @@ const SecurityPage = () => {
                   )}
 
                   <button
-                    onClick={handleRecoveryPasswordNext}
-                    disabled={!recoveryPassword.trim()}
-                    className={`w-full py-3.5 rounded-2xl font-bold text-sm transition-all ${
-                      recoveryPassword.trim()
-                        ? 'bg-gradient-to-r from-[#f5d579] to-[#d4af37] text-[#260101] shadow-lg shadow-[#f5d579]/10 hover:scale-[1.02] active:scale-95'
-                        : 'bg-white/5 border border-white/10 text-white/30 cursor-not-allowed'
-                    }`}
-                  >
-                    Continuer
-                  </button>
-
-                  <button onClick={closeRecovery} className="w-full mt-3 py-3 rounded-2xl text-white/50 text-sm font-medium hover:text-white hover:bg-white/5 transition-all">
-                    Annuler
-                  </button>
-                </div>
-              </>
-            )}
-
-            {/* ── STEP 2: Choose method ── */}
-            {recoveryStep === 'method' && (
-              <>
-                <div className="pt-8 pb-4 px-6 text-center">
-                  <div className="mx-auto w-14 h-14 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-4">
-                    <svg className="w-7 h-7 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <h2 className="text-[#f5d579] font-bold text-lg">Choisissez une méthode</h2>
-                  <p className="text-white/50 text-xs mt-1">
-                    Un nouveau code PIN à 4 chiffres vous sera envoyé.
-                  </p>
-                </div>
-
-                <div className="px-6 pb-6 space-y-3">
-                  {/* Email option */}
-                  {userHasEmail && (
-                    <button
-                      onClick={() => setRecoveryMethod('email')}
-                      className={`w-full p-4 rounded-2xl border text-left flex items-center gap-3 transition-all ${
-                        recoveryMethod === 'email'
-                          ? 'bg-[#f5d579]/10 border-[#f5d579] shadow-[0_0_15px_rgba(245,213,121,0.1)]'
-                          : 'bg-black/40 border-white/10 hover:border-white/20'
-                      }`}
-                    >
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                        recoveryMethod === 'email' ? 'bg-[#f5d579]/20' : 'bg-yellow-500/20'
-                      }`}>
-                        <svg className={`w-5 h-5 ${recoveryMethod === 'email' ? 'text-[#f5d579]' : 'text-yellow-500'}`} fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                          <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                        </svg>
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-white font-medium text-sm">Par email</p>
-                        <p className="text-white/40 text-xs">{profile?.email || ''}</p>
-                      </div>
-                      {recoveryMethod === 'email' && (
-                        <svg className="w-5 h-5 text-[#f5d579]" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      )}
-                    </button>
-                  )}
-
-                  {/* Phone option */}
-                  {userHasPhone && (
-                    <button
-                      onClick={() => setRecoveryMethod('phone')}
-                      className={`w-full p-4 rounded-2xl border text-left flex items-center gap-3 transition-all ${
-                        recoveryMethod === 'phone'
-                          ? 'bg-[#f5d579]/10 border-[#f5d579] shadow-[0_0_15px_rgba(245,213,121,0.1)]'
-                          : 'bg-black/40 border-white/10 hover:border-white/20'
-                      }`}
-                    >
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                        recoveryMethod === 'phone' ? 'bg-[#f5d579]/20' : 'bg-yellow-500/20'
-                      }`}>
-                        <svg className={`w-5 h-5 ${recoveryMethod === 'phone' ? 'text-[#f5d579]' : 'text-yellow-500'}`} fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                        </svg>
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-white font-medium text-sm">Par SMS</p>
-                        <p className="text-white/40 text-xs">{profile?.phone || ''}</p>
-                      </div>
-                      {recoveryMethod === 'phone' && (
-                        <svg className="w-5 h-5 text-[#f5d579]" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      )}
-                    </button>
-                  )}
-
-                  {/* No method available */}
-                  {!userHasEmail && !userHasPhone && (
-                    <p className="text-white/40 text-xs text-center py-4">
-                      Aucun email ou numéro de téléphone trouvé sur votre compte.
-                    </p>
-                  )}
-
-                  <button
                     onClick={submitRecovery}
-                    disabled={recoverySending || (!userHasEmail && !userHasPhone)}
+                    disabled={recoverySending || !recoveryPassword.trim()}
                     className={`w-full py-3.5 rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
-                      !recoverySending && (userHasEmail || userHasPhone)
+                      !recoverySending && recoveryPassword.trim()
                         ? 'bg-gradient-to-r from-[#f5d579] to-[#d4af37] text-[#260101] shadow-lg shadow-[#f5d579]/10 hover:scale-[1.02] active:scale-95'
                         : 'bg-white/5 border border-white/10 text-white/30 cursor-not-allowed'
                     }`}
@@ -768,17 +631,14 @@ const SecurityPage = () => {
                     ) : 'Envoyer le nouveau code PIN'}
                   </button>
 
-                  <button
-                    onClick={() => setRecoveryStep('password')}
-                    className="w-full mt-2 py-3 rounded-2xl text-white/40 text-xs font-medium hover:text-white/60 hover:bg-white/5 transition-all"
-                  >
-                    Retour
+                  <button onClick={closeRecovery} className="w-full mt-3 py-3 rounded-2xl text-white/50 text-sm font-medium hover:text-white hover:bg-white/5 transition-all">
+                    Annuler
                   </button>
                 </div>
               </>
             )}
 
-            {/* ── STEP 3: Confirmation ── */}
+            {/* ── STEP 2: Confirmation ── */}
             {recoveryStep === 'sent' && (
               <>
                 <div className="pt-8 pb-4 px-6 text-center">
@@ -917,8 +777,6 @@ const ArrowItem = ({ icon, label, onClick }) => (
 const Icon = ({ name }) => {
   const icons = {
     lock: <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"/></svg>,
-    shield: <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd"/></svg>,
-    key: <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1-2 1-2 1H2v-2l2-2 2-2 1-1 1.257-1.257A6 6 0 1118 8z" clipRule="evenodd"/></svg>,
     recovery: <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>,
   };
   return icons[name] || null;

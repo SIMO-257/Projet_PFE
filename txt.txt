@@ -417,3 +417,9 @@ Summary
 │                                                    │ journey-aware result                       │
 └────────────────────────────────────────────────────┴────────────────────────────────────────────┘
 Want me to implement this? I'd start by creating the migration and transit line service, then work through each layer bottom-up (backend → frontend).
+
+-- in the admin part there are some donuts diagrammes that feed upon the users preferences there is this one toogle in the settings part of the user were he chooose to either share his infos for the analysis feature or not .
+-- we accendatlly remove that toglle btn were the user choose i want you to add it back and link teh feature again.
+
+
+in the pin code section you are stoping the user from using simple refetettive codes right ? but you dont give them a signa like an error to tell them so now they will get confused thinking the app is broken add an errro when the user try this case the same style when the user type a false pin 

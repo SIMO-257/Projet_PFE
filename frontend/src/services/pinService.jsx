@@ -12,5 +12,5 @@ export const disablePin = (pin) =>
 export const getPinStatus = () =>
     userApi.get('/users/pin/status').then(r => r.data);
 
-export const resetPin = (currentPassword, method) =>
-    userApi.post('/users/pin/reset', { current_password: currentPassword, method }).then(r => r.data);
+export const resetPin = (currentPassword) =>
+    userApi.post('/users/pin/reset', { current_password: currentPassword }).then(r => r.data);

@@ -227,7 +227,7 @@ const SettingsPage = () => {
             </Section>
 
 
-            {/* ========== SÉCURITÉ ========== */}
+            {/* ========== SÉCURITÉ ET CONFIDENTIALITÉ ========== */}
             <Section title={t("security_title")}>
               <ToggleItem
                 icon="lock"
@@ -236,6 +236,15 @@ const SettingsPage = () => {
                 value={pinEnabled}
                 onChange={handlePinToggle}
               />
+
+              <ToggleItem
+                icon="analytics"
+                label={t("share_analytics_data")}
+                description={t("share_analytics_desc")}
+                value={analyticsEnabled}
+                onChange={handleAnalyticsToggle}
+              />
+
               {pinEnabled && pinSet && (
                 <button
                   onClick={() => navigate('/security')}
@@ -257,17 +266,6 @@ const SettingsPage = () => {
                   </svg>
                 </button>
               )}
-            </Section>
-
-            {/* ========== CONFIDENTIALITÉ ========== */}
-            <Section title={t("privacy")}>
-              <ToggleItem
-                icon="analytics"
-                label={t("share_analytics_data")}
-                description={t("share_analytics_desc")}
-                value={analyticsEnabled}
-                onChange={handleAnalyticsToggle}
-              />
             </Section>
 
             {/* ========== SUPPORT & LÉGAL ========== */}

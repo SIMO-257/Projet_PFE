@@ -21,6 +21,9 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class,
         ]);
 
-        
+        // Seed random users for development/testing
+        if (app()->environment('local', 'development')) {
+            $this->call(RandomUsersSeeder::class);
+        }
     }
 }

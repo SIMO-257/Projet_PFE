@@ -140,7 +140,7 @@ class UserPinController extends Controller
     /**
      * Reset the PIN (recovery).
      * Requires the account password to confirm identity.
-     * Generates a new random PIN and sends it via email or phone.
+     * Generates a new random PIN and sends it via email.
      *
      * POST /api/users/pin/reset
      */
@@ -148,7 +148,6 @@ class UserPinController extends Controller
     {
         $validated = $request->validate([
             'current_password' => 'required|string',
-            'method'           => 'required|string|in:email,phone',
         ]);
 
         $user = $request->user();
@@ -173,26 +172,13 @@ class UserPinController extends Controller
         $user->user_preferences = $prefs;
         $user->save();
 
-        // Send the new PIN via the chosen method
-        if ($validated['method'] === 'email') {
-            $user->notify(new PinResetNotification($newPin));
-        } else {
-            // SMS — log for now; wire up to an SMS provider (Twilio, Vonage, etc.)
-            Log::info('PIN reset via SMS', [
-                'user_id' => $user->id,
-                'phone'   => $user->phone,
-                'new_pin' => $newPin,
-            ]);
-            // TODO: Send SMS via provider
-            // e.g. SmsService::send($user->phone, "Votre nouveau code PIN est : $newPin");
-        }
+        // Send the new PIN via email
+        $user->notify(new PinResetNotification($newPin));
 
         return $this->successResponse([
-            'method' => $validated['method'],
-            'masked' => $validated['method'] === 'email'
-                ? $this->maskEmail($user->email)
-                : $this->maskPhone($user->phone),
-        ], 'Un nouveau code PIN a été envoyé.');
+            'method' => 'email',
+            'masked' => $this->maskEmail($user->email),
+        ], 'Un nouveau code PIN a été envoyé par email.');
     }
 
     /**
@@ -217,18 +203,6 @@ class UserPinController extends Controller
         $domain = $parts[1] ?? '';
         $masked = substr($name, 0, 1) . str_repeat('*', max(0, strlen($name) - 1));
         return $masked . '@' . $domain;
-    }
-
-    /**
-     * Mask a phone number for display (e.g., +2126******10).
-     */
-    private function maskPhone(?string $phone): string
-    {
-        if (!$phone) return '';
-        $len = strlen($phone);
-        if ($len <= 4) return $phone;
-        $visible = 2;
-        return substr($phone, 0, $visible) . str_repeat('*', $len - $visible * 2) . substr($phone, -$visible);
     }
 
     /**

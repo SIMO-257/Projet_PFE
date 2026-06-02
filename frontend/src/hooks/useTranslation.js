@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux';
+import { useCallback } from 'react';
 import userTranslations from './userTranslations';
 import adminTranslations from './adminTranslations';
 
@@ -11,7 +12,7 @@ for (const lang of Object.keys(userTranslations)) {
 export const useTranslation = () => {
     const language = useSelector((state) => state.settings?.language || 'fr');
     
-    const t = (key, params = {}) => {
+    const t = useCallback((key, params = {}) => {
         const lang = allTranslations[language] || allTranslations['fr'];
         const value = lang[key] || allTranslations['fr'][key] || key;
         const str = typeof value === 'string' ? value : key;
@@ -20,9 +21,9 @@ export const useTranslation = () => {
         return str.replace(/\{(\w+)\}/g, (_, param) =>
             params[param] !== undefined ? params[param] : `{${param}}`
         );
-    };
+    }, [language]);
 
-    const formatReference = (reference) => {
+    const formatReference = useCallback((reference) => {
         if (!reference) return '';
         
         // 1. Check for Stripe recharge reference
@@ -39,7 +40,7 @@ export const useTranslation = () => {
         }
         
         return reference;
-    };
+    }, [t]);
 
     return { t, language, formatReference };
 };

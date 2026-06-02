@@ -101,5 +101,6 @@ export const createAdmin = (data) => adminApi.post('/admin/admins', data);
 export const updateAdminBySuper = (id, data) => adminApi.put(`/admin/admins/${id}`, data);
 export const toggleAdminStatus = (id) => adminApi.patch(`/admin/admins/${id}/toggle-status`);
 export const deleteAdmin = (id) => adminApi.delete(`/admin/admins/${id}`);
+export const deleteAdminWithPassword = (id, data) => adminApi.post(`/admin/admins/${id}/delete`, data);
 
 export default adminApi;

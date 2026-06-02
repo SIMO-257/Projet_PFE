@@ -167,6 +167,7 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'admin'])->group(function ()
     Route::put('/admins/{admin}', [AdminManagementController::class, 'update']);
     Route::patch('/admins/{admin}/toggle-status', [AdminManagementController::class, 'toggleStatus']);
     Route::delete('/admins/{admin}', [AdminManagementController::class, 'destroy']);
+    Route::post('/admins/{admin}/delete', [AdminManagementController::class, 'destroyWithPassword']);
 
     // Student Verifications
     Route::get('/student-verifications', [AdminStudentVerificationController::class, 'index']);

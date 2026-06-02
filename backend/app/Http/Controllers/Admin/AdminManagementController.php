@@ -181,7 +181,7 @@ class AdminManagementController extends Controller
     }
 
     /**
-     * Delete an admin.
+     * Simple delete (legacy — no password check, super admin only).
      * DELETE /api/admin/admins/{admin}
      */
     public function destroy(Request $request, Admin $admin)
@@ -189,7 +189,6 @@ class AdminManagementController extends Controller
         $forbidden = $this->requireSuperAdmin($request);
         if ($forbidden) return $forbidden;
 
-        // Cannot delete yourself
         if ($request->user()->id === $admin->id) {
             return response()->json([
                 'status' => 'error',
@@ -197,12 +196,61 @@ class AdminManagementController extends Controller
             ], 422);
         }
 
-        // Prevent deleting another super admin
         if ($admin->is_super_admin) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Vous ne pouvez pas supprimer un autre super administrateur.',
             ], 422);
+        }
+
+        $admin->delete();
+
+        Log::info('Admin deleted by super admin (DELETE)', [
+            'deleter_id' => $request->user()->id,
+            'deleted_admin_id' => $admin->id,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Administrateur supprimé avec succès.',
+        ]);
+    }
+
+    /**
+     * Delete an admin with password confirmation.
+     * POST /api/admin/admins/{admin}/delete
+     */
+    public function destroyWithPassword(Request $request, Admin $admin)
+    {
+        $forbidden = $this->requireSuperAdmin($request);
+        if ($forbidden) return $forbidden;
+
+        if ($request->user()->id === $admin->id) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Vous ne pouvez pas supprimer votre propre compte.',
+            ], 422);
+        }
+
+        if ($admin->is_super_admin) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Vous ne pouvez pas supprimer un autre super administrateur.',
+            ], 422);
+        }
+
+        $request->validate([
+            'password' => 'required|string',
+        ]);
+
+        /** @var \App\Models\Admin $currentAdmin */
+        $currentAdmin = $request->user();
+
+        if (!Hash::check($request->password, $currentAdmin->password)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Mot de passe incorrect. La suppression est annulée.',
+            ], 403);
         }
 
         $admin->delete();
