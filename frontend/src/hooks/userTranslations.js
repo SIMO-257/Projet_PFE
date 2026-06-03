@@ -731,6 +731,17 @@ const userTranslations = {
         student_file_required: "Veuillez télécharger les deux documents requis.",
         student_invalid_file: "Type de fichier invalide. Veuillez télécharger uniquement des fichiers PDF, DOC ou DOCX.",
     
+
+        // ========== Intro Slider (Onboarding) ==========
+        intro_skip: "Passer",
+        intro_start: "Commencer →",
+        intro_slide_aria: "Aller à la diapositive {number}",
+        intro_slide_1_title: "Bienvenue sur CasaWay",
+        intro_slide_1_subtitle: "Découvrez la nouvelle façon de naviguer dans votre ville. Une expérience fluide et entièrement digitalisée pour vos déplacements quotidiens.",
+        intro_slide_2_title: "Liberté de paiement",
+        intro_slide_2_subtitle: "Rechargez votre portefeuille numérique en quelques secondes. Payez vos trajets en toute sécurité, sans contact et sans attente.",
+        intro_slide_3_title: "Tout est sous contrôle",
+        intro_slide_3_subtitle: "Accédez à vos billets, suivez vos validations et restez informé grâce aux notifications en temps réel sur l'état du réseau."
     },
     ar: {
 
@@ -1463,6 +1474,17 @@ const userTranslations = {
         saved_card_default_status: "افتراضي",
         card_visa_default: "Visa",
         no_expiration: "بدون انتهاء",
+
+        // ========== Intro Slider (Onboarding) ==========
+        intro_skip: "تخطي",
+        intro_start: "ابدأ ←",
+        intro_slide_aria: "انتقل إلى الشريحة {number}",
+        intro_slide_1_title: "مرحباً بكم في CasaWay",
+        intro_slide_1_subtitle: "اكتشف طريقة جديدة للتنقل في مدينتك. تجربة سلسة ورقمية بالكامل لتنقلاتك اليومية.",
+        intro_slide_2_title: "حرية الدفع",
+        intro_slide_2_subtitle: "اشحن محفظتك الرقمية في ثوانٍ. ادفع مقابل رحلاتك بأمان، بدون تلامس وبدون انتظار.",
+        intro_slide_3_title: "كل شيء تحت السيطرة",
+        intro_slide_3_subtitle: "اطلع على تذاكرك، تابع تحققاتك وابق على اطلاع دائم بفضل الإشعارات الفورية حول حالة الشبكة.",
     
     },
     en: {
@@ -2187,6 +2209,17 @@ const userTranslations = {
         student_not_eligible: "You are already verified as a student.",
         student_file_required: "Please upload both required documents.",
         student_invalid_file: "Invalid file type. Please upload PDF, DOC, or DOCX files only.",
+
+        // ========== Intro Slider (Onboarding) ==========
+        intro_skip: "Skip",
+        intro_start: "Start →",
+        intro_slide_aria: "Go to slide {number}",
+        intro_slide_1_title: "Welcome to CasaWay",
+        intro_slide_1_subtitle: "Discover the new way to navigate your city. A smooth, fully digitalized experience for your daily commutes.",
+        intro_slide_2_title: "Freedom of Payment",
+        intro_slide_2_subtitle: "Recharge your digital wallet in seconds. Pay for your trips securely, contactlessly, and without waiting.",
+        intro_slide_3_title: "Everything Under Control",
+        intro_slide_3_subtitle: "Access your tickets, track your validations, and stay informed with real-time notifications about the network status."
     },
 };
 

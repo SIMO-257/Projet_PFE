@@ -438,6 +438,67 @@ select option {
   animation: countUp 0.3s ease-out both;
 }
 
+/* === LANGUAGE SWITCHER (reusable) === */
+
+.lang-switcher {
+  display: flex;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 3px;
+}
+
+.lang-switcher__btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 6px;
+  transition: all 0.25s ease;
+}
+
+.lang-switcher__btn:hover {
+  color: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.lang-switcher__btn--active {
+  color: #1a0507 !important;
+  background: #f5d579 !important;
+  box-shadow: 0 2px 8px rgba(245, 213, 121, 0.3);
+}
+
+/* Light mode overrides for auth pages */
+[data-theme='light'] .lang-switcher {
+  background: rgba(92, 42, 46, 0.08);
+}
+
+[data-theme='light'] .lang-switcher__btn {
+  color: rgba(31, 23, 24, 0.5);
+}
+
+[data-theme='light'] .lang-switcher__btn:hover {
+  color: rgba(31, 23, 24, 0.75);
+  background: rgba(92, 42, 46, 0.1);
+}
+
+[data-theme='light'] .lang-switcher__btn--active {
+  color: #1f1718 !important;
+  background: #f5d579 !important;
+}
+
+/* === AUTH LANG BAR (login/signup) === */
+
+.auth-lang-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 6px 0;
+}
+
 /* === INTRO SLIDER === */
 
 /* ── Root container ── */
@@ -546,9 +607,16 @@ select option {
   margin-left: -2px;
 }
 
+/* Top bar — language switcher + skip */
+.intro-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
 /* Skip button */
 .intro-skip {
-  align-self: flex-end;
   background: transparent;
   border: none;
   color: rgba(245, 213, 121, 0.55);

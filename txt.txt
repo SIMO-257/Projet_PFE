@@ -423,3 +423,10 @@ Want me to implement this? I'd start by creating the migration and transit line 
 
 
 in the pin code section you are stoping the user from using simple refetettive codes right ? but you dont give them a signa like an error to tell them so now they will get confused thinking the app is broken add an errro when the user try this case the same style when the user type a false pin 
+
+
+git checkout --orphan simo-production production
+
+# The working tree will have all files from production's last commit
+# Commit them as a single commit
+git commit -m "Import state from production branch"

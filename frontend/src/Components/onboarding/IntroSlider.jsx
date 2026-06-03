@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from '../../Styles/Auth.module.css';
+import { useTranslation } from '../../hooks/useTranslation';
+import LanguageSwitcher from '../UI/LanguageSwitcher';
 
 import slide1 from '../../assets/onboarding/slide1.jpg';
 import slide2 from '../../assets/onboarding/slide2.jpg';
@@ -8,39 +10,34 @@ import slide3 from '../../assets/onboarding/slide3.jpg';
 const SLIDES = [
   {
     icon: '🚊',
-    title: 'Bienvenue sur CasaWay',
-    subtitle: 'Découvrez la nouvelle façon de naviguer dans votre ville. Une expérience fluide et entièrement digitalisée pour vos déplacements quotidiens.',
     accent: '#400106',
     image: slide1,
   },
   {
     icon: '💳',
-    title: 'Liberté de paiement',
-    subtitle: 'Rechargez votre portefeuille numérique en quelques secondes. Payez vos trajets en toute sécurité, sans contact et sans attente.',
     accent: '#5C2A2E',
     image: slide2,
   },
   {
     icon: '🔔',
-    title: 'Tout est sous contrôle',
-    subtitle: 'Accédez à vos billets, suivez vos validations et restez informé grâce aux notifications en temps réel sur l\'état du réseau.',
     accent: '#260101',
     image: slide3,
   },
 ];
 
 export default function IntroSlider({ onComplete }) {
+  const { t } = useTranslation();
   const [current, setCurrent]   = useState(0);
   const [exiting, setExiting]   = useState(false);
   const [animKey, setAnimKey]   = useState(0); 
 
   useEffect(() => {
     if (current === SLIDES.length - 1) return;
-    const t = setTimeout(() => {
+    const timer = setTimeout(() => {
       setAnimKey(k => k + 1);
       setCurrent(c => c + 1);
     }, 3500);
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [current]);
 
   const handleComplete = () => {
@@ -55,6 +52,7 @@ export default function IntroSlider({ onComplete }) {
   };
 
   const slide = SLIDES[current];
+  const slideNum = current + 1;
 
   return (
     <div className={`intro-root${exiting ? ' intro-exit' : ''}`}>
@@ -89,13 +87,17 @@ export default function IntroSlider({ onComplete }) {
 
       {/* RIGHT — dark panel */}
       <div className="intro-right">
-        <button className="intro-skip" onClick={handleComplete}>
-          Passer
-        </button>
+        {/* Top bar: language switcher left, skip right */}
+        <div className="intro-top-bar">
+          <LanguageSwitcher />
+          <button className="intro-skip" onClick={handleComplete}>
+            {t('intro_skip')}
+          </button>
+        </div>
 
         <div className="intro-text-block" key={`text-${animKey}`}>
-          <h1 className="intro-title">{slide.title}</h1>
-          <p className="intro-subtitle">{slide.subtitle}</p>
+          <h1 className="intro-title">{t(`intro_slide_${slideNum}_title`)}</h1>
+          <p className="intro-subtitle">{t(`intro_slide_${slideNum}_subtitle`)}</p>
         </div>
 
         <div className="intro-bottom">
@@ -105,7 +107,7 @@ export default function IntroSlider({ onComplete }) {
                 key={i}
                 className={`intro-dot${i === current ? ' intro-dot-active' : ''}`}
                 onClick={() => goTo(i)}
-                aria-label={`Aller à la diapositive ${i + 1}`}
+                aria-label={t('intro_slide_aria', { number: i + 1 })}
               />
             ))}
           </div>
@@ -115,7 +117,7 @@ export default function IntroSlider({ onComplete }) {
               className={`intro-cta ${styles.authButton} ${styles.authButtonPrimary}`}
               onClick={handleComplete}
             >
-              Commencer →
+              {t('intro_start')}
             </button>
           )}
         </div>

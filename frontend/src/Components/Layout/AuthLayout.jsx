@@ -1,6 +1,7 @@
 import React, { useCallback, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from '../../Styles/Auth.module.css';
+import LanguageSwitcher from '../UI/LanguageSwitcher';
 
 const AuthLayout = ({ 
     children, 
@@ -47,6 +48,9 @@ const AuthLayout = ({
                 <div className={`${styles.authCard} app-card`}>
                     <div className="app-content">
                         <div className={styles.authContainer}>
+                            <div className="auth-lang-bar">
+                                <LanguageSwitcher />
+                            </div>
                             <header className={styles.authHeader}>
                                 <h1 
                                     className={styles.authLogo}
