@@ -6,6 +6,7 @@ import { fetchAdminMe } from '../../Redux/Slices/adminSlice';
 export default function AdminGuard() {
   const dispatch = useDispatch();
   const { isAuthenticated, adminChecked, loading } = useSelector((state) => state.admin);
+  const mustChangePassword = useSelector((state) => state.admin.mustChangePassword);
   const token = localStorage.getItem('admin_token') || sessionStorage.getItem('admin_token');
 
   // On mount, verify the token with the backend if we haven't checked yet
@@ -30,6 +31,11 @@ export default function AdminGuard() {
   // No token at all → redirect to login
   if (!isAuthenticated) {
     return <Navigate to="/admin/login" replace />;
+  }
+
+  // Must change password → redirect to force password change page
+  if (mustChangePassword) {
+    return <Navigate to="/admin/force-password-reset" replace />;
   }
 
   return <Outlet />;

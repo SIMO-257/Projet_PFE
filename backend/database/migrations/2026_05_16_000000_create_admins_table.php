@@ -18,6 +18,7 @@ return new class extends Migration
                 $table->string('last_name');
                 $table->string('email')->unique();
                 $table->string('password');
+                $table->boolean('must_change_password')->default(true);
                 $table->boolean('is_super_admin')->default(false);
                 $table->boolean('is_active')->default(true);
                 $table->rememberToken();

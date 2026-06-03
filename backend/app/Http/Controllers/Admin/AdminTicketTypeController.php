@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Events\TicketTypeUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\TicketType;
 use Illuminate\Http\Request;
@@ -74,8 +75,10 @@ class AdminTicketTypeController extends Controller
             'name'             => 'required|array',
             'name.fr'          => 'required|string|max:100',
             'name.en'          => 'required|string|max:100',
-            'name.ar'          => 'required|string|max:100',
-            'description'      => 'nullable|array',
+            'name.ar'          => 'nullable|string|max:100',
+            'description.fr'   => 'nullable|string',
+            'description.en'   => 'nullable|string',
+            'description.ar'   => 'nullable|string',
             'price'            => 'required|numeric|min:0',
             'student_price'    => 'nullable|numeric|min:0',
             'duration_minutes' => 'nullable|integer|min:1',
@@ -95,6 +98,8 @@ class AdminTicketTypeController extends Controller
             'max_uses'         => $request->input('max_uses', 1),
             'is_active'        => $request->boolean('is_active', true),
         ]);
+
+        event(new TicketTypeUpdated($type->id, $type->is_active));
 
         Log::info('Ticket type created by admin', [
             'admin_id' => $request->user()->id,
@@ -120,8 +125,10 @@ class AdminTicketTypeController extends Controller
             'name'             => 'required|array',
             'name.fr'          => 'required|string|max:100',
             'name.en'          => 'required|string|max:100',
-            'name.ar'          => 'required|string|max:100',
-            'description'      => 'nullable|array',
+            'name.ar'          => 'nullable|string|max:100',
+            'description.fr'   => 'nullable|string',
+            'description.en'   => 'nullable|string',
+            'description.ar'   => 'nullable|string',
             'price'            => 'required|numeric|min:0',
             'student_price'    => 'nullable|numeric|min:0',
             'duration_minutes' => 'nullable|integer|min:1',
@@ -141,6 +148,8 @@ class AdminTicketTypeController extends Controller
             'max_uses'         => $request->input('max_uses', 1),
             'is_active'        => $request->boolean('is_active', true),
         ]);
+
+        event(new TicketTypeUpdated($ticketType->id, $ticketType->is_active));
 
         Log::info('Ticket type updated by admin', [
             'admin_id' => $request->user()->id,
@@ -163,6 +172,8 @@ class AdminTicketTypeController extends Controller
         $ticketType->is_active = !$ticketType->is_active;
         $ticketType->save();
 
+        event(new TicketTypeUpdated($ticketType->id, $ticketType->is_active));
+
         Log::info('Ticket type status toggled by admin', [
             'admin_id'   => $request->user()->id,
             'type_id'    => $ticketType->id,
@@ -183,6 +194,8 @@ class AdminTicketTypeController extends Controller
     public function destroy(Request $request, TicketType $ticketType)
     {
         $ticketType->delete();
+
+        event(new TicketTypeUpdated($ticketType->id, false));
 
         Log::info('Ticket type deleted by admin', [
             'admin_id' => $request->user()->id,

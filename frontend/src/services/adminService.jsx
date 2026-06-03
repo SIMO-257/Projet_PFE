@@ -57,6 +57,7 @@ adminApi.interceptors.response.use(
 export const adminLogin = (credentials) => adminApi.post('/admin/login', credentials);
 export const adminLogout = () => adminApi.post('/admin/logout');
 export const adminMe = () => adminApi.get('/admin/me');
+export const forcePasswordReset = (data) => adminApi.post('/admin/force-password-reset', data);
 
 // Dashboard
 export const getDashboardStats = (params) => adminApi.get('/admin/dashboard', { params });

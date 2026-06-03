@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
 class AdminUserController extends Controller
@@ -31,13 +32,23 @@ class AdminUserController extends Controller
         ]);
     }
 
-    public function toggleStatus(User $user)
+    public function toggleStatus(User $user, NotificationService $notifier)
     {
         $user->update(['is_active' => !$user->is_active]);
-        $status = $user->is_active ? 'active' : 'bloque';
+        $status = $user->is_active ? 'active' : 'bloqué';
+        $statusLabel = $user->is_active ? 'activé' : 'désactivé';
+
+        $notifier->send(
+            $user,
+            'security',
+            'warning',
+            'Compte ' . $statusLabel,
+            "Votre compte a été {$statusLabel} par l'administrateur.",
+        );
+
         return response()->json([
             'status' => 'success',
-            'message' => "Utilisateur {$status} avec succes.",
+            'message' => "Utilisateur {$status} avec succès.",
             'data'    => ['is_active' => $user->is_active],
         ]);
     }

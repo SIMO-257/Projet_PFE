@@ -38,6 +38,13 @@ export function useRealtime() {
     const channelName = `user.${user.id}`;
     const channel = echo.private(channelName);
 
+    // ── Global: ticket types updated (create, update, toggle, delete) ──
+    const ticketTypesChannel = echo.channel('ticket-types');
+    ticketTypesChannel.listen('.ticket-type.updated', (e) => {
+      console.log('[WS] ticket-type.updated:', e);
+      dispatch(getTicketsData());
+    });
+
     // ── Ticket purchased ──
     channel.listen('.ticket.purchased', (e) => {
       console.log('[WS] ticket.purchased:', e);
@@ -75,6 +82,7 @@ export function useRealtime() {
     return () => {
       try {
         echo.leave(channelName);
+        echo.leave('ticket-types');
       } catch (err) {
         // Ignore cleanup errors
       }

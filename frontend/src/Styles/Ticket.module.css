@@ -161,11 +161,18 @@
   }
 
   .priceValue {
-    @apply text-2xl text-yellow-500 font-bold;
+    @apply text-2xl font-extrabold;
+    background: linear-gradient(to right, #fcd34d, #eab308);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   .ticketCard:not(.activeTicket) .priceValue {
-    @apply text-white/70;
+    background: linear-gradient(to right, #fbbf24, #d97706);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   /* Buttons */

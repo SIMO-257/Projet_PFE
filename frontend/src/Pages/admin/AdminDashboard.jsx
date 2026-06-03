@@ -37,7 +37,7 @@ const KPI_COLORS = {
 
 const PREF_COLORS = {
   enabled: '#22c55e',
-  disabled: '#6b7280',
+  disabled: '#92400e',
   validation: '#3b82f6',
   payment: '#eab308',
   security: '#a855f7',
@@ -225,9 +225,9 @@ const AdminDashboard = () => {
       </div>
 
       {/* Chart + Quick Links Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         {/* Chart */}
-        <div className="lg:col-span-2 bg-[#1a0507]/80 border border-white/10 rounded-2xl p-6 flex flex-col h-full">
+        <div className="lg:col-span-2 bg-[#1a0507]/80 border border-white/10 rounded-2xl p-6 flex flex-col">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-bold text-white">{t('admin_chart_title')}</h3>
             <div className="flex gap-1.5 bg-white/5 rounded-xl p-1">
@@ -460,7 +460,7 @@ const AdminDashboard = () => {
       {data?.preferences_analytics && (
         <>
         {/* Period Selector for Preferences */}
-        <div className="flex items-center justify-between bg-[#1a0507]/80 border border-white/10 rounded-2xl px-6 py-4">
+        <div className="flex items-center justify-between bg-[#1a0507]/80 border border-white/10 rounded-2xl px-6 py-4 lg:-mt-20 relative z-10">
           <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider">
             {t('privacy')} & {t('notifications_pref')}
           </h3>
@@ -487,85 +487,99 @@ const AdminDashboard = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Analytics Enabled */}
-          <div className="bg-[#1a0507]/80 border border-white/10 rounded-2xl p-6">
-            <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider mb-4">
-              {t('share_analytics_data')}
-            </h3>
-            <ResponsiveContainer width="100%" height={220}>
-              <PieChart>
-                <Pie
-                  data={[
-                    { name: t('yes'), value: data.preferences_analytics.analytics_enabled },
-                    { name: t('no'), value: data.preferences_analytics.analytics_disabled },
-                  ]}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={55}
-                  outerRadius={85}
-                  paddingAngle={4}
-                  dataKey="value"
-                >
-                  <Cell fill={PREF_COLORS.enabled} />
-                  <Cell fill={PREF_COLORS.disabled} />
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    background: '#1a0507',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: '12px',
-                    fontSize: '13px',
-                  }}
-                  itemStyle={{ color: 'rgba(255,255,255,0.8)' }}
-                />
-                <Legend
-                  wrapperStyle={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}
-                  iconType="circle"
-                />
-              </PieChart>
-            </ResponsiveContainer>
-            <p className="text-center text-white/40 text-xs mt-2">
+          <div className="bg-[#1a0507]/80 border border-white/10 rounded-2xl p-6 flex flex-col justify-between h-full">
+            <div>
+              <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider mb-4">
+                {t('share_analytics_data')}
+              </h3>
+              <div className="h-[280px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                    <Pie
+                      data={[
+                        { name: t('yes'), value: data.preferences_analytics.analytics_enabled },
+                        { name: t('no'), value: data.preferences_analytics.analytics_disabled },
+                      ]}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius="55%"
+                      outerRadius="90%"
+                      paddingAngle={4}
+                      dataKey="value"
+                    >
+                      <Cell fill={PREF_COLORS.enabled} />
+                      <Cell fill={PREF_COLORS.disabled} />
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        background: '#1a0507',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: '12px',
+                        fontSize: '13px',
+                      }}
+                      itemStyle={{ color: 'rgba(255,255,255,0.8)' }}
+                    />
+                    <Legend
+                      layout="horizontal"
+                      verticalAlign="bottom"
+                      align="center"
+                      wrapperStyle={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}
+                      iconType="circle"
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            <p className="text-center text-white/40 text-xs mt-4">
               {data.preferences_analytics.analytics_enabled}/{data.preferences_analytics.total_users}
             </p>
           </div>
 
           {/* Auth Purchase */}
-          <div className="bg-[#1a0507]/80 border border-white/10 rounded-2xl p-6">
-            <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider mb-4">
-              {t('auth_purchase')}
-            </h3>
-            <ResponsiveContainer width="100%" height={220}>
-              <PieChart>
-                <Pie
-                  data={[
-                    { name: t('yes'), value: data.preferences_analytics.auth_purchase_enabled },
-                    { name: t('no'), value: data.preferences_analytics.auth_purchase_disabled },
-                  ]}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={55}
-                  outerRadius={85}
-                  paddingAngle={4}
-                  dataKey="value"
-                >
-                  <Cell fill={PREF_COLORS.validation} />
-                  <Cell fill={PREF_COLORS.disabled} />
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    background: '#1a0507',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: '12px',
-                    fontSize: '13px',
-                  }}
-                  itemStyle={{ color: 'rgba(255,255,255,0.8)' }}
-                />
-                <Legend
-                  wrapperStyle={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}
-                  iconType="circle"
-                />
-              </PieChart>
-            </ResponsiveContainer>
-            <p className="text-center text-white/40 text-xs mt-2">
+          <div className="bg-[#1a0507]/80 border border-white/10 rounded-2xl p-6 flex flex-col justify-between h-full">
+            <div>
+              <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider mb-4">
+                {t('auth_purchase')}
+              </h3>
+              <div className="h-[280px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                    <Pie
+                      data={[
+                        { name: t('yes'), value: data.preferences_analytics.auth_purchase_enabled },
+                        { name: t('no'), value: data.preferences_analytics.auth_purchase_disabled },
+                      ]}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius="55%"
+                      outerRadius="90%"
+                      paddingAngle={4}
+                      dataKey="value"
+                    >
+                      <Cell fill={PREF_COLORS.validation} />
+                      <Cell fill={PREF_COLORS.disabled} />
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        background: '#1a0507',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: '12px',
+                        fontSize: '13px',
+                      }}
+                      itemStyle={{ color: 'rgba(255,255,255,0.8)' }}
+                    />
+                    <Legend
+                      layout="horizontal"
+                      verticalAlign="bottom"
+                      align="center"
+                      wrapperStyle={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}
+                      iconType="circle"
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            <p className="text-center text-white/40 text-xs mt-4">
               {data.preferences_analytics.auth_purchase_enabled}/{data.preferences_analytics.total_users}
             </p>
           </div>
@@ -602,7 +616,7 @@ const AdminDashboard = () => {
                             dataKey="value"
                           >
                             <Cell fill={item.color} />
-                            <Cell fill="rgba(255,255,255,0.06)" />
+                            <Cell fill="rgba(212,175,55,0.15)" />
                           </Pie>
                         </PieChart>
                       </ResponsiveContainer>

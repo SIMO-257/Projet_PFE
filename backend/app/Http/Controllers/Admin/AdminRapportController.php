@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Repport;
+use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
 class AdminRapportController extends Controller
@@ -40,15 +42,29 @@ class AdminRapportController extends Controller
      * PATCH /api/admin/repports/{id}/statut
      * Advance or set the status of a repport.
      */
-    public function updateStatut(Request $request, $id)
+    public function updateStatut(Request $request, $id, NotificationService $notifier)
     {
-        $repport = Repport::findOrFail($id);
+        $repport = Repport::with('client')->findOrFail($id);
 
         $validated = $request->validate([
             'statut' => 'required|string|in:en attente,en cours,résolu',
         ]);
 
         $repport->update(['statut' => $validated['statut']]);
+
+        $statusLabels = [
+            'en attente' => 'en attente',
+            'en cours'   => 'en cours de traitement',
+            'résolu'     => 'résolu',
+        ];
+
+        $notifier->send(
+            $repport->client,
+            'validation',
+            'info',
+            'Statut du signalement mis à jour',
+            "Votre signalement est désormais {$statusLabels[$validated['statut']]}.",
+        );
 
         return response()->json([
             'status'  => 'success',

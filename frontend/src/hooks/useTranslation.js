@@ -1,12 +1,19 @@
 import { useSelector } from 'react-redux';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import userTranslations from './userTranslations';
 import adminTranslations from './adminTranslations';
 
 // Merge both translation sets (admin takes precedence for overlapping keys)
+// Only merge fr and en (Arabic is not supported for admin)
 const allTranslations = {};
 for (const lang of Object.keys(userTranslations)) {
-    allTranslations[lang] = { ...userTranslations[lang], ...adminTranslations[lang] };
+    const adminLang = adminTranslations[lang] || {};
+    // Skip Arabic for admin translation merging
+    if (lang === 'ar') {
+        allTranslations[lang] = { ...userTranslations[lang] };
+    } else {
+        allTranslations[lang] = { ...userTranslations[lang], ...adminLang };
+    }
 }
 
 export const useTranslation = () => {

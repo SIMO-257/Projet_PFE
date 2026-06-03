@@ -8,6 +8,7 @@ use App\Models\AuditLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rules\Password;
 
 class AdminAuthController extends Controller
 {
@@ -48,11 +49,12 @@ class AdminAuthController extends Controller
             'message' => 'Connexion réussie.',
             'token'   => $token,
             'admin'   => [
-                'id'             => $admin->id,
-                'first_name'     => $admin->first_name,
-                'last_name'      => $admin->last_name,
-                'email'          => $admin->email,
-                'is_super_admin' => $admin->is_super_admin,
+                'id'                  => $admin->id,
+                'first_name'          => $admin->first_name,
+                'last_name'           => $admin->last_name,
+                'email'               => $admin->email,
+                'is_super_admin'      => $admin->is_super_admin,
+                'must_change_password' => $admin->must_change_password,
             ],
         ]);
     }
@@ -73,6 +75,36 @@ class AdminAuthController extends Controller
         return response()->json([
             'status' => 'success',
             'admin' => $request->user()
+        ]);
+    }
+
+    // POST /api/admin/force-password-reset
+    public function forcePasswordReset(Request $request)
+    {
+        $request->validate([
+            'password'              => ['required', 'confirmed', Password::min(8)],
+        ]);
+
+        /** @var \App\Models\Admin $admin */
+        $admin = $request->user();
+
+        $admin->password = Hash::make($request->password);
+        $admin->must_change_password = false;
+        $admin->save();
+
+        AuditLog::log('admin_password_force_reset', $admin->id, ['ip' => $request->ip()]);
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Mot de passe modifié avec succès.',
+            'admin'   => [
+                'id'                  => $admin->id,
+                'first_name'          => $admin->first_name,
+                'last_name'           => $admin->last_name,
+                'email'               => $admin->email,
+                'is_super_admin'      => $admin->is_super_admin,
+                'must_change_password' => false,
+            ],
         ]);
     }
 }

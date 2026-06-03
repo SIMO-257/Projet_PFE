@@ -94,9 +94,9 @@ class TicketTypeSeeder extends Seeder
         ];
 
         foreach ($ticketTypes as $type) {
-            // Cast arrays to JSON for storage
-            $type['name'] = json_encode($type['name']);
-            $type['description'] = json_encode($type['description']);
+            // Cast arrays to JSON for storage (preserve Unicode for Arabic)
+            $type['name'] = json_encode($type['name'], JSON_UNESCAPED_UNICODE);
+            $type['description'] = json_encode($type['description'], JSON_UNESCAPED_UNICODE);
 
             TicketType::updateOrCreate(
                 ['code' => $type['code']],

@@ -245,6 +245,9 @@ select option {
 /* ── 12. Admin layout overrides ── */
 [data-theme='light'] .bg-\[\#1a0507\].text-white { background-color: #f5f7fa; color: #1f1718; }
 
+/* Sidebar gradient end: to-[#0d0304] — light mode */
+[data-theme='light'] .to-\[\#0d0304\] { --tw-gradient-to: #e8ecf2 var(--tw-gradient-to-position); }
+
 /* ── 13. Loading overlay / PublicRoute ── */
 [data-theme='light'] .bg-\[\#1a0507\].text-white.h-screen { background-color: #f5f7fa; color: #1f1718; }
 

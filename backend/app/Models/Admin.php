@@ -29,6 +29,7 @@ class Admin extends Authenticatable
         'password',
         'is_active',
         'is_super_admin',
+        'must_change_password',
     ];
 
     /**
@@ -48,8 +49,9 @@ class Admin extends Authenticatable
     protected function casts(): array
     {
         return [
-            'is_active'      => 'boolean',
-            'is_super_admin' => 'boolean',
+            'is_active'           => 'boolean',
+            'is_super_admin'      => 'boolean',
+            'must_change_password' => 'boolean',
         ];
     }
 

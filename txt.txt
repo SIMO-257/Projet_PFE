@@ -430,3 +430,10 @@ git checkout --orphan simo-production production
 # The working tree will have all files from production's last commit
 # Commit them as a single commit
 git commit -m "Import state from production branch"
+
+-- in ticket types i want the ticket price to appear in golden color matching the style.
+-- how do we deal with admin forgot password the super admin will recover it for the admin but what is the most secure way.
+-- wha does no alerts mean when does the admin get alerted is it just static or what.
+-- remove the arabic lan support for admin and make sure the translation keys are well set for eng / fr.
+-- add settings to the admin languages / dark mode / 
+-- what is the plan 

@@ -46,8 +46,9 @@ const adminSlice = createSlice({
   initialState: {
     admin: null,
     token: getAdminToken(),
-    isAuthenticated: false, // Changed: no longer trust token without server verification
-    adminChecked: false,     // New: becomes true once server verifies (or rejects) the token
+    isAuthenticated: false,
+    adminChecked: false,
+    mustChangePassword: false,
     loading: false,
     error: null,
   },
@@ -60,7 +61,11 @@ const adminSlice = createSlice({
       state.token = null;
       state.isAuthenticated = false;
       state.adminChecked = true;
+      state.mustChangePassword = false;
       clearAdminToken();
+    },
+    clearMustChangePassword: (state) => {
+      state.mustChangePassword = false;
     },
   },
   extraReducers: (builder) => {
@@ -75,6 +80,7 @@ const adminSlice = createSlice({
         state.adminChecked = true;
         state.admin = action.payload.admin;
         state.token = action.payload.token;
+        state.mustChangePassword = action.payload.admin?.must_change_password === true;
       })
       .addCase(loginAdmin.rejected, (state, action) => {
         state.loading = false;
@@ -86,6 +92,7 @@ const adminSlice = createSlice({
         state.token = null;
         state.isAuthenticated = false;
         state.adminChecked = true;
+        state.mustChangePassword = false;
       })
       .addCase(logoutAdmin.rejected, (state) => {
         state.admin = null;
@@ -96,6 +103,7 @@ const adminSlice = createSlice({
         state.adminChecked = true;
         state.admin = action.payload;
         state.isAuthenticated = true;
+        state.mustChangePassword = action.payload?.must_change_password === true;
       })
       .addCase(fetchAdminMe.rejected, (state) => {
         state.adminChecked = true;
@@ -119,5 +127,5 @@ const adminSlice = createSlice({
   },
 });
 
-export const { clearAdminError, clearAdminAuth } = adminSlice.actions;
+export const { clearAdminError, clearAdminAuth, clearMustChangePassword } = adminSlice.actions;
 export default adminSlice.reducer;

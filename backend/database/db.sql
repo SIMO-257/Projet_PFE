@@ -348,13 +348,14 @@ CREATE TABLE `admins` (
     `password` VARCHAR(255) NOT NULL,
     `is_active` TINYINT(1) NOT NULL DEFAULT 1,
     `is_super_admin` TINYINT(1) NOT NULL DEFAULT 0,
+    `must_change_password` TINYINT(1) NOT NULL DEFAULT 0,
     `created_at` TIMESTAMP NULL,
     `updated_at` TIMESTAMP NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `admins_email_unique` (`email`)
 ) ENGINE=InnoDB;
 
-INSERT INTO `admins` (`first_name`, `last_name`, `email`, `password`, `is_active`, `is_super_admin`, `created_at`, `updated_at`)
+INSERT INTO `admins` (`first_name`, `last_name`, `email`, `password`, `is_active`, `is_super_admin`, `must_change_password`, `created_at`, `updated_at`)
 VALUES ('Admin', 'CasaWay', 'admin@casaway.ma', '$2y$10$WuqkRgbZpbhi20dbEHROFe19B/2LE2KiJPv15jTn.neaK6ES57diO', 1, 1, NOW(), NOW());
 
 -- =============================================

@@ -34,6 +34,23 @@ class EnsureUserIsAdmin
             ], 403);
         }
 
+        // If admin must change password, only allow force-password-reset and logout routes
+        if ($user->must_change_password) {
+            $currentPath = trim($request->path(), '/');
+
+            // $request->path() returns something like "api/admin/force-password-reset"
+            $isAllowed = str_contains($currentPath, 'force-password-reset')
+                      || str_contains($currentPath, 'logout');
+
+            if (!$isAllowed) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Vous devez changer votre mot de passe avant d\'accéder à cette page.',
+                    'must_change_password' => true,
+                ], 403);
+            }
+        }
+
         return $next($request);
     }
 }

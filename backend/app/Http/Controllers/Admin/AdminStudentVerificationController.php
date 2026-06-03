@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\StudentVerification;
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -76,7 +77,7 @@ class AdminStudentVerificationController extends Controller
      * POST /api/admin/student-verifications/{id}/approve
      * Approve a student verification request.
      */
-    public function approve(Request $request, $id)
+    public function approve(Request $request, $id, NotificationService $notifier)
     {
         $verification = StudentVerification::findOrFail($id);
 
@@ -95,6 +96,14 @@ class AdminStudentVerificationController extends Controller
         ]);
 
         $user->update(['is_student' => true]);
+
+        $notifier->send(
+            $user,
+            'validation',
+            'success',
+            'Statut étudiant approuvé',
+            'Votre demande de statut étudiant a été approuvée. Vous bénéficiez désormais des tarifs réduits.',
+        );
 
         // Log the action
         Log::info('Student verification approved', [
@@ -117,7 +126,7 @@ class AdminStudentVerificationController extends Controller
      * POST /api/admin/student-verifications/{id}/reject
      * Reject a student verification request with a reason.
      */
-    public function reject(Request $request, $id)
+    public function reject(Request $request, $id, NotificationService $notifier)
     {
         $validated = $request->validate([
             'reason' => 'required|string|max:500',
@@ -132,11 +141,21 @@ class AdminStudentVerificationController extends Controller
             ], 422);
         }
 
+        $user = User::findOrFail($verification->user_id);
+
         $verification->update([
             'status'          => 'rejected',
             'admin_id'        => request()->user()->id,
             'rejected_reason' => $validated['reason'],
         ]);
+
+        $notifier->send(
+            $user,
+            'validation',
+            'error',
+            'Statut étudiant refusé',
+            "Votre demande de statut étudiant a été refusée. Raison : {$validated['reason']}",
+        );
 
         return response()->json([
             'status'  => 'success',

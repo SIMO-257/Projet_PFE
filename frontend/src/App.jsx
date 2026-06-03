@@ -64,6 +64,8 @@ const AdminStudentVerifications = lazy(() => import("./Pages/admin/AdminStudentV
 const AdminAdmins = lazy(() => import("./Pages/admin/AdminAdmins"));
 const AdminAuditLogs = lazy(() => import("./Pages/admin/AdminAuditLogs"));
 const AdminTicketTypes = lazy(() => import("./Pages/admin/AdminTicketTypes"));
+const AdminSettings = lazy(() => import("./Pages/admin/AdminSettings"));
+const AdminForcePasswordChange = lazy(() => import("./Pages/admin/AdminForcePasswordChange"));
 const ValidatorPage = lazy(() => import("./Pages/validation/ValidatorPage"));
 
 // Admin Components
@@ -204,6 +206,7 @@ function App() {
 
           {/* ADMIN ROUTES */}
           <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/force-password-reset" element={<AdminForcePasswordChange />} />
 
           <Route path="/admin" element={<AdminGuard />}>
             <Route element={<AdminLayout />}>
@@ -217,6 +220,7 @@ function App() {
               <Route path="student-verifications" element={<AdminStudentVerifications />} />
               <Route path="audit-logs" element={<AdminAuditLogs />} />
               <Route path="ticket-types" element={<AdminTicketTypes />} />
+              <Route path="settings" element={<AdminSettings />} />
               <Route path="validator" element={<ValidatorPage />} />
               <Route path="admins" element={<AdminAdmins />} />
               <Route path="profil" element={<AdminProfile />} />

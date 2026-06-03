@@ -77,12 +77,13 @@ class AdminManagementController extends Controller
         ]);
 
         $admin = Admin::create([
-            'first_name'     => $request->first_name,
-            'last_name'      => $request->last_name,
-            'email'          => $request->email,
-            'password'       => Hash::make($request->password),
-            'is_active'      => true,
-            'is_super_admin' => false,
+            'first_name'           => $request->first_name,
+            'last_name'            => $request->last_name,
+            'email'                => $request->email,
+            'password'             => Hash::make($request->password),
+            'is_active'            => true,
+            'is_super_admin'       => false,
+            'must_change_password' => true,
         ]);
 
         Log::info('New admin created by super admin', [

@@ -10,8 +10,8 @@ import {
 
 const emptyForm = () => ({
   code: '',
-  name: { fr: '', en: '', ar: '' },
-  description: { fr: '', en: '', ar: '' },
+  name: { fr: '', en: '' },
+  description: { fr: '', en: '' },
   price: '',
   student_price: '',
   duration_minutes: '',
@@ -58,7 +58,7 @@ const AdminTicketTypes = () => {
     setForm({
       code: type.code,
       name: { ...type.name },
-      description: type.description ? { ...type.description } : { fr: '', en: '', ar: '' },
+      description: type.description ? { ...type.description } : { fr: '', en: '' },
       price: type.price.toString(),
       student_price: type.student_price?.toString() || '',
       duration_minutes: type.duration_minutes?.toString() || '',
@@ -80,8 +80,8 @@ const AdminTicketTypes = () => {
     e.preventDefault();
     setError('');
 
-    if (!form.name.fr || !form.name.en || !form.name.ar) {
-      setError('Les traductions du nom sont requises (fr, en, ar).');
+    if (!form.name.fr || !form.name.en) {
+      setError('Les traductions du nom sont requises (fr, en).');
       return;
     }
 
@@ -182,14 +182,14 @@ const AdminTicketTypes = () => {
                   </div>
                   <p className="text-white/50 text-sm mb-3">{type.description?.fr || '—'}</p>
                   <div className="flex flex-wrap gap-4 text-sm">
-                    <div className="bg-white/5 rounded-xl px-3 py-2">
-                      <span className="text-white/40 text-[10px] uppercase block">Prix normal</span>
-                      <span className="text-yellow-400 font-bold">{type.price} DH</span>
+                    <div className="bg-gradient-to-br from-yellow-500/25 to-yellow-600/10 border border-yellow-500/30 rounded-xl px-4 py-2.5 shadow-lg shadow-yellow-500/5">
+                      <span className="text-yellow-400/60 text-[10px] uppercase block tracking-wider">Prix normal</span>
+                      <span className="text-transparent bg-gradient-to-r from-yellow-300 to-yellow-500 bg-clip-text font-extrabold text-lg">{type.price} DH</span>
                     </div>
                     {type.student_price && (
-                      <div className="bg-white/5 rounded-xl px-3 py-2">
-                        <span className="text-white/40 text-[10px] uppercase block">Prix étudiant</span>
-                        <span className="text-blue-400 font-bold">{type.student_price} DH</span>
+                      <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/5 border border-blue-500/20 rounded-xl px-4 py-2.5">
+                        <span className="text-blue-400/60 text-[10px] uppercase block tracking-wider">Prix étudiant</span>
+                        <span className="text-blue-400 font-bold text-lg">{type.student_price} DH</span>
                       </div>
                     )}
                     <div className="bg-white/5 rounded-xl px-3 py-2">
@@ -285,7 +285,7 @@ const AdminTicketTypes = () => {
               {/* Translations - Name */}
               <div className="space-y-3">
                 <label className="text-white/70 text-sm font-medium">Nom (traductions) *</label>
-                {['fr', 'en', 'ar'].map((lang) => (
+                {['fr', 'en'].map((lang) => (
                   <div key={lang} className="flex items-center gap-3">
                     <span className="w-8 text-xs font-bold text-white/40 uppercase">{lang}</span>
                     <input
@@ -303,7 +303,7 @@ const AdminTicketTypes = () => {
               {/* Translations - Description */}
               <div className="space-y-3">
                 <label className="text-white/70 text-sm font-medium">Description (traductions)</label>
-                {['fr', 'en', 'ar'].map((lang) => (
+                {['fr', 'en'].map((lang) => (
                   <div key={lang} className="flex items-center gap-3">
                     <span className="w-8 text-xs font-bold text-white/40 uppercase">{lang}</span>
                     <input

@@ -221,7 +221,7 @@ export default function TicketSelectionPage() {
                                     >
                                         <div className="flex justify-between items-center mb-3">
                                             <span className="text-white font-bold text-lg">{type.name}</span>
-                                            <span className="text-[#f5d579] font-bold text-xl">{(type.effective_price || type.price)} {t('currency')}</span>
+                                            <span className="text-transparent bg-gradient-to-r from-yellow-300 to-yellow-500 bg-clip-text font-extrabold text-xl">{(type.effective_price || type.price)} {t('currency')}</span>
                                         </div>
                                         <p className="text-white/60 text-sm leading-relaxed">{type.description}</p>
                                     </div>
@@ -246,7 +246,7 @@ export default function TicketSelectionPage() {
                                         </button>
                                     </div>
                                     <div className="text-right">
-                                        <div className="text-[#f5d579] font-bold text-2xl">{totalPrice} {t('currency')}</div>
+                                        <div className="text-transparent bg-gradient-to-r from-yellow-300 to-yellow-500 bg-clip-text font-extrabold text-2xl">{totalPrice} {t('currency')}</div>
                                     </div>
                                 </div>
                             )}
@@ -358,7 +358,7 @@ export default function TicketSelectionPage() {
                                     )}
                                     <div className="border-t border-white/10 my-2 pt-2 flex justify-between items-center">
                                         <span className="text-white/60 text-sm font-medium">{t('total_to_pay') || (language === 'ar' ? 'إجمالي الدفع' : language === 'en' ? 'Total to pay' : 'Total à payer')}</span>
-                                        <span className="text-[#f5d579] font-bold text-lg">{totalPrice} {t('currency')}</span>
+                                        <span className="text-transparent bg-gradient-to-r from-yellow-300 to-yellow-500 bg-clip-text font-extrabold text-lg">{totalPrice} {t('currency')}</span>
                                     </div>
                                 </div>
 
