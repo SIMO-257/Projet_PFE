@@ -1,0 +1,124 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* Success Animation Container */
+  .successContainer {
+    @apply text-center mb-8;
+  }
+
+  /* Success Pulse Animation */
+  .successPulse {
+    @apply w-32 h-32 rounded-full flex items-center justify-center mx-auto mb-6;
+    background: rgba(72, 187, 120, 0.1);
+    animation: successPulse 2s infinite;
+  }
+
+  @keyframes successPulse {
+    0% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(72, 187, 120, 0.7);
+    }
+    70% {
+      transform: scale(1);
+      box-shadow: 0 0 0 25px rgba(72, 187, 120, 0);
+    }
+    100% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(72, 187, 120, 0);
+    }
+  }
+
+  /* Checkmark Animation */
+  .checkmark {
+    @apply w-20 h-20;
+    stroke-width: 2;
+    stroke: #10b981;
+    stroke-miterlimit: 10;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+  }
+
+  .checkmarkCircle {
+    animation: checkmarkCircle 0.6s ease-in-out both;
+  }
+
+  .checkmarkPath {
+    animation: checkmarkPath 0.5s ease-in-out 0.5s both;
+  }
+
+  @keyframes checkmarkCircle {
+    from {
+      stroke-dashoffset: 157;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes checkmarkPath {
+    0% {
+      stroke-dashoffset: 100;
+    }
+    100% {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* Modal Card */
+  .resultModalCard {
+    @apply relative rounded-3xl overflow-hidden border backdrop-blur-lg;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    background: linear-gradient(135deg, rgba(64, 1, 6, 0.95), rgba(38, 1, 1, 0.95));
+    border-color: rgba(212, 175, 55, 0.2);
+  }
+
+  :global([data-theme='light']) .resultModalCard {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(248, 241, 224, 0.98));
+    border-color: rgba(212, 175, 55, 0.24);
+    box-shadow: 0 20px 45px -22px rgba(92, 42, 46, 0.28);
+    color: #1f1718;
+  }
+
+  .resultModalCard::before {
+    content: '';
+    @apply absolute top-0 left-0 right-0 h-1 z-20;
+    background: linear-gradient(to right, #FFD700, #D4AF37);
+    border-radius: 24px 24px 0 0;
+  }
+
+  /* Fade In Up Animation */
+  .fadeInUp {
+    @apply animate-fade-in-up;
+  }
+
+  /* Hide scrollbar */
+  .noScrollbar::-webkit-scrollbar {
+    @apply hidden;
+  }
+
+  .noScrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Custom scrollbar for content */
+  .customScrollbar::-webkit-scrollbar {
+    @apply w-1;
+  }
+
+  .customScrollbar::-webkit-scrollbar-track {
+    @apply rounded-[10px];
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .customScrollbar::-webkit-scrollbar-thumb {
+    @apply rounded-[10px];
+    background: rgba(255, 215, 0, 0.3);
+  }
+
+  .customScrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 215, 0, 0.5);
+  }
+}

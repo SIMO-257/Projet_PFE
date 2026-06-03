@@ -1,0 +1,365 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .appContainer {
+    @apply min-h-screen flex items-start justify-center p-4;
+    background: linear-gradient(180deg, #4a1a1a 0%, #2d0f0f 100%);
+    font-family: 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  :global([data-theme='light']) .appContainer {
+    background: linear-gradient(180deg, #f5f7fa 0%, #e8ecf2 100%);
+  }
+
+  .container {
+    @apply w-full max-w-md px-6 py-8 relative;
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Close Button */
+  .closeBtn {
+    @apply absolute top-4 right-4 bg-transparent border-none text-white/60 text-3xl cursor-pointer w-10 h-10 flex items-center justify-center rounded-full z-10 transition-all duration-200;
+  }
+
+  :global([data-theme='light']) .closeBtn {
+    color: rgba(31, 23, 24, 0.64);
+  }
+
+  .closeBtn:hover {
+    @apply bg-white/10 text-white/90 rotate-90;
+  }
+
+  /* Success Icon */
+  .successIcon {
+    @apply flex justify-center mb-6;
+    animation: scaleIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  @keyframes scaleIn {
+    from {
+      transform: scale(0);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .checkmark {
+    @apply w-20 h-20;
+  }
+
+  .circleBg {
+    @apply fill-none;
+    stroke: rgba(255, 255, 255, 0.2);
+    stroke-width: 2;
+  }
+
+  .check {
+    @apply fill-none;
+    stroke: #d4af77;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    animation: drawCheck 0.8s ease-out 0.3s forwards;
+  }
+
+  @keyframes drawCheck {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* Header */
+  .header {
+    @apply text-center mb-8;
+  }
+
+  .subTitle {
+    @apply text-2xl text-white font-semibold mb-2 tracking-tight;
+  }
+
+  :global([data-theme='light']) .subTitle {
+    color: #1f1718;
+  }
+
+  .description {
+    @apply text-white/70 text-[0.95rem] font-light leading-relaxed;
+  }
+
+  :global([data-theme='light']) .description {
+    color: rgba(31, 23, 24, 0.74);
+  }
+
+  /* Ticket Card */
+  .ticketCard {
+    @apply border rounded-2xl p-6 mb-6 backdrop-blur-lg;
+    background: rgba(20, 10, 10, 0.6);
+    border-color: rgba(212, 175, 119, 0.2);
+    animation: slideUp 0.5s ease-out 0.2s backwards;
+  }
+
+  :global([data-theme='light']) .ticketCard {
+    background: rgba(255, 255, 255, 0.7);
+    border-color: rgba(212, 175, 55, 0.24);
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .ticketHeader {
+    @apply flex items-center gap-3 mb-6 pb-4;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  :global([data-theme='light']) .ticketHeader {
+    border-bottom-color: rgba(92, 42, 46, 0.14);
+  }
+
+  .ticketIcon {
+    @apply w-5 h-5;
+    stroke: #d4af77;
+  }
+
+  .ticketType {
+    @apply text-white font-medium text-base;
+  }
+
+  :global([data-theme='light']) .ticketType {
+    color: #1f1718;
+  }
+
+  .ticketDetails {
+    @apply flex flex-col gap-3 mb-5;
+  }
+
+  .detailRow {
+    @apply flex justify-between items-center text-sm;
+  }
+
+  .label {
+    @apply text-white/60 font-normal;
+  }
+
+  :global([data-theme='light']) .label {
+    color: rgba(31, 23, 24, 0.64);
+  }
+
+  .value {
+    @apply text-white font-medium;
+  }
+
+  :global([data-theme='light']) .value {
+    color: #1f1718;
+  }
+
+  .statusBadge {
+    @apply inline-flex items-center gap-2 border rounded-[20px] py-2 px-4 text-sm font-medium;
+    background: rgba(212, 175, 119, 0.15);
+    border-color: rgba(212, 175, 119, 0.3);
+    color: #d4af77;
+  }
+
+  .statusIcon {
+    @apply w-4 h-4;
+    stroke: #d4af77;
+  }
+
+  /* Buttons */
+  .buttonContainer {
+    @apply flex flex-col gap-3 mb-6;
+  }
+
+  .btnPrimary,
+  .btnSecondary,
+  .btnLink,
+  .btnDownload {
+    @apply border-none rounded-xl py-4 px-6 text-[0.95rem] font-medium cursor-pointer transition-all duration-300 flex items-center justify-center gap-2;
+    font-family: 'Sora', sans-serif;
+  }
+
+  .btnIcon {
+    @apply w-[18px] h-[18px];
+    stroke: #2d0f0f;
+    stroke-width: 2;
+  }
+
+  .btnPrimary {
+    @apply text-[#2d0f0f];
+    background: linear-gradient(135deg, #d4af77 0%, #c19a5f 100%);
+    box-shadow: 0 4px 15px rgba(212, 175, 119, 0.3);
+  }
+
+  .btnPrimary:hover {
+    @apply -translate-y-0.5;
+    box-shadow: 0 6px 20px rgba(212, 175, 119, 0.4);
+  }
+
+  .btnPrimary:active {
+    @apply translate-y-0;
+  }
+
+  .btnSecondary {
+    @apply text-white border;
+    background: rgba(20, 10, 10, 0.6);
+    border-color: rgba(212, 175, 119, 0.2);
+  }
+
+  .btnSecondary:hover {
+    @apply bg-[rgba(20,10,10,0.8)];
+    border-color: rgba(212, 175, 119, 0.4);
+  }
+
+  .plusIcon {
+    @apply text-lg font-normal;
+  }
+
+  .btnLink {
+    @apply bg-transparent border-none text-white/70 py-3;
+  }
+
+  :global([data-theme='light']) .btnLink {
+    color: rgba(31, 23, 24, 0.74);
+  }
+
+  .btnLink:hover {
+    @apply text-white bg-white/5;
+  }
+
+  :global([data-theme='light']) .btnLink:hover {
+    color: #1f1718;
+    background-color: rgba(92, 42, 46, 0.09);
+  }
+
+  .homeIcon {
+    @apply w-[18px] h-[18px];
+    stroke: currentColor;
+    stroke-width: 2;
+  }
+
+  /* Transaction Accordion */
+  .transactionAccordion {
+    @apply border rounded-xl overflow-hidden;
+    background: rgba(20, 10, 10, 0.4);
+    border-color: rgba(255, 255, 255, 0.1);
+    animation: slideUp 0.5s ease-out 0.4s backwards;
+  }
+
+  :global([data-theme='light']) .transactionAccordion {
+    background: rgba(255, 255, 255, 0.7);
+    border-color: rgba(92, 42, 46, 0.14);
+  }
+
+  .accordionHeader {
+    @apply flex items-center justify-between py-4 px-5 text-white/80 font-medium text-[0.95rem] cursor-pointer select-none list-none transition-all duration-300;
+  }
+
+  :global([data-theme='light']) .accordionHeader {
+    color: rgba(31, 23, 24, 0.82);
+  }
+
+  .accordionHeader:hover {
+    @apply bg-white/5;
+  }
+
+  :global([data-theme='light']) .accordionHeader:hover {
+    background-color: rgba(92, 42, 46, 0.09);
+  }
+
+  .accordionHeader::-webkit-details-marker {
+    @apply hidden;
+  }
+
+  .chevron {
+    @apply w-5 h-5 transition-transform duration-300;
+    stroke: rgba(255, 255, 255, 0.6);
+    stroke-width: 2;
+  }
+
+  .transactionAccordion[open] .chevron {
+    @apply rotate-180;
+  }
+
+  .accordionContent {
+    @apply px-5 pb-5;
+    animation: accordionSlide 0.3s ease-out;
+  }
+
+  @keyframes accordionSlide {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .transactionInfo {
+    @apply flex flex-col gap-3 mb-4 pb-4;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  :global([data-theme='light']) .transactionInfo {
+    border-bottom-color: rgba(92, 42, 46, 0.14);
+  }
+
+  .btnDownload {
+    @apply w-full border text-[#d4af77];
+    background: rgba(20, 10, 10, 0.6);
+    border-color: rgba(212, 175, 119, 0.3);
+  }
+
+  .btnDownload:hover {
+    @apply bg-[rgba(212,175,119,0.1)];
+    border-color: rgba(212, 175, 119, 0.5);
+  }
+
+  .downloadIcon {
+    @apply w-[18px] h-[18px];
+    stroke: #d4af77;
+    stroke-width: 2;
+  }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    .container {
+      @apply px-4 py-6;
+    }
+
+    .ticketCard {
+      @apply p-5;
+    }
+
+    .subTitle {
+      @apply text-[1.3rem];
+    }
+  }
+}

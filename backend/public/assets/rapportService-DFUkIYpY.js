@@ -1,0 +1,1 @@
+import{aq as p,ar as a}from"./index-DIHu_bFS.js";const r=()=>p.get("/help"),e=t=>p.post("/repports",t),i=t=>a.get("/admin/repports",{params:t}),n=(t,s)=>a.patch(`/admin/repports/${t}/statut`,{statut:s});export{i as a,r as g,e as s,n as u};

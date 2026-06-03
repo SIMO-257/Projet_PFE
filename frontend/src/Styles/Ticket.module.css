@@ -1,0 +1,256 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* App Container */
+  .appContainer {
+    @apply min-h-screen bg-[#0a0a0a] text-white mx-auto px-4 pt-5 pb-20;
+    max-width: 480px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  :global([data-theme='light']) .appContainer {
+    background: #f5f7fa;
+    color: #1f1718;
+  }
+
+  /* Header Section */
+  .header {
+    @apply flex justify-between items-center mb-2;
+  }
+
+  .backButton,
+  .menuButton {
+    @apply bg-none border-none text-white text-2xl cursor-pointer p-2 w-10 h-10 flex items-center justify-center;
+  }
+
+  .mainTitle {
+    @apply text-2xl font-semibold text-white m-0;
+  }
+
+  :global([data-theme='light']) .mainTitle {
+    color: #1f1718;
+  }
+
+  .subtitle {
+    @apply text-sm text-white/50 m-0 mb-6 font-normal;
+  }
+
+  :global([data-theme='light']) .subtitle {
+    color: rgba(31, 23, 24, 0.54);
+  }
+
+  /* Main Content - Tickets */
+  .mainContent {
+    @apply flex flex-col gap-4 mb-5;
+  }
+
+  /* Ticket Card */
+  .ticketCard {
+    @apply bg-black/40 rounded-2xl p-6 border border-white/10 transition-all duration-300;
+  }
+
+  :global([data-theme='light']) .ticketCard {
+    background-color: rgba(255, 255, 255, 0.7);
+    border-color: rgba(92, 42, 46, 0.14);
+  }
+
+  .ticketCard:hover {
+    @apply -translate-y-1 border-yellow-500/20;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+  }
+
+  .activeTicket {
+    @apply border-yellow-500/20;
+    background: linear-gradient(135deg, rgba(139, 64, 73, 0.1) 0%, rgba(92, 42, 46, 0.1) 100%);
+  }
+
+  .ticketTop {
+    @apply mb-5;
+  }
+
+  .ticketHeaderRow {
+    @apply flex justify-between items-start mb-3;
+  }
+
+  .ticketTitleSection {
+    @apply flex items-start gap-3;
+  }
+
+  .ticketIcon {
+    @apply text-3xl opacity-50;
+    color: #D4AF37;
+  }
+
+  .activeTicket .ticketIcon {
+    @apply opacity-100;
+    color: #FFD700;
+  }
+
+  .ticketTitle {
+    @apply text-lg font-semibold text-white m-0 mb-1;
+    letter-spacing: 0.5px;
+  }
+
+  :global([data-theme='light']) .ticketTitle {
+    color: #1f1718;
+  }
+
+  .ticketDescription {
+    @apply text-xs text-white/40 m-0 font-light;
+  }
+
+  :global([data-theme='light']) .ticketDescription {
+    color: rgba(31, 23, 24, 0.44);
+  }
+
+  /* Status Badge */
+  .statusBadge {
+    @apply py-1 px-3 rounded-full text-[10px] font-medium uppercase tracking-wider;
+  }
+
+  .activeBadge {
+    @apply bg-yellow-500/20 text-yellow-500 border border-yellow-500/30;
+  }
+
+  .inactiveBadge {
+    @apply bg-white/5 text-white/30 border border-white/10;
+  }
+
+  :global([data-theme='light']) .inactiveBadge {
+    background-color: rgba(92, 42, 46, 0.07);
+    color: rgba(31, 23, 24, 0.34);
+    border-color: rgba(92, 42, 46, 0.14);
+  }
+
+  /* Ticket Details */
+  .ticketDetails {
+    @apply flex justify-between items-end mb-6 py-4;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  :global([data-theme='light']) .ticketDetails {
+    border-top-color: rgba(92, 42, 46, 0.08);
+    border-bottom-color: rgba(92, 42, 46, 0.08);
+  }
+
+  .detailRow {
+    @apply flex flex-col items-start gap-1;
+  }
+
+  .detailRow:last-child {
+    @apply items-end;
+  }
+
+  .detailLabel {
+    @apply text-[10px] text-white/40 font-medium uppercase tracking-wider;
+  }
+
+  :global([data-theme='light']) .detailLabel {
+    color: rgba(31, 23, 24, 0.44);
+  }
+
+  .detailValue {
+    @apply text-sm text-white/90 font-medium;
+  }
+
+  :global([data-theme='light']) .detailValue {
+    color: rgba(31, 23, 24, 0.92);
+  }
+
+  .priceValue {
+    @apply text-2xl text-yellow-500 font-bold;
+  }
+
+  .ticketCard:not(.activeTicket) .priceValue {
+    @apply text-white/70;
+  }
+
+  /* Buttons */
+  .ticketButton {
+    @apply w-full py-3 border-none rounded-xl text-sm font-semibold cursor-pointer transition-all duration-300 flex items-center justify-center gap-2;
+  }
+
+  .buttonIcon {
+    @apply text-base;
+  }
+
+  .viewButton {
+    @apply text-white shadow-lg;
+    background: linear-gradient(135deg, #8B4049 0%, #5C2A2E 100%);
+  }
+
+  .viewButton:hover {
+    @apply scale-[1.02];
+    filter: brightness(1.1);
+  }
+
+  .purchaseButton {
+    @apply bg-white/5 text-white/70 border border-white/10;
+  }
+
+  :global([data-theme='light']) .purchaseButton {
+    background-color: rgba(92, 42, 46, 0.07);
+    color: rgba(31, 23, 24, 0.74);
+    border-color: rgba(92, 42, 46, 0.14);
+  }
+
+  .purchaseButton:hover {
+    @apply bg-white/10 text-white/90;
+  }
+
+  :global([data-theme='light']) .purchaseButton:hover {
+    background-color: rgba(92, 42, 46, 0.14);
+    color: rgba(31, 23, 24, 0.92);
+  }
+
+
+  /* Navigation Footer */
+  .navigation {
+    @apply fixed bottom-0 left-0 right-0 flex justify-around py-3 px-4 mx-auto;
+    max-width: 480px;
+    background: rgba(15, 15, 15, 0.98);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  :global([data-theme='light']) .navigation {
+    background: rgba(245, 247, 250, 0.98);
+    border-top-color: rgba(92, 42, 46, 0.14);
+  }
+
+  .navItem {
+    @apply bg-none border-none text-white/40 text-xs font-normal cursor-pointer py-2 px-3 rounded-lg transition-all duration-200 flex flex-col items-center gap-1 flex-1;
+  }
+
+  :global([data-theme='light']) .navItem {
+    color: rgba(31, 23, 24, 0.44);
+  }
+
+  :global([data-theme='light']) .navItem:hover {
+    color: rgba(31, 23, 24, 0.74);
+  }
+
+  .navIcon {
+    @apply text-xl grayscale brightness-[0.6];
+  }
+
+  .navLabel {
+    @apply text-xs;
+    letter-spacing: 0.2px;
+  }
+
+  .navItem:hover {
+    @apply text-white/70;
+  }
+
+  .activeNav {
+    @apply text-gold;
+  }
+
+  .activeNav .navIcon {
+    @apply grayscale-0 text-gold;
+  }
+}

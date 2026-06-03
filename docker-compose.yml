@@ -1,0 +1,104 @@
+services:
+  # MySQL Database Service
+  db:
+    image: mysql:8.0
+    container_name: projet_pfe_db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${DB_DATABASE:-projet_pfe}
+      MYSQL_USER: ${DB_USERNAME:-projet_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-projet_password}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./backend/database/db.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    networks:
+      - app-network
+
+  # Laravel Backend Service
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: projet_pfe_app
+    environment:
+      APP_NAME: ${APP_NAME:-"Projet PFE"}
+      APP_ENV: ${APP_ENV:-local}
+      APP_KEY: ${APP_KEY}
+      APP_DEBUG: ${APP_DEBUG:-true}
+      APP_URL: ${APP_URL:-http://localhost}
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE:-projet_pfe}
+      DB_USERNAME: ${DB_USERNAME:-projet_user}
+      DB_PASSWORD: ${DB_PASSWORD:-projet_password}
+      CACHE_DRIVER: ${CACHE_DRIVER:-file}
+      SESSION_DRIVER: ${SESSION_DRIVER:-file}
+      QUEUE_CONNECTION: ${QUEUE_CONNECTION:-sync}
+      STRIPE_KEY: ${STRIPE_KEY}
+      STRIPE_SECRET: ${STRIPE_SECRET}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+    volumes:
+      - ./backend:/var/www
+      - /var/www/vendor
+      - /var/www/node_modules
+      - /var/www/bootstrap/cache
+    ports:
+      - "9000:9000"
+      - "8080:8080"   # Laravel Reverb WebSocket
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # Nginx Web Server
+  nginx:
+    image: nginx:alpine
+    container_name: projet_pfe_nginx
+    volumes:
+      - ./backend/public:/var/www/public:ro
+      - ./backend/storage/app/public:/var/www/public/storage:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - app
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # React Frontend Service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: projet_pfe_frontend
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost}
+      VITE_STRIPE_PUBLISHABLE_KEY: ${VITE_STRIPE_PUBLISHABLE_KEY}
+      VITE_API_PROXY_TARGET: http://nginx
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/dist
+    ports:
+      - "5173:5173"
+    networks:
+      - app-network
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge

@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* Success Circle Animation */
+  .pulse-ring {
+    @apply animate-pulse-ring;
+  }
+
+  .animate-circle-grow {
+    @apply animate-circle-grow;
+  }
+}
