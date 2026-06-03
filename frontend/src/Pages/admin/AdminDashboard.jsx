@@ -380,6 +380,55 @@ const AdminDashboard = () => {
             </a>
           </div>
 
+          {/* Audit Logs Quick Link */}
+          <div className="bg-[#1a0507]/80 border border-white/10 rounded-2xl p-5 hover:border-white/20 transition-all group">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-purple-500/15 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                <svg className="w-6 h-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-white/50 text-xs uppercase tracking-wider">Journal d'Audit</p>
+                <p className="text-2xl font-bold text-purple-400">{stats.total_logs ?? '—'}</p>
+              </div>
+            </div>
+            <a
+              href="/admin/audit-logs"
+              className="mt-4 flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 text-sm font-medium hover:bg-purple-500/20 transition-all"
+            >
+              <span>Voir le journal</span>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </a>
+          </div>
+
+          {/* Ticket Types Quick Link */}
+          <div className="bg-[#1a0507]/80 border border-white/10 rounded-2xl p-5 hover:border-white/20 transition-all group">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-teal-500/15 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                <svg className="w-6 h-6 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6z" />
+                </svg>
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-white/50 text-xs uppercase tracking-wider">Gestion des Tarifs</p>
+                <p className="text-sm text-teal-400/70">Types de tickets & prix</p>
+              </div>
+            </div>
+            <a
+              href="/admin/ticket-types"
+              className="mt-4 flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-teal-500/10 border border-teal-500/20 text-teal-400 text-sm font-medium hover:bg-teal-500/20 transition-all"
+            >
+              <span>Gérer les tarifs</span>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </a>
+          </div>
+
           {/* Daily Activity Summary */}
           <div className="bg-[#1a0507]/80 border border-white/10 rounded-2xl p-5">
             <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider mb-4">{t('admin_daily_activity')}</h3>

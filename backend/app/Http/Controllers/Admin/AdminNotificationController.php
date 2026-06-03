@@ -34,15 +34,21 @@ class AdminNotificationController extends Controller
             ], 422);
         }
 
+        /** @var \App\Models\Admin $admin */
+        $admin = $request->user();
+        $adminId = $admin->id;
+        $adminName = $admin->first_name . ' ' . $admin->last_name;
+
         if ($request->target === 'all') {
-            // Dispatch a queued job per user to avoid timeout with thousands of users
-            User::chunk(100, function ($users) use ($request) {
+            User::chunk(100, function ($users) use ($request, $adminId, $adminName) {
                 foreach ($users as $user) {
                     SendAdminNotificationJob::dispatch(
                         $user->id,
                         $request->type,
                         $request->title,
                         $request->body,
+                        $adminId,
+                        $adminName,
                     );
                 }
             });
@@ -54,13 +60,14 @@ class AdminNotificationController extends Controller
             ]);
         }
 
-        // Single user — dispatch job as well for consistency
         $user = User::findOrFail($request->user_id);
         SendAdminNotificationJob::dispatch(
             $user->id,
             $request->type,
             $request->title,
             $request->body,
+            $adminId,
+            $adminName,
         );
 
         return response()->json([

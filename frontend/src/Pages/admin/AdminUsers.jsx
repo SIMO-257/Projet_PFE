@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from '../../hooks/useTranslation';
-import { getUsers, toggleUserStatus } from '../../services/adminService';
+import { getUsers, toggleUserStatus, exportUsersCSV } from '../../services/adminService';
 
 const AdminUsers = () => {
   const { t } = useTranslation();
@@ -48,14 +48,25 @@ const AdminUsers = () => {
           <h2 className="text-2xl font-bold text-white">{t('admin_client_management')}</h2>
           <p className="text-white/50">{t('admin_client_subtitle')}</p>
         </div>
-        <div className="relative">
-          <input
-            type="text"
-            placeholder={t('search_name_email')}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white w-64 focus:outline-none focus:border-yellow-500/50 transition-all"
-          />
+        <div className="flex space-x-3">
+          <button
+            onClick={async () => { try { await exportUsersCSV({ search }); } catch (e) { console.error('Export failed', e); } }}
+            className="flex items-center gap-2 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 px-4 py-2 rounded-xl text-sm font-medium hover:bg-yellow-500/20 transition-all"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+            </svg>
+            Export CSV
+          </button>
+          <div className="relative">
+            <input
+              type="text"
+              placeholder={t('search_name_email')}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white w-64 focus:outline-none focus:border-yellow-500/50 transition-all"
+            />
+          </div>
         </div>
       </div>
 

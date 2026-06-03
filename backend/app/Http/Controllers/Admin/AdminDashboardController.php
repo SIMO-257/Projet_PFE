@@ -9,6 +9,7 @@ use App\Models\Transaction;
 use App\Models\ValidationLog;
 use App\Models\Repport;
 use App\Models\StudentVerification;
+use App\Models\AuditLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -62,6 +63,7 @@ class AdminDashboardController extends Controller
             'transactions_today' => Transaction::whereDate('created_at', today())->count(),
             'new_clients_today'  => User::whereDate('created_at', today())->count(),
             'revenue_today'      => Transaction::where('type', 'recharge')->where('status', 'completed')->whereDate('created_at', today())->sum('amount'),
+            'total_logs'         => AuditLog::count(),
         ];
 
         // Chart data — last 30 days (daily revenue + tickets sold)

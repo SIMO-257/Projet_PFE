@@ -64,8 +64,11 @@ const AdminLayout = () => {
     { path: '/admin/tickets', label: t('admin_nav_tickets'), icon: 'ticket' },
     { path: '/admin/transactions', label: t('admin_nav_transactions'), icon: 'credit-card' },
     { path: '/admin/notifications', label: t('admin_nav_notifications'), icon: 'bell' },
+    { path: '/admin/ticket-types', label: 'Tarifs', icon: 'tag' },
     { path: '/admin/rapports', label: t('admin_nav_rapports') || 'Rapports', icon: 'message' },
     { path: '/admin/student-verifications', label: 'Vérifications Étudiant', icon: 'graduation' },
+    { path: '/admin/audit-logs', label: 'Journal d\'Audit', icon: 'history' },
+
     { path: '/admin/validator', label: 'Validateur QR', icon: 'qr' },
     ...(admin?.is_super_admin ? [{ path: '/admin/admins', label: t('admin_management'), icon: 'shield' }] : []),
   ];

@@ -62,6 +62,8 @@ const AdminProfile = lazy(() => import("./Pages/admin/AdminProfile"));
 const AdminRapports = lazy(() => import("./Pages/admin/AdminRapports"));
 const AdminStudentVerifications = lazy(() => import("./Pages/admin/AdminStudentVerifications"));
 const AdminAdmins = lazy(() => import("./Pages/admin/AdminAdmins"));
+const AdminAuditLogs = lazy(() => import("./Pages/admin/AdminAuditLogs"));
+const AdminTicketTypes = lazy(() => import("./Pages/admin/AdminTicketTypes"));
 const ValidatorPage = lazy(() => import("./Pages/validation/ValidatorPage"));
 
 // Admin Components
@@ -213,6 +215,8 @@ function App() {
               <Route path="notifications" element={<AdminNotifications />} />
               <Route path="rapports" element={<AdminRapports />} />
               <Route path="student-verifications" element={<AdminStudentVerifications />} />
+              <Route path="audit-logs" element={<AdminAuditLogs />} />
+              <Route path="ticket-types" element={<AdminTicketTypes />} />
               <Route path="validator" element={<ValidatorPage />} />
               <Route path="admins" element={<AdminAdmins />} />
               <Route path="profil" element={<AdminProfile />} />

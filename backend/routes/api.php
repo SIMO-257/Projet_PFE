@@ -125,6 +125,9 @@ use App\Http\Controllers\Admin\AdminNotificationController;
 use App\Http\Controllers\Admin\AdminProfileController;
 use App\Http\Controllers\Admin\AdminValidationController;
 use App\Http\Controllers\Admin\AdminManagementController;
+use App\Http\Controllers\Admin\AdminAuditLogController;
+use App\Http\Controllers\Admin\AdminNotificationLogController;
+use App\Http\Controllers\Admin\AdminTicketTypeController;
 
 // Public admin route — no auth required (throttled like user login)
 Route::prefix('admin')->group(function () {
@@ -140,14 +143,17 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'admin'])->group(function ()
     Route::get('/dashboard', [AdminDashboardController::class, 'index']);
 
     // Users (formerly Clients)
+    Route::get('/users/export', [AdminUserController::class, 'export']);
     Route::get('/users',                       [AdminUserController::class, 'index']);
     Route::get('/users/{user}',              [AdminUserController::class, 'show']);
     Route::patch('/users/{user}/toggle-status',  [AdminUserController::class, 'toggleStatus']);
 
     // Tickets
+    Route::get('/tickets/export', [AdminTicketController::class, 'export']);
     Route::get('/tickets', [AdminTicketController::class, 'index']);
 
     // Transactions
+    Route::get('/transactions/export', [AdminTransactionController::class, 'export']);
     Route::get('/transactions', [AdminTransactionController::class, 'index']);
 
     // Notifications
@@ -174,6 +180,24 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'admin'])->group(function ()
     Route::get('/student-verifications/{id}', [AdminStudentVerificationController::class, 'show']);
     Route::post('/student-verifications/{id}/approve', [AdminStudentVerificationController::class, 'approve']);
     Route::post('/student-verifications/{id}/reject', [AdminStudentVerificationController::class, 'reject']);
+
+    // Audit Logs
+    Route::get('/audit-logs', [AdminAuditLogController::class, 'index']);
+    Route::get('/audit-logs/export', [AdminAuditLogController::class, 'export']);
+
+    // Notification History
+    Route::get('/notifications/log', [AdminNotificationLogController::class, 'index']);
+    Route::get('/notifications/log/export', [AdminNotificationLogController::class, 'export']);
+
+    // Ticket Types (Fare Manager)
+    Route::get('/ticket-types', [AdminTicketTypeController::class, 'index']);
+    Route::get('/ticket-types/{ticketType}', [AdminTicketTypeController::class, 'show']);
+    Route::post('/ticket-types', [AdminTicketTypeController::class, 'store']);
+    Route::put('/ticket-types/{ticketType}', [AdminTicketTypeController::class, 'update']);
+    Route::patch('/ticket-types/{ticketType}/toggle-status', [AdminTicketTypeController::class, 'toggleStatus']);
+    Route::delete('/ticket-types/{ticketType}', [AdminTicketTypeController::class, 'destroy']);
+
+
 
     // Validator (admin can validate any user's tickets)
     Route::prefix('validator')->group(function () {

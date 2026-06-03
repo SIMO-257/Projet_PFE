@@ -49,14 +49,11 @@ class AdminManagementController extends Controller
     }
 
     /**
-     * Get a single admin.
+     * Get a single admin (any admin can view basic info).
      * GET /api/admin/admins/{admin}
      */
     public function show(Request $request, Admin $admin)
     {
-        $forbidden = $this->requireSuperAdmin($request);
-        if ($forbidden) return $forbidden;
-
         return response()->json([
             'status' => 'success',
             'admin' => $admin->only(['id', 'first_name', 'last_name', 'email', 'is_active', 'is_super_admin', 'created_at']),

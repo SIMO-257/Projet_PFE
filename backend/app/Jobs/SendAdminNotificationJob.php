@@ -28,6 +28,8 @@ class SendAdminNotificationJob implements ShouldQueue
         public string $type,
         public string $title,
         public string $body,
+        public ?int   $adminId = null,
+        public ?string $adminName = null,
     ) {}
 
     /**
@@ -50,6 +52,7 @@ class SendAdminNotificationJob implements ShouldQueue
             'info',
             $this->title,
             $this->body,
+            $this->adminId ? ['admin_id' => $this->adminId, 'admin_name' => $this->adminName] : [],
         );
     }
 }

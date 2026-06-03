@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 
 class AdminUserController extends Controller
 {
-    // GET /api/admin/users?search=&page=1
     public function index(Request $request)
     {
         $query = User::query();
@@ -32,25 +31,21 @@ class AdminUserController extends Controller
         ]);
     }
 
-    // PATCH /api/admin/users/{user}/toggle-status
     public function toggleStatus(User $user)
     {
         $user->update(['is_active' => !$user->is_active]);
-        $status = $user->is_active ? 'activé' : 'bloqué';
+        $status = $user->is_active ? 'active' : 'bloque';
         return response()->json([
             'status' => 'success',
-            'message' => "Utilisateur {$status} avec succès.",
+            'message' => "Utilisateur {$status} avec succes.",
             'data'    => ['is_active' => $user->is_active],
         ]);
     }
 
-    // GET /api/admin/users/{user}
     public function show(User $user)
     {
-        // Load relevant relations
-        $user->load(['transactions']); 
+        $user->load(['transactions']);
 
-        // Load tickets as well
         try {
             $user->load(['tickets']);
         } catch (\Exception $e) {
@@ -61,5 +56,33 @@ class AdminUserController extends Controller
             'status' => 'success',
             'data' => $user
         ]);
+    }
+
+    public function export(Request $request)
+    {
+        $query = User::query();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('email', 'like', "%{$search}%")
+                  ->orWhere('full_name', 'like', "%{$search}%");
+            });
+        }
+
+        $users = $query->orderBy('created_at', 'desc')->get();
+        $filename = 'utilisateurs-' . now()->format('Y-m-d-His') . '.csv';
+
+        return $this->csvDownload($users,
+            ['ID', 'Nom', 'Email', 'Actif', 'Inscrit le'],
+            fn($user) => [
+                $user->id,
+                $user->full_name,
+                $user->email,
+                $user->is_active ? 'Oui' : 'Non',
+                $user->created_at?->format('Y-m-d H:i:s'),
+            ],
+            $filename
+        );
     }
 }

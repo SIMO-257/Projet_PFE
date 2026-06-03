@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 
 class AdminTransactionController extends Controller
 {
-    // GET /api/admin/transactions?search=&type=&page=1
     public function index(Request $request)
     {
         $query = Transaction::with('user');
@@ -29,5 +28,32 @@ class AdminTransactionController extends Controller
             'status' => 'success',
             'data' => $transactions
         ]);
+    }
+
+    public function export(Request $request)
+    {
+        $query = Transaction::with('user');
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        $transactions = $query->orderBy('created_at', 'desc')->get();
+        $filename = 'transactions-' . now()->format('Y-m-d-His') . '.csv';
+
+        return $this->csvDownload($transactions,
+            ['ID', 'UUID', 'Client', 'Email', 'Type', 'Montant', 'Statut', 'Date'],
+            fn($tx) => [
+                $tx->id,
+                $tx->uuid,
+                $tx->user?->full_name ?? 'N/A',
+                $tx->user?->email ?? '',
+                $tx->type,
+                (float) $tx->amount,
+                $tx->status,
+                $tx->created_at?->format('Y-m-d H:i:s'),
+            ],
+            $filename
+        );
     }
 }

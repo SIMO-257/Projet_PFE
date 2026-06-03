@@ -103,4 +103,61 @@ export const toggleAdminStatus = (id) => adminApi.patch(`/admin/admins/${id}/tog
 export const deleteAdmin = (id) => adminApi.delete(`/admin/admins/${id}`);
 export const deleteAdminWithPassword = (id, data) => adminApi.post(`/admin/admins/${id}/delete`, data);
 
+// ── Helpers ───────────────────────────────────────────────────
+const downloadBlob = (response, filename) => {
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', filename || 'export.csv');
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(url);
+};
+
+// ── Audit Logs ────────────────────────────────────────────────
+export const getAuditLogs = (params) => adminApi.get('/admin/audit-logs', { params });
+export const exportAuditLogs = async (params) => {
+  const response = await adminApi.get('/admin/audit-logs/export', { params, responseType: 'blob' });
+  const disposition = response.headers?.['content-disposition'];
+  const match = disposition?.match(/filename="?([^";]+)"?/);
+  downloadBlob(response, match?.[1] || 'audit-logs.csv');
+};
+
+// ── Notification History ──────────────────────────────────────
+export const getNotificationLog = (params) => adminApi.get('/admin/notifications/log', { params });
+export const exportNotificationLog = async (params) => {
+  const response = await adminApi.get('/admin/notifications/log/export', { params, responseType: 'blob' });
+  const disposition = response.headers?.['content-disposition'];
+  const match = disposition?.match(/filename="?([^";]+)"?/);
+  downloadBlob(response, match?.[1] || 'notification-history.csv');
+};
+
+// ── Ticket Types (Fare Manager) ───────────────────────────────
+export const getTicketTypes = (params) => adminApi.get('/admin/ticket-types', { params });
+export const createTicketType = (data) => adminApi.post('/admin/ticket-types', data);
+export const updateTicketType = (id, data) => adminApi.put(`/admin/ticket-types/${id}`, data);
+export const toggleTicketTypeStatus = (id) => adminApi.patch(`/admin/ticket-types/${id}/toggle-status`);
+export const deleteTicketType = (id) => adminApi.delete(`/admin/ticket-types/${id}`);
+
+// ── CSV Exports ────────────────────────────────────────────────
+export const exportUsersCSV = async (params) => {
+  const response = await adminApi.get('/admin/users/export', { params, responseType: 'blob' });
+  const disposition = response.headers?.['content-disposition'];
+  const match = disposition?.match(/filename="?([^";]+)"?/);
+  downloadBlob(response, match?.[1] || 'utilisateurs.csv');
+};
+export const exportTicketsCSV = async (params) => {
+  const response = await adminApi.get('/admin/tickets/export', { params, responseType: 'blob' });
+  const disposition = response.headers?.['content-disposition'];
+  const match = disposition?.match(/filename="?([^";]+)"?/);
+  downloadBlob(response, match?.[1] || 'tickets.csv');
+};
+export const exportTransactionsCSV = async (params) => {
+  const response = await adminApi.get('/admin/transactions/export', { params, responseType: 'blob' });
+  const disposition = response.headers?.['content-disposition'];
+  const match = disposition?.match(/filename="?([^";]+)"?/);
+  downloadBlob(response, match?.[1] || 'transactions.csv');
+};
+
 export default adminApi;
