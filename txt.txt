@@ -437,3 +437,14 @@ git commit -m "Import state from production branch"
 -- remove the arabic lan support for admin and make sure the translation keys are well set for eng / fr.
 -- add settings to the admin languages / dark mode / 
 -- what is the plan 
+
+-- fix the 8 pages you mentionned along side with the bottom navbar keep it as it is in dark mode .
+-- for the help and support page the text is light almost invinsible you need to use black for some labels.
+-- the edit profile btn text stays white and for the cards that are purple and lighting up in light mode keep the same dark color for them . 
+-- in the wallet page keep the text inside the balance card white not black and make the recharge wallet btn golden with whit text for both the mods.
+-- the same thing with the emty default card it should use the dark vertion.
+
+-- in both light an dark mode the card that appear to be purple like the empty default card and the wallet card should have the same gradient color in the buy btn in my tickets.
+-- when i meant golden color for the recharge btn i meant the same golden color like confirm purchase in mytickets.
+-- the bottom nav bar in light mode should be a litlle more light just like the buy tickets btn color.
+-- in light  mode in the profile section why did you touch the background just keep the white color in the background and for the profile infos they shall have the same color as the arrow card like settings help and support.

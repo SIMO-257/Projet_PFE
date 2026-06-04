@@ -32,8 +32,8 @@ const BalanceCard = ({
             )}
             
             <div className="relative z-10">
-                <p className="text-white/70 text-sm mb-2">{title}</p>
-                <h3 className="text-white text-4xl font-bold mb-6">{amount}</h3>
+                <p className="text-white-force/70 text-sm mb-2">{title}</p>
+                <h3 className="text-white-force text-4xl font-bold mb-6">{amount}</h3>
                 
                 <div className="flex items-center justify-between">
                     <div>

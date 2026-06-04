@@ -15,6 +15,42 @@
   color: #1f1718;
 }
 
+/* Text color fixes for light mode — the cream/gold colors become dark */
+:global([data-theme='light']) .text-\[\#e8ddd0\] { color: #1f1718; }
+:global([data-theme='light']) .text-\[\#c8a96e\] { color: #b8860b; }
+:global([data-theme='light']) .text-\[rgba\(232\,221\,208\,0\.7\)\] { color: rgba(31, 23, 24, 0.74); }
+:global([data-theme='light']) .text-\[rgba\(232\,221\,208\,0\.4\)\] { color: rgba(31, 23, 24, 0.44); }
+:global([data-theme='light']) .text-\[rgba\(232\,221\,208\,0\.25\)\] { color: rgba(31, 23, 24, 0.34); }
+:global([data-theme='light']) .text-\[rgba\(232\,221\,208\,0\.15\)\] { color: rgba(31, 23, 24, 0.24); }
+:global([data-theme='light']) .text-black\/40 { color: rgba(31, 23, 24, 0.44); }
+
+/* Form element backgrounds in light mode */
+:global([data-theme='light']) .bg-\[rgba\(255\,255\,255\,0\.04\)\] {
+  background: rgba(92, 42, 46, 0.04);
+}
+/* ── All select dropdown text should be dark ── */
+:global([data-theme='light']) select {
+  color: #1f1718 !important;
+}
+
+:global([data-theme='light']) select option {
+  background-color: #ffffff !important;
+  color: #1f1718 !important;
+}
+
+/* ── Footer visibility in light mode ── */
+:global([data-theme='light']) .text-\[rgba\(232\,221\,208\,0\.25\)\] {
+  color: rgba(31, 23, 24, 0.5) !important;
+}
+
+:global([data-theme='light']) .text-\[rgba\(232\,221\,208\,0\.4\)\] {
+  color: rgba(31, 23, 24, 0.6) !important;
+}
+
+/* ── Keep golden section titles visible in light mode ── */
+:global([data-theme='light']) .text-\[\#c8a96e\] {
+  color: #b8860b !important;
+}
 .helpCard::before {
   content: '';
   position: absolute;
@@ -69,6 +105,13 @@
   font-weight: 700;
   margin-right: 8px;
   border: 1px solid rgba(200, 169, 110, 0.25);
+}
+
+/* Keep section number visible in light mode */
+:global([data-theme='light']) .sectionNumber {
+  background: rgba(184, 134, 11, 0.15) !important;
+  color: #b8860b !important;
+  border-color: rgba(184, 134, 11, 0.35) !important;
 }
 
 /* ── Status Badges ── */

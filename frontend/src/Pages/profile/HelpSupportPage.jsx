@@ -152,8 +152,7 @@ const HelpSupportPage = () => {
           <div className={`app-content ${styles.scrollContainer}`}>
             {/* ======== 1. SOUMETTRE UN RAPPORT ======== */}
             <div className="mb-7">
-              <h2 className="text-[#c8a96e] text-sm font-bold uppercase tracking-wider mb-4 flex items-center">
-                <span className={styles.sectionNumber}>1</span>
+              <h2 className="text-[#c8a96e] text-sm font-bold uppercase tracking-wider mb-4">
                 {t('submit_report')}
               </h2>
 
@@ -252,8 +251,7 @@ const HelpSupportPage = () => {
 
             {/* ======== 2. FAQ ======== */}
             <div className="mb-7">
-              <h2 className="text-[#c8a96e] text-sm font-bold uppercase tracking-wider mb-4 flex items-center">
-                <span className={styles.sectionNumber}>2</span>
+              <h2 className="text-[#c8a96e] text-sm font-bold uppercase tracking-wider mb-4">
                 {t('faq_section')}
               </h2>
 
@@ -310,8 +308,7 @@ const HelpSupportPage = () => {
 
             {/* ======== 3. CONTACT SECTION ======== */}
             <div className="mb-7">
-              <h2 className="text-[#c8a96e] text-sm font-bold uppercase tracking-wider mb-4 flex items-center">
-                <span className={styles.sectionNumber}>3</span>
+              <h2 className="text-[#c8a96e] text-sm font-bold uppercase tracking-wider mb-4">
                 {t('contact_us')}
               </h2>
 
@@ -337,8 +334,7 @@ const HelpSupportPage = () => {
 
             {/* ======== 4. MES RAPPORTS / SUIVI ======== */}
             <div className="mb-6">
-              <h2 className="text-[#c8a96e] text-sm font-bold uppercase tracking-wider mb-4 flex items-center">
-                <span className={styles.sectionNumber}>4</span>
+              <h2 className="text-[#c8a96e] text-sm font-bold uppercase tracking-wider mb-4">
                 {t('my_reports')}
               </h2>
 

@@ -253,7 +253,7 @@ export default function TicketSelectionPage() {
 
                             {/* Ticket Type Description Card */}
                             {selectedType && selectedType.description && (
-                                <div className="rounded-2xl bg-gradient-to-br from-[#5C2A36]/40 to-[#3D1A24]/40 border border-[#f5d579]/15 overflow-hidden">
+                                <div className="rounded-2xl bg-black/40 border border-white/10 overflow-hidden">
                                     <div className="p-5">
                                         <div className="flex items-center gap-3 mb-3">
                                             <div className="w-8 h-8 rounded-lg bg-[#f5d579]/10 border border-[#f5d579]/20 flex items-center justify-center">

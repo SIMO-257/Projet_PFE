@@ -77,8 +77,8 @@ export default function WalletPage() {
                 <BalanceCard 
                   title={t('available_balance')}
                   amount={`${safeBalance.toFixed(2)} ${t('currency')}`}
-                  gradientFrom="#7A3B47"
-                  gradientTo="#5C2A36"
+                  gradientFrom="#8B4049"
+                  gradientTo="#5C2A2E"
                   showCircles={false}
                 />
               )}
@@ -93,18 +93,21 @@ export default function WalletPage() {
                   <p className="text-white/40 text-xs flex-1">Recharge verrouillée — désactivez le PIN dans Sécurité</p>
                 </div>
               ) : (
-                <ActionButtonCard
-                  variant="validation"
-                  icon={
-                    <svg className="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"/>
-                    </svg>
-                  }
-                  label={t('recharge_wallet')}
+                <button
                   onClick={handleRecharge}
-                  className="mb-6 shadow-lg"
-                  showArrow={false}
-                />
+                  className="w-full rounded-2xl p-6 mb-6 shadow-xl shadow-[#f5d579]/20 hover:-translate-y-1 active:translate-y-0 transition-all duration-300 bg-gradient-to-r from-[#f5d579] to-[#d4af37] hover:from-[#f5d579] hover:to-[#d4af37] hover:scale-[1.02] active:scale-95 group"
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 rounded-xl bg-[#260101]/20 flex items-center justify-center">
+                      <svg className="w-4 h-4 text-[#260101]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"/>
+                      </svg>
+                    </div>
+                    <div className="flex-1 text-left">
+                      <h3 className="text-[#260101] font-semibold text-lg">{t('recharge_wallet')}</h3>
+                    </div>
+                  </div>
+                </button>
               )}
 
               <div className="mb-6">

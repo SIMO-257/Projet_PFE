@@ -15,6 +15,32 @@
   color: #1f1718;
 }
 
+/* Ensure all text in edit profile card is dark in light mode */
+:global([data-theme='light']) .editProfileCard h2,
+:global([data-theme='light']) .editProfileCard h3,
+:global([data-theme='light']) .editProfileCard p,
+:global([data-theme='light']) .editProfileCard label,
+:global([data-theme='light']) .editProfileCard span {
+  color: #1f1718 !important;
+}
+
+/* Input fields should have dark text */
+:global([data-theme='light']) .editProfileCard input[type="text"],
+:global([data-theme='light']) .editProfileCard input[type="email"],
+:global([data-theme='light']) .editProfileCard input[type="password"],
+:global([data-theme='light']) .editProfileCard input[type="tel"],
+:global([data-theme='light']) .editProfileCard textarea,
+:global([data-theme='light']) .editProfileCard select {
+  color: #1f1718 !important;
+  background-color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Keep white text on edit profile button */
+:global([data-theme='light']) .editProfileCard .from-\[\#8B4049\] .text-white,
+:global([data-theme='light']) .editProfileCard .to-\[\#5C2A2E\] .text-white {
+  color: #ffffff !important;
+}
+
 .editProfileCard::before {
   content: '';
   position: absolute;

@@ -104,4 +104,17 @@
   ::-webkit-scrollbar-thumb:hover {
     background: #7d2a2a;
   }
+
+  /* Light mode scrollbar */
+  :global([data-theme='light']) ::-webkit-scrollbar-track {
+    background: rgba(92, 42, 46, 0.07);
+  }
+
+  :global([data-theme='light']) ::-webkit-scrollbar-thumb {
+    background: rgba(92, 42, 46, 0.2);
+  }
+
+  :global([data-theme='light']) ::-webkit-scrollbar-thumb:hover {
+    background: rgba(92, 42, 46, 0.35);
+  }
 }

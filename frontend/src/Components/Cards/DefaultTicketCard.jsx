@@ -29,8 +29,8 @@ const DefaultTicketCard = ({
   // Background gradient based on color logic
   const getBackgroundStyle = () => {
     if (!hasTicket) {
-      // No default ticket exists: Existing red color from screenshot (gradient from app palette)
-      return 'linear-gradient(to bottom right, #7A3B47, #5C2A36)';
+      // No default ticket exists: Purple gradient matching ticket button style
+      return 'linear-gradient(to bottom right, #8B4049, #5C2A2E)';
     }
     if (defaultTicket.isReusable === true) {
       // Default ticket exists AND isReusable === true: Golden brown (matching app palette)
@@ -86,10 +86,10 @@ const DefaultTicketCard = ({
             <>
               {/* Ticket Name & Price */}
               <div>
-                <p className="text-white/70 text-xs font-semibold uppercase tracking-wider mb-2">
+                <p className="text-white-force/70 text-xs font-semibold uppercase tracking-wider mb-2">
                   {defaultTicket.name || t('default_ticket')}
                 </p>
-                <h3 className="text-white text-4xl font-extrabold tracking-tight">
+                <h3 className="text-white-force text-4xl font-extrabold tracking-tight">
                   {defaultTicket.price || '0.00 MAD'}
                 </h3>
               </div>
@@ -98,7 +98,7 @@ const DefaultTicketCard = ({
               <div className="flex items-end justify-between mt-4">
                 <div>
                   {defaultTicket.uuid && (
-                    <p className="text-white/80 font-mono text-xs tracking-widest bg-black/25 px-2.5 py-1 rounded-md border border-white/5 inline-block">
+                    <p className="text-white-force/80 font-mono text-xs tracking-widest bg-black/25 px-2.5 py-1 rounded-md border border-white/5 inline-block">
                       Code: {defaultTicket.uuid.substring(0, 8).toUpperCase()}
                     </p>
                   )}
@@ -124,10 +124,10 @@ const DefaultTicketCard = ({
             <>
               {/* No Cards Purchased Display */}
               <div>
-                <p className="text-white/70 text-xs font-semibold uppercase tracking-wider mb-2">
+                <p className="text-white-force/70 text-xs font-semibold uppercase tracking-wider mb-2">
                   {t('default_ticket')}
                 </p>
-                <h3 className="text-white/60 text-lg font-medium italic mt-2">
+                <h3 className="text-white-force/60 text-lg font-medium italic mt-2">
                   {t('no_cards_purchased')}
                 </h3>
               </div>

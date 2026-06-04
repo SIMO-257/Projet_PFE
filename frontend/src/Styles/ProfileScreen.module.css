@@ -12,6 +12,32 @@
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(248, 241, 224, 0.98));
   border-color: rgba(212, 175, 55, 0.24);
   box-shadow: 0 20px 45px -22px rgba(92, 42, 46, 0.28);
+  color: #1f1718;
+}
+
+/* Ensure all text in profile card is dark in light mode */
+:global([data-theme='light']) .profileCard h2,
+:global([data-theme='light']) .profileCard h3,
+:global([data-theme='light']) .profileCard p {
+  color: #1f1718 !important;
+}
+
+/* Profile info labels should be dark */
+:global([data-theme='light']) .profileCard .text-white\/60 {
+  color: rgba(31, 23, 24, 0.78) !important;
+}
+
+/* Profile info values should be dark */
+:global([data-theme='light']) .profileCard .text-white {
+  color: #1f1718 !important;
+}
+
+/* But keep white text on edit profile button - force white in light mode */
+:global([data-theme='light']) button.from-\[\#8B4049\].to-\[\#5C2A2E\] .text-white,
+:global([data-theme='light']) button.from-\[\#8B4049\].to-\[\#5C2A2E\] span,
+:global([data-theme='light']) .profileCard .from-\[\#8B4049\] .text-white,
+:global([data-theme='light']) .profileCard .to-\[\#5C2A2E\] .text-white {
+  color: #ffffff !important;
 }
 
 .profileCard::before {

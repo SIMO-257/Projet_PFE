@@ -15,6 +15,26 @@
   color: #1f1718;
 }
 
+/* Ensure all text in security card is dark in light mode */
+:global([data-theme='light']) .securityCard h2,
+:global([data-theme='light']) .securityCard h3,
+:global([data-theme='light']) .securityCard p,
+:global([data-theme='light']) .securityCard label,
+:global([data-theme='light']) .securityCard span {
+  color: #1f1718 !important;
+}
+
+/* Input fields should have dark text */
+:global([data-theme='light']) .securityCard input[type="text"],
+:global([data-theme='light']) .securityCard input[type="email"],
+:global([data-theme='light']) .securityCard input[type="password"],
+:global([data-theme='light']) .securityCard input[type="tel"],
+:global([data-theme='light']) .securityCard textarea,
+:global([data-theme='light']) .securityCard select {
+  color: #1f1718 !important;
+  background-color: rgba(255, 255, 255, 0.8) !important;
+}
+
 .securityCard::before {
   content: '';
   position: absolute;

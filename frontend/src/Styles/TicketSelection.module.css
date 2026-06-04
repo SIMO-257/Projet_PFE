@@ -4,6 +4,10 @@
     padding: 1rem;
 }
 
+:global([data-theme='light']) .container {
+    background-color: #f5f7fa;
+}
+
 @media (min-width: 768px) {
     .container {
         padding: 1.5rem;
@@ -73,6 +77,11 @@
     color: #9ca3af;
 }
 
+:global([data-theme='light']) .stepCircleInactive {
+    background-color: #e8ecf2;
+    color: #6b7280;
+}
+
 .stepLabel {
     margin-top: 0.75rem;
     font-size: 0.875rem;
@@ -90,6 +99,11 @@
     opacity: 0.6;
 }
 
+:global([data-theme='light']) .stepLabelInactive {
+    color: rgba(31, 23, 24, 0.54);
+    opacity: 0.8;
+}
+
 .progressLineWrapper {
     flex: 1;
     padding: 0 1rem;
@@ -102,6 +116,10 @@
     position: relative;
     overflow: hidden;
     transition: all 0.3s ease-in-out;
+}
+
+:global([data-theme='light']) .progressLine {
+    background-color: #d1d5db;
 }
 
 .progressLineActive {
