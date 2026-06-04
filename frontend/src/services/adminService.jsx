@@ -45,8 +45,8 @@ adminApi.interceptors.response.use(
     if (error.response?.status === 401) {
       clearAdminToken();
       // Redirect to admin login (only if not already there)
-      if (!window.location.pathname.startsWith('/admin/login')) {
-        window.location.href = '/admin/login';
+      if (!globalThis.location.pathname.startsWith('/admin/login')) {
+        globalThis.location.href = '/admin/login';
       }
     }
     return Promise.reject(error);
@@ -106,14 +106,14 @@ export const deleteAdminWithPassword = (id, data) => adminApi.post(`/admin/admin
 
 // ── Helpers ───────────────────────────────────────────────────
 const downloadBlob = (response, filename) => {
-  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const url = globalThis.URL.createObjectURL(new Blob([response.data]));
   const link = document.createElement('a');
   link.href = url;
   link.setAttribute('download', filename || 'export.csv');
   document.body.appendChild(link);
   link.click();
   link.remove();
-  window.URL.revokeObjectURL(url);
+  globalThis.URL.revokeObjectURL(url);
 };
 
 // ── Audit Logs ────────────────────────────────────────────────
