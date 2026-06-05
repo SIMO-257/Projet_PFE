@@ -124,12 +124,12 @@ const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel, isCance
         <ExpressCheckoutElement onConfirm={handleSubmit} />
       </div>
 
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center" aria-hidden="true">
-          <div className="w-full border-t border-white/10"></div>
-        </div>
-        <div className="relative flex justify-center text-sm">
-          <span className="px-2 bg-transparent text-white/30 text-xs uppercase font-medium">{t('or_pay_by_card')}</span>
+      <div className="relative py-4">
+        <div className="absolute inset-x-0 top-1/2 h-px bg-white/10" aria-hidden="true"></div>
+        <div className="relative flex justify-center">
+          <span className="relative px-3 bg-slate-950 text-white/70 text-xs uppercase font-medium tracking-widest">
+            {t('or_pay_by_card')}
+          </span>
         </div>
       </div>
 

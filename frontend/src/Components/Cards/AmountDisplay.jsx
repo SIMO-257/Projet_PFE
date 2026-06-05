@@ -32,7 +32,7 @@ const AmountDisplay = ({
                     {getIcon()}
                 </div>
                 <div>
-                    <p className="text-white/60 text-xs mb-0.5">{label}</p>
+                    <p className="text-white text-xs mb-0.5">{label}</p>
                     <p className="text-white text-2xl font-bold">{amount}</p>
                 </div>
             </div>

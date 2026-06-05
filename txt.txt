@@ -448,3 +448,11 @@ git commit -m "Import state from production branch"
 -- when i meant golden color for the recharge btn i meant the same golden color like confirm purchase in mytickets.
 -- the bottom nav bar in light mode should be a litlle more light just like the buy tickets btn color.
 -- in light  mode in the profile section why did you touch the background just keep the white color in the background and for the profile infos they shall have the same color as the arrow card like settings help and support.
+
+-- i want like a recovery email in the profil were the user add it so that he can protect his child in case the child pressed on the reset pin a new random pin will be sent to the email the child might be connected to his user email so he can rest his password wich is risky.
+-- in other words the pin is useless because it can reset any password.
+-- i was thinking the parent will add his email in recovery which the kid will not have acces to but in order to that the kid can chanege the recovery email since he have his account password.
+-- i was thinking and i am in a loop help me with some ideas.
+
+-- in wallet card infos make the text the same gold gardien as ticket price in mytickets.
+in the amount to add card i want the text to be white fix the "or pay card" so that the line doesn't cut the phrase and make it better. 

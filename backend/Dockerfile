@@ -14,6 +14,8 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     supervisor \
+    nginx \
+    gettext-base \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
         pdo \
@@ -51,13 +53,18 @@ RUN mkdir -p storage/logs \
 RUN sed -i 's/listen = \/run\/php\/php8.2-fpm.sock/listen = 9000/g' /usr/local/etc/php-fpm.d/zz-docker.conf \
     && sed -i 's/listen = 9000/listen = 0.0.0.0:9000/g' /usr/local/etc/php-fpm.d/zz-docker.conf
 
-# Supervisor config for PHP-FPM + Reverb
+# Supervisor config for Nginx + PHP-FPM + Reverb
 RUN mkdir -p /etc/supervisor/conf.d
 COPY docker-supervisord.conf /etc/supervisor/supervisord.conf
 COPY docker-reverb.conf /etc/supervisor/conf.d/reverb.conf
 
-# Expose ports for PHP-FPM (9000) and Reverb (8080)
-EXPOSE 9000
+# Nginx config (proxies HTTP to PHP-FPM and WebSocket /app to Reverb)
+COPY docker-nginx.conf /etc/nginx/conf.d/default.conf
+
+# Entrypoint: substitutes DO App Platform $PORT into Nginx config, then starts supervisord
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 EXPOSE 8080
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
+CMD ["/usr/local/bin/docker-entrypoint.sh"]
