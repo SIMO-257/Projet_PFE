@@ -7,9 +7,6 @@ sed -i "s/__PORT__/${PORT}/g" /etc/nginx/conf.d/default.conf
 # 2. Start PHP-FPM in the background
 php-fpm -D
 
-# 3. Start Laravel Reverb in the background on port 8081
-php artisan reverb:start --port=8081 &
-
-# 4. Start Nginx in the foreground to keep the container alive
+# 3. Start Nginx in the foreground to keep the container alive
 echo "Starting Nginx on port $PORT..."
 nginx -g "daemon off;"

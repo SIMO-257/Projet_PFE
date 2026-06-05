@@ -1,7 +1,7 @@
 # Multi-stage build for Laravel backend
 FROM php:8.2-fpm as base
 
-# Install system dependencies including pcntl and sockets for Reverb
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -27,8 +27,7 @@ RUN apt-get update && apt-get install -y \
         xml \
         simplexml \
         dom \
-        pcntl \
-        sockets \
+
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -53,12 +52,11 @@ RUN mkdir -p storage/logs \
 RUN sed -i 's/listen = \/run\/php\/php8.2-fpm.sock/listen = 9000/g' /usr/local/etc/php-fpm.d/zz-docker.conf \
     && sed -i 's/listen = 9000/listen = 0.0.0.0:9000/g' /usr/local/etc/php-fpm.d/zz-docker.conf
 
-# Supervisor config for Nginx + PHP-FPM + Reverb
+# Supervisor config for Nginx + PHP-FPM
 RUN mkdir -p /etc/supervisor/conf.d
 COPY docker-supervisord.conf /etc/supervisor/supervisord.conf
-COPY docker-reverb.conf /etc/supervisor/conf.d/reverb.conf
 
-# Nginx config (proxies HTTP to PHP-FPM and WebSocket /app to Reverb)
+# Nginx config
 COPY docker-nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy the entrypoint script
@@ -66,7 +64,6 @@ COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Expose the internal routing ports
-EXPOSE 8080
 EXPOSE 9000
 
 # Run the unified entrypoint script (ONLY ONE CMD ALLOWED)
