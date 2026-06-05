@@ -61,10 +61,14 @@ COPY docker-reverb.conf /etc/supervisor/conf.d/reverb.conf
 # Nginx config (proxies HTTP to PHP-FPM and WebSocket /app to Reverb)
 COPY docker-nginx.conf /etc/nginx/conf.d/default.conf
 
-# Entrypoint: substitutes DO App Platform $PORT into Nginx config, then starts supervisord
+# Copy the entrypoint script
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
+# Expose the internal routing ports
 EXPOSE 8080
+EXPOSE 9000
 
+# Run the unified entrypoint script (ONLY ONE CMD ALLOWED)
 CMD ["/usr/local/bin/docker-entrypoint.sh"]
+

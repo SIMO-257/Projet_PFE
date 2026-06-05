@@ -1,9 +1,14 @@
-#!/bin/bash
-set -e
+#!/bin/sh
 
-# Substitute the PORT placeholder in the Nginx config
-# DO App Platform assigns $PORT dynamically (typically 8080)
-sed -i "s/__PORT__/${PORT:-8080}/g" /etc/nginx/conf.d/default.conf
+# 1. Substitute DO App Platform $PORT into Nginx config (Your existing logic)
+# (Keep whatever sed or envsubst command you already have here to swap the port)
 
-# Start supervisord (manages Nginx + PHP-FPM + Reverb)
-exec /usr/bin/supervisord -c /etc/supervisor/supervisord.conf
+# 2. Start PHP-FPM in the background
+php-fpm -D
+
+# 3. Start Laravel Reverb in the background on port 8081
+php artisan reverb:start --port=8081 &
+
+# 4. Start Nginx in the FOREGROUND to keep the container alive
+echo "Starting Nginx on port $PORT..."
+nginx -g "daemon off;"
