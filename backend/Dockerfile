@@ -48,9 +48,8 @@ RUN mkdir -p storage/logs \
     && chown -R www-data:www-data /var/www \
     && chmod -R 755 /var/www/storage /var/www/bootstrap/cache
 
-# Configure PHP-FPM to listen on TCP (for Docker networking)
-RUN sed -i 's/listen = \/run\/php\/php8.2-fpm.sock/listen = 9000/g' /usr/local/etc/php-fpm.d/zz-docker.conf \
-    && sed -i 's/listen = 9000/listen = 0.0.0.0:9000/g' /usr/local/etc/php-fpm.d/zz-docker.conf
+# Configure PHP-FPM to listen on TCP port 9000 (for Docker networking)
+RUN echo "listen = 0.0.0.0:9000" >> /usr/local/etc/php-fpm.d/zz-docker.conf
 
 # Supervisor config for Nginx + PHP-FPM
 RUN mkdir -p /etc/supervisor/conf.d
