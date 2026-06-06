@@ -1,0 +1,75 @@
+name: casaway
+region: fra
+
+services:
+  - name: Backend
+    # Source directory relative to the git repo root
+    source_dir: backend
+    # Dockerfile inside the source_dir
+    dockerfile_path: Dockerfile
+    # The port nginx listens on inside the container
+    # (docker-nginx.conf uses __PORT__ which gets replaced with this value)
+    http_port: 8080
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    # Route ALL /api/* requests to this backend service
+    routes:
+      - path: /api
+    health_check:
+      http_path: /health
+      initial_delay_seconds: 30
+      period_seconds: 60
+    envs:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        value: "${APP_KEY}"
+        type: SECRET
+      - key: APP_URL
+        value: "https://${APP_DOMAIN}"
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_HOST
+        value: "${DB_HOST}"
+        type: SECRET
+      - key: DB_PORT
+        value: "3306"
+      - key: DB_DATABASE
+        value: "${DB_DATABASE}"
+        type: SECRET
+      - key: DB_USERNAME
+        value: "${DB_USERNAME}"
+        type: SECRET
+      - key: DB_PASSWORD
+        value: "${DB_PASSWORD}"
+        type: SECRET
+      - key: STRIPE_KEY
+        value: "${STRIPE_KEY}"
+        type: SECRET
+      - key: STRIPE_SECRET
+        value: "${STRIPE_SECRET}"
+        type: SECRET
+      - key: STRIPE_WEBHOOK_SECRET
+        value: "${STRIPE_WEBHOOK_SECRET}"
+        type: SECRET
+
+static_sites:
+  - name: Frontend
+    source_dir: frontend
+    # Built output directory (relative to source_dir)
+    output_dir: dist
+    # Build command
+    build_command: npm run build
+    # Serve index.html for all 404s → makes SPA routing work
+    catchall_document: index.html
+    # Route all non-API traffic to the frontend
+    routes:
+      - path: /
+    envs:
+      - key: VITE_API_URL
+        value: ""
+      - key: VITE_STRIPE_PUBLISHABLE_KEY
+        value: "${VITE_STRIPE_PUBLISHABLE_KEY}"
+        type: SECRET
