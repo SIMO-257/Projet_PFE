@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Ticket;
 use App\Models\AuditLog;
 use App\Services\TicketValidationService;
-use App\Events\TicketValidatedEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -33,17 +32,6 @@ class AdminValidationController extends Controller
 
         if (!$result['success']) {
             return $this->errorResponse($result['message'], $result['status']);
-        }
-
-        // Dispatch validation event
-        if (isset($result['ticket'])) {
-            event(new TicketValidatedEvent(
-                $result['user'],
-                $result['ticket']->id,
-                6.00,
-                'Tramway T1',
-                $location ?? $validatorId
-            ));
         }
 
         AuditLog::log('admin_ticket_validation_success', $admin->id, [
@@ -103,17 +91,6 @@ class AdminValidationController extends Controller
 
         if (!$result['success']) {
             return $this->errorResponse($result['message'], $result['status']);
-        }
-
-        // Dispatch validation event
-        if (isset($result['ticket'])) {
-            event(new TicketValidatedEvent(
-                $result['user'],
-                $result['ticket']->id,
-                6.00,
-                'Tramway T1',
-                $location ?? $validatorId
-            ));
         }
 
         AuditLog::log('admin_qr_validation_success', $admin->id, [

@@ -91,7 +91,7 @@ function RootRedirect() {
 }
 
 import { useLocation } from "react-router-dom";
-import useRealtime from "./hooks/useRealtime";
+import usePolling from "./hooks/usePolling";
 
 function RouteWatcher() {
   const location = useLocation();
@@ -111,8 +111,8 @@ function RouteWatcher() {
 function App() {
   const dispatch = useDispatch();
   const { refreshProfile, isAuthChecked } = useAuth();
-  // Initialize real-time WebSocket connection (auto-connects when authenticated)
-  useRealtime();
+  // Poll data every second instead of WebSockets
+  usePolling();
   const theme = useSelector((state) => state.settings.theme);
   const language = useSelector((state) => state.settings.language);
   const { isGlobalLoading, isRouteLoading } = useSelector((state) => state.ui || { isGlobalLoading: false, isRouteLoading: false });

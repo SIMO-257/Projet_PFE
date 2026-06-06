@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Ticket;
 use App\Models\AuditLog;
 use App\Services\TicketValidationService;
-use App\Events\TicketValidatedEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -224,17 +223,6 @@ class TicketValidationController extends Controller
             return $this->errorResponse($result['message'], $result['status']);
         }
 
-        // Dispatch validation event for QR
-        if (isset($result['ticket'])) {
-            event(new TicketValidatedEvent(
-                $result['user'],
-                $result['ticket']->id,
-                6.00,
-                'Tramway T1',
-                $location ?? $validatorId
-            ));
-        }
-
         return $this->successResponse($result['data'], $result['message']);
     }
 
@@ -252,17 +240,6 @@ class TicketValidationController extends Controller
 
         if (!$result['success']) {
             return $this->errorResponse($result['message'], $result['status']);
-        }
-
-        // Dispatch validation event
-        if (isset($result['ticket'])) {
-            event(new TicketValidatedEvent(
-                $result['user'],
-                $result['ticket']->id,
-                6.00,
-                'Tramway T1',
-                $location ?? $validatorId
-            ));
         }
 
         return $this->successResponse($result['data'], $result['message']);

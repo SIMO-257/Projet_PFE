@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use App\Services\NotificationService;
-use App\Events\LowBalanceEvent;
 
 class ProcessStripeWebhookJob implements ShouldQueue
 {
@@ -206,7 +205,6 @@ class ProcessStripeWebhookJob implements ShouldQueue
                         // Redis unavailable — non-blocking
                     }
 
-                    event(new LowBalanceEvent($user, $wallet->balance));
                 }
             }, 5);
         } catch (\Exception $e) {

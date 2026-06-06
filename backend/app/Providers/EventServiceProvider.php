@@ -3,17 +3,6 @@
 namespace App\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use App\Events\TicketPurchasedEvent;
-use App\Events\TicketValidatedEvent;
-use App\Events\LowBalanceEvent;
-use App\Events\UserRegisteredEvent;
-use App\Listeners\ScheduleTicketExpiration;
-use App\Listeners\SendTicketValidatedNotification;
-use App\Listeners\SendLowBalanceNotification;
-use App\Listeners\SendWelcomeNotification;
-use App\Listeners\CreateDefaultWallet;
-use App\Listeners\LogRegistrationAudit;
-
 class EventServiceProvider extends ServiceProvider
 {
     /**
@@ -22,20 +11,7 @@ class EventServiceProvider extends ServiceProvider
      * @var array<class-string, array<int, class-string>>
      */
     protected $listen = [
-        TicketPurchasedEvent::class => [
-            ScheduleTicketExpiration::class,
-        ],
-        TicketValidatedEvent::class => [
-            SendTicketValidatedNotification::class,
-        ],
-        LowBalanceEvent::class => [
-            SendLowBalanceNotification::class,
-        ],
-        UserRegisteredEvent::class => [
-            SendWelcomeNotification::class,
-            CreateDefaultWallet::class,
-            LogRegistrationAudit::class,
-        ],
+        //
     ];
 
     /**

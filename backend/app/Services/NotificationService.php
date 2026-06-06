@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Notification;
 use App\Models\User;
-use App\Events\NewNotificationEvent;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Log;
@@ -59,25 +58,6 @@ class NotificationService
 
         $this->invalidateUnreadCache($user->id);
         $this->sendFcmPush($user, $title, $body, ['type' => $type, 'severity' => $severity]);
-
-        // Broadcast the notification via WebSocket for real-time delivery
-        try {
-            event(new NewNotificationEvent(
-                $user,
-                $notif->id,
-                $type,
-                $title,
-                $body,
-                $severity,
-                $meta
-            ));
-        } catch (\Throwable $e) {
-            Log::warning('WebSocket broadcast for notification failed', [
-                'user_id' => $user->id,
-                'notification_id' => $notif->id,
-                'error' => $e->getMessage(),
-            ]);
-        }
 
         return $notif;
     }

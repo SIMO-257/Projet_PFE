@@ -37,10 +37,6 @@ export default defineConfig({
         target: PROXY_TARGET,
         changeOrigin: true,
       },
-      '/broadcasting': {
-        target: PROXY_TARGET,
-        changeOrigin: true,
-      },
     },
     headers: {
   'X-Frame-Options': 'DENY',

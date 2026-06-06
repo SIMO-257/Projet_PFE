@@ -8,8 +8,6 @@ use App\Models\TicketType;
 use App\Models\Wallet;
 use App\Models\Transaction;
 use App\Models\AuditLog;
-use App\Events\TicketPurchasedEvent;
-use App\Events\LowBalanceEvent;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -97,7 +95,6 @@ class TicketPurchaseController extends Controller
                         'price_paid' => $effectivePrice,
                     ]);
                     $tickets[] = $ticket;
-                    event(new TicketPurchasedEvent($user, $ticket->id, $ticket->valid_until, $wallet->balance));
 
                     if ($ticketType->is_reusable) {
                         $nextReusableStartAt = $validUntil->copy();
@@ -114,8 +111,6 @@ class TicketPurchaseController extends Controller
                     "Vous avez acheté {$validated['quantity']} " . ($validated['quantity'] > 1 ? 'billets' : 'billet') . " ({$ticketType->name}). {$totalPrice} DH débités.",
                     ['ticket_type' => $ticketType->name, 'quantity' => $validated['quantity'], 'amount' => $totalPrice]
                 );
-
-                event(new LowBalanceEvent($user, $wallet->balance));
 
                 return $this->successResponse([
                     'tickets' => $tickets,

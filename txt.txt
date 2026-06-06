@@ -456,3 +456,7 @@ git commit -m "Import state from production branch"
 
 -- in wallet card infos make the text the same gold gardien as ticket price in mytickets.
 in the amount to add card i want the text to be white fix the "or pay card" so that the line doesn't cut the phrase and make it better. 
+
+-- in edit profile btn make the text white.
+-- the payement btn in wallet after selecting the price to add should be disabled until the payement form load. 
+-- make the 
