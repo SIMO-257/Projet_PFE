@@ -130,7 +130,7 @@ Projet_PFE/
 ├── docker-compose.yml    # Docker orchestration
 ├── docker-compose.prod.yml
 ├── .env.docker           # Env template for Docker
-├── nginx.conf            # Nginx config for Docker
+├── docker/nginx.local.conf # Nginx config for Docker
 └── DOCKER_SETUP.md       # Detailed Docker guide
 ```
 

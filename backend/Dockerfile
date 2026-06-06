@@ -31,6 +31,9 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Remove default Nginx site config to avoid port conflicts
+RUN rm -f /etc/nginx/sites-enabled/default
+
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
