@@ -11,6 +11,8 @@ CREATE TABLE `users` (
     `full_name` VARCHAR(100) NULL,
     `phone` VARCHAR(20) NULL,
     `email` VARCHAR(255) NOT NULL,
+    `recovery_email` VARCHAR(255) NULL AFTER `email`,
+    `recovery_email_verified_at` TIMESTAMP NULL AFTER `recovery_email`,
     `email_verification_code` VARCHAR(6) NULL,
     `email_verification_token` VARCHAR(255) NULL,
     `email_verified_at` TIMESTAMP NULL,

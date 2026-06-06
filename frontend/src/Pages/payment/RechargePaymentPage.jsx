@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
@@ -28,6 +28,14 @@ export default function RechargePaymentPage() {
   const [paymentIntentId, setPaymentIntentId] = useState("");
   const [isInitializing, setIsInitializing] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [stripeReady, setStripeReady] = useState(false);
+
+  // Track when Stripe.js has finished loading
+  useEffect(() => {
+    if (stripePromise) {
+      stripePromise.then(() => setStripeReady(true));
+    }
+  }, []);
 
   const goBack = () => {
     if (step === 2) {
@@ -206,7 +214,7 @@ export default function RechargePaymentPage() {
                 </button>
               </div>
             ) : (
-              stripePromise && clientSecret ? (
+              stripePromise && clientSecret && stripeReady ? (
                 <Elements stripe={stripePromise} options={{ clientSecret, appearance, locale: language }}>
                   <div className="mt-4">
                     <StripeCheckoutForm 
@@ -218,6 +226,11 @@ export default function RechargePaymentPage() {
                     />
                   </div>
                 </Elements>
+              ) : clientSecret ? (
+                <div className="mt-8 flex flex-col items-center justify-center space-y-4">
+                   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500"></div>
+                   <p className="text-white/60 text-sm">{t('load_payment')}</p>
+                </div>
               ) : (
                 <div className="mt-8 flex flex-col items-center justify-center space-y-4">
                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500"></div>

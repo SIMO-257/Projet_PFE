@@ -57,7 +57,7 @@ class AdminAuditLogController extends Controller
         }
 
         $logs = $query->orderBy('created_at', 'desc')->get();
-        $filename = 'audit-logs-' . now()->format('Y-m-d-His') . '.csv';
+        $filename = 'audit-logs-' . now()->format('Y-m-d-His') . '.xls';
 
         return $this->csvDownload($logs,
             ['Date', 'Action', 'Utilisateur', 'Email', 'IP', 'User-Agent', 'Metadonnees'],

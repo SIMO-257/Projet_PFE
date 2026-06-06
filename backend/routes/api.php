@@ -107,6 +107,8 @@ Route::middleware(['auth:sanctum', 'track.activity'])->group(function () {
     Route::post('/users/pin/disable', [UserPinController::class, 'disable'])->name('api.users.pin.disable');
     Route::post('/users/pin/reset', [UserPinController::class, 'reset'])->name('api.users.pin.reset');
     Route::get('/users/pin/status', [UserPinController::class, 'status'])->name('api.users.pin.status');
+    Route::get('/users/pin/recovery-email', [UserPinController::class, 'getRecoveryEmail'])->name('api.users.pin.recovery_email.get');
+    Route::post('/users/pin/recovery-email', [UserPinController::class, 'setRecoveryEmail'])->name('api.users.pin.recovery_email.set');
 
     // Student Verification
     Route::get('/users/student-status', [StudentVerificationController::class, 'studentStatus'])->name('api.users.student.status');

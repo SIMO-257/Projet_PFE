@@ -23,42 +23,41 @@ abstract class Controller
     }
 
     /**
-     * Return a CSV download response using a simple string body.
-     * Compatible with PHP-FPM + nginx.
+     * Return an Excel download response (.xls) built as an HTML table.
+     * Excel opens HTML tables natively — no external library required.
+     *
+     * @param  \Illuminate\Support\Collection|array  $items
+     * @param  array   $headers      Column header labels
+     * @param  callable $rowCallback  fn($item) => [col1, col2, ...]
+     * @param  string   $filename    Output filename (will get .xls extension)
+     * @return \Illuminate\Http\Response
      */
     protected function csvDownload($items, array $headers, callable $rowCallback, string $filename)
     {
-        // Build CSV as a string in memory
-        $csv = chr(0xEF) . chr(0xBB) . chr(0xBF); // UTF-8 BOM
-        $csv .= $this->csvRow($headers);
+        // Prefix: filename may still have .csv — normalise to .xls
+        $filename = preg_replace('/\.csv$/i', '.xls', $filename);
+
+        $rows = '';
+        $rows .= '<tr>' . implode('', array_map(fn($h) => '<th style="background:#f5d579;color:#1a0507;padding:6px 12px;text-align:left;font-weight:600">' . htmlspecialchars((string) $h) . '</th>', $headers)) . '</tr>' . "\n";
 
         foreach ($items as $item) {
-            $csv .= $this->csvRow($rowCallback($item));
+            $cells = array_map(fn($v) => '<td style="padding:4px 12px;border:1px solid #ccc">' . htmlspecialchars((string) ($v ?? '')) . '</td>', $rowCallback($item));
+            $rows .= '<tr>' . implode('', $cells) . '</tr>' . "\n";
         }
 
-        return response($csv, 200, [
-            'Content-Type'        => 'text/csv; charset=UTF-8',
+        $html = '<!DOCTYPE html>' . "\n"
+            . '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">' . "\n"
+            . '<head><meta charset="UTF-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Export</x:Name></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>' . "\n"
+            . '<body><table>' . "\n"
+            . $rows
+            . '</table></body></html>' . "\n";
+
+        return response($html, 200, [
+            'Content-Type'        => 'application/vnd.ms-excel; charset=UTF-8',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
             'Pragma'              => 'no-cache',
             'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0',
             'Expires'             => '0',
         ]);
-    }
-
-    /**
-     * Encode an array as a CSV line.
-     */
-    private function csvRow(array $fields): string
-    {
-        $escaped = array_map(function ($val) {
-            $val = (string) ($val ?? '');
-            // If contains comma, double-quote, or newline, wrap in double-quotes
-            if (strpbrk($val, '",' . "\n\r") !== false) {
-                $val = '"' . str_replace('"', '""', $val) . '"';
-            }
-            return $val;
-        }, $fields);
-
-        return implode(',', $escaped) . "\r\n";
     }
 }

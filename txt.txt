@@ -457,6 +457,13 @@ git commit -m "Import state from production branch"
 -- in wallet card infos make the text the same gold gardien as ticket price in mytickets.
 in the amount to add card i want the text to be white fix the "or pay card" so that the line doesn't cut the phrase and make it better. 
 
--- in edit profile btn make the text white.
+-- in edit profile btn make the text white in both mods.
 -- the payement btn in wallet after selecting the price to add should be disabled until the payement form load. 
 -- make the 
+
+-- in the student verificationtion page add a go back arrow in the user.
+-- in edit profile btn make the text white in both mods.
+-- in the balanc card make the card in light mode exactly like dark mode.
+
+-- remove the black white gradient from admin nav in light mode.
+-- 

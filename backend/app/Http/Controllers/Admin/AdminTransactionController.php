@@ -39,7 +39,7 @@ class AdminTransactionController extends Controller
         }
 
         $transactions = $query->orderBy('created_at', 'desc')->get();
-        $filename = 'transactions-' . now()->format('Y-m-d-His') . '.csv';
+        $filename = 'transactions-' . now()->format('Y-m-d-His') . '.xls';
 
         return $this->csvDownload($transactions,
             ['ID', 'UUID', 'Client', 'Email', 'Type', 'Montant', 'Statut', 'Date'],

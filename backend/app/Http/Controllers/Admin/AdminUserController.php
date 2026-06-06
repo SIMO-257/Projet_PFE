@@ -82,7 +82,7 @@ class AdminUserController extends Controller
         }
 
         $users = $query->orderBy('created_at', 'desc')->get();
-        $filename = 'utilisateurs-' . now()->format('Y-m-d-His') . '.csv';
+        $filename = 'utilisateurs-' . now()->format('Y-m-d-His') . '.xls';
 
         return $this->csvDownload($users,
             ['ID', 'Nom', 'Email', 'Actif', 'Inscrit le'],

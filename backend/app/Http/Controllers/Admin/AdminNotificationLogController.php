@@ -53,7 +53,7 @@ class AdminNotificationLogController extends Controller
         }
 
         $notifications = $query->orderBy('created_at', 'desc')->get();
-        $filename = 'notification-history-' . now()->format('Y-m-d-His') . '.csv';
+        $filename = 'notification-history-' . now()->format('Y-m-d-His') . '.xls';
 
         return $this->csvDownload($notifications,
             ['Date', 'Type', 'Titre', 'Message', 'Utilisateur', 'Email', 'Admin', 'Lu'],

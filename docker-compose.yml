@@ -36,11 +36,12 @@ services:
       DB_HOST: db
       DB_PORT: 3306
       DB_DATABASE: ${DB_DATABASE:-projet_pfe}
-      DB_USERNAME: ${DB_USERNAME:-projet_user}
-      DB_PASSWORD: ${DB_PASSWORD:-projet_password}
+      DB_USERNAME: projet_user
+      DB_PASSWORD: projet_password
       CACHE_DRIVER: ${CACHE_DRIVER:-file}
       SESSION_DRIVER: ${SESSION_DRIVER:-file}
       QUEUE_CONNECTION: ${QUEUE_CONNECTION:-sync}
+      PORT: 80
       STRIPE_KEY: ${STRIPE_KEY}
       STRIPE_SECRET: ${STRIPE_SECRET}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
@@ -81,7 +82,7 @@ services:
       dockerfile: Dockerfile
     container_name: projet_pfe_frontend
     environment:
-      VITE_API_URL: ${VITE_API_URL:-http://localhost}
+      VITE_API_URL: ''
       VITE_STRIPE_PUBLISHABLE_KEY: ${VITE_STRIPE_PUBLISHABLE_KEY}
       VITE_API_PROXY_TARGET: http://nginx
     volumes:

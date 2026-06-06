@@ -12,6 +12,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Notifications\ResetPasswordNotification;
+use App\Notifications\PinResetNotification;
 
 class User extends Authenticatable implements CanResetPasswordContract, MustVerifyEmail
 {
@@ -44,6 +45,8 @@ class User extends Authenticatable implements CanResetPasswordContract, MustVeri
         'email_verified_at',
         'fcm_token',
         'is_student',
+        'recovery_email',
+        'recovery_email_verified_at',
     ];
 
     /**
@@ -73,6 +76,7 @@ class User extends Authenticatable implements CanResetPasswordContract, MustVeri
             'user_preferences' => 'array',
             'email_verified_at'           => 'datetime',
             'email_verification_sent_at'  => 'datetime',
+            'recovery_email_verified_at'  => 'datetime',
         ];
     }
 
@@ -95,6 +99,20 @@ class User extends Authenticatable implements CanResetPasswordContract, MustVeri
     public function sendPasswordResetNotification($token): void
     {
         $this->notify(new ResetPasswordNotification($token));
+    }
+
+    /**
+     * Redirect PIN reset notifications to recovery email if set.
+     */
+    public function routeNotificationForMail(\Illuminate\Notifications\Notification $notification): array|string
+    {
+        // If this is a PIN reset notification AND recovery email is set, use that
+        if ($notification instanceof PinResetNotification && !empty($this->recovery_email)) {
+            return $this->recovery_email;
+        }
+
+        // Default: use the primary email
+        return $this->email;
     }
 
     /**

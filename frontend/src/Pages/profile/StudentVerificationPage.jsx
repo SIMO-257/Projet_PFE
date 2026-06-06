@@ -10,6 +10,8 @@ export default function StudentVerificationPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
+  const goBack = () => navigate(-1);
+
   const [studentStatus, setStudentStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -97,7 +99,7 @@ export default function StudentVerificationPage() {
       <div className="app-shell">
         <div className="app-frame">
           <div className={`${styles.profileCard} app-card`}>
-            <Header title={t('student_verification_title')} />
+            <Header title={t('student_verification_title')} showBackButton={true} onBack={goBack} />
             <div className="app-content flex items-center justify-center min-h-[60vh]">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500"></div>
             </div>

@@ -37,7 +37,7 @@ class AdminTicketController extends Controller
         }
 
         $tickets = $query->orderBy('created_at', 'desc')->get();
-        $filename = 'tickets-' . now()->format('Y-m-d-His') . '.csv';
+        $filename = 'tickets-' . now()->format('Y-m-d-His') . '.xls';
 
         return $this->csvDownload($tickets,
             ['UUID', 'Type', 'Client', 'Email', 'Statut', 'Prix', 'Achete le'],

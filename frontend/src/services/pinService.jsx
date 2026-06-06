@@ -14,3 +14,9 @@ export const getPinStatus = () =>
 
 export const resetPin = (currentPassword) =>
     userApi.post('/users/pin/reset', { current_password: currentPassword }).then(r => r.data);
+
+export const setRecoveryEmail = (email, currentPassword, pin) =>
+    userApi.post('/users/pin/recovery-email', { email, current_password: currentPassword, pin }).then(r => r.data);
+
+export const getRecoveryEmail = () =>
+    userApi.get('/users/pin/recovery-email').then(r => r.data);

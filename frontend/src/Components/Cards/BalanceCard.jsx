@@ -21,18 +21,18 @@ const BalanceCard = ({
             {/* Decorative circles */}
             {circlesPosition === 'right' ? (
                 <>
-                    <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/5 animate-float"></div>
-                    <div className="absolute -right-4 top-12 w-20 h-20 rounded-full bg-white/5 animate-float" style={{animationDelay: '1s'}}></div>
+                    <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/[0.07] animate-float"></div>
+                    <div className="absolute -right-4 top-12 w-20 h-20 rounded-full bg-white/[0.07] animate-float" style={{animationDelay: '1s'}}></div>
                 </>
             ) : (
                 <>
-                    <div className="absolute -left-8 -bottom-8 w-32 h-32 rounded-full bg-white/5 animate-float"></div>
-                    <div className="absolute left-12 -bottom-4 w-20 h-20 rounded-full bg-white/5 animate-float" style={{animationDelay: '1s'}}></div>
+                    <div className="absolute -left-8 -bottom-8 w-32 h-32 rounded-full bg-white/[0.07] animate-float"></div>
+                    <div className="absolute left-12 -bottom-4 w-20 h-20 rounded-full bg-white/[0.07] animate-float" style={{animationDelay: '1s'}}></div>
                 </>
             )}
             
             <div className="relative z-10">
-                <p className="text-white text-sm mb-2">{title}</p>
+                <p className="text-white-force text-sm mb-2">{title}</p>
                 <h3 className="text-4xl font-bold mb-6 bg-gradient-to-r from-[#fcd34d] via-[#f5d579] to-[#eab308] bg-clip-text text-transparent">
                   {amount}
                 </h3>

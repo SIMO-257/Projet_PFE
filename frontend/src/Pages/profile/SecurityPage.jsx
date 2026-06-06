@@ -4,7 +4,7 @@ import { useTranslation } from '../../hooks/useTranslation';
 import Header from '../../Components/Layout/Header';
 import styles from '../../Styles/Security.module.css';
 import { getUserPreferences, updateUserPreferences } from '../../services/notificationService';
-import { setPin, disablePin, getPinStatus, resetPin } from '../../services/pinService';
+import { setPin, disablePin, getPinStatus, resetPin, setRecoveryEmail as setRecoveryEmailApi, getRecoveryEmail as getRecoveryEmailApi } from '../../services/pinService';
 
 const PIN_LENGTH = 4;
 
@@ -45,17 +45,36 @@ const SecurityPage = () => {
   const [recoverySending, setRecoverySending] = useState(false);
   const [recoverySentTo, setRecoverySentTo] = useState('');
 
+  // --- Recovery Email Modal State ---
+  const [showRecoveryEmail, setShowRecoveryEmail] = useState(false);
+  const [recoveryEmailData, setRecoveryEmailData] = useState(null); // { email, masked } | null
+  const [recoveryEmailStep, setRecoveryEmailStep] = useState('verify'); // 'verify' | 'email'
+  const [recoveryEmailPassword, setRecoveryEmailPassword] = useState('');
+  const [recoveryEmailPin, setRecoveryEmailPin] = useState('');
+  const [recoveryEmailNew, setRecoveryEmailNew] = useState('');
+  const [recoveryEmailError, setRecoveryEmailError] = useState('');
+  const [recoveryEmailSaving, setRecoveryEmailSaving] = useState(false);
+  const [recoveryEmailShowPw, setRecoveryEmailShowPw] = useState(false);
+  const [recoveryEmailShowPin, setRecoveryEmailShowPin] = useState(false);
+
   // ========== Load ==========
   useEffect(() => {
     const loadAll = async () => {
       try {
-        const [prefs, pinStatus] = await Promise.all([
+        const [prefs, pinStatus, recoveryRes] = await Promise.all([
           getUserPreferences(),
           getPinStatus(),
+          getRecoveryEmailApi(),
         ]);
         const ps = pinStatus?.data || pinStatus;
         setPinSet(ps?.pin_set ?? false);
         setPinEnabled(prefs?.pin_enabled ?? ps?.pin_set ?? false);
+
+        // Load recovery email data
+        const recoveryData = recoveryRes?.data || recoveryRes;
+        if (recoveryData?.email) {
+          setRecoveryEmailData(recoveryData);
+        }
 
       } catch (err) {
         console.error('Failed to load security preferences:', err);
@@ -229,6 +248,80 @@ const SecurityPage = () => {
     }
   }, [pinSetupStep, showPinSetup]);
 
+  // ========== Recovery Email Helpers ==========
+
+  const openRecoveryEmail = () => {
+    setRecoveryEmailStep('verify');
+    setRecoveryEmailPassword('');
+    setRecoveryEmailPin('');
+    setRecoveryEmailNew('');
+    setRecoveryEmailError('');
+    setRecoveryEmailShowPw(false);
+    setRecoveryEmailShowPin(false);
+    setShowRecoveryEmail(true);
+  };
+
+  const closeRecoveryEmail = () => {
+    setShowRecoveryEmail(false);
+    setRecoveryEmailStep('verify');
+  };
+
+  const submitRecoveryEmailVerify = () => {
+    if (!recoveryEmailPassword.trim()) {
+      setRecoveryEmailError('Veuillez entrer votre mot de passe.');
+      return;
+    }
+    if (recoveryEmailPin.length < 4) {
+      setRecoveryEmailError('Veuillez entrer votre code PIN.');
+      return;
+    }
+    setRecoveryEmailError('');
+    setRecoveryEmailStep('email');
+  };
+
+  const submitRecoveryEmailSave = async () => {
+    const email = recoveryEmailNew.trim();
+    if (!email) {
+      setRecoveryEmailError('Veuillez entrer un email de récupération.');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setRecoveryEmailError('Email invalide.');
+      return;
+    }
+
+    setRecoveryEmailSaving(true);
+    setRecoveryEmailError('');
+
+    try {
+      const res = await setRecoveryEmailApi(email, recoveryEmailPassword, recoveryEmailPin);
+      const data = res?.data || res;
+      setRecoveryEmailData({ email, masked: data?.masked || email });
+      closeRecoveryEmail();
+    } catch (err) {
+      const msg = err?.response?.data?.message
+        || err?.response?.data?.errors?.email?.[0]
+        || err?.response?.data?.errors?.current_password?.[0]
+        || err?.response?.data?.errors?.pin?.[0]
+        || 'Erreur lors de l\'enregistrement.';
+      setRecoveryEmailError(msg);
+    } finally {
+      setRecoveryEmailSaving(false);
+    }
+  };
+
+  const handleRecoveryEmailPinDigit = (digit) => {
+    if (recoveryEmailPin.length < 4) {
+      setRecoveryEmailPin(prev => prev + digit);
+      setRecoveryEmailError('');
+    }
+  };
+
+  const handleRecoveryEmailPinBackspace = () => {
+    setRecoveryEmailPin(prev => prev.slice(0, -1));
+    setRecoveryEmailError('');
+  };
+
   // ========== PIN Disable Modal ==========
   const handleDisableDigit = (digit) => {
     if (pinDisableValue.length < PIN_LENGTH) {
@@ -389,6 +482,15 @@ const SecurityPage = () => {
 
             {/* ── Password & Recovery ── */}
             <Section title={t('password_recovery_section')}>
+              {/* Recovery Email */}
+              <ArrowItem
+                icon="email"
+                label={recoveryEmailData?.masked ? `Email de récupération : ${recoveryEmailData.masked}` : 'Ajouter un email de récupération'}
+                description={recoveryEmailData?.masked ? 'Le PIN réinitialisé sera envoyé sur cet email.' : 'Recevez le code PIN de réinitialisation sur un email différent.'}
+                onClick={openRecoveryEmail}
+              />
+
+              {/* PIN Reset */}
               <ArrowItem
                 icon="recovery"
                 label={t('set_recovery')}
@@ -653,7 +755,9 @@ const SecurityPage = () => {
                   </p>
                   <p className="text-[#f5d579] font-semibold text-sm mt-2">{recoverySentTo}</p>
                   <p className="text-white/40 text-xs mt-3 leading-relaxed">
-                    Utilisez ce code pour vous connecter. Vous pourrez le modifier dans les paramètres de sécurité.
+                    {recoveryEmailData?.masked
+                      ? 'Ce code a été envoyé à votre email de récupération.'
+                      : 'Utilisez ce code pour vous connecter. Vous pourrez le modifier dans les paramètres de sécurité.'}
                   </p>
                 </div>
 
@@ -663,6 +767,194 @@ const SecurityPage = () => {
                     className="w-full py-3.5 rounded-2xl font-bold text-sm bg-gradient-to-r from-[#f5d579] to-[#d4af37] text-[#260101] shadow-lg shadow-[#f5d579]/10 hover:scale-[1.02] active:scale-95 transition-all"
                   >
                     Terminé
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════
+          RECOVERY EMAIL MODAL
+      ════════════════════════════════════════════════════════ */}
+      {showRecoveryEmail && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fadeIn p-4">
+          <div
+            className="bg-gradient-to-br from-[#2f0205]/95 to-[#180103]/95 border border-[#f5d579]/20 rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl shadow-black/50 animate-countUp"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* ── STEP 1: Verify identity (password + PIN) ── */}
+            {recoveryEmailStep === 'verify' && (
+              <>
+                <div className="pt-8 pb-4 px-6 text-center">
+                  <div className="mx-auto w-14 h-14 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-4">
+                    <svg className="w-7 h-7 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </div>
+                  <h2 className="text-[#f5d579] font-bold text-lg">
+                    {recoveryEmailData?.masked ? 'Modifier l\'email de récupération' : 'Ajouter un email de récupération'}
+                  </h2>
+                  <p className="text-white/50 text-xs mt-1">
+                    Vérifions votre identité avant de continuer.
+                  </p>
+                </div>
+
+                <div className="px-6 pb-6">
+                  {/* Password */}
+                  <div className="relative mb-3">
+                    <input
+                      type={recoveryEmailShowPw ? 'text' : 'password'}
+                      value={recoveryEmailPassword}
+                      onChange={(e) => { setRecoveryEmailPassword(e.target.value); setRecoveryEmailError(''); }}
+                      placeholder="Mot de passe actuel"
+                      className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-3.5 text-white text-sm
+                        placeholder:text-white/30 focus:outline-none focus:border-[#f5d579]/40 focus:ring-1 focus:ring-[#f5d579]/20 transition-all"
+                    />
+                    <button
+                      onClick={() => setRecoveryEmailShowPw(!recoveryEmailShowPw)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/60 transition-colors"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* PIN */}
+                  <div className="mb-4">
+                    <div className="flex justify-center gap-3 mb-4">
+                      {[1, 2, 3, 4].map((_, i) => (
+                        <div
+                          key={i}
+                          className={`w-4 h-4 rounded-full border-2 transition-all duration-200 ${
+                            recoveryEmailPin.length > i
+                              ? 'bg-[#f5d579] border-[#f5d579] scale-110'
+                              : 'bg-transparent border-white/30'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <div className="grid grid-cols-3 gap-3 max-w-[220px] mx-auto mb-4">
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((digit) => (
+                        <button
+                          key={digit}
+                          onClick={() => handleRecoveryEmailPinDigit(String(digit))}
+                          className="w-full aspect-square rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-xl
+                            hover:bg-white/10 hover:border-white/20 active:scale-90 active:bg-[#f5d579]/20 transition-all duration-150"
+                        >
+                          {digit}
+                        </button>
+                      ))}
+                      <button
+                        onClick={handleRecoveryEmailPinBackspace}
+                        disabled={recoveryEmailPin.length === 0}
+                        className="w-full aspect-square rounded-2xl bg-white/5 border border-white/10 text-white/70
+                          hover:bg-white/10 hover:border-white/20 active:scale-90 transition-all duration-150
+                          disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center"
+                      >
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414 6.414a2 2 0 001.414.586H19a2 2 0 002-2V7a2 2 0 00-2-2h-8.172a2 2 0 00-1.414.586L3 12z" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => handleRecoveryEmailPinDigit('0')}
+                        className="w-full aspect-square rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-xl
+                          hover:bg-white/10 hover:border-white/20 active:scale-90 active:bg-[#f5d579]/20 transition-all duration-150"
+                      >
+                        0
+                      </button>
+                      <button
+                        onClick={submitRecoveryEmailVerify}
+                        disabled={!recoveryEmailPassword.trim() || recoveryEmailPin.length < 4}
+                        className={`w-full aspect-square rounded-2xl font-bold text-lg transition-all duration-150 flex items-center justify-center
+                          ${recoveryEmailPassword.trim() && recoveryEmailPin.length >= 4
+                            ? 'bg-gradient-to-br from-[#f5d579] to-[#d4af37] text-[#260101] shadow-lg shadow-[#f5d579]/20 active:scale-90 hover:shadow-xl hover:shadow-[#f5d579]/30'
+                            : 'bg-white/5 border border-white/10 text-white/30 cursor-not-allowed'
+                          }`}
+                      >
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  {recoveryEmailError && (
+                    <p className="text-red-400 text-xs text-center mb-4 animate-fadeIn">{recoveryEmailError}</p>
+                  )}
+
+                  <button onClick={closeRecoveryEmail} className="w-full py-3 rounded-2xl text-white/50 text-sm font-medium hover:text-white hover:bg-white/5 transition-all">
+                    Annuler
+                  </button>
+                </div>
+              </>
+            )}
+
+            {/* ── STEP 2: Enter new email ── */}
+            {recoveryEmailStep === 'email' && (
+              <>
+                <div className="pt-8 pb-4 px-6 text-center">
+                  <div className="mx-auto w-14 h-14 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-4">
+                    <svg className="w-7 h-7 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <h2 className="text-[#f5d579] font-bold text-lg">
+                    {recoveryEmailData?.masked ? 'Nouvel email de récupération' : 'Email de récupération'}
+                  </h2>
+                  <p className="text-white/50 text-xs mt-1">
+                    Cet email recevra le nouveau code PIN en cas de réinitialisation.
+                  </p>
+                </div>
+
+                <div className="px-6 pb-6">
+                  <input
+                    type="email"
+                    value={recoveryEmailNew}
+                    onChange={(e) => { setRecoveryEmailNew(e.target.value); setRecoveryEmailError(''); }}
+                    onKeyDown={(e) => { if (e.key === 'Enter' && recoveryEmailNew.trim()) submitRecoveryEmailSave(); }}
+                    placeholder="exemple@email.com"
+                    autoFocus
+                    className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-3.5 text-white text-sm mb-3
+                      placeholder:text-white/30 focus:outline-none focus:border-[#f5d579]/40 focus:ring-1 focus:ring-[#f5d579]/20 transition-all"
+                  />
+
+                  {recoveryEmailError && (
+                    <p className="text-red-400 text-xs text-center mb-4 animate-fadeIn">{recoveryEmailError}</p>
+                  )}
+
+                  <button
+                    onClick={submitRecoveryEmailSave}
+                    disabled={recoveryEmailSaving || !recoveryEmailNew.trim()}
+                    className={`w-full py-3.5 rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
+                      !recoveryEmailSaving && recoveryEmailNew.trim()
+                        ? 'bg-gradient-to-r from-[#f5d579] to-[#d4af37] text-[#260101] shadow-lg shadow-[#f5d579]/10 hover:scale-[1.02] active:scale-95'
+                        : 'bg-white/5 border border-white/10 text-white/30 cursor-not-allowed'
+                    }`}
+                  >
+                    {recoveryEmailSaving ? (
+                      <>
+                        <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        Enregistrement...
+                      </>
+                    ) : (recoveryEmailData?.masked ? 'Modifier' : 'Enregistrer')}
+                  </button>
+
+                  <button
+                    onClick={() => setRecoveryEmailStep('verify')}
+                    className="w-full mt-3 py-3 rounded-2xl text-white/50 text-sm font-medium hover:text-white hover:bg-white/5 transition-all"
+                  >
+                    Retour
+                  </button>
+
+                  <button onClick={closeRecoveryEmail} className="w-full mt-1 py-3 rounded-2xl text-white/30 text-xs font-medium hover:text-white/50 hover:bg-white/5 transition-all">
+                    Annuler
                   </button>
                 </div>
               </>
@@ -757,18 +1049,23 @@ const ToggleItem = ({ icon, label, description, value, onChange }) => (
   </div>
 );
 
-const ArrowItem = ({ icon, label, onClick }) => (
+const ArrowItem = ({ icon, label, description, onClick }) => (
   <button
     onClick={onClick}
     className="w-full bg-black/40 rounded-xl border border-white/10 hover:border-white/20 transition-all p-3 text-left flex items-center justify-between group"
   >
-    <div className="flex items-center space-x-3">
+    <div className="flex items-center space-x-3 flex-1">
       <div className="w-10 h-10 rounded-xl bg-yellow-500/20 flex items-center justify-center">
         <Icon name={icon} />
       </div>
-      <span className="text-white text-sm font-medium">{label}</span>
+      <div className="flex-1 min-w-0">
+        <span className="text-white text-sm font-medium block truncate">{label}</span>
+        {description && (
+          <span className="text-white/40 text-xs block mt-0.5 truncate">{description}</span>
+        )}
+      </div>
     </div>
-    <svg className="w-5 h-5 text-white/40 rtl-flip group-hover:text-white/60 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="w-5 h-5 text-white/40 rtl-flip group-hover:text-white/60 transition-colors flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/>
     </svg>
   </button>
@@ -778,6 +1075,7 @@ const Icon = ({ name }) => {
   const icons = {
     lock: <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"/></svg>,
     recovery: <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>,
+    email: <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>,
   };
   return icons[name] || null;
 };

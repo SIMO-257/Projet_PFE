@@ -172,13 +172,89 @@ class UserPinController extends Controller
         $user->user_preferences = $prefs;
         $user->save();
 
-        // Send the new PIN via email
+        // Send the new PIN via email (will use recovery_email if set, thanks to routeNotificationForMail)
         $user->notify(new PinResetNotification($newPin));
+
+        // Determine which email to show as masked
+        $maskedEmail = !empty($user->recovery_email)
+            ? $this->maskEmail($user->recovery_email)
+            : $this->maskEmail($user->email);
+
+        $message = !empty($user->recovery_email)
+            ? 'Un nouveau code PIN a été envoyé à votre email de récupération.'
+            : 'Un nouveau code PIN a été envoyé par email.';
 
         return $this->successResponse([
             'method' => 'email',
-            'masked' => $this->maskEmail($user->email),
-        ], 'Un nouveau code PIN a été envoyé par email.');
+            'masked' => $maskedEmail,
+        ], $message);
+    }
+
+    /**
+     * Set or update the recovery email.
+     * Requires current password + current PIN to confirm identity.
+     *
+     * POST /api/users/pin/recovery-email
+     */
+    public function setRecoveryEmail(Request $request)
+    {
+        $validated = $request->validate([
+            'email'           => 'required|email|max:255',
+            'current_password' => 'required|string',
+            'pin'             => 'required|string',
+        ]);
+
+        $user = $request->user();
+
+        // Verify account password
+        if (!Hash::check($validated['current_password'], $user->password_hash)) {
+            throw ValidationException::withMessages([
+                'current_password' => ['Le mot de passe actuel est incorrect.'],
+            ]);
+        }
+
+        // Verify current PIN
+        if (empty($user->pin_hash) || !Hash::check($validated['pin'], $user->pin_hash)) {
+            throw ValidationException::withMessages([
+                'pin' => ['Le code PIN est incorrect.'],
+            ]);
+        }
+
+        // Check that recovery email is different from primary email
+        if (strtolower($validated['email']) === strtolower($user->email)) {
+            throw ValidationException::withMessages([
+                'email' => ['L\'email de récupération doit être différent de votre email principal.'],
+            ]);
+        }
+
+        // Save recovery email
+        $user->recovery_email = $validated['email'];
+        $user->recovery_email_verified_at = now();
+        $user->save();
+
+        return $this->successResponse([
+            'masked' => $this->maskEmail($user->recovery_email),
+        ], 'Email de récupération enregistré avec succès.');
+    }
+
+    /**
+     * Get the current recovery email (masked).
+     *
+     * GET /api/users/pin/recovery-email
+     */
+    public function getRecoveryEmail(Request $request)
+    {
+        $user = $request->user();
+
+        if (empty($user->recovery_email)) {
+            return $this->successResponse([
+                'masked' => null,
+            ]);
+        }
+
+        return $this->successResponse([
+            'masked' => $this->maskEmail($user->recovery_email),
+        ]);
     }
 
     /**

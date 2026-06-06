@@ -329,7 +329,7 @@ export default function EditProfilePage()  {
               <button
                 onClick={handleSaveChanges}
                 disabled={processing}
-                className="w-full bg-gradient-to-r from-[#D9B991] to-[#C9A961] text-[#400106] font-semibold py-4 rounded-2xl hover:from-[#E5C5A1] hover:to-[#D9B971] transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg"
+                className="w-full bg-gradient-to-r from-[#D9B991] to-[#C9A961] text-white-force font-semibold py-4 rounded-2xl hover:from-[#E5C5A1] hover:to-[#D9B971] transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg"
               >
                 {processing ? t('edit_saving') : t('edit_save_changes')}
               </button>
