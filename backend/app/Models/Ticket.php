@@ -50,6 +50,13 @@ class Ticket extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    /**
+     * The UUID of the ticket.
+     *
+     * @var string|null
+     */
+    protected ?string $uuid = null;
+
     protected static function booted(): void
     {
         static::creating(function (Ticket $ticket): void {

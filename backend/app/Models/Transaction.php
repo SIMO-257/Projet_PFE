@@ -57,6 +57,13 @@ class Transaction extends Model
         ];
     }
 
+    /**
+     * The UUID of the transaction.
+     *
+     * @var string|null
+     */
+    protected $uuid;
+
     protected static function booted(): void
     {
         static::creating(function (Transaction $transaction): void {
@@ -65,4 +72,3 @@ class Transaction extends Model
             }
         });
     }
-}

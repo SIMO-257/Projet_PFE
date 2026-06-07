@@ -162,6 +162,11 @@ class AdminManagementController extends Controller
             ], 422);
         }
 
+        // Ensure is_active property is defined and initialized
+        if (!isset($admin->is_active)) {
+            $admin->is_active = false;
+        }
+
         $admin->is_active = !$admin->is_active;
         $admin->save();
 

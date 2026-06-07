@@ -52,9 +52,10 @@ class TicketValidationService
     {
         $defaultTicket = null;
 
-        if (!empty($user->default_ticket_id)) {
+        $defaultTicketId = $user->getAttribute('default_ticket_id');
+        if (!empty($defaultTicketId)) {
             $defaultTicket = Ticket::with('ticketType')
-                ->where('id', $user->default_ticket_id)
+                ->where('id', $defaultTicketId)
                 ->where('user_id', $user->id)
                 ->first();
 
@@ -77,7 +78,7 @@ class TicketValidationService
             ->first();
 
         if ($persistFallback) {
-            $user->default_ticket_id = $fallback ? $fallback->id : null;
+            $user->setAttribute('default_ticket_id', $fallback ? $fallback->id : null);
             $user->save();
         }
 
