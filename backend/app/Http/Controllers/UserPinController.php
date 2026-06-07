@@ -74,10 +74,19 @@ class UserPinController extends Controller
         }
 
         // Revoke old PIN tokens first to avoid accumulation
-        $user->tokens()->where('name', 'pin_verification')->delete();
+        try {
+            $user->tokens()->where('name', 'pin_verification')->delete();
+        } catch (\Throwable $e) {
+            Log::warning('Failed to revoke old PIN tokens', ['error' => $e->getMessage()]);
+        }
 
         // Generate a short-lived verification token (expires in 5 minutes)
-        $pinToken = $user->createToken('pin_verification', ['*'], now()->addMinutes(5))->plainTextToken;
+        try {
+            $pinToken = $user->createToken('pin_verification', ['*'], now()->addMinutes(5))->plainTextToken;
+        } catch (\Throwable $e) {
+            Log::error('Failed to create PIN verification token', ['error' => $e->getMessage()]);
+            return $this->errorResponse('Erreur lors de la vérification du code PIN.', 500);
+        }
 
         return $this->successResponse([
             'pin_verified'  => true,
@@ -116,7 +125,11 @@ class UserPinController extends Controller
         $user->save();
 
         // Revoke any active PIN verification tokens
-        $user->tokens()->where('name', 'pin_verification')->delete();
+        try {
+            $user->tokens()->where('name', 'pin_verification')->delete();
+        } catch (\Throwable $e) {
+            Log::warning('Failed to revoke PIN tokens on disable', ['error' => $e->getMessage()]);
+        }
 
         return $this->successResponse(null, 'Code PIN désactivé.');
     }
@@ -129,7 +142,16 @@ class UserPinController extends Controller
     public function status(Request $request)
     {
         $user = $request->user();
-        $prefs = $user->user_preferences ?? [];
+
+        try {
+            $prefs = $user->user_preferences ?? [];
+        } catch (\Throwable $e) {
+            Log::warning('Failed to decode user_preferences for PIN status', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+            $prefs = [];
+        }
 
         return $this->successResponse([
             'pin_set'       => !empty($user->pin_hash),
@@ -173,7 +195,15 @@ class UserPinController extends Controller
         $user->save();
 
         // Send the new PIN via email (will use recovery_email if set, thanks to routeNotificationForMail)
-        $user->notify(new PinResetNotification($newPin));
+        try {
+            $user->notify(new PinResetNotification($newPin));
+        } catch (\Throwable $e) {
+            Log::error('Failed to send PIN reset email', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+            // PIN was reset successfully in DB even if email fails
+        }
 
         // Determine which email to show as masked
         $maskedEmail = !empty($user->recovery_email)

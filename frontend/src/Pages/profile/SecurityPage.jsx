@@ -72,8 +72,8 @@ const SecurityPage = () => {
 
         // Load recovery email data
         const recoveryData = recoveryRes?.data || recoveryRes;
-        if (recoveryData?.email) {
-          setRecoveryEmailData(recoveryData);
+        if (recoveryData?.masked) {
+          setRecoveryEmailData({ masked: recoveryData.masked });
         }
 
       } catch (err) {
