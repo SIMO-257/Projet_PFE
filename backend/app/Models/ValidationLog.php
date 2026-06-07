@@ -7,7 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 
 class ValidationLog extends Model
 {
-    /** @use HasFactory<\Database\Factories\ValidationLogFactory> */
+    /**
+ * @property int $id
+ * @property int|null $ticket_id
+ * @property int|null $user_id
+ * @property string|null $validator_id
+ * @property string $validation_type
+ * @property string $status
+ * @property string|null $failure_reason
+ * @property array|null $location
+ * @property array|null $metadata
+ * @property string|null $created_at
+ *
+ * @use HasFactory<\Database\Factories\ValidationLogFactory>
+ */
     use HasFactory;
 
     /**

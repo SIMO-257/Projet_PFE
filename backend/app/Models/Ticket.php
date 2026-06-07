@@ -9,7 +9,24 @@ use Illuminate\Support\Facades\Hash;
 
 class Ticket extends Model
 {
-    /** @use HasFactory<\Database\Factories\TicketFactory> */
+    /**
+ * @property int $id
+ * @property string $uuid
+ * @property int $user_id
+ * @property int|null $ticket_type_id
+ * @property int|null $purchase_id
+ * @property string $status
+ * @property string|null $valid_from
+ * @property string|null $valid_until
+ * @property int $remaining_uses
+ * @property string|null $price_paid
+ * @property string|null $created_at
+ * @property string|null $updated_at
+ * @property-read \App\Models\TicketType|null $ticketType
+ * @property-read \App\Models\User|null $user
+ *
+ * @use HasFactory<\Database\Factories\TicketFactory>
+ */
     use HasFactory;
 
     /**

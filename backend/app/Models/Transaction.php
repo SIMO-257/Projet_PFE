@@ -8,7 +8,25 @@ use Illuminate\Support\Str;
 
 class Transaction extends Model
 {
-    /** @use HasFactory<\Database\Factories\TransactionFactory> */
+    /**
+ * @property int $id
+ * @property string $uuid
+ * @property string|null $payment_intent_id
+ * @property int $user_id
+ * @property string $type
+ * @property string $status
+ * @property string $amount
+ * @property string $currency
+ * @property string|null $balance_before
+ * @property string|null $balance_after
+ * @property string|null $payment_method
+ * @property string|null $reference
+ * @property array|null $metadata
+ * @property string|null $created_at
+ * @property-read \App\Models\User|null $user
+ *
+ * @use HasFactory<\Database\Factories\TransactionFactory>
+ */
     use HasFactory;
 
     /**

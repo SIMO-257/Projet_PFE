@@ -10,7 +10,19 @@ use Laravel\Sanctum\HasApiTokens;
 
 class Admin extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\AdminFactory> */
+    /**
+ * @property int $id
+ * @property string $first_name
+ * @property string $last_name
+ * @property string $email
+ * @property string $password
+ * @property bool $is_active
+ * @property bool $is_super_admin
+ * @property bool $must_change_password
+ * @property string|null $created_at
+ *
+ * @use HasFactory<\Database\Factories\AdminFactory>
+ */
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $table = 'admins';
