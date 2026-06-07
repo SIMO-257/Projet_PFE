@@ -25,12 +25,13 @@ class TicketController extends Controller
         $tickets = Ticket::with('ticketType')
             ->where('user_id', $user->id)
             ->orderBy('created_at', 'desc')
-            ->get();
-
-        // Normalize statuses (mark expired ones)
-        foreach ($tickets as $ticket) {
-            $this->validationService->normalizeTicketStatus($ticket);
-        }
+            ->get()
+            ->map(function ($ticket) use ($user) {
+                $this->validationService->normalizeTicketStatus($ticket);
+                $ticketArray = $ticket->toArray();
+                $ticketArray['is_default'] = $ticket->id === $user->default_ticket_id;
+                return $ticketArray;
+            });
 
         return $this->successResponse($tickets);
     }
@@ -67,9 +68,11 @@ class TicketController extends Controller
             ->where('user_id', $user->id)
             ->orderBy('created_at', 'desc')
             ->get()
-            ->map(function ($ticket) {
+            ->map(function ($ticket) use ($user) {
                 $this->validationService->normalizeTicketStatus($ticket);
-                return $ticket;
+                $ticketArray = $ticket->toArray();
+                $ticketArray['is_default'] = $ticket->id === $user->default_ticket_id;
+                return $ticketArray;
             });
 
         return $this->successResponse($cards);
