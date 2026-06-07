@@ -88,8 +88,8 @@ class AdminAuthController extends Controller
         /** @var \App\Models\Admin $admin */
         $admin = $request->user();
 
-        $admin->password = Hash::make($request->password);
-        $admin->must_change_password = false;
+        $admin->setAttribute('password', Hash::make($request->password));
+        $admin->setAttribute('must_change_password', false);
         $admin->save();
 
         AuditLog::log('admin_password_force_reset', $admin->id, ['ip' => $request->ip()]);

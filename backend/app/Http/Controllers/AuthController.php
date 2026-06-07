@@ -122,8 +122,7 @@ class AuthController extends Controller
         $userId = $user?->id;
 
         if ($user) {
-            $user->last_active_at = null;
-            $user->save();
+            $user->update(['last_active_at' => null]);
             $user->currentAccessToken()->delete();
         }
 
@@ -172,7 +171,7 @@ class AuthController extends Controller
         $status = Password::broker('users')->reset(
             $data,
             function (User $user, string $password): void {
-                $user->password_hash = Hash::make($password);
+                $user->password = Hash::make($password);
                 $user->save();
                 AuditLog::log('password_reset_success', $user->id);
             }
