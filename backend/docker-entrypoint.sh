@@ -1,7 +1,13 @@
 #!/bin/sh
 
-# 1. Clear Laravel cache to ensure fresh config/routes/services on every deploy
+# 1. Optimize Laravel for production — clear stale cache then rebuild
+# Each command uses || true so a single failure (e.g. route closures) doesn't
+# prevent the container from starting with the remaining optimizations active.
 php artisan optimize:clear
+php artisan config:cache --ansi || true
+php artisan route:cache --ansi || true
+php artisan view:cache --ansi || true
+php artisan event:cache --ansi || true
 
 # 2. Substitute the dynamic DO port into the Nginx configuration file
 # This finds "__PORT__" and replaces it with whatever value $PORT holds (e.g., 80 or 8080)

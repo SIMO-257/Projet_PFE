@@ -54,6 +54,17 @@ RUN mkdir -p storage/logs \
 # Configure PHP-FPM to listen on TCP port 9000 (for Docker networking)
 RUN echo "listen = 0.0.0.0:9000" >> /usr/local/etc/php-fpm.d/zz-docker.conf
 
+# ── PHP Opcache configuration for production performance ──
+RUN echo '\
+opcache.memory_consumption=128 \
+opcache.interned_strings_buffer=8 \
+opcache.max_accelerated_files=10000 \
+opcache.revalidate_freq=2 \
+opcache.fast_shutdown=1 \
+opcache.enable_cli=1 \
+opcache.validate_timestamps=0 \
+' | tr ' ' '\n' > /usr/local/etc/php/conf.d/opcache.ini
+
 # Supervisor config for Nginx + PHP-FPM
 RUN mkdir -p /etc/supervisor/conf.d
 COPY docker-supervisord.conf /etc/supervisor/supervisord.conf

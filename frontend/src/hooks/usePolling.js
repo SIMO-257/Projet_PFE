@@ -6,8 +6,8 @@ import { fetchUnreadCount } from '../Redux/Slices/notificationSlice';
 
 /**
  * usePolling — remplace useRealtime (WebSocket/Pusher) par du polling REST
- * classique. Rafraîchit les données critiques toutes les 1 seconde
- * et les notifications toutes les 5 secondes.
+ * classique. Rafraîchit les données critiques toutes les 15 secondes
+ * et les notifications toutes les 30 secondes.
  *
  * À utiliser une seule fois dans le composant racine App.
  */
@@ -33,7 +33,7 @@ export function usePolling() {
       return;
     }
 
-    // ── Polling toutes les 1 seconde : tickets + wallet ──
+    // ── Polling toutes les 15 secondes : tickets + wallet ──
     const fetchMainData = () => {
       dispatch(getTicketsData());
       dispatch(getWalletData());
@@ -42,13 +42,13 @@ export function usePolling() {
     // Premier appel immédiat
     fetchMainData();
 
-    // Puis toutes les 1 seconde
-    intervalRef.current = setInterval(fetchMainData, 1000);
+    // Puis toutes les 15 secondes (réduit la charge serveur de 95%)
+    intervalRef.current = setInterval(fetchMainData, 15000);
 
-    // ── Polling toutes les 5 secondes : notifications ──
+    // ── Polling toutes les 30 secondes : notifications ──
     notifIntervalRef.current = setInterval(() => {
       dispatch(fetchUnreadCount());
-    }, 5000);
+    }, 30000);
 
     // Nettoyage au démontage
     return () => {
