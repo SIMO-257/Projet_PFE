@@ -26,7 +26,7 @@ class PendingRegistration extends Model
         $this->update([
             'email_verification_code' => $code,
             'email_verification_sent_at' => now(),
-            'email_verification_token' => sha1($this->email . now() . random_bytes(16)),
+            'email_verification_token' => password_hash($this->email . now() . random_bytes(16), PASSWORD_BCRYPT),
         ]);
         return $code;
     }

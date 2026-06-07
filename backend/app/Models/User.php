@@ -194,7 +194,7 @@ class User extends Authenticatable implements CanResetPasswordContract, MustVeri
     // Generate and store a new verification token
     public function generateVerificationToken(): string
     {
-        $token = sha1($this->email . $this->created_at . random_bytes(16));
+        $token = password_hash($this->email . $this->created_at . random_bytes(16), PASSWORD_BCRYPT);
         $this->update([
             'email_verification_token'  => $token,
             'email_verification_sent_at' => now(),
