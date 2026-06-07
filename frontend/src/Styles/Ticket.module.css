@@ -260,4 +260,20 @@
   .activeNav .navIcon {
     @apply grayscale-0 text-gold;
   }
+
+  /* Ticket history cards - light invisible gold in light mode */
+  :global([data-theme='light']) div[class*="bg-[#1a1a1a]/50"] {
+    background: linear-gradient(to bottom right, rgba(212, 175, 55, 0.08), rgba(212, 175, 55, 0.04)) !important;
+    border-color: rgba(212, 175, 55, 0.15) !important;
+  }
+
+  /* Ticket history card text should be dark in light mode */
+  :global([data-theme='light']) div[class*="bg-[#1a1a1a]/50"] .text-white,
+  :global([data-theme='light']) div[class*="bg-[#1a1a1a]/50"] .text-white\/50 {
+    color: #1f1718 !important;
+  }
+
+  :global([data-theme='light']) div[class*="bg-[#1a1a1a]/50"] .text-white\/50 {
+    color: rgba(31, 23, 24, 0.6) !important;
+  }
 }

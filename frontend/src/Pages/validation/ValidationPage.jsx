@@ -39,9 +39,7 @@ export default function ValidationPage() {
   const [notification, setNotification] = useState(null);
   const [nfcStatusMessage, setNfcStatusMessage] = useState('');
   const [nfcToken, setNfcToken] = useState('');
-  const [nfcTicketUuidInput, setNfcTicketUuidInput] = useState('');
   const [nfcSecondsRemaining, setNfcSecondsRemaining] = useState(0);
-  const [isNfcSubmitting, setIsNfcSubmitting] = useState(false);
   const [isGeneratingQR, setIsGeneratingQR] = useState(false);
   const [isGeneratingNFC, setIsGeneratingNFC] = useState(false);
 
@@ -61,12 +59,6 @@ export default function ValidationPage() {
     selectedTicket && ['active', 'used'].includes(selectedTicket.status) && selectedTicket.remaining_uses > 0
       ? selectedTicket
       : safeTickets.find((t) => ['active', 'used'].includes(t.status) && t.remaining_uses > 0);
-
-  useEffect(() => {
-    if (activeTicket && !nfcTicketUuidInput) {
-      setNfcTicketUuidInput(activeTicket.uuid);
-    }
-  }, [activeTicket, nfcTicketUuidInput]);
 
   useEffect(() => {
     // Automatically trigger method if passed in state
@@ -151,10 +143,8 @@ export default function ValidationPage() {
   const closeNFCModal = () => {
     setShowNFCModal(false);
     setNfcToken('');
-    setNfcTicketUuidInput('');
     setNfcSecondsRemaining(0);
     setNfcStatusMessage('');
-    setIsNfcSubmitting(false);
   };
 
   const validateQR = async () => {
@@ -215,7 +205,6 @@ export default function ValidationPage() {
       const data = await createNfcChallenge();
       setNfcToken(data?.nfc_token || '');
       setNfcSecondsRemaining(Number(data?.expires_in || 60));
-      setNfcTicketUuidInput(selectedTicketUuid || '');
       setNfcStatusMessage('Token genere. Collez le UUID du ticket avant expiration.');
       setShowNFCModal(true);
     } catch (err) {
@@ -226,58 +215,6 @@ export default function ValidationPage() {
       });
     } finally {
       setIsGeneratingNFC(false);
-    }
-  };
-
-  const submitNfcTicket = async () => {
-    if (isNfcSubmitting) return;
-
-    if (!nfcToken || nfcSecondsRemaining <= 0) {
-      setNotification({
-        type: 'error',
-        title: t('qr_expired'),
-        message: t('token_expired_error'),
-      });
-      return;
-    }
-
-    const ticketUuid = nfcTicketUuidInput.trim();
-    if (!ticketUuid) {
-      setNotification({
-        type: 'error',
-        title: t('error'),
-        message: t('uuid_missing_error'),
-      });
-      return;
-    }
-
-    setIsNfcSubmitting(true);
-    setNfcStatusMessage(t('validating'));
-
-    try {
-      const result = await consumeNfcChallenge({
-        ticket_uuid: ticketUuid,
-        nfc_token: nfcToken,
-      });
-
-      setNotification({
-        type: 'success',
-        title: t('nfc_success'),
-        message: result?.message || t('validating'),
-      });
-
-      setTimeout(() => {
-        closeNFCModal();
-        navigateHook('/validation-success', { state: { ticket: activeTicket } });
-      }, 700);
-    } catch (err) {
-      setNotification({
-        type: 'error',
-        title: t('nfc_failed'),
-        message: err?.response?.data?.message || t('nfc_failed'),
-      });
-    } finally {
-      setIsNfcSubmitting(false);
     }
   };
 
@@ -316,7 +253,7 @@ export default function ValidationPage() {
               </div>
 
               <div className="px-6 pb-6 space-y-4">
-                <div className="relative rounded-2xl overflow-hidden">
+                <div className={`relative rounded-2xl overflow-hidden p-2 ${styles.lightGoldContainer}`}>
                   {isGeneratingNFC && (
                       <div className="absolute inset-0 bg-[#400106]/50 backdrop-blur-sm z-20 flex items-center justify-center">
                           <GoldenSpinner size={40} />
@@ -324,8 +261,7 @@ export default function ValidationPage() {
                   )}
                   <ActionButtonCard
                     variant="validation"
-                    icon={
-                      <svg className="w-7 h-7 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    icon={                        <svg className="w-7 h-7 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -341,7 +277,7 @@ export default function ValidationPage() {
                   />
                 </div>
 
-                <div className="relative rounded-2xl overflow-hidden">
+                <div className={`relative rounded-2xl overflow-hidden p-2 ${styles.lightGoldContainer}`}>
                   {isGeneratingQR && (
                       <div className="absolute inset-0 bg-[#400106]/50 backdrop-blur-sm z-20 flex items-center justify-center">
                           <GoldenSpinner size={40} />
@@ -349,8 +285,7 @@ export default function ValidationPage() {
                   )}
                   <ActionButtonCard
                     variant="validation"
-                    icon={
-                      <svg className="w-7 h-7 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    icon={                        <svg className="w-7 h-7 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -391,29 +326,10 @@ export default function ValidationPage() {
 
             <h3 className="text-2xl font-bold text-white mb-2">{t('nfc_token_title')}</h3>
             <p className="text-white/70 mb-2 text-xs">{t('expires_in_seconds', { seconds: nfcSecondsRemaining })}</p>
-            <p className="text-yellow-400 text-lg font-bold tracking-wider mb-4">{nfcToken || '---'}</p>
+            <p className="text-yellow-400 text-lg font-bold tracking-wider mb-4">
+              {activeTicket?.uuid ? activeTicket.uuid.substring(0, 8).toUpperCase() : '---'}
+            </p>
             <p className="text-white/60 mb-4 text-sm">{nfcStatusMessage}</p>
-
-            <input
-              type="text"
-              value={nfcTicketUuidInput}
-              onChange={(e) => setNfcTicketUuidInput(e.target.value)}
-              placeholder={t('paste_ticket_uuid')}
-              className="w-full rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-white text-sm mb-4"
-            />
-
-            {isNfcSubmitting ? (
-              <ProcessingIndicator message={t('validating')} dotCount={3} dotSize="sm" showMessage={true} />
-            ) : (
-              <button
-                type="button"
-                onClick={submitNfcTicket}
-                disabled={nfcSecondsRemaining <= 0}
-                className="w-full rounded-lg bg-yellow-500/20 border border-yellow-500/30 text-yellow-300 py-2 text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                {t('validate_active_ticket')}
-              </button>
-            )}
 
             <div className="mt-4">
               <ActionButtonCard

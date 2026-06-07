@@ -43,7 +43,7 @@ const AdminTransactions = () => {
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
             </svg>
-            Export CSV
+            {t('admin_export_excel')}
           </button>
           <div className="relative">
             <select
@@ -54,7 +54,6 @@ const AdminTransactions = () => {
               <option value="" className="bg-[#1a0507] text-white">{t('all_types')}</option>
               <option value="recharge" className="bg-[#1a0507] text-white">{t('recharge_type')}</option>
               <option value="purchase" className="bg-[#1a0507] text-white">{t('type_purchase')}</option>
-              <option value="validation" className="bg-[#1a0507] text-white">{t('type_validation_admin')}</option>
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-white/40">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

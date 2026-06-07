@@ -10,8 +10,8 @@ import {
 
 const emptyForm = () => ({
   code: '',
-  name: { fr: '', en: '' },
-  description: { fr: '', en: '' },
+  name: { fr: '', en: '', ar: '' },
+  description: { fr: '', en: '', ar: '' },
   price: '',
   student_price: '',
   duration_minutes: '',
@@ -58,12 +58,12 @@ const AdminTicketTypes = () => {
     setForm({
       code: type.code,
       name: { ...type.name },
-      description: type.description ? { ...type.description } : { fr: '', en: '' },
+      description: type.description ? { ...type.description } : { fr: '', en: '', ar: '' },
       price: type.price.toString(),
       student_price: type.student_price?.toString() || '',
       duration_minutes: type.duration_minutes?.toString() || '',
       is_reusable: type.is_reusable,
-      max_uses: type.max_uses,
+      max_uses: type.is_reusable ? 999 : (type.max_uses || 1),
       is_active: type.is_active,
     });
     setError('');
@@ -285,12 +285,12 @@ const AdminTicketTypes = () => {
               {/* Translations - Name */}
               <div className="space-y-3">
                 <label className="text-white/70 text-sm font-medium">Nom (traductions) *</label>
-                {['fr', 'en'].map((lang) => (
+                {['fr', 'en', 'ar'].map((lang) => (
                   <div key={lang} className="flex items-center gap-3">
                     <span className="w-8 text-xs font-bold text-white/40 uppercase">{lang}</span>
                     <input
                       type="text"
-                      required
+                      required={lang !== 'ar'}
                       value={form.name[lang] || ''}
                       onChange={(e) => setForm({ ...form, name: { ...form.name, [lang]: e.target.value } })}
                       className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-yellow-500/50"
@@ -303,7 +303,7 @@ const AdminTicketTypes = () => {
               {/* Translations - Description */}
               <div className="space-y-3">
                 <label className="text-white/70 text-sm font-medium">Description (traductions)</label>
-                {['fr', 'en'].map((lang) => (
+                {['fr', 'en', 'ar'].map((lang) => (
                   <div key={lang} className="flex items-center gap-3">
                     <span className="w-8 text-xs font-bold text-white/40 uppercase">{lang}</span>
                     <input
@@ -365,8 +365,13 @@ const AdminTicketTypes = () => {
                     type="number"
                     min="1"
                     value={form.max_uses}
+                    disabled={form.is_reusable}
                     onChange={(e) => setForm({ ...form, max_uses: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-yellow-500/50"
+                    className={`w-full bg-white/5 border rounded-xl px-4 py-3 text-white text-sm focus:outline-none transition-all ${
+                      form.is_reusable
+                        ? 'border-yellow-500/30 bg-yellow-500/5 text-yellow-300 cursor-not-allowed'
+                        : 'border-white/10 focus:border-yellow-500/50'
+                    }`}
                   />
                 </div>
                 <div className="space-y-2 flex items-end pb-3">
@@ -374,7 +379,14 @@ const AdminTicketTypes = () => {
                     <input
                       type="checkbox"
                       checked={form.is_reusable}
-                      onChange={(e) => setForm({ ...form, is_reusable: e.target.checked })}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        setForm({
+                          ...form,
+                          is_reusable: checked,
+                          max_uses: checked ? 999 : 1,
+                        });
+                      }}
                       className="accent-yellow-500 w-4 h-4"
                     />
                     <span className="text-white/70 text-sm">Réutilisable</span>

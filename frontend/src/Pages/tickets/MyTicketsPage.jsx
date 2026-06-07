@@ -17,6 +17,24 @@ export default function MyTicketsPage() {
     refreshTickets();
   }, [refreshTickets]);
 
+  // Refresh data when user returns to the page (visibility change + focus)
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        refreshTickets();
+      }
+    };
+    const handleFocus = () => refreshTickets();
+
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [refreshTickets]);
+
   const safeAvailableTypes = Array.isArray(availableTypes) ? availableTypes : [];
   const safeTickets = Array.isArray(tickets) ? tickets : [];
 

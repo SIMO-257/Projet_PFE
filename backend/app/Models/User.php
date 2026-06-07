@@ -149,7 +149,7 @@ class User extends Authenticatable implements CanResetPasswordContract, MustVeri
 
     public function defaultTicket()
     {
-        return $this->belongsTo(Ticket::class, 'default_ticket_id');
+        return $this->hasOne(Ticket::class, 'id', 'default_ticket_id');
     }
 
     /**

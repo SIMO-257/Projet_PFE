@@ -466,4 +466,13 @@ in the amount to add card i want the text to be white fix the "or pay card" so t
 -- in the balanc card make the card in light mode exactly like dark mode.
 
 -- remove the black white gradient from admin nav in light mode.
--- 
+
+-- in the tickets page the pulling feature dont really work.
+-- i changed the tickets type in the admin panel it doesn't change until the user refresh so it does not change instantlly.
+-- there are issues in te css the changes do not happen like in the edit profile btn the text have to be whiyet in both modes you made it for 5 times yet it never show up what is the issue is the btn fighting you or what the smae thong go for balance card they have to be identical in both mods waht cant you undestand .
+-- in the validations page the 2 choices nfc and qr cards have to be in a light gold bg color container.  
+
+-- in add new ticket type in the admin add the ar label for arabic ame and description .
+-- also when the admin press is resuable the uses input is blocked and set by default to 999. 
+
+the eng /fr translation in adamin page isnt properly implemented in the navbar optionnes and the parameters page it self use one languages.

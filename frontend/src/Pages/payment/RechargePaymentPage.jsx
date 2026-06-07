@@ -197,10 +197,22 @@ export default function RechargePaymentPage() {
 
                 <button
                   onClick={handleProceedToPayment}
-                  disabled={isInitializing}
-                  className="w-full py-4 mt-4 rounded-2xl bg-gradient-to-r from-yellow-600 to-yellow-500 text-white font-bold shadow-2xl hover:from-yellow-500 hover:to-yellow-400 transform active:scale-[0.98] transition-all flex items-center justify-center space-x-2"
+                  disabled={!stripeReady || isInitializing}
+                  className={`w-full py-4 mt-4 rounded-2xl font-bold shadow-2xl transition-all flex items-center justify-center space-x-2 ${
+                    !stripeReady || isInitializing
+                      ? 'bg-white/10 text-white/30 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-yellow-600 to-yellow-500 text-white hover:from-yellow-500 hover:to-yellow-400 transform active:scale-[0.98]'
+                  }`}
                 >
-                  {isInitializing ? (
+                  {!stripeReady ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5 text-white/40" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span>{t('load_payment')}</span>
+                    </>
+                  ) : isInitializing ? (
                     <>
                       <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

@@ -32,11 +32,11 @@
   color: #1f1718 !important;
 }
 
-/* But keep white text on edit profile button - force white in light mode */
-:global([data-theme='light']) button.from-\[\#8B4049\].to-\[\#5C2A2E\] .text-white,
-:global([data-theme='light']) button.from-\[\#8B4049\].to-\[\#5C2A2E\] span,
-:global([data-theme='light']) .profileCard .from-\[\#8B4049\] .text-white,
-:global([data-theme='light']) .profileCard .to-\[\#5C2A2E\] .text-white {
+/* Keep edit profile button text white in both modes */
+:global([data-theme='light']) .profileCard :global(button.text-white) {
+  color: #ffffff !important;
+}
+:global([data-theme='light']) .profileCard :global(button.text-white svg) {
   color: #ffffff !important;
 }
 

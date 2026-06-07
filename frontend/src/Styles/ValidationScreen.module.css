@@ -85,4 +85,14 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  /* Light gold container — only visible in light mode */
+  .lightGoldContainer {
+    border: 1px solid transparent;
+  }
+
+  :global([data-theme='light']) .lightGoldContainer {
+    background: linear-gradient(to bottom right, rgba(212, 175, 55, 0.15), rgba(185, 150, 15, 0.10));
+    border-color: rgba(212, 175, 55, 0.20);
+  }
 }

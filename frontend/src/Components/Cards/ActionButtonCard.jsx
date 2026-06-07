@@ -31,7 +31,7 @@ const ActionButtonCard = ({
         if (variant === 'validation') {
             return (
                 <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-xl bg-black/20 flex items-center justify-center">
                         {icon}
                     </div>
                     <div className="flex-1 text-left">
@@ -39,7 +39,7 @@ const ActionButtonCard = ({
                         {description && <p className="text-white/50 text-sm">{description}</p>}
                     </div>
                     {showArrow && (
-                        <svg className="w-6 h-6 text-white/40 group-hover:text-yellow-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-6 h-6 text-white/40 group-hover:text-white/80 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/>
                         </svg>
                     )}

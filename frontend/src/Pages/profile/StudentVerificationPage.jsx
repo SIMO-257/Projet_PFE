@@ -116,7 +116,7 @@ export default function StudentVerificationPage() {
     <div className="app-shell">
       <div className="app-frame">
         <div className={`${styles.profileCard} app-card`}>
-          <Header title={t('student_verification_title')} />
+          <Header title={t('student_verification_title')} showBackButton={true} onBack={goBack} />
 
           <div className="app-content p-4 space-y-4 overflow-y-auto">
             {/* Already verified */}

@@ -11,21 +11,21 @@ const AdminSettings = () => {
   return (
     <div className="space-y-6 max-w-2xl">
       <div>
-        <h2 className="text-2xl font-bold text-white">Paramètres</h2>
-        <p className="text-white/50">Personnalisez votre expérience d'administration.</p>
+        <h2 className="text-2xl font-bold text-white">{t('admin_settings_title')}</h2>
+        <p className="text-white/50">{t('admin_settings_subtitle')}</p>
       </div>
 
       {/* Appearance Section */}
       <div className="bg-[#1a0507]/80 border border-white/10 rounded-2xl overflow-hidden">
         <div className="px-6 py-5 border-b border-white/5">
-          <h3 className="text-lg font-semibold text-white">Apparence</h3>
+          <h3 className="text-lg font-semibold text-white">{t('admin_settings_appearance')}</h3>
         </div>
         <div className="p-6 space-y-6">
           {/* Dark Mode Toggle */}
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-white font-medium">Mode sombre</p>
-              <p className="text-white/40 text-sm mt-0.5">Thème sombre / clair pour l'interface d'administration</p>
+              <p className="text-white font-medium">{t('admin_settings_dark_mode')}</p>
+              <p className="text-white/40 text-sm mt-0.5">{t('admin_settings_dark_mode_desc')}</p>
             </div>
             <button
               onClick={() => dispatch(toggleTheme())}
@@ -56,8 +56,8 @@ const AdminSettings = () => {
           {/* Language Selector */}
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-white font-medium">Langue</p>
-              <p className="text-white/40 text-sm mt-0.5">Langue de l'interface d'administration</p>
+              <p className="text-white font-medium">{t('admin_settings_language')}</p>
+              <p className="text-white/40 text-sm mt-0.5">{t('admin_settings_language_desc')}</p>
             </div>
             <div className="flex gap-1.5 bg-white/5 rounded-xl p-1">
               {[
@@ -90,8 +90,8 @@ const AdminSettings = () => {
             </svg>
           </div>
           <div>
-            <p className="text-white font-medium">CasaWay Admin v1.0</p>
-            <p className="text-white/40 text-sm">Les paramètres sont sauvegardés automatiquement.</p>
+            <p className="text-white font-medium">{t('admin_settings_version')}</p>
+            <p className="text-white/40 text-sm">{t('admin_settings_save_info')}</p>
           </div>
         </div>
       </div>

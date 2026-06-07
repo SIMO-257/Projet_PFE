@@ -40,17 +40,17 @@
     scrollbar-width: none;
   }
 
-  /* Light mode overrides for wallet page */
-  :global([data-theme='light']) .walletCard h3,
+  /* Light mode overrides for wallet page - DISABLED to keep dark mode appearance */
+  /* :global([data-theme='light']) .walletCard h3,
   :global([data-theme='light']) .walletCard h2,
   :global([data-theme='light']) .walletCard p {
     color: #1f1718 !important;
-  }
+  } */
 
-  /* Light mode overrides for balance card labels */
-  :global([data-theme='light']) .walletCard .text-white-force\/70 {
+  /* Light mode overrides for balance card labels - DISABLED */
+  /* :global([data-theme='light']) .walletCard .text-white-force\/70 {
     color: rgba(31, 23, 24, 0.7) !important;
-  }
+  } */
 
   /* Keep white text on dark gradient cards */
   :global([data-theme='light']) .walletCard .text-white-force {
