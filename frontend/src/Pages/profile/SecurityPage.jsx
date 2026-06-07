@@ -204,9 +204,8 @@ const SecurityPage = () => {
 
     try {
       await setPin(pinTemp, pinPassword);
-      // Success
+      // Success — the backend already sets pin_enabled=true in preferences atomically
       setPinSet(true);
-      await updateUserPreferences({ pin_enabled: true });
       setPinEnabled(true);
       resetPinSetup();
     } catch (err) {
@@ -343,8 +342,8 @@ const SecurityPage = () => {
 
     try {
       await disablePin(pinDisableValue);
+      // Success — the backend already sets pin_enabled=false in preferences atomically
       setPinSet(false);
-      await updateUserPreferences({ pin_enabled: false });
       setPinEnabled(false);
       setShowPinDisable(false);
       setPinDisableValue('');

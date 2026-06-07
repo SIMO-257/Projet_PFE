@@ -38,10 +38,8 @@ class UserPinController extends Controller
             return $this->errorResponse('Ce code PIN est trop simple. Choisissez un code plus sécurisé (pas de séquences évidentes).', 422);
         }
 
+        // Atomically store the PIN hash AND enable pin_enabled in preferences
         $user->pin_hash = Hash::make($pin);
-        $user->save();
-
-        // Also enable pin_enabled in preferences
         $prefs = $user->user_preferences ?? [];
         $prefs['pin_enabled'] = true;
         $user->user_preferences = $prefs;
