@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('phone', 20)->unique()->nullable();
             $table->boolean('is_student')->default(false);
             $table->string('email', 255)->unique();
-            $table->string('recovery_email')->nullable()->after('email');
+            $table->string('recovery_email')->nullable();
             $table->timestamp('recovery_email_verified_at')->nullable();
             $table->string('email_verification_code', 6)->nullable();
             $table->string('email_verification_token')->nullable();
