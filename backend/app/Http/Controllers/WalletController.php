@@ -144,6 +144,25 @@ class WalletController extends Controller
                 'transaction_id' => $transaction?->id,
             ], 'Paiement confirme et traite.');
 
+        } catch (\Stripe\Exception\ApiErrorException $e) {
+            Log::error('Wallet Recharge Confirm Stripe Error: ' . $e->getMessage(), [
+                'payment_intent_id' => $request->paymentIntentId ?? null,
+                'user_id' => Auth::id(),
+                'stripe_code' => $e->getStripeCode(),
+                'http_status' => $e->getHttpStatus(),
+            ]);
+            return $this->errorResponse(
+                app()->isProduction()
+                    ? 'Erreur de paiement.'
+                    : 'Erreur Stripe : ' . $e->getMessage(),
+                500
+            );
+        } catch (\Illuminate\Database\QueryException $e) {
+            Log::error('Wallet Recharge Confirm DB Error: ' . $e->getMessage(), [
+                'payment_intent_id' => $request->paymentIntentId ?? null,
+                'user_id' => Auth::id(),
+            ]);
+            return $this->errorResponse('Erreur de base de donnees lors de la verification.', 500);
         } catch (\Exception $e) {
             Log::error('Wallet Recharge Confirm Error: ' . $e->getMessage(), [
                 'payment_intent_id' => $request->paymentIntentId ?? null,
