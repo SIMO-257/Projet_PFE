@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   useStripe,
   useElements,
@@ -23,6 +23,9 @@ const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel, isCance
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
 
+  // Guard: prevent concurrent / double submissions
+  const submittingRef = useRef(false);
+
   const extractPaymentIntentId = (secret) => {
     if (!secret || typeof secret !== 'string') return null;
     const marker = '_secret_';
@@ -31,6 +34,68 @@ const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel, isCance
     return secret.slice(0, idx);
   };
 
+  // Shared payment logic — called by both form submit and Express Checkout
+  const doConfirmPayment = async () => {
+    if (!stripe || !elements) {
+      return { error: { message: 'Stripe not loaded' } };
+    }
+
+    const { error: submitError } = await elements.submit();
+    if (submitError) return { error: submitError };
+
+    const result = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: `${window.location.origin}/payment-confirmation`,
+      },
+      redirect: 'if_required',
+    });
+
+    return result;
+  };
+
+  const handlePaymentResult = async (result) => {
+    if (result.error) {
+      console.error('[Stripe] Confirm error:', result.error);
+      const errorMsg = result.error.message || t('unexpected_error');
+
+      notificationService
+        .logFailure({
+          type: 'payment',
+          title: 'Echec de paiement',
+          body: `La transaction de ${amount} DH a echoue : ${errorMsg}`,
+          meta: { error: errorMsg, amount },
+        })
+        .catch(() => {});
+
+      if (result.error.type === 'card_error' || result.error.type === 'validation_error') {
+        setMessage(errorMsg);
+      } else {
+        setMessage(t('payment_failed_desc'));
+      }
+      return { error: result.error };
+    }
+
+    console.log('[Stripe] Payment successful:', result.paymentIntent);
+
+    const paymentIntentId = result.paymentIntent?.id || extractPaymentIntentId(clientSecret);
+    if (!paymentIntentId) {
+      setMessage(t('payment_failed_desc'));
+      return { error: { message: 'Missing payment intent ID' } };
+    }
+
+    try {
+      await confirmRecharge({ paymentIntentId });
+      onSuccess(paymentIntentId);
+      return {};
+    } catch (confirmErr) {
+      const msg = confirmErr?.response?.data?.message || t('payment_failed_desc');
+      setMessage(msg);
+      return { error: { message: msg } };
+    }
+  };
+
+  // ── Form submit handler ──
   const handleSubmit = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
 
@@ -39,77 +104,54 @@ const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel, isCance
       return;
     }
 
+    // Prevent double-submission
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+
     setIsLoading(true);
     dispatch(setGlobalLoading(true));
     setMessage(null);
 
     try {
-      const { error: submitError } = await elements.submit();
-      if (submitError) {
-        console.error('[Stripe] Submit error:', submitError);
-        setMessage(submitError.message);
-        setIsLoading(false);
-        dispatch(setGlobalLoading(false));
-        return;
-      }
-
-      const result = await stripe.confirmPayment({
-        elements,
-        confirmParams: {
-          return_url: `${window.location.origin}/payment-confirmation`,
-        },
-        redirect: 'if_required',
-      });
-
-      if (result.error) {
-        console.error('[Stripe] Confirm error:', result.error);
-        const errorMsg = result.error.message || t('unexpected_error');
-
-        notificationService
-          .logFailure({
-            type: 'payment',
-            title: 'Echec de paiement',
-            body: `La transaction de ${amount} DH a echoue : ${errorMsg}`,
-            meta: { error: errorMsg, amount },
-          })
-          .catch((logErr) => {
-            console.error('Failed to log notification:', logErr);
-          });
-
-        if (result.error.type === 'card_error' || result.error.type === 'validation_error') {
-          setMessage(errorMsg);
-        } else {
-          setMessage(t('payment_failed_desc'));
-        }
-        dispatch(setGlobalLoading(false));
-      } else {
-        console.log('[Stripe] Payment successful:', result.paymentIntent);
-
-        const paymentIntentId = result.paymentIntent?.id || extractPaymentIntentId(clientSecret);
-        if (!paymentIntentId) {
-          setMessage(t('payment_failed_desc'));
-          setIsLoading(false);
-          dispatch(setGlobalLoading(false));
-          return;
-        }
-
-        try {
-          await confirmRecharge({ paymentIntentId });
-          onSuccess(paymentIntentId);
-        } catch (confirmErr) {
-          setMessage(
-            confirmErr?.response?.data?.message ||
-              t('payment_failed_desc')
-          );
-          dispatch(setGlobalLoading(false));
-        }
-      }
+      const result = await doConfirmPayment();
+      await handlePaymentResult(result);
     } catch (err) {
       console.error('[Stripe] Unexpected error:', err);
       setMessage(t('unexpected_error'));
-      dispatch(setGlobalLoading(false));
     } finally {
       setIsLoading(false);
+      dispatch(setGlobalLoading(false));
+      submittingRef.current = false;
+    }
+  };
+
+  // ── Express Checkout handler ──
+  // ExpressCheckoutElement calls this on authorisation. Must return { error } on failure.
+  const handleExpressCheckout = async () => {
+    if (!stripe || !elements) {
+      return { error: { message: 'Stripe not loaded', code: 'stripe_not_loaded' } };
+    }
+
+    if (submittingRef.current) {
+      return { error: { message: 'Payment already in progress', code: 'in_progress' } };
+    }
+    submittingRef.current = true;
+
+    setIsLoading(true);
+    dispatch(setGlobalLoading(true));
+    setMessage(null);
+
+    try {
+      const result = await doConfirmPayment();
+      return await handlePaymentResult(result);
+    } catch (err) {
+      console.error('[Stripe] Express Checkout error:', err);
+      setMessage(t('unexpected_error'));
+      return { error: { message: t('unexpected_error'), code: 'unexpected' } };
+    } finally {
+      setIsLoading(false);
+      dispatch(setGlobalLoading(false));
+      submittingRef.current = false;
     }
   };
 
@@ -121,7 +163,7 @@ const StripeCheckoutForm = ({ amount, clientSecret, onSuccess, onCancel, isCance
     <form id="payment-form" onSubmit={handleSubmit} className="space-y-6">
       <div className="mb-8">
         <h3 className="text-white/40 text-[10px] uppercase font-bold mb-4 tracking-widest">{t('express_checkout')}</h3>
-        <ExpressCheckoutElement onConfirm={handleSubmit} />
+        <ExpressCheckoutElement onConfirm={handleExpressCheckout} />
       </div>
 
       <div className="relative py-4">

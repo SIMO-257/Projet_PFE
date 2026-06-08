@@ -42,7 +42,7 @@ class EmailVerificationController extends Controller
         }
 
         // Create the real user
-        $newUser = User::create([
+        User::create([
             'email' => $pending->email,
             'phone' => $pending->phone,
             'password_hash' => $pending->password_hash,
