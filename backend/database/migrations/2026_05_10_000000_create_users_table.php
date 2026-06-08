@@ -24,7 +24,7 @@ return new class extends Migration
             $table->boolean('is_student')->default(false);
             $table->string('email', 255)->unique();
             $table->string('recovery_email')->nullable()->after('email');
-            $table->timestamp('recovery_email_verified_at')->nullable()->after('recovery_email');
+            $table->timestamp('recovery_email_verified_at')->nullable();
             $table->string('email_verification_code', 6)->nullable();
             $table->string('email_verification_token')->nullable();
             $table->timestamp('email_verified_at')->nullable();
