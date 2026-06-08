@@ -90,3 +90,4 @@ class Transaction extends Model
             }
         });
     }
+}
