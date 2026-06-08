@@ -133,7 +133,7 @@ class WalletController extends Controller
                         'error' => $notificationError->getMessage(),
                     ]);
                 }
-            });
+            }, 5);  // Retry up to 5 times on deadlock
 
             $wallet = Wallet::where('user_id', $user->id)->first();
 
