@@ -1,6 +1,7 @@
-#!/bin/sh
+#!/bin/sh# 1. Run pending database migrations (safe: each migration is idempotent with hasColumn guards)
+php artisan migrate --force --ansi 2>&1 || echo "[entrypoint] WARNING: migrations failed -- check logs"
 
-# 1. Optimize Laravel for production — clear stale cache then rebuild
+# 2. Optimize Laravel for production — clear stale cache then rebuild
 # Each command uses || true so a single failure (e.g. route closures) doesn't
 # prevent the container from starting with the remaining optimizations active.
 php artisan optimize:clear
