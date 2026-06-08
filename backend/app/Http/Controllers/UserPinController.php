@@ -40,10 +40,31 @@ class UserPinController extends Controller
 
         // Atomically store the PIN hash AND enable pin_enabled in preferences
         $user->pin_hash = Hash::make($pin);
-        $prefs = $user->user_preferences ?? [];
+
+        try {
+            $prefs = $user->user_preferences ?? [];
+        } catch (\Throwable $e) {
+            Log::error('Failed to decode user_preferences while setting PIN', [
+                'user_id' => $user->id,
+                'error'   => $e->getMessage(),
+            ]);
+            $prefs = [];
+        }
+
         $prefs['pin_enabled'] = true;
         $user->user_preferences = $prefs;
-        $user->save();
+
+        try {
+            $user->save();
+        } catch (\Throwable $e) {
+            Log::error('Failed to save PIN', [
+                'user_id' => $user->id,
+                'error'   => $e->getMessage(),
+            ]);
+            return $this->errorResponse('Erreur lors de l\'enregistrement du code PIN.', 500);
+        }
+
+        Log::info('PIN set successfully', ['user_id' => $user->id]);
 
         return $this->successResponse(null, 'Code PIN créé avec succès.');
     }
@@ -117,10 +138,31 @@ class UserPinController extends Controller
 
         // Clear the PIN hash and disable in preferences
         $user->pin_hash = null;
-        $prefs = $user->user_preferences ?? [];
+
+        try {
+            $prefs = $user->user_preferences ?? [];
+        } catch (\Throwable $e) {
+            Log::error('Failed to decode user_preferences while disabling PIN', [
+                'user_id' => $user->id,
+                'error'   => $e->getMessage(),
+            ]);
+            $prefs = [];
+        }
+
         $prefs['pin_enabled'] = false;
         $user->user_preferences = $prefs;
-        $user->save();
+
+        try {
+            $user->save();
+        } catch (\Throwable $e) {
+            Log::error('Failed to save PIN disable', [
+                'user_id' => $user->id,
+                'error'   => $e->getMessage(),
+            ]);
+            return $this->errorResponse('Erreur lors de la désactivation du code PIN.', 500);
+        }
+
+        Log::info('PIN disabled successfully', ['user_id' => $user->id]);
 
         // Revoke any active PIN verification tokens
         try {
@@ -182,15 +224,33 @@ class UserPinController extends Controller
         // Generate a new random 4-digit PIN (avoid trivial sequences)
         $newPin = $this->generateSecurePin();
 
-        // Store the new PIN hash
+        // Atomically store the new PIN hash AND enable pin_enabled
         $user->pin_hash = Hash::make($newPin);
-        $user->save();
 
-        // Also enable pin_enabled in preferences
-        $prefs = $user->user_preferences ?? [];
+        try {
+            $prefs = $user->user_preferences ?? [];
+        } catch (\Throwable $e) {
+            Log::error('Failed to decode user_preferences while resetting PIN', [
+                'user_id' => $user->id,
+                'error'   => $e->getMessage(),
+            ]);
+            $prefs = [];
+        }
+
         $prefs['pin_enabled'] = true;
         $user->user_preferences = $prefs;
-        $user->save();
+
+        try {
+            $user->save();
+        } catch (\Throwable $e) {
+            Log::error('Failed to save PIN reset', [
+                'user_id' => $user->id,
+                'error'   => $e->getMessage(),
+            ]);
+            return $this->errorResponse('Erreur lors de la réinitialisation du code PIN.', 500);
+        }
+
+        Log::info('PIN reset successfully', ['user_id' => $user->id]);
 
         // Send the new PIN via email (will use recovery_email if set, thanks to routeNotificationForMail)
         try {
